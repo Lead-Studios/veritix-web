@@ -6,10 +6,12 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
 import Help from './pages/Help';
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
   <>
+  <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
