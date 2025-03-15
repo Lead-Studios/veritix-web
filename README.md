@@ -24,11 +24,6 @@ npm install
 npm start
 ```
 
-## Usage
-Instructions on how to use the VeriTix platform:
 
 ## Contributing
 Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
