@@ -1,5 +1,7 @@
 import React from 'react';
 
+// import SignUpForm from '../components/forms/SignUpForm';
+// import SignInForm from '../components/forms/SignInForm';
 function Home() {
   return (
     <div className='max-w-4xl mx-auto'>
