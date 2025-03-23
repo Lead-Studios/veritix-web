@@ -1,13 +1,15 @@
-import { Outlet } from "react-router-dom";
-import Footer from "../Footer";
-import React from "react";
-import Navbar from "../Navbar";
+import { Outlet } from 'react-router-dom';
+import Footer from '../Footer';
+import React from 'react';
+import Navbar from '../Navbar';
 
 function LandingLayout() {
   return (
     <>
       <Navbar />
-      <Outlet />
+      <main className='mt-20'>
+        <Outlet />
+      </main>
       <Footer />
     </>
   );
