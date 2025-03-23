@@ -12,11 +12,11 @@ function Footer() {
           {/* Brand Section */}
           <div className='w-full  lg:w-[320px]'>
             <div className='flex items-center space-x-1'>
-              <IoTicket className='w-8 h-7 rotate-[80deg]' />
+              <IoTicket className='w-5 h-5 sm:w-8 sm:h-7 rotate-[80deg]' />
               <img
                 src={'/veritix_logo.svg'}
                 alt='Veritixlogo'
-                className='w-16 h-16'
+                className='w-14 h-14 sm:w-16 sm:h-16'
               />
             </div>
             <p className='text-gray-300 text-sm mt-4 max-md:w-full max-lg:w-[70%]'>

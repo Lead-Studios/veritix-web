@@ -21,7 +21,7 @@ function Navbar() {
             <img
               src={'/veritix_logo.svg'}
               alt='Veritixlogo'
-              className='w-24 h-24'
+              className='w-16 h-16 sm:w-24 sm:h-24'
             />
           </Link>
 
