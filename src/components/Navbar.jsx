@@ -53,7 +53,6 @@ function Navbar() {
           <div className='hidden md:flex items-center space-x-4 lg:space-x-8 whitespace-nowrap max-lg:text-sm'>
             <NavLink to='/'>Home</NavLink>
             <NavLink to='/upcoming-events'>Upcoming Events</NavLink>
-            <NavLink to='/how-it-works'>How it Works</NavLink>
           </div>
           <div className='hidden md:flex space-x-4 lg:space-x-8 items-center whitespace-nowrap max-lg:text-sm'>
             <Link
