@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 import { Outlet } from "react-router-dom";
 
 function AuthLayout() {
   return (
-    <div className="auth-container">
+    <div className="min-h-screen flex bg-[#e7fdff]">
       <Outlet />
     </div>
   );
