@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaDiscord, FaFacebook } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
 import { IoTicket } from 'react-icons/io5';
 
 function Footer() {
@@ -80,7 +78,7 @@ function Footer() {
                 <Link to='/promoters' className='hover:text-[#00FFA0]'>
                   Promoters
                 </Link>
-                <Link to='/how-it-works' className='hover:text-[#00FFA0]'>
+                <Link to='/about' className='hover:text-[#00FFA0]'>
                   How it Works
                 </Link>
               </div>

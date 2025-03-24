@@ -1,6 +1,30 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import React, { useState } from 'react';
 import { HiMenu, HiX } from 'react-icons/hi';
+import PropTypes from 'prop-types';
+
+function NavLink({ to, children }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`${
+        isActive
+          ? 'text-[#00FFA0] border-b-2 border-[#00FFA0]'
+          : 'text-white hover:text-[#00FFA0] border-b-2 border-transparent'
+      } pb-1 transition-colors ease-in-out duration-300 !cursor-pointer`}
+    >
+      {children}
+    </Link>
+  );
+}
+
+NavLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,28 +51,13 @@ function Navbar() {
 
           {/* Desktop Menu */}
           <div className='hidden md:flex items-center space-x-4 lg:space-x-8 whitespace-nowrap max-lg:text-sm'>
-            <Link
-              to='/'
-              className='text-[#00FFA0] border-b-2 border-[#00FFA0] pb-1'
-            >
-              Home
-            </Link>
-            <Link
-              to='/upcoming-events'
-              className='text-white hover:text-[#00FFA0] transition-colors'
-            >
-              Upcoming Events
-            </Link>
-            <Link
-              to='/how-it-works'
-              className='text-white hover:text-[#00FFA0] transition-colors'
-            >
-              How it Works
-            </Link>
+            <NavLink to='/'>Home</NavLink>
+            <NavLink to='/upcoming-events'>Upcoming Events</NavLink>
+            <NavLink to='/how-it-works'>How it Works</NavLink>
           </div>
           <div className='hidden md:flex space-x-4 lg:space-x-8 items-center whitespace-nowrap max-lg:text-sm'>
             <Link
-              to='/connect-wallet'
+              to='#'
               className='text-[#00FFA0] border border-[#00FFA0] px-6 py-2 rounded-full hover:bg-[#00FFA0] hover:text-[#000625] transition-colors'
             >
               Connect Wallet
