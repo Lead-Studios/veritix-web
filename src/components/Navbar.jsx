@@ -63,7 +63,7 @@ function Navbar() {
               Connect Wallet
             </Link>
             <Link
-              to='/sign-up'
+              to='/signup'
               className='bg-[#00FFA0] text-[#000625] px-6 py-2 rounded-full font-medium hover:bg-[#00FFA0]/90 transition-colors'
             >
               Sign Up
