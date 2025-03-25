@@ -3,13 +3,25 @@ import React, { useState } from 'react';
 import { HiMenu, HiX } from 'react-icons/hi';
 import PropTypes from 'prop-types';
 
-function NavLink({ to, children }) {
+function NavLink({ to, children, onClick }) {
   const location = useLocation();
   const isActive = location.pathname === to;
+
+  const handleClick = (e) => {
+    if (to.startsWith('#')) {
+      e.preventDefault();
+      const element = document.querySelector(to);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (onClick) onClick();
+    }
+  };
 
   return (
     <Link
       to={to}
+      onClick={handleClick}
       className={`${
         isActive
           ? 'text-[#00FFA0] border-b-2 border-[#00FFA0]'
@@ -24,6 +36,7 @@ function NavLink({ to, children }) {
 NavLink.propTypes = {
   to: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  onClick: PropTypes.func,
 };
 
 function Navbar() {
@@ -53,6 +66,7 @@ function Navbar() {
           <div className='hidden md:flex items-center space-x-4 lg:space-x-8 whitespace-nowrap max-lg:text-sm'>
             <NavLink to='/'>Home</NavLink>
             <NavLink to='/upcoming-events'>Upcoming Events</NavLink>
+            <NavLink to='#how-it-works'>How it Works</NavLink>
           </div>
           <div className='hidden md:flex space-x-4 lg:space-x-8 items-center whitespace-nowrap max-lg:text-sm'>
             <Link

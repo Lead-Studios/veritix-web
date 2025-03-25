@@ -19,7 +19,7 @@ function App() {
         <Route element={<LandingLayout />}>
           <Route path='/' element={<Home />} />
           <Route path='/upcoming-events' element={<Events />} />
-          <Route path='/about' element={<About />} />
+          <Route path='/how-it-works' element={<About />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/pricing' element={<Pricing />} />
           <Route path='/help' element={<Help />} />

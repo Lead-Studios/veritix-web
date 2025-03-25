@@ -62,24 +62,24 @@ const HowItWorks = () => {
   });
 
   return (
-    <div className="min-h-screen py-16 md:py-24 overflow-hidden" style={{
-      background: 'linear-gradient(180deg, #011217 0%, #013237 100%)'
-    }}>
-      <div className="container mx-auto px-4 md:px-6">
+    <div className="min-h-screen py-16 md:py-24 overflow-hidden bg-[#101428] "
+      id="how-it-works"
+    >
+      <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="text-center mb-16 md:mb-24"
         >
-          <motion.h2 
+          <motion.h2
             variants={itemVariants}
             className="font-['FONTSPRING_DEMO-Poly'] text-[36px] md:text-[48px] font-semibold text-white"
           >
             How It Works
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="font-['Poly'] text-[18px] md:text-[20px] text-gray-300 max-w-2xl mx-auto"
           >
@@ -93,9 +93,9 @@ const HowItWorks = () => {
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full flex flex-col items-center">
             {/* Top Dot */}
             <div className="w-[5px] h-[5px] rounded-full bg-[#A3E6EB]" />
-            
+
             {/* Dotted Line */}
-            <motion.div 
+            <motion.div
               initial={{ height: 0 }}
               animate={{ height: '100%' }}
               transition={{ duration: 1 }}
@@ -104,13 +104,13 @@ const HowItWorks = () => {
                 background: 'repeating-linear-gradient(to bottom, #A3E6EB 0px, #A3E6EB 8px, transparent 8px, transparent 20px)'
               }}
             />
-            
+
             {/* Bottom Dot */}
             <div className="w-[5px] h-[5px] rounded-full bg-[#A3E6EB]" />
           </div>
 
           {/* Steps List */}
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate={inView ? "visible" : "hidden"}
@@ -125,11 +125,11 @@ const HowItWorks = () => {
                   className="relative pt-[70px] lg:pt-[10px]"
                 >
                   {/* Timeline Dot with Number */}
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="absolute left-[46.5%] lg:left-[47.5%] xl:left-[48%] transform top-[30px] w-[50px] h-[50px] bg-[#E7FDFF] rounded-full flex items-center justify-center cursor-pointer transition-shadow hover:shadow-lg" 
-                    style={{ 
+                    className="absolute left-[44.5%] sm:left-[46.5%] lg:left-[47.5%] xl:left-[48%] transform top-[30px] w-[50px] h-[50px] bg-[#E7FDFF] rounded-full flex items-center justify-center cursor-pointer transition-shadow hover:shadow-lg"
+                    style={{
                       border: '1px solid #A3E6EB',
                       zIndex: 30
                     }}
@@ -252,6 +252,30 @@ const HowItWorks = () => {
               );
             })}
           </motion.div>
+        </div>
+      </div>
+
+      {/* Make Your Own Event Section */}
+      <div className="bg-[#000625] py-12 mt-20">
+        <div className="flex flex-col md:flex-row items-center max-w-[1440px] mx-auto px-4 md:px-12">
+          <div className="w-full md:w-1/2">
+            <img
+              src="/public/images/how-it-works/5.png"
+              alt="Make your own event"
+              className="w-full max-w-[400px] h-auto mx-auto"
+            />
+          </div>
+          <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0">
+            <h3 className="text-[28px] md:text-[34px] font-bold text-white mb-3">
+              Make your own Event
+            </h3>
+            <p className="text-[14px] md:text-[16px] text-gray-300 mb-6">
+              From live concerts to NFT drops, bring your events to life with us. Create, promote, and sell tickets your way!
+            </p>
+            <button className="bg-[#00FFA0] text-[#000625] px-8 py-2.5 rounded-full font-medium hover:bg-[#00FFA0]/90 transition-colors">
+              Create Event
+            </button>
+          </div>
         </div>
       </div>
     </div>
