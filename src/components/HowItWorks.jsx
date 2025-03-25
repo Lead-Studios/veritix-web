@@ -256,13 +256,13 @@ const HowItWorks = () => {
       </div>
 
       {/* Make Your Own Event Section */}
-      <div className="bg-[#000625] py-12 mt-20">
-        <div className="flex flex-col md:flex-row items-center max-w-[1440px] mx-auto px-4 md:px-12">
-          <div className="w-full md:w-1/2">
+      <div className="bg-[#000625] mt-20 py-12 md:py-0">
+        <div className="flex flex-col md:flex-row items-center max-w-[1440px] mx-auto px-4 md:px-12 md:h-screen md:max-h-[252px]">
+          <div className="w-full md:w-1/2 flex justify-center md:justify-start">
             <img
               src="/public/images/how-it-works/5.png"
               alt="Make your own event"
-              className="w-full max-w-[400px] h-auto mx-auto"
+              className="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[545px] h-auto md:pb-[6px] lg:pb-[52px] object-contain"
             />
           </div>
           <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0">
