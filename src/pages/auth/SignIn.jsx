@@ -25,7 +25,7 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="relative overflow-x-hidden flex w-full justify-between items-start min-h-full px-8 gap-4 py-[42px]">
+    <div className="relative flex items-start justify-between w-full min-h-full gap-6 px-8 py-8 mx-auto overflow-hidden max-w-7xl">
       {/* Left Section - Login Form */}
       <div className="flex w-full h-full md:w-1/2 ">
         <div className="flex flex-col items-center justify-between w-full">
@@ -95,7 +95,7 @@ export default function SignInForm() {
             </button>
           </form>
 
-          <div className="flex flex-col items-center justify-end flex-1 w-full">
+          <div className="flex flex-col items-center justify-start flex-1 w-full mt-5">
             <p className="">
               Already have an account ?
               <NavLink to="/signup" className="inline ml-1 font-bold">
@@ -106,12 +106,12 @@ export default function SignInForm() {
         </div>
       </div>
       {/* Right Section - Image */}
-      <div className="relative hidden w-1/2 h-full rounded-3xl md:block">
+      <div className="relative flex-grow-0 hidden w-1/2 h-full rounded-3xl md:block">
         {/* Background Image */}
         <img
           src={"/Images/sign_asset_1.svg"}
           alt="Veritixlogo"
-          className="object-cover w-full h-full rounded-3xl"
+          className="object-cover w-full h-full rounded-3xl signin-img"
         />
         <div className="absolute inset-0 z-0 flex flex-col w-full h-full px-10 rounded-3xl py-9">
           <div className="flex items-center justify-between w-full">
@@ -122,29 +122,24 @@ export default function SignInForm() {
             />
             <NavLink
               to="/"
-              className="rounded-3xl font-poly flex justify-between items-center gap-4 text-2xl text-[#013237] bg-[#E7FDFF] py-4 px-6"
+              className="rounded-3xl font-poly flex justify-between items-center gap-4 text-2xl text-[#013237] bg-[#E7FDFF] py-3 px-6"
             >
               Back
               <ArrowRightIcon />
             </NavLink>
           </div>
 
-          <div className="flex flex-col items-center justify-end flex-1 gap-5 mb-48">
-            <h1 className="font-medium text-center leading-[70px] text-[64px] text-white">
+          <div className="flex flex-col items-center justify-center flex-1 gap-5 mt-10 mb-0">
+            <h1 className="text-[56px] leading-[56px] font-medium text-center text-white">
               Start Your Event Journey 🚀
             </h1>
-            <p className="text-3xl font-light text-center text-white">
+            <p className="text-xl font-light text-center text-white">
               Sign up to unlock NFT tickets, crypto rewards, and exclusive
               access. Your adventure in live events and Web3 begins here!
             </p>
           </div>
         </div>
       </div>
-      <img
-        src={"/Images/sign_asset_2.svg"}
-        alt="Veritixlogo"
-        className="absolute bottom-0 right-0 hidden translate-x-20 md:block"
-      />
     </div>
   );
 }
