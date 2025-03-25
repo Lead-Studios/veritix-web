@@ -256,28 +256,6 @@ const HowItWorks = () => {
       </div>
 
       {/* Make Your Own Event Section */}
-      <div className="bg-[#000625] mt-20 py-12 md:py-0">
-        <div className="flex flex-col md:flex-row items-center max-w-[1440px] mx-auto px-4 md:px-12 md:h-screen md:max-h-[252px]">
-          <div className="w-full md:w-1/2 flex justify-center md:justify-start">
-            <img
-              src="/public/images/how-it-works/5.png"
-              alt="Make your own event"
-              className="w-full max-w-[300px] sm:max-w-[400px] md:max-w-[545px] h-auto md:pb-[6px] lg:pb-[52px] object-contain"
-            />
-          </div>
-          <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0">
-            <h3 className="text-[28px] md:text-[34px] font-bold text-white mb-3">
-              Make your own Event
-            </h3>
-            <p className="text-[14px] md:text-[16px] text-gray-300 mb-6">
-              From live concerts to NFT drops, bring your events to life with us. Create, promote, and sell tickets your way!
-            </p>
-            <button className="bg-[#00FFA0] text-[#000625] px-8 py-2.5 rounded-full font-medium hover:bg-[#00FFA0]/90 transition-colors">
-              Create Event
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
