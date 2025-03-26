@@ -1,6 +1,9 @@
 // import SignUpForm from '../components/forms/SignUpForm';
 // import SignInForm from '../components/forms/SignInForm';
-import HowItWorksSection from "../components/HowItWorks";
+
+import HowItWorksSection from '../components/HowItWorks';
+import BottomBanner from '../components/BottomBanner';
+
 
 import React from "react";
 import TrendingEvent from "../components/TrendingEvent";
@@ -15,12 +18,16 @@ function Home() {
         <img src="/Images/Vector.svg" className="absolute -top-52 right-0" />
         <TrendingEvent />
         <HowItWorksSection />
+    <BottomBanner />
 
-        {/* <SignInForm /> */}
-        {/* <SignUpForm /> */}
-      </div>
+
+
+      {/* <SignInForm /> */}
+      {/* <SignUpForm /> */}
+
     </div>
   );
 }
+
 
 export default Home;
