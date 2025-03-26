@@ -43,6 +43,11 @@ function TrendingEvent({}: Props) {
           ))}
         </div>
       </div>
+      <div className="mt-12 flex flex-col items-center">
+        <button className="border-[#00FFA0] text-center border rounded-[50px] px-6 py-2 text-[#00FFA0] font-normal lg:text-2xl md:text-lg text-base">
+          Explore Events
+        </button>
+      </div>
     </div>
   );
 }
