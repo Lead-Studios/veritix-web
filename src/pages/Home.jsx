@@ -1,6 +1,7 @@
 // import SignUpForm from '../components/forms/SignUpForm';
 // import SignInForm from '../components/forms/SignInForm';
 import HowItWorksSection from '../components/HowItWorks';
+import BottomBanner from '../components/BottomBanner';
 
 import React from "react";
 
@@ -12,11 +13,14 @@ function Home() {
       </h1>
 
       <HowItWorksSection />
+      <BottomBanner />
+
 
       {/* <SignInForm /> */}
       {/* <SignUpForm /> */}
     </div>
   );
 }
+
 
 export default Home;
