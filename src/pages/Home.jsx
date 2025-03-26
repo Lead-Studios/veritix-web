@@ -1,23 +1,26 @@
-// import React from 'react';
+// import SignUpForm from '../components/forms/SignUpForm';
+// import SignInForm from '../components/forms/SignInForm';
+import HowItWorksSection from '../components/HowItWorks';
 
 import React from "react";
 import TrendingEvent from "../components/TrendingEvent";
 
-// import SignUpForm from '../components/forms/SignUpForm';
-// import SignInForm from '../components/forms/SignInForm';
 function Home() {
   return (
-    <div className="flex flex-col relative w-full bg-transparent ">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Welcome to Our Website
-        </h1>
 
-        {/* <SignInForm /> */}
-        {/* <SignUpForm /> */}
-      </div>
+    <div className="flex flex-col relative w-full bg-transparent ">
+ 
+    <div className="mx-auto">
+      <h1 className="mb-4 text-3xl font-bold text-gray-800">
+        Welcome to Our Website
+      </h1>
       <img src="/Images/Vector.svg" className="absolute -top-52 right-0" />
       <TrendingEvent />
+      <HowItWorksSection />
+
+      {/* <SignInForm /> */}
+      {/* <SignUpForm /> */}
+    </div>
     </div>
   );
 }
