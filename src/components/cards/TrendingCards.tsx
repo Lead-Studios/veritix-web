@@ -8,7 +8,7 @@ function TrendingCards({}: Props) {
     <motion.div
       className="h-[350px] rounded-[20px] relative flex items-center justify-center w-full bg-[#00FFA01A] hover:bg-gradient-to-b from-[#E7FDFF] to-[#000625] group transition-all duration-300"
       whileHover={{ scale: 1.20 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5 , ease: "easeInOut"}}
     >
       <div className="z-10 px-[3%] flex-row flex absolute w-full justify-between top-5">
         <button
