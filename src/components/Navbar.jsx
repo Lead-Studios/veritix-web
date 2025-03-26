@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
@@ -49,11 +50,13 @@ function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full bg-[#000625] z-50">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
         <div className="flex items-center justify-between h-16 space-x-4 lg:space-x-8">
           {/* Logo */}
           <Link
             to="/"
             className="flex items-center space-x-2 text-2xl font-bold text-white"
+
           >
             <img
               src={"/veritix_logo.svg"}
@@ -63,12 +66,14 @@ function Navbar() {
           </Link>
 
           {/* Desktop Menu */}
+
           <div className="items-center hidden space-x-4 md:flex lg:space-x-8 whitespace-nowrap max-lg:text-sm">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/upcoming-events">Upcoming Events</NavLink>
             <NavLink to="#how-it-works">How it Works</NavLink>
           </div>
           <div className="items-center hidden space-x-4 md:flex lg:space-x-8 whitespace-nowrap max-lg:text-sm">
+
             <Link
               to="#"
               className="text-[#00FFA0] border border-[#00FFA0] px-6 py-2 rounded-full hover:bg-[#00FFA0] hover:text-[#000625] transition-colors"
@@ -85,7 +90,9 @@ function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+
             className="z-50 text-2xl text-white md:hidden"
+
             onClick={toggleMobileMenu}
           >
             {isMobileMenuOpen ? <HiX /> : <HiMenu />}
@@ -99,7 +106,9 @@ function Navbar() {
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         } md:hidden`}
       >
+
         <div className="flex flex-col px-6 pt-20 space-y-6">
+
           <Link
             to="/"
             className="text-[#00FFA0] text-lg border-b border-[#00FFA0] pb-1 w-fit"
@@ -109,14 +118,18 @@ function Navbar() {
           </Link>
           <Link
             to="/upcoming-events"
+
             className="text-lg text-white"
+
             onClick={toggleMobileMenu}
           >
             Upcoming Events
           </Link>
           <Link
             to="/how-it-works"
+
             className="text-lg text-white"
+
             onClick={toggleMobileMenu}
           >
             How it Works
