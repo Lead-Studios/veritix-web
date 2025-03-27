@@ -6,14 +6,13 @@ import HowItWorksSection from "../components/HowItWorks";
 
 import React from "react";
 import TrendingEvent from "../components/TrendingEvent";
+import Hero from "../components/Hero";
 
 function Home() {
   return (
     <div className="flex flex-col relative w-full bg-transparent ">
       <div className="mx-auto w-full">
-        <h1 className="mb-4 text-3xl font-bold text-gray-800">
-          Welcome to Our Website
-        </h1>
+        <Hero />
         <img src="/Images/Vector.svg" className="absolute -top-52 right-0" />
         <TrendingEvent />
         <HowItWorksSection />
