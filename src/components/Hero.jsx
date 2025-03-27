@@ -30,53 +30,59 @@ const Hero = () => {
   return (
     // <div>Hero</div>
     <section className="relative mx-auto -mt-4 overflow-hidden h-[600px] w-full">
-      <div className='absolute inset-0 z-0 bg-gradient-to-r from-[#000625] to-[#455A64] h-full w-full'>
-        <img src="/Images/bg.svg" alt="bg" className='h-full w-full object-cover opacity-20'
-          style={{ top: 0, left: 0 }}
-        />
-        {/* <div className=' inset-0' /> */}
-      </div>
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#000625] to-[#455A64] min-h-screen w-full">
+  <img 
+    src="/Images/bg.svg" 
+    alt="bg" 
+    className="absolute inset-0 h-full w-full object-cover opacity-30 sm:opacity-20"
+  />
+</div>
+
       <div className='container relative z-10 mx-auto flex h-full items-center px-4 py-16 md:px-6'>
         <div className='grid gap-8 md:grid-cols-2 md:gap-12'>
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className='flex items-center justify-center'
-          >
-            <div className='relative h-[400px] w-full  overflow-hidden rounded-lg  md:h-[500px]'>
-              <img src="/pp.png" alt="Hero" className='h-full w-full object-cover' style={{ top: 0, left: 0 }} />
+        <motion.div
+  initial={{ opacity: 0, x: -50 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.7, ease: "easeOut" }}
+  className="flex items-center justify-center px-4"
+>
+  <div className="relative w-full max-w-4xl overflow-hidden rounded-lg h-[250px] sm:mt-20 sm:h-[350px] md:h-[450px] lg:h-[500px]">
+    <img
+      src="/pp.png"
+      alt="Hero"
+      className="h-full w-full object-cover"
+    />
+  </div>
+</motion.div>
 
-            </div>
-
-          </motion.div>
           <motion.dev
             variant={containerVariants}
             initial='hidden'
             animate='visible'
             className='flex flex-col justify-center'
           >
-            <div className="flex w-full items-center justify-center">
-              <motion.h1
-                initial="hidden"
-                animate="visible"
-                variants={itemVariants}
-                className="text-[64px] text-white font-bold leading-[100%] tracking-[0%] text-center font-[FONTSPRING]"
-                style={{fontFamily: "FONTSPRING"}}
-              >
-                Discover, Own, and Trade{" "}
-                <span className="whitespace-nowrap">
-                  <span className="text-[#00FFA0]">Event Tickets</span> Reimagined
-                </span>
-              </motion.h1>
-            </div>
+           <div className="flex w-full items-center justify-center px-4">
+  <motion.h1
+    initial="hidden"
+    animate="visible"
+    variants={itemVariants}
+    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight md:leading-[100%] text-center font-[FONTSPRING]"
+    style={{ fontFamily: "FONTSPRING" }}
+  >
+    Discover, Own, and Trade{" "}
+    <span className="block sm:inline">
+      <span className="text-[#00FFA0]">Event Tickets</span> Reimagined
+    </span>
+  </motion.h1>
+</div>
+
             <div className='flex justify-center text-center mt-5'>
-            <motion.p variants={itemVariants} className="w-full max-w-[578px] h-auto rounded-[50px] px-4 py-3 text-[24px] leading-[100%] text-center font-[400] font-[Poly] tracking-[0%] text-white mx-auto">
+            <motion.p variants={itemVariants} className="w-full max-w-[578px] h-auto rounded-[50px] px-4 py-3 md:text-[24px] leading-[100%] text-center font-[400] font-[Poly] tracking-[0%] text-white mx-auto">
               Discover real-life events, mint NFT tickets, and earn rewards with crypto
             </motion.p>
             </div>
             <div className='flex justify-center mt-10'>
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-14">
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-2 md:gap-14">
               {/* Using standard anchor tags instead of React Router */}
               <a
                 href="#"
