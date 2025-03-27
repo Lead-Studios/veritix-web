@@ -29,12 +29,12 @@ const Hero = () => {
     }
   return (
     // <div>Hero</div>
-    <section className='relative  mx-auto mt-[80px] overflow-hidden opacity-90'>
-        <div className='absolute inset-0 z-0'>
-            <img src="/Images/bg.svg" alt="bg" className='absolute h-full w-full object-cover'
+<section className="relative mx-auto mt-0 overflow-hidden opacity-90 bg-gradient-to-r from-[#000625] to-[#455A64] h-[1440]">    
+      <div className='absolute inset-0 z-0'>
+            <img src="/Images/bg.svg" alt="bg" className='h-full w-full object-cover opacity-30'
             style={{ top: 0, left: 0 }}
             />
-            <div className='absolute inset-0 bg-gradient-to-r from-[#000625] to-[#455A64]' />
+            {/* <div className=' inset-0' /> */}
         </div>
         <div className='container relative z-10 mx-auto flex h-full items-center px-4 py-16 md:px-6'>
             <div className='grid gap-8 md:grid-cols-2 md:gap-12'>
