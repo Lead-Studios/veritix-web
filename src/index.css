@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 /* Sign Page */
+@font-face {
+  font-family: "FONTSPRING";
+  src: url("./assets/fontspring-demo-28.ttf") format("ttf");
+  font-weight: 400;
+}
 .sign-right {
   background-image: url("/public/Images/sign_asset_1.svg");
   background-repeat: no-repeat;
@@ -11,3 +16,5 @@
 .signin-img {
   max-height: calc(100vh - 50px);
 }
+
+
