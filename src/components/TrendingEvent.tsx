@@ -1,11 +1,13 @@
 import React from "react";
 import TrendingCards from "./cards/TrendingCards";
+import DIvSkeleton from "./skeleton/DIvSkeleton";
 
 type Props = {};
 
 function TrendingEvent({}: Props) {
   return (
     <div className="h-auto w-full flex flex-col  bg-[#101428] lg:px-4 py-8 lg:py-12 items-center ">
+      
       <div className="flex flex-col items-center mt-8 lg:mt-12   w-full">
         <div className="items-start max-w-[1400px]  px-4 mb-10 flex-col gap-4 lg:gap-0  lg:flex-row flex w-full">
           <div className="w-full ">
