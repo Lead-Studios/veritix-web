@@ -97,13 +97,13 @@ const Hero = () => {
             >
               <a
                 href="#"
-                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px]  bg-[#00FFA0] text-black md:text-lg font-medium shadow-md hover:bg-[#54c49b] transition"
+                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px]  bg-[#00FFA0] text-black md:text-lg font-medium shadow-md hover:bg-[#013237] hover:text-white transition"
               >
                 Create Event
               </a>
               <a
                  href="#"
-                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-[#00FFA0] text-[#00FFA0] text-sm text-center md:text-lg font-medium shadow-md hover:bg-[#81e7c2] hover:text-white transition"
+                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-[#00FFA0] text-[#00FFA0] text-sm text-center md:text-lg font-medium shadow-md hover:bg-[#013237] hover:text-white transition"
 
                >
                  Learn More
