@@ -84,7 +84,7 @@ const Hero = () => {
             {/* Subtitle */}
             <motion.p
               variants={itemVariants}
-              className="w-full max-w-lg mx-auto mt-4 rounded-[50px] px-4 py-3 text-[16px] sm:text-[18px] md:text-[20px] leading-[130%] text-white font-[400] font-[Poly] tracking-[0%]"
+              className="w-full max-w-lg mx-auto mt-4 text-center rounded-[50px] px-4 py-3 text-[16px] sm:text-[18px] md:text-[20px] leading-[130%] text-white font-[400] font-[Poly] tracking-[0%]"
             >
               Discover real-life events, mint NFT tickets, and earn rewards with crypto.
             </motion.p>
@@ -97,13 +97,13 @@ const Hero = () => {
             >
               <a
                 href="#"
-                className="md:w-[158px] md:h-[57px] text-center rounded-[50px] px-[18px] py-[14px] gap-[24px]  bg-[#00FFA0] text-black md:text-lg font-medium shadow-md hover:bg-[#54c49b] transition"
+                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px]  bg-[#00FFA0] text-black md:text-lg font-medium shadow-md hover:bg-[#54c49b] transition"
               >
                 Create Event
               </a>
               <a
                  href="#"
-                 className="md:w-[158px] md:h-[57px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-[#00FFA0] text-[#00FFA0] text-center md:text-lg font-medium shadow-md hover:bg-[#81e7c2] hover:text-white transition"
+                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-[#00FFA0] text-[#00FFA0] text-sm text-center md:text-lg font-medium shadow-md hover:bg-[#81e7c2] hover:text-white transition"
 
                >
                  Learn More
