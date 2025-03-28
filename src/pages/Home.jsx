@@ -14,6 +14,14 @@ function Home() {
       <div className="mx-auto w-full">
         <Hero />
         <img src="/Images/Vector.svg" className="absolute -top-52 right-0" />
+        <h1 className="mb-4 text-3xl font-bold text-gray-800">
+          Welcome to Our Website
+        </h1>
+
+        <div>
+          {/* <ImageSkeleton/> */}
+          <img src="/Images/Vector.svg" className="absolute -top-52 right-0" />
+        </div>
         <TrendingEvent />
         <HowItWorksSection />
         <BottomBanner />
