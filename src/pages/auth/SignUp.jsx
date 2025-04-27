@@ -7,17 +7,22 @@ import { BsFillWalletFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import threeDElementsImg from '../../assets/Blend_Group_1.svg';
 import { signUpSchema } from '../../utils/authValidators';
-import { AiOutlineArrowRight } from 'react-icons/ai';
+import { AiOutlineArrowRight } from 'react-icons/ai'; 
 import { LuUserRoundPlus } from 'react-icons/lu';
+import { toast } from "react-toastify";
+import { useSignUp } from '../../hooks/useSignUp';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const SignUpPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { signUp, isLoading } = useSignUp();
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(signUpSchema)
   });
+
 
 
   // eslint-disable-next-line react/prop-types
@@ -52,11 +57,15 @@ const SignUpPage = () => {
 
 
   const onSubmit = async (data) => {
-    setIsLoading(true);
 
     try {
       // Simulate API call or processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const success = await signUp(data);
+      if (success) {
+        navigate('/signin'); // Redirect to sign-in page after successful sign-up
+        reset(); // Clear the form after successful submission
+
+      }
 
       console.log(data);
       // Actual sign-up logic would go here
@@ -65,8 +74,8 @@ const SignUpPage = () => {
       reset();
     } catch (error) {
       console.error('Sign-up error:', error);
-    } finally {
-      setIsLoading(false);
+      toast.error("Login failed. Please check your credentials.");
+
     }
   };
 

@@ -4,9 +4,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signInSchema } from "../../utils/authValidators";
 import { UserIcon } from "../../icons/UserIcon";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ArrowRightIcon } from "../../icons/ArrowRightIcon";
-
+import { useLogin } from "../../hooks/useLogin";
+import { useForgotPassword } from "../../hooks/useForgotPassword";
+import { toast } from "react-toastify";
 // NOTE: This is the SignInForm component
 // It should be further designed and styled as per the required UI design, this is just a basic implementation
 // to show how the form works with the created validations
@@ -18,11 +20,31 @@ export default function SignInForm() {
   } = useForm({
     resolver: yupResolver(signInSchema),
   });
-
+  const { login } = useLogin();
+  const { forgotPassword } = useForgotPassword();
+  const navigate = useNavigate()
   const onSubmit = (data) => {
-    // Handle form submission
-    console.log(data);
+    try {
+
+      const { email, password } = data;
+      const success = login({ email, password });
+      if (success) {
+        navigate("/");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
+
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
+    }
   };
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    forgotPassword();
+
+  }
 
   return (
     <div className="relative flex items-start justify-between w-full min-h-full gap-6 px-8 py-8 mx-auto overflow-hidden max-w-7xl">
@@ -63,7 +85,8 @@ export default function SignInForm() {
                   Password
                 </label>
                 <Link
-                  href="#"
+                  to="#"
+                  onClick={handleForgotPassword}
                   className="text-sm text-[#013237] hover:underline"
                 >
                   Forgot Password?

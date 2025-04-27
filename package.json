@@ -14,12 +14,15 @@
     "@rollup/rollup-darwin-x64": "^4.37.0",
     "framer-motion": "^12.5.0",
     "motion": "^12.6.0",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
+    "react-query": "^3.39.3",
     "react-router-dom": "^7.2.0",
+    "react-toastify": "^11.0.5",
     "yup": "^1.6.1"
   },
   "devDependencies": {
