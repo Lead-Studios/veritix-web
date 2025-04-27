@@ -17,7 +17,7 @@ export const useForgotPassword = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      toast.success('Password reset link sent to your email.');
+      toast.success('Email successfully sent.');
       return true;
     } catch (err) {
       setError(err.message || 'Failed to send reset link');
