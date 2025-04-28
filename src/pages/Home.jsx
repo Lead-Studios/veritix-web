@@ -7,6 +7,7 @@ import HowItWorksSection from "../components/HowItWorks";
 import React from "react";
 import TrendingEvent from "../components/TrendingEvent";
 import Hero from "../components/Hero";
+import GetInTouch from "../components/GetInTouch";
 
 function Home() {
   return (
@@ -19,6 +20,7 @@ function Home() {
         </div>
         <TrendingEvent />
         <HowItWorksSection />
+        <GetInTouch />
         <BottomBanner />
 
         {/* <SignInForm /> */}

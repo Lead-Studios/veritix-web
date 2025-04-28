@@ -44,3 +44,26 @@ export const signInSchema = yup.object().shape({
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters'),
 });
+
+// Contact Form Schema
+export const contactFormSchema = yup.object().shape({
+  name: yup
+    .string()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters'),
+  
+  email: yup
+    .string()
+    .required('Email is required')
+    .email('Please enter a valid email address'),
+  
+  subject: yup
+    .string()
+    .required('Subject is required')
+    .min(2, 'Subject must be at least 2 characters'),
+  
+  message: yup
+    .string()
+    .required('Message is required')
+    .min(10, 'Message must be at least 10 characters'),
+});

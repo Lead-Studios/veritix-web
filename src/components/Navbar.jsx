@@ -71,6 +71,7 @@ function Navbar() {
             <NavLink to="/">Home</NavLink>
             <NavLink to="/upcoming-events">Upcoming Events</NavLink>
             <NavLink to="#how-it-works">How it Works</NavLink>
+            <NavLink to="#get-in-touch">Get in Touch</NavLink>
           </div>
           <div className="items-center hidden space-x-4 md:flex lg:space-x-8 whitespace-nowrap max-lg:text-sm">
 
@@ -133,6 +134,15 @@ function Navbar() {
             onClick={toggleMobileMenu}
           >
             How it Works
+          </Link>
+          <Link
+            to="/get-in-touch"
+
+            className="text-lg text-white"
+
+            onClick={toggleMobileMenu}
+          >
+            Get in Touch
           </Link>
           <Link
             to="/connect-wallet"
