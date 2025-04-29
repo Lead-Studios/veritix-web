@@ -1,21 +1,19 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FiMail, FiLock, FiEyeOff, FiEye } from 'react-icons/fi';
+import { FiMail, FiLock } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { BsFillWalletFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import threeDElementsImg from '../../assets/Blend_Group_1.svg';
 import { signUpSchema } from '../../utils/authValidators';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { LuUserRoundPlus } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { useSignUp } from '../../hooks/auth';
+import InputComponent from '../../components/Input';
 
 const SignUpPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const signUp = useSignUp();
   const navigate = useNavigate();
   const {
@@ -37,9 +35,6 @@ const SignUpPage = () => {
       }
 
       console.log(data);
-      // Actual sign-up logic would go here
-
-      // Clear the form after successful submission
       reset();
     } catch (error) {
       console.error('Sign-up error:', error);
@@ -48,18 +43,18 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#E7FDFF]">
+    <div className="w-full flex flex-col md:flex-row min-h-screen bg-[#E7FDFF]">
       {/* Left Side - Dark teal background with text and images */}
       <div className="hidden md:flex md:w-2/5 bg-[#013237] mih-[screen] rounded-[30px] my-12 ml-8 text-white p-8 flex-col justify-between relative ">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-white">Veritix</h2>
-          <button className="md:block relative bg-[#E7FDFF] rounded-[20px] w-[143px] h-[50px] font-medium text-[#013237] text-lg flex items-center">
+          <NavLink
+            to="/"
+            className="rounded-3xl font-poly flex justify-between items-center gap-4 text-2xl text-[#013237] bg-[#E7FDFF] py-3 px-6"
+          >
             <span>Back</span>
-            <AiOutlineArrowRight
-              className="text-teal-900 absolute top-3 right-2"
-              size={24}
-            />
-          </button>
+            <AiOutlineArrowRight className="text-teal-900" size={24} />
+          </NavLink>
         </div>
 
         <div className="mt-20 z-10">
@@ -83,14 +78,14 @@ const SignUpPage = () => {
       </div>
 
       {/* Right Side - Sign Up Form */}
-      <div className="md:w-3/5 p-4 md:p-8 lg:p-1 flex flex-col justify-center">
+      <div className="relative md:w-3/5 p-4 md:p-8 lg:p-1 flex flex-col justify-center">
         <div className="max-w-[100%] mx-auto w-full px-5">
           <h2 className="text-2xl md:text-3xl font-bold text-[#013237] mb-8 text-center">
             Create Your Account
           </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name row */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="w-full flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <label
                   htmlFor="firstName"
@@ -107,6 +102,7 @@ const SignUpPage = () => {
                     className=""
                     label="First Name"
                     type="text"
+                    register={register}
                   />
                 </div>
                 {errors.firstName && (
@@ -127,7 +123,12 @@ const SignUpPage = () => {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <LuUserRoundPlus className="text-gray-400" />
                   </div>
-                  <InputComponent id="lastName" label="Lastname" type="text" />
+                  <InputComponent
+                    id="lastName"
+                    label="Lastname"
+                    type="text"
+                    register={register}
+                  />
                 </div>
                 {errors.lastName && (
                   <p className="text-red-500 text-xs mt-1">
@@ -149,7 +150,12 @@ const SignUpPage = () => {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <LuUserRoundPlus className="text-gray-400" />
                 </div>
-                <InputComponent id="username" label="Username" type="text" />
+                <InputComponent
+                  id="username"
+                  label="Username"
+                  type="text"
+                  register={register}
+                />
               </div>
               {errors.username && (
                 <p className="text-red-500 text-xs mt-1">
@@ -202,9 +208,7 @@ const SignUpPage = () => {
                   label="Password"
                   type="password"
                   isPasswordField={true}
-                  showPassword={showPassword}
                   register={register}
-                  setShowPassword={setShowPassword}
                 />
               </div>
               {errors.password && (
@@ -306,55 +310,3 @@ const SignUpPage = () => {
 };
 
 export default SignUpPage;
-
-function InputComponent({
-  type,
-  id,
-  className = '',
-  label,
-  isPasswordField = false,
-  showPassword,
-  register,
-  setShowPassword,
-}) {
-  return (
-    <>
-      <input
-        type={isPasswordField ? (showPassword ? 'text' : 'password') : type}
-        id={id}
-        className={`pl-10 block w-full bg-[#E7FDFF] rounded-md border-[#CCCCCCCC] border p-2 focus:border-teal-500 focus:ring-teal-500 ${className}`}
-        placeholder={`Enter your ${label}`}
-        {...(register ? register(id) : {})}
-      />
-      {isPasswordField && (
-        <button
-          type="button"
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? (
-            <FiEyeOff className="text-gray-400" />
-          ) : (
-            <FiEye className="text-gray-400" />
-          )}
-        </button>
-      )}
-    </>
-  );
-}
-
-InputComponent.propTypes = {
-  type: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  className: PropTypes.string,
-  label: PropTypes.string.isRequired,
-  isPasswordField: PropTypes.bool,
-  showPassword: PropTypes.bool,
-  register: PropTypes.func.isRequired,
-  setShowPassword: PropTypes.func.isRequired,
-};
-
-InputComponent.defaultProps = {
-  className: '',
-  isPasswordField: false,
-};
