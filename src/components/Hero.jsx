@@ -1,4 +1,3 @@
-
 "use client"
 import React from 'react'
 import { motion } from 'framer-motion'
@@ -77,7 +76,7 @@ const Hero = () => {
             >
               Discover, Own, and Trade{" "}
               <span className="block sm:inline">
-                <span className="text-[#00FFA0]">Event Tickets</span> Reimagined
+                <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent">Event Tickets</span> Reimagined
               </span>
             </motion.h1>
 
@@ -97,13 +96,13 @@ const Hero = () => {
             >
               <a
                 href="#"
-                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px]  bg-[#00FFA0] text-black md:text-lg font-medium shadow-md hover:bg-[#013237] hover:text-white transition"
+                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px] bg-gradient-to-r from-blue-500 to-indigo-600 text-white md:text-lg font-medium shadow-md hover:from-blue-600 hover:to-indigo-700 transition"
               >
                 Create Event
               </a>
               <a
                  href="#"
-                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-[#00FFA0] text-[#00FFA0] text-sm text-center md:text-lg font-medium shadow-md hover:bg-[#013237] hover:text-white transition"
+                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-blue-500 text-blue-500 text-sm text-center md:text-lg font-medium shadow-md hover:bg-blue-500 hover:text-white transition"
 
                >
                  Learn More
