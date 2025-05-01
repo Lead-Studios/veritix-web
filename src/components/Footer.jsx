@@ -69,16 +69,16 @@ function Footer() {
             <div className='max-[575px]:w-[180px] max-md:w-[160px] max-[812px]:w-[200px]'>
               <h4 className='font-semibold mb-4'>Quick Links</h4>
               <div className='flex flex-col space-y-2 text-sm text-gray-300'>
-                <Link to='/attendees' className='hover:text-[#00FFA0]'>
+                <Link to='/attendees' className='hover:text-blue-400'>
                   Attendees
                 </Link>
-                <Link to='/organiser' className='hover:text-[#00FFA0]'>
+                <Link to='/organiser' className='hover:text-blue-400'>
                   Organiser
                 </Link>
-                <Link to='/promoters' className='hover:text-[#00FFA0]'>
+                <Link to='/promoters' className='hover:text-blue-400'>
                   Promoters
                 </Link>
-                <Link to='/about' className='hover:text-[#00FFA0]'>
+                <Link to='/about' className='hover:text-blue-400'>
                   How it Works
                 </Link>
               </div>
@@ -88,16 +88,16 @@ function Footer() {
             <div className='max-[575px]:w-[180px] max-md:w-[160px] max-[812px]:w-[200px]'>
               <h4 className='font-semibold mb-4'>Plan Events</h4>
               <div className='flex flex-col space-y-2 text-sm text-gray-300'>
-                <Link to='/create-and-setup' className='hover:text-[#00FFA0]'>
+                <Link to='/create-and-setup' className='hover:text-blue-400'>
                   Create and Setup
                 </Link>
-                <Link to='/sell-tickets' className='hover:text-[#00FFA0]'>
+                <Link to='/sell-tickets' className='hover:text-blue-400'>
                   Sell Tickets
                 </Link>
-                <Link to='/online-rsvp' className='hover:text-[#00FFA0]'>
+                <Link to='/online-rsvp' className='hover:text-blue-400'>
                   Online RSVP
                 </Link>
-                <Link to='/online-event' className='hover:text-[#00FFA0]'>
+                <Link to='/online-event' className='hover:text-blue-400'>
                   Online Event
                 </Link>
               </div>
@@ -107,16 +107,16 @@ function Footer() {
             <div className='max-[575px]:w-[180px] max-md:w-[160px] max-[812px]:w-[200px]'>
               <h4 className='font-semibold mb-4'>Legal</h4>
               <div className='flex flex-col space-y-2 text-sm text-gray-300'>
-                <Link to='/privacy-policy' className='hover:text-[#00FFA0]'>
+                <Link to='/privacy-policy' className='hover:text-blue-400'>
                   Privacy Policy
                 </Link>
-                <Link to='/terms' className='hover:text-[#00FFA0]'>
+                <Link to='/terms' className='hover:text-blue-400'>
                   Terms of Service
                 </Link>
-                <Link to='/cookie-policy' className='hover:text-[#00FFA0]'>
+                <Link to='/cookie-policy' className='hover:text-blue-400'>
                   Cookie Policy
                 </Link>
-                <Link to='/host-events' className='hover:text-[#00FFA0]'>
+                <Link to='/host-events' className='hover:text-blue-400'>
                   Host Events
                 </Link>
               </div>
@@ -129,13 +129,13 @@ function Footer() {
                 Get updates on trending events, exclusive NFT drops, and crypto
                 rewards
               </p>
-              <div className='flex flex-row gap-2 sm:gap-0 border border-[#00FFA0] rounded-full'>
+              <div className='flex flex-row gap-2 sm:gap-0 border border-blue-500 rounded-full'>
                 <input
                   type='email'
                   placeholder='Enter your email address...'
                   className='w-full h-12 sm:w-auto flex-1 px-4 py-2 bg-transparent rounded-full sm:rounded-r-none text-white text-sm focus:outline-none'
                 />
-                <button className='w-auto whitespace-nowrap px-4 sm:px-6 py-2 bg-[#00FFA0] text-[#000625] rounded-full font-semibold text-sm hover:bg-[#00FFA0]/90 transition-colors'>
+                <button className='w-auto whitespace-nowrap px-4 sm:px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold text-sm hover:from-blue-600 hover:to-indigo-700 transition-colors'>
                   Subscribe Now
                 </button>
               </div>

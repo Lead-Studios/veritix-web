@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
@@ -25,8 +24,8 @@ function NavLink({ to, children, onClick }) {
       onClick={handleClick}
       className={`${
         isActive
-          ? "text-[#00FFA0] border-b-2 border-[#00FFA0]"
-          : "text-white hover:text-[#00FFA0] border-b-2 border-transparent"
+          ? "text-blue-500 border-b-2 border-blue-500"
+          : "text-white hover:text-blue-400 border-b-2 border-transparent"
       } pb-1 transition-colors ease-in-out duration-300 !cursor-pointer`}
     >
       {children}
@@ -69,7 +68,7 @@ function Navbar() {
 
           <div className="items-center hidden space-x-4 md:flex lg:space-x-8 whitespace-nowrap max-lg:text-sm">
             <NavLink to="/">Home</NavLink>
-            <NavLink to="/upcoming-events">Upcoming Events</NavLink>
+            <NavLink to="/explore">Explore</NavLink>
             <NavLink to="#how-it-works">How it Works</NavLink>
             <NavLink to="#get-in-touch">Get in Touch</NavLink>
           </div>
@@ -77,13 +76,13 @@ function Navbar() {
 
             <Link
               to="#"
-              className="text-[#00FFA0] border border-[#00FFA0] px-6 py-2 rounded-full hover:bg-[#00FFA0] hover:text-[#000625] transition-colors"
+              className="text-blue-500 border border-blue-500 px-6 py-2 rounded-full hover:bg-blue-500 hover:text-white transition-colors"
             >
               Connect Wallet
             </Link>
             <Link
               to="/signup"
-              className="bg-[#00FFA0] text-[#000625] px-6 py-2 rounded-full font-medium hover:bg-[#00FFA0]/90 transition-colors"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-600 hover:to-indigo-700 transition-colors"
             >
               Sign Up
             </Link>
@@ -112,19 +111,17 @@ function Navbar() {
 
           <Link
             to="/"
-            className="text-[#00FFA0] text-lg border-b border-[#00FFA0] pb-1 w-fit"
+            className="text-blue-500 text-lg border-b border-blue-500 pb-1 w-fit"
             onClick={toggleMobileMenu}
           >
             Home
           </Link>
           <Link
-            to="/upcoming-events"
-
+            to="/explore"
             className="text-lg text-white"
-
             onClick={toggleMobileMenu}
           >
-            Upcoming Events
+            Explore
           </Link>
           <Link
             to="/how-it-works"
@@ -146,14 +143,14 @@ function Navbar() {
           </Link>
           <Link
             to="/connect-wallet"
-            className="text-[#00FFA0] border border-[#00FFA0] px-6 py-2 rounded-full text-center"
+            className="text-blue-500 border border-blue-500 px-6 py-2 rounded-full text-center hover:bg-blue-500 hover:text-white transition-colors"
             onClick={toggleMobileMenu}
           >
             Connect Wallet
           </Link>
           <Link
             to="/sign-up"
-            className="bg-[#00FFA0] text-[#000625] px-6 py-2 rounded-full font-medium text-center"
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2 rounded-full font-medium text-center hover:from-blue-600 hover:to-indigo-700 transition-colors"
             onClick={toggleMobileMenu}
           >
             Sign Up
