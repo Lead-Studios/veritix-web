@@ -1,14 +1,12 @@
-// eslint-disable-next-line no-unused-vars
-import React from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { signInSchema } from "../../utils/authValidators";
-import { UserIcon } from "../../icons/UserIcon";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { ArrowRightIcon } from "../../icons/ArrowRightIcon";
-import { useLogin } from "../../hooks/useLogin";
-import { useForgotPassword } from "../../hooks/useForgotPassword";
-import { toast } from "react-toastify";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { signInSchema } from '../../utils/authValidators';
+import { UserIcon } from '../../icons/UserIcon';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { ArrowRightIcon } from '../../icons/ArrowRightIcon';
+import { useForgotPassword } from '../../hooks/useForgotPassword';
+import { toast } from 'react-toastify';
+import { useLogin } from '../../hooks/auth';
 // NOTE: This is the SignInForm component
 // It should be further designed and styled as per the required UI design, this is just a basic implementation
 // to show how the form works with the created validations
@@ -20,31 +18,28 @@ export default function SignInForm() {
   } = useForm({
     resolver: yupResolver(signInSchema),
   });
-  const { login } = useLogin();
+  const login = useLogin();
   const { forgotPassword } = useForgotPassword();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const onSubmit = (data) => {
     try {
-
       const { email, password } = data;
-      const success = login({ email, password });
-      if (success) {
-        navigate("/");
+      const response = login.mutateAsync({ email, password });
+      if (response.status === 200) {
+        navigate('/');
       } else {
-        toast.error("Login failed. Please try again.");
+        toast.error('Login failed. Please try again.');
       }
-
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Login failed. Please try again.");
+      console.error('Login error:', error);
+      toast.error('Login failed. Please try again.');
     }
   };
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
     forgotPassword();
-
-  }
+  };
 
   return (
     <div className="relative flex items-start justify-between w-full min-h-full gap-6 px-8 py-8 mx-auto overflow-hidden max-w-7xl">
@@ -68,7 +63,7 @@ export default function SignInForm() {
                   <UserIcon className="h-5 w-5 text-[#666666]" />
                 </div>
                 <input
-                  {...register("email")}
+                  {...register('email')}
                   type="email"
                   placeholder="Enter your Email Address"
                   className="w-full rounded-md border border-[#cccccc] bg-transparent py-3 pl-10 pr-3 text-[#121212] focus:border-[#013237] focus:outline-none"
@@ -97,7 +92,7 @@ export default function SignInForm() {
                   <UserIcon className="h-5 w-5 text-[#666666]" />
                 </div>
                 <input
-                  {...register("password")}
+                  {...register('password')}
                   type="password"
                   placeholder="Enter your Password"
                   className="w-full rounded-md border border-[#cccccc] bg-transparent py-3 pl-10 pr-3 text-[#121212] focus:border-[#013237] focus:outline-none"
@@ -132,14 +127,14 @@ export default function SignInForm() {
       <div className="relative flex-grow-0 hidden w-1/2 h-full rounded-3xl md:block">
         {/* Background Image */}
         <img
-          src={"/Images/sign_asset_1.svg"}
+          src={'/Images/sign_asset_1.svg'}
           alt="Veritixlogo"
           className="object-cover w-full h-full rounded-3xl signin-img"
         />
         <div className="absolute inset-0 z-0 flex flex-col w-full h-full px-10 rounded-3xl py-9">
           <div className="flex items-center justify-between w-full">
             <img
-              src={"/veritix_logo.svg"}
+              src={'/veritix_logo.svg'}
               alt="Veritixlogo"
               className="w-16 h-8"
             />
