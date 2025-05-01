@@ -18,10 +18,10 @@ export default function InputComponent({
         type={showPassword ? 'text' : type}
         id={id}
         name={id}
-        className={`pl-10 block w-full bg-[#E7FDFF] rounded-md border-[#CCCCCCCC] border p-2 focus:border-teal-500 focus:ring-teal-500 ${className}`}
-        placeholder={`Enter your ${label}`}
+        className={`pl-10 block w-full bg-transparent rounded-md border-[#CCCCCCCC] border p-2 focus:border-[#000625] focus:ring-0 focus:outline-none ${className}`}
         {...(register ? register(id) : {})}
         {...rest}
+        placeholder={rest?.placeholder || `Enter your ${label}`}
       />
       {type === 'password' && (
         <button

@@ -10,6 +10,8 @@ import LandingLayout from './components/Layout/LandingLayout';
 import AuthLayout from './components/Layout/AuthLayout';
 import SignInForm from './pages/auth/SignIn';
 import SignUpForm from './pages/auth/SignUp';
+import ForgotForm from './pages/auth/Forgot-Password';
+import PasswordReset from './pages/auth/Reset-Password';
 
 const queryClient = new QueryClient();
 function App() {
@@ -31,6 +33,8 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path="/signin" element={<SignInForm />} />
             <Route path="/signup" element={<SignUpForm />} />
+            <Route path="/forgot-password" element={<ForgotForm />} />
+            <Route path="/reset-password" element={<PasswordReset />} />
           </Route>
         </Routes>
       </QueryClientProvider>

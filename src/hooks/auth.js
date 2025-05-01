@@ -32,3 +32,33 @@ export const useLogin = () => {
     },
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: async (email) => {
+      const response = await api.post(apiEndpoints.forgotPassword, { email });
+      return response;
+    },
+    onSuccess: () => {
+      toast.success('Password reset link sent to your email!');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to send password reset link');
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: async (data) => {
+      const response = await api.post(apiEndpoints.resetPassword, data);
+      return response;
+    },
+    onSuccess: () => {
+      toast.success('Password reset successful!');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to reset password');
+    },
+  });
+};
