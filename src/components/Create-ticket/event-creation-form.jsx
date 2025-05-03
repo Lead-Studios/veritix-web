@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import MapContainer from "./map-container"
-import ImageUpload from "./image-upload"
-import DateTimePicker from "./date-time-picker"
+import { useState } from "react";
+import MapContainer from "./map-container";
+import ImageUpload from "./image-upload";
+import DateTimePicker from "./date-time-picker";
 
 export default function EventCreationForm() {
   const [eventData, setEventData] = useState({
@@ -38,14 +38,14 @@ export default function EventCreationForm() {
       network: "ethereum",
       royalty: 5,
     },
-  })
+  });
 
   const handleInputChange = (field, value) => {
     setEventData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleLocationChange = (field, value) => {
     setEventData((prev) => ({
@@ -54,22 +54,22 @@ export default function EventCreationForm() {
         ...prev.location,
         [field]: value,
       },
-    }))
-  }
+    }));
+  };
 
   const handleTicketChange = (index, field, value) => {
     setEventData((prev) => {
-      const updatedTickets = [...prev.tickets]
+      const updatedTickets = [...prev.tickets];
       updatedTickets[index] = {
         ...updatedTickets[index],
         [field]: value,
-      }
+      };
       return {
         ...prev,
         tickets: updatedTickets,
-      }
-    })
-  }
+      };
+    });
+  };
 
   const handleBlockchainChange = (field, value) => {
     setEventData((prev) => ({
@@ -78,8 +78,8 @@ export default function EventCreationForm() {
         ...prev.blockchain,
         [field]: value,
       },
-    }))
-  }
+    }));
+  };
 
   const addTicketType = () => {
     setEventData((prev) => ({
@@ -96,26 +96,30 @@ export default function EventCreationForm() {
           resellPrice: "",
         },
       ],
-    }))
-  }
+    }));
+  };
 
   const handleCreateEvent = () => {
-    console.log("Event created:", eventData)
+    console.log("Event created:", eventData);
     // Here you would typically send the data to your backend
-    alert("Event created successfully!")
-  }
+    alert("Event created successfully!");
+  };
 
   const handleSaveAsDraft = () => {
-    console.log("Event saved as draft:", eventData)
+    console.log("Event saved as draft:", eventData);
     // Here you would typically save the draft to your backend
-    alert("Event saved as draft!")
-  }
+    alert("Event saved as draft!");
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="flex-1">
-        <h1 className="text-[#6366f1] text-2xl font-semibold mb-2">Create New Event</h1>
-        <p className="text-gray-400 text-sm mb-6">Fill in the details below to create your blockchain-powered event</p>
+        <h1 className="text-[#6366f1] text-2xl font-semibold mb-2">
+          Create New Event
+        </h1>
+        <p className="text-gray-400 text-sm mb-6">
+          Fill in the details below to create your blockchain-powered event
+        </p>
 
         <div className="space-y-8">
           {/* Step 1: Basic Information */}
@@ -129,7 +133,10 @@ export default function EventCreationForm() {
 
             <div className="space-y-4">
               <div>
-                <label htmlFor="eventTitle" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="eventTitle"
+                  className="block text-sm font-medium mb-1"
+                >
                   Event Title
                 </label>
                 <input
@@ -142,7 +149,10 @@ export default function EventCreationForm() {
               </div>
 
               <div>
-                <label htmlFor="eventDescription" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="eventDescription"
+                  className="block text-sm font-medium mb-1"
+                >
                   Event Description
                 </label>
                 <textarea
@@ -150,13 +160,20 @@ export default function EventCreationForm() {
                   placeholder="Describe your event in details"
                   className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                   value={eventData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Event Cover Image</label>
-                <ImageUpload value={eventData.coverImage} onChange={(url) => handleInputChange("coverImage", url)} />
+                <label className="block text-sm font-medium mb-1">
+                  Event Cover Image
+                </label>
+                <ImageUpload
+                  value={eventData.coverImage}
+                  onChange={(url) => handleInputChange("coverImage", url)}
+                />
               </div>
             </div>
           </div>
@@ -172,7 +189,9 @@ export default function EventCreationForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Start Date</label>
+                <label className="block text-sm font-medium mb-1">
+                  Start Date
+                </label>
                 <DateTimePicker
                   type="date"
                   value={eventData.startDate}
@@ -180,7 +199,9 @@ export default function EventCreationForm() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">End Date</label>
+                <label className="block text-sm font-medium mb-1">
+                  End Date
+                </label>
                 <DateTimePicker
                   type="date"
                   value={eventData.endDate}
@@ -188,7 +209,9 @@ export default function EventCreationForm() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Start Time</label>
+                <label className="block text-sm font-medium mb-1">
+                  Start Time
+                </label>
                 <DateTimePicker
                   type="time"
                   value={eventData.startTime}
@@ -196,7 +219,9 @@ export default function EventCreationForm() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">End Time</label>
+                <label className="block text-sm font-medium mb-1">
+                  End Time
+                </label>
                 <DateTimePicker
                   type="time"
                   value={eventData.endTime}
@@ -216,7 +241,9 @@ export default function EventCreationForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Event Type</label>
+              <label className="block text-sm font-medium mb-2">
+                Event Type
+              </label>
               <div className="flex flex-col space-y-2">
                 <label className="inline-flex items-center">
                   <input
@@ -225,7 +252,9 @@ export default function EventCreationForm() {
                     name="locationType"
                     value="physical"
                     checked={eventData.location.type === "physical"}
-                    onChange={(e) => handleLocationChange("type", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("type", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Physical Event</span>
                 </label>
@@ -236,7 +265,9 @@ export default function EventCreationForm() {
                     name="locationType"
                     value="online"
                     checked={eventData.location.type === "online"}
-                    onChange={(e) => handleLocationChange("type", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("type", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Online Event</span>
                 </label>
@@ -247,7 +278,9 @@ export default function EventCreationForm() {
                     name="locationType"
                     value="hybrid"
                     checked={eventData.location.type === "hybrid"}
-                    onChange={(e) => handleLocationChange("type", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("type", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Hybrid Event</span>
                 </label>
@@ -256,7 +289,10 @@ export default function EventCreationForm() {
 
             {eventData.location.type === "online" && (
               <div>
-                <label htmlFor="virtualRoom" className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor="virtualRoom"
+                  className="block text-sm font-medium mb-1"
+                >
                   Virtual Room
                 </label>
                 <input
@@ -264,15 +300,21 @@ export default function EventCreationForm() {
                   placeholder="Enter virtual room name"
                   className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                   value={eventData.location.virtualRoom}
-                  onChange={(e) => handleLocationChange("virtualRoom", e.target.value)}
+                  onChange={(e) =>
+                    handleLocationChange("virtualRoom", e.target.value)
+                  }
                 />
               </div>
             )}
 
-            {(eventData.location.type === "physical" || eventData.location.type === "hybrid") && (
+            {(eventData.location.type === "physical" ||
+              eventData.location.type === "hybrid") && (
               <>
                 <div>
-                  <label htmlFor="venue" className="block text-sm font-medium mb-1">
+                  <label
+                    htmlFor="venue"
+                    className="block text-sm font-medium mb-1"
+                  >
                     Venue
                   </label>
                   <input
@@ -280,12 +322,17 @@ export default function EventCreationForm() {
                     placeholder="Enter venue name"
                     className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                     value={eventData.location.venue}
-                    onChange={(e) => handleLocationChange("venue", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("venue", e.target.value)
+                    }
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium mb-1">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium mb-1"
+                  >
                     Address
                   </label>
                   <input
@@ -293,13 +340,18 @@ export default function EventCreationForm() {
                     placeholder="Enter full address"
                     className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                     value={eventData.location.address}
-                    onChange={(e) => handleLocationChange("address", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("address", e.target.value)
+                    }
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="city" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="city"
+                      className="block text-sm font-medium mb-1"
+                    >
                       City
                     </label>
                     <input
@@ -307,11 +359,16 @@ export default function EventCreationForm() {
                       placeholder="City"
                       className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                       value={eventData.location.city}
-                      onChange={(e) => handleLocationChange("city", e.target.value)}
+                      onChange={(e) =>
+                        handleLocationChange("city", e.target.value)
+                      }
                     />
                   </div>
                   <div>
-                    <label htmlFor="state" className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor="state"
+                      className="block text-sm font-medium mb-1"
+                    >
                       State
                     </label>
                     <input
@@ -319,13 +376,18 @@ export default function EventCreationForm() {
                       placeholder="State"
                       className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                       value={eventData.location.state}
-                      onChange={(e) => handleLocationChange("state", e.target.value)}
+                      onChange={(e) =>
+                        handleLocationChange("state", e.target.value)
+                      }
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="zipCode" className="block text-sm font-medium mb-1">
+                  <label
+                    htmlFor="zipCode"
+                    className="block text-sm font-medium mb-1"
+                  >
                     Zip Code
                   </label>
                   <input
@@ -333,7 +395,9 @@ export default function EventCreationForm() {
                     placeholder="Zip Code"
                     className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                     value={eventData.location.zipCode}
-                    onChange={(e) => handleLocationChange("zipCode", e.target.value)}
+                    onChange={(e) =>
+                      handleLocationChange("zipCode", e.target.value)
+                    }
                   />
                 </div>
 
@@ -352,9 +416,15 @@ export default function EventCreationForm() {
             </div>
 
             {eventData.tickets.map((ticket, index) => (
-              <div key={index} className="space-y-4 p-4 border border-[#1e293b] rounded-lg">
+              <div
+                key={index}
+                className="space-y-4 p-4 border border-[#1e293b] rounded-lg"
+              >
                 <div>
-                  <label htmlFor={`ticketType-${index}`} className="block text-sm font-medium mb-1">
+                  <label
+                    htmlFor={`ticketType-${index}`}
+                    className="block text-sm font-medium mb-1"
+                  >
                     Ticket Type {index + 1}
                   </label>
                   <input
@@ -362,13 +432,18 @@ export default function EventCreationForm() {
                     placeholder="e.g. VIP, General admission"
                     className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                     value={ticket.name}
-                    onChange={(e) => handleTicketChange(index, "name", e.target.value)}
+                    onChange={(e) =>
+                      handleTicketChange(index, "name", e.target.value)
+                    }
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor={`price-${index}`} className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor={`price-${index}`}
+                      className="block text-sm font-medium mb-1"
+                    >
                       Price (ETH)
                     </label>
                     <input
@@ -376,11 +451,16 @@ export default function EventCreationForm() {
                       placeholder="e.g. 0.05"
                       className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                       value={ticket.price}
-                      onChange={(e) => handleTicketChange(index, "price", e.target.value)}
+                      onChange={(e) =>
+                        handleTicketChange(index, "price", e.target.value)
+                      }
                     />
                   </div>
                   <div>
-                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium mb-1">
+                    <label
+                      htmlFor={`quantity-${index}`}
+                      className="block text-sm font-medium mb-1"
+                    >
                       Quantity Available
                     </label>
                     <input
@@ -389,13 +469,22 @@ export default function EventCreationForm() {
                       placeholder="0"
                       className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                       value={ticket.quantity}
-                      onChange={(e) => handleTicketChange(index, "quantity", Number.parseInt(e.target.value))}
+                      onChange={(e) =>
+                        handleTicketChange(
+                          index,
+                          "quantity",
+                          Number.parseInt(e.target.value)
+                        )
+                      }
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor={`description-${index}`} className="block text-sm font-medium mb-1">
+                  <label
+                    htmlFor={`description-${index}`}
+                    className="block text-sm font-medium mb-1"
+                  >
                     Description (Optional)
                   </label>
                   <input
@@ -403,7 +492,9 @@ export default function EventCreationForm() {
                     placeholder="Ticket benefits, restrictions etc."
                     className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                     value={ticket.description}
-                    onChange={(e) => handleTicketChange(index, "description", e.target.value)}
+                    onChange={(e) =>
+                      handleTicketChange(index, "description", e.target.value)
+                    }
                   />
                 </div>
 
@@ -412,10 +503,15 @@ export default function EventCreationForm() {
 
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <label htmlFor={`transferable-${index}`} className="text-sm">
+                      <label
+                        htmlFor={`transferable-${index}`}
+                        className="text-sm"
+                      >
                         Transferable
                       </label>
-                      <p className="text-xs text-gray-400">Allow ticket holders to transfer tickets to others</p>
+                      <p className="text-xs text-gray-400">
+                        Allow ticket holders to transfer tickets to others
+                      </p>
                     </div>
                     <div className="relative inline-block w-10 mr-2 align-middle select-none">
                       <input
@@ -423,7 +519,13 @@ export default function EventCreationForm() {
                         id={`transferable-${index}`}
                         className="sr-only"
                         checked={ticket.transferable}
-                        onChange={(e) => handleTicketChange(index, "transferable", e.target.checked)}
+                        onChange={(e) =>
+                          handleTicketChange(
+                            index,
+                            "transferable",
+                            e.target.checked
+                          )
+                        }
                       />
                       <label
                         htmlFor={`transferable-${index}`}
@@ -433,7 +535,9 @@ export default function EventCreationForm() {
                       >
                         <span
                           className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
-                            ticket.transferable ? "translate-x-4" : "translate-x-0"
+                            ticket.transferable
+                              ? "translate-x-4"
+                              : "translate-x-0"
                           }`}
                         ></span>
                       </label>
@@ -442,11 +546,15 @@ export default function EventCreationForm() {
 
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <label htmlFor={`resellable-${index}`} className="text-sm">
+                      <label
+                        htmlFor={`resellable-${index}`}
+                        className="text-sm"
+                      >
                         Resellable
                       </label>
                       <p className="text-xs text-gray-400">
-                        Allow ticket holders to resell tickets on secondary market
+                        Allow ticket holders to resell tickets on secondary
+                        market
                       </p>
                     </div>
                     <div className="relative inline-block w-10 mr-2 align-middle select-none">
@@ -455,7 +563,13 @@ export default function EventCreationForm() {
                         id={`resellable-${index}`}
                         className="sr-only"
                         checked={ticket.resellable}
-                        onChange={(e) => handleTicketChange(index, "resellable", e.target.checked)}
+                        onChange={(e) =>
+                          handleTicketChange(
+                            index,
+                            "resellable",
+                            e.target.checked
+                          )
+                        }
                       />
                       <label
                         htmlFor={`resellable-${index}`}
@@ -465,7 +579,9 @@ export default function EventCreationForm() {
                       >
                         <span
                           className={`block h-6 w-6 rounded-full bg-white transform transition-transform ${
-                            ticket.resellable ? "translate-x-4" : "translate-x-0"
+                            ticket.resellable
+                              ? "translate-x-4"
+                              : "translate-x-0"
                           }`}
                         ></span>
                       </label>
@@ -474,7 +590,10 @@ export default function EventCreationForm() {
 
                   {ticket.resellable && (
                     <div>
-                      <label htmlFor={`resellPrice-${index}`} className="block text-sm font-medium mb-1">
+                      <label
+                        htmlFor={`resellPrice-${index}`}
+                        className="block text-sm font-medium mb-1"
+                      >
                         Resell Price Limit (%)
                       </label>
                       <input
@@ -482,9 +601,17 @@ export default function EventCreationForm() {
                         placeholder="e.g. 150"
                         className="w-full px-3 py-2 bg-[#0f172a] border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6366f1] focus:border-transparent"
                         value={ticket.resellPrice}
-                        onChange={(e) => handleTicketChange(index, "resellPrice", e.target.value)}
+                        onChange={(e) =>
+                          handleTicketChange(
+                            index,
+                            "resellPrice",
+                            e.target.value
+                          )
+                        }
                       />
-                      <p className="text-xs text-gray-400 mt-1">Restrict reselling at more than X% of original price</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Restrict reselling at more than X% of original price
+                      </p>
                     </div>
                   )}
                 </div>
@@ -509,7 +636,9 @@ export default function EventCreationForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Select Blockchain Network</label>
+              <label className="block text-sm font-medium mb-2">
+                Select Blockchain Network
+              </label>
               <div className="flex flex-col space-y-2">
                 <label className="inline-flex items-center">
                   <input
@@ -518,7 +647,9 @@ export default function EventCreationForm() {
                     name="blockchainNetwork"
                     value="ethereum"
                     checked={eventData.blockchain.network === "ethereum"}
-                    onChange={(e) => handleBlockchainChange("network", e.target.value)}
+                    onChange={(e) =>
+                      handleBlockchainChange("network", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Ethereum</span>
                 </label>
@@ -529,7 +660,9 @@ export default function EventCreationForm() {
                     name="blockchainNetwork"
                     value="polygon"
                     checked={eventData.blockchain.network === "polygon"}
-                    onChange={(e) => handleBlockchainChange("network", e.target.value)}
+                    onChange={(e) =>
+                      handleBlockchainChange("network", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Polygon</span>
                 </label>
@@ -540,7 +673,9 @@ export default function EventCreationForm() {
                     name="blockchainNetwork"
                     value="solana"
                     checked={eventData.blockchain.network === "solana"}
-                    onChange={(e) => handleBlockchainChange("network", e.target.value)}
+                    onChange={(e) =>
+                      handleBlockchainChange("network", e.target.value)
+                    }
                   />
                   <span className="ml-2 text-sm">Solana</span>
                 </label>
@@ -549,10 +684,15 @@ export default function EventCreationForm() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="treasury-address" className="block text-sm font-medium">
+                <label
+                  htmlFor="treasury-address"
+                  className="block text-sm font-medium"
+                >
                   Treasury Address
                 </label>
-                <span className="text-xs text-gray-400">Where funds will be sent</span>
+                <span className="text-xs text-gray-400">
+                  Where funds will be sent
+                </span>
               </div>
               <input
                 id="treasury-address"
@@ -563,10 +703,14 @@ export default function EventCreationForm() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium">Creator Royalty</label>
+                <label className="block text-sm font-medium">
+                  Creator Royalty
+                </label>
                 <span className="text-xs">{eventData.blockchain.royalty}%</span>
               </div>
-              <p className="text-xs text-gray-400">Percentage of secondary sales that goes to organizers</p>
+              <p className="text-xs text-gray-400">
+                Percentage of secondary sales that goes to organizers
+              </p>
               <div className="relative pt-1">
                 <input
                   type="range"
@@ -574,7 +718,9 @@ export default function EventCreationForm() {
                   max="10"
                   step="1"
                   value={eventData.blockchain.royalty}
-                  onChange={(e) => handleBlockchainChange("royalty", Number(e.target.value))}
+                  onChange={(e) =>
+                    handleBlockchainChange("royalty", Number(e.target.value))
+                  }
                   className="w-full h-2 bg-[#1e293b] rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -606,22 +752,28 @@ export default function EventCreationForm() {
                 </div>
               )}
 
-              <h3 className="font-medium">{eventData.title || "No title yet"}</h3>
+              <h3 className="font-medium">
+                {eventData.title || "No title yet"}
+              </h3>
 
-              <div className="space-y-2 mt-4 text-sm">
-                <div className="flex justify-between">
+              <div className="space-y-6 mt-4 text-sm">
+                <div className="flex flex-col gap-2 justify-between">
                   <span className="text-gray-400">Start Date</span>
                   <span>{eventData.startDate || "Not set yet"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-2 justify-between">
                   <span className="text-gray-400">End Date</span>
                   <span>{eventData.endDate || "Not set yet"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-2 justify-between">
                   <span className="text-gray-400">Location</span>
-                  <span>{eventData.location.venue || eventData.location.type || "Not specified"}</span>
+                  <span>
+                    {eventData.location.venue ||
+                      eventData.location.type ||
+                      "Not specified"}
+                  </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-2 justify-between">
                   <span className="text-gray-400">Blockchain</span>
                   <span>{eventData.blockchain.network}</span>
                 </div>
@@ -646,7 +798,7 @@ export default function EventCreationForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function PlusIcon(props) {
@@ -666,5 +818,5 @@ function PlusIcon(props) {
       <path d="M5 12h14" />
       <path d="M12 5v14" />
     </svg>
-  )
+  );
 }
