@@ -95,7 +95,7 @@ const Hero = () => {
               className="flex flex-wrap justify-center md:justify-start mt-6 gap-4 md:gap-6"
             >
               <a
-                href="#"
+                href="/create-ticket"
                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px] bg-gradient-to-r from-blue-500 to-indigo-600 text-white md:text-lg font-medium shadow-md hover:from-blue-600 hover:to-indigo-700 transition"
               >
                 Create Event
