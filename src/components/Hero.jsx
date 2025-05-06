@@ -28,7 +28,7 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative mx-auto -mt-4 overflow-hidden h-[600px] w-full">
+    <section className="relative mx-auto overflow-hidden h-[600px] w-full pt-16 sm:pt-0">
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#000625] to-[#455A64] w-full h-full">
         <img
@@ -49,7 +49,7 @@ const Hero = () => {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="flex items-center justify-center px-4"
           >
-            <div className="relative w-full max-w-4xl overflow-hidden rounded-lg h-[250px] sm:mt-20 sm:h-[350px] md:h-[450px] lg:h-[500px]">
+            <div className="relative w-full max-w-4xl overflow-hidden rounded-lg h-[250px] sm:h-[350px] md:h-[450px] lg:h-[500px]">
               <img
                 src="/Images/hero.png"
                 alt="Hero"

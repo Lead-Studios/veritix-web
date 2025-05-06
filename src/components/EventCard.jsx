@@ -1,7 +1,8 @@
 import React from "react";
 import { FaMapMarkerAlt, FaCalendarAlt, FaClock } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const EventCard = ({ imageUrl, eventName, eventDate, location, price }) => {
+const EventCard = ({ id, imageUrl, eventName, eventDate, location, price }) => {
   // Format the date string
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -66,9 +67,12 @@ const EventCard = ({ imageUrl, eventName, eventDate, location, price }) => {
               {price || "0.05 ETH"}
             </div>
             
-            <button className="mt-6 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white font-medium py-3 px-8 rounded-full text-sm transition-all duration-300">
+            <Link 
+              to={`/event/${id}`}
+              className="mt-6 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white font-medium py-3 px-8 rounded-full text-sm transition-all duration-300"
+            >
               Get Tickets
-            </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -11,27 +11,33 @@ import AuthLayout from "./components/Layout/AuthLayout";
 import SignInForm from "./pages/auth/SignIn";
 import SignUpForm from "./pages/auth/SignUp";
 import CategoryDetail from "./pages/CategoryDetail";
+import EventDetail from "./components/events/EventDetail";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
-    <Routes>
-      {/* Landing pages with Navbar */}
-      <Route element={<LandingLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/explore" element={<Events />} />
-        <Route path="/how-it-works" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/category/:id" element={<CategoryDetail />} />
-      </Route>
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Landing pages with Navbar */}
+        <Route element={<LandingLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Events />} />
+          <Route path="/how-it-works" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/category/:id" element={<CategoryDetail />} />
+          <Route path="/event/:eventId" element={<EventDetail />} />
+        </Route>
 
-      {/* Auth pages without Navbar */}
-      <Route element={<AuthLayout />}>
-        <Route path="/signin" element={<SignInForm />} />
-        <Route path="/signup" element={<SignUpForm />} />
-      </Route>
-    </Routes>
+        {/* Auth pages without Navbar */}
+        <Route element={<AuthLayout />}>
+          <Route path="/signin" element={<SignInForm />} />
+          <Route path="/signup" element={<SignUpForm />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
 
