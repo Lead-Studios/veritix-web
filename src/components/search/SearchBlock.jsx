@@ -3,60 +3,101 @@ import SearchInput from "./SearchInput";
 import LocationInput from "./LocationInput";
 import DateInput from "./DateInput";
 import { categories } from "../../data/categoryData";
+import { eventsById, validateEvent } from "../../data/events";
 
-const SearchBlock = ({ onSearch = () => {} }) => {
+const SearchBlock = ({ onSearch = () => {}, categoryId = null }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [eventCount, setEventCount] = useState(0);
   const [results, setResults] = useState([]);
 
-  // Get total events from all categories
+  // Get total events based on category
   useEffect(() => {
-    let count = 0;
     let allEvents = [];
     
-    categories.forEach(category => {
-      if (category.events && category.events.length) {
-        count += category.events.length;
-        allEvents = [...allEvents, ...category.events];
+    // Only show events for Concert category
+    if (categoryId === "cat-1") {
+      // If searching within Concert category
+      const category = categories.find(cat => cat.id === categoryId);
+      if (category && category.events) {
+        const categoryEvents = category.events
+          .map(eventId => eventsById[eventId])
+          .filter(Boolean)
+          .filter(validateEvent);
+        allEvents = categoryEvents;
       }
-    });
+    } else if (!categoryId) {
+      // On the main events page, show all events
+      const eventIdSet = new Set();
+      categories.forEach(category => {
+        if (category.events && category.events.length) {
+          category.events.forEach(eventId => eventIdSet.add(eventId));
+        }
+      });
+      
+      allEvents = Array.from(eventIdSet)
+        .map(eventId => eventsById[eventId])
+        .filter(Boolean)
+        .filter(validateEvent);
+    }
     
-    setEventCount(count);
+    setEventCount(allEvents.length);
     setResults(allEvents);
-  }, []);
+    onSearch(allEvents);
+  }, [categoryId]);
 
   // Filter events based on search criteria
   const handleSearch = () => {
-    let filteredEvents = [];
-    let count = 0;
+    // Get all event objects
+    let allEvents = [];
     
-    categories.forEach(category => {
-      if (category.events && category.events.length) {
-        const filtered = category.events.filter(event => {
-          // Filter by search query
-          const matchesQuery = searchQuery === "" || 
-            event.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            event.location.toLowerCase().includes(searchQuery.toLowerCase());
-          
-          // Filter by location
-          const matchesLocation = location === "" || 
-            event.location.toLowerCase().includes(location.toLowerCase());
-          
-          // Filter by date (simplified for demo purposes)
-          const matchesDate = date === "" || 
-            new Date(event.eventDate).toLocaleDateString().includes(date);
-          
-          return matchesQuery && matchesLocation && matchesDate;
-        });
-        
-        count += filtered.length;
-        filteredEvents = [...filteredEvents, ...filtered];
+    // Only show events for Concert category
+    if (categoryId === "cat-1") {
+      // If searching within Concert category
+      const category = categories.find(cat => cat.id === categoryId);
+      if (category && category.events) {
+        allEvents = category.events
+          .map(eventId => eventsById[eventId])
+          .filter(Boolean)
+          .filter(validateEvent);
       }
+    } else if (!categoryId) {
+      // On the main events page, show all events
+      const eventIdSet = new Set();
+      categories.forEach(category => {
+        if (category.events && category.events.length) {
+          category.events.forEach(eventId => eventIdSet.add(eventId));
+        }
+      });
+      
+      allEvents = Array.from(eventIdSet)
+        .map(eventId => eventsById[eventId])
+        .filter(Boolean)
+        .filter(validateEvent);
+    }
+    
+    // Apply filters
+    const filteredEvents = allEvents.filter(event => {
+      // Filter by search query (event name, description, or location)
+      const matchesQuery = searchQuery === "" || 
+        (event.eventName && event.eventName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (event.description && event.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (event.location && event.location.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Filter by location
+      const matchesLocation = location === "" || 
+        (event.location && event.location.toLowerCase().includes(location.toLowerCase()));
+      
+      // Filter by date
+      const matchesDate = date === "" ||
+        (event.eventDate && new Date(event.eventDate).toISOString().substring(0, 10) === date);
+      
+      return matchesQuery && matchesLocation && matchesDate;
     });
     
-    setEventCount(count);
+    console.log("Search results:", filteredEvents.length, filteredEvents);
+    setEventCount(filteredEvents.length);
     setResults(filteredEvents);
     onSearch(filteredEvents);
   };
@@ -66,35 +107,34 @@ const SearchBlock = ({ onSearch = () => {} }) => {
     handleSearch();
   }, [searchQuery, location, date]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleSearch();
+  };
+
   return (
-    <div className="bg-[#0a0e21] py-10">
-      <div className="container mx-auto px-4">
-        <div className="bg-[#0f1334] rounded-xl p-10 shadow-lg border border-[#1c2044]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Search Input Component */}
-            <SearchInput
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
-            
-            {/* Location Input Component */}
-            <LocationInput
-              value={location}
-              onChange={setLocation}
-            />
-            
-            {/* Date Input Component */}
-            <DateInput
-              value={date}
-              onChange={setDate}
-            />
-          </div>
-          
-          {/* Results Count */}
-          <div className="flex justify-end">
-            <p className="text-white">{eventCount} events found</p>
-          </div>
+    <div className="bg-[#181c3a] rounded-xl p-4 xl:py-6 xl:px-8">
+      <form onSubmit={handleSubmit} className="flex flex-col xl:flex-row gap-4">
+        <div className="flex-grow">
+          <SearchInput
+            placeholder="Search events, venues, artists..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
         </div>
+        <div className="flex-grow">
+          <LocationInput
+            placeholder="All Locations"
+            value={location}
+            onChange={setLocation}
+          />
+        </div>
+        <div className="flex-grow">
+          <DateInput value={date} onChange={setDate} />
+        </div>
+      </form>
+      <div className="mt-3 text-sm text-gray-400">
+        <span>{eventCount} events found</span>
       </div>
     </div>
   );

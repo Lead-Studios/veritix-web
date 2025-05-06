@@ -1,11 +1,13 @@
 import React from "react";
 import TrendingCards from "./cards/TrendingCards";
-import { events } from "../data/Data";
+import { getTrendingEvents } from "../data/events";
 import DIvSkeleton from "./skeleton/DIvSkeleton";
 
 type Props = {};
 
 function TrendingEvent({}: Props) {
+  const trendingEvents = getTrendingEvents();
+
   return (
     <div className="h-auto w-full flex flex-col  bg-[#101428] lg:px-4 py-8 lg:py-12 items-center ">
       
@@ -39,8 +41,8 @@ function TrendingEvent({}: Props) {
         </div>
 
         <div className="grid lg:grid-cols-3 xl:grid-cols-4 px-4  md:grid-cols-2 grid-cols-1 max-w-[1400px] justify-between items-center gap-8 w-full">
-          {events.map((event, i) => (
-            <div key={i} className="">
+          {trendingEvents.map((event) => (
+            <div key={event.id} className="">
               <TrendingCards
                 amount={event.amount}
                 title={event.title}

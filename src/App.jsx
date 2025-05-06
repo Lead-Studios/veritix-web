@@ -14,12 +14,15 @@ import CategoryDetail from "./pages/CategoryDetail";
 import CreateTicket from "./pages/Create-Ticket";
 import ForgotForm from "./pages/auth/Forgot-Password";
 import PasswordReset from "./pages/auth/Reset-Password";
+import EventDetail from "./components/events/EventDetail";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 function App() {
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <>
+        <ScrollToTop />
         <Routes>
           {/* Landing pages with Navbar */}
           <Route element={<LandingLayout />}>
@@ -31,6 +34,7 @@ function App() {
             <Route path="/help" element={<Help />} />
             <Route path="/category/:id" element={<CategoryDetail />} />
             <Route path="/create-ticket" element={<CreateTicket />} />
+            <Route path="/event/:eventId" element={<EventDetail />} />
           </Route>
           {/* Auth pages without Navbar */}
           <Route element={<AuthLayout />}>
@@ -40,8 +44,8 @@ function App() {
             <Route path="/reset-password" element={<PasswordReset />} />
           </Route>
         </Routes>
-      </QueryClientProvider>
-    </>
+      </>
+    </QueryClientProvider>
   );
 }
 

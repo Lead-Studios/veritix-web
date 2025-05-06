@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EventCard from "../EventCard";
 import { categories } from "../../data/categoryData";
+import { eventsById, validateEvent } from "../../data/events";
 
 const EventList = ({ categoryId = null, customEvents = null }) => {
   const [events, setEvents] = useState([]);
@@ -10,41 +11,37 @@ const EventList = ({ categoryId = null, customEvents = null }) => {
   useEffect(() => {
     // If customEvents are provided, use those
     if (customEvents) {
-      setEvents(customEvents);
+      // Validate all events
+      const validEvents = customEvents.filter(validateEvent);
+      setEvents(validEvents);
       return;
     }
     
-    // If categoryId is provided, only show events from that category
-    // Otherwise, collect all events from all categories
     let allEvents = [];
-    
     if (categoryId) {
       const category = categories.find(cat => cat.id === categoryId);
-      allEvents = category ? [...category.events] : [];
+      if (category && category.events) {
+        allEvents = category.events
+          .map(eventId => eventsById[eventId])
+          .filter(Boolean) // filter out undefined
+          .filter(validateEvent); // validate events
+      }
     } else {
       // Collect all events from all categories
+      const eventIdSet = new Set();
       categories.forEach(category => {
         if (category.events && category.events.length) {
-          // Add category info to each event
-          const eventsWithCategory = category.events.map(event => ({
-            ...event,
-            categoryName: category.name,
-            categoryId: category.id
-          }));
-          allEvents = [...allEvents, ...eventsWithCategory];
+          category.events.forEach(eventId => eventIdSet.add(eventId));
         }
       });
+      allEvents = Array.from(eventIdSet)
+        .map(eventId => eventsById[eventId])
+        .filter(Boolean)
+        .filter(validateEvent);
     }
     
     // Sort events by date (newest first)
     allEvents.sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate));
-    
-    // Add prices if not present (for display purposes)
-    allEvents = allEvents.map(event => ({
-      ...event,
-      price: event.price || (Math.random() > 0.5 ? "0.08 ETH" : "0.05 ETH")
-    }));
-    
     setEvents(allEvents);
   }, [categoryId, customEvents]);
 
@@ -75,6 +72,7 @@ const EventList = ({ categoryId = null, customEvents = null }) => {
         {currentEvents.map((event) => (
           <EventCard
             key={event.id}
+            id={event.id}
             imageUrl={event.imageUrl}
             eventName={event.eventName}
             eventDate={event.eventDate}
@@ -102,7 +100,7 @@ const EventList = ({ categoryId = null, customEvents = null }) => {
           <div className="flex space-x-2">
             {[...Array(totalPages)].map((_, index) => (
               <button
-                key={index}
+                key={`page-${index + 1}`}
                 onClick={() => setCurrentPage(index + 1)}
                 className={`w-10 h-10 flex items-center justify-center rounded-md text-lg font-bold ${
                   currentPage === index + 1
