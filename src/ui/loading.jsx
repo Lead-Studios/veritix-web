@@ -17,4 +17,11 @@ const Loading = ({fullScreen = false, size = 20}) => {
   return spinner;
 };
 
+
 export default Loading;
+
+
+Loading.propTypes = {
+  fullScreen: PropTypes.bool,
+  size: PropTypes.number,
+};
