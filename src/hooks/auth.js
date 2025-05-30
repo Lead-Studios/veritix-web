@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
-import api from '../lib/axios';
-import { apiEndpoints } from '../lib/endpoints';
-import { toast } from 'react-toastify';
+import { useMutation } from "@tanstack/react-query";
+import api from "../lib/axios";
+import { apiEndpoints } from "../lib/endpoints";
+import { toast } from "react-toastify";
 
 export const useSignUp = () => {
   return useMutation({
@@ -10,10 +10,11 @@ export const useSignUp = () => {
       return response;
     },
     onSuccess: () => {
-      toast.success('Account created successfully!');
+      toast.success("Account created successfully!");
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create account');
+      toast.dismiss()
+      toast.error(error.message || "Failed to create account");
     },
   });
 };
@@ -25,10 +26,11 @@ export const useLogin = () => {
       return response;
     },
     onSuccess: () => {
-      toast.success('Login successful!');
+      toast.success("Login successful!");
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to login');
+      toast.dismiss()
+      toast.error(error.message || "Failed to login");
     },
   });
 };
@@ -40,10 +42,11 @@ export const useForgotPassword = () => {
       return response;
     },
     onSuccess: () => {
-      toast.success('Password reset link sent to your email!');
+      toast.success("Password reset link sent to your email!");
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to send password reset link');
+      toast.dismiss()
+      toast.error(error.message || "Failed to send password reset link");
     },
   });
 };
@@ -55,10 +58,11 @@ export const useResetPassword = () => {
       return response;
     },
     onSuccess: () => {
-      toast.success('Password reset successful!');
+      toast.success("Password reset successful!");
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to reset password');
+      toast.dismiss()
+      toast.error(error.message || "Failed to reset password");
     },
   });
 };

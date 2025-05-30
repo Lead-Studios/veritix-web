@@ -25,6 +25,7 @@ export default function PasswordReset() {
         navigate('/');
       }
     } catch (error) {
+      toast.dismiss()
       console.error('Password reset error:', error);
       toast.error('Password reset failed. Please try again.');
     }

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 import PropTypes from "prop-types";
 

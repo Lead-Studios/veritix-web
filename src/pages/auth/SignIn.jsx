@@ -1,11 +1,12 @@
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { signInSchema } from '../../utils/authValidators';
-import { UserIcon } from '../../icons/UserIcon';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useLogin } from '../../hooks/auth';
-import AuthInnerLayout from '../../components/Layout/AuthInnerLayout';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signInSchema } from "../../utils/authValidators";
+import { UserIcon } from "../../icons/UserIcon";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useLogin } from "../../hooks/auth";
+import AuthInnerLayout from "../../components/Layout/AuthInnerLayout";
+import Loading from "../../ui/loading";
 // NOTE: This is the SignInForm component
 // It should be further designed and styled as per the required UI design, this is just a basic implementation
 // to show how the form works with the created validations
@@ -24,13 +25,15 @@ export default function SignInForm() {
       const { email, password } = data;
       const response = login.mutateAsync({ email, password });
       if (response.status === 200) {
-        navigate('/');
+        navigate("/");
       } else {
-        toast.error('Login failed. Please try again.');
+        toast.dismiss();
+        toast.error("Login failed. Please try again.");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Login failed. Please try again.');
+      toast.dismiss();
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
     }
   };
 
@@ -54,7 +57,7 @@ export default function SignInForm() {
                 <UserIcon className="h-5 w-5 text-[#666666]" />
               </div>
               <input
-                {...register('email')}
+                {...register("email")}
                 type="email"
                 placeholder="Enter your Email Address"
                 className="w-full rounded-md border border-[#cccccc] bg-transparent py-3 pl-10 pr-3 text-[#121212] focus:border-[#013237] focus:outline-none"
@@ -82,7 +85,7 @@ export default function SignInForm() {
                 <UserIcon className="h-5 w-5 text-[#666666]" />
               </div>
               <input
-                {...register('password')}
+                {...register("password")}
                 type="password"
                 placeholder="Enter your Password"
                 className="w-full rounded-md border border-[#cccccc] bg-transparent py-3 pl-10 pr-3 text-[#121212] focus:border-[#013237] focus:outline-none"
@@ -97,9 +100,17 @@ export default function SignInForm() {
 
           <button
             type="submit"
-            className="w-full text-xl font-poly rounded-md bg-[linear-gradient(274.96deg,_#1E3A8A_-12.07%,_#0A1854_36.94%,_#000625_85.96%)] hover:opacity-80 py-4 text-center font-bold text-white transition-colors"
+            disabled={login.isPending}
+            className={`w-full text-xl font-poly rounded-md bg-[linear-gradient(274.96deg,_#1E3A8A_-12.07%,_#0A1854_36.94%,_#000625_85.96%)] hover:opacity-80 py-4 text-center font-bold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            Sign In
+            {login.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loading />
+                Signing in...
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
