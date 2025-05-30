@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useLogin } from "../../hooks/auth";
 import AuthInnerLayout from "../../components/Layout/AuthInnerLayout";
+import Loading from "../../ui/loading";
 // NOTE: This is the SignInForm component
 // It should be further designed and styled as per the required UI design, this is just a basic implementation
 // to show how the form works with the created validations
@@ -99,10 +100,17 @@ export default function SignInForm() {
 
           <button
             type="submit"
-            disabled={login.isLoading}
-            className="w-full text-xl font-poly rounded-md bg-[linear-gradient(274.96deg,_#1E3A8A_-12.07%,_#0A1854_36.94%,_#000625_85.96%)] hover:opacity-80 py-4 text-center font-bold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={login.isPending}
+            className={`w-full text-xl font-poly rounded-md bg-[linear-gradient(274.96deg,_#1E3A8A_-12.07%,_#0A1854_36.94%,_#000625_85.96%)] hover:opacity-80 py-4 text-center font-bold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            {login.isLoading ? "Signing In..." : "Sign In"}
+            {login.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loading />
+                Signing in...
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
