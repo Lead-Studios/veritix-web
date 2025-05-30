@@ -117,15 +117,15 @@ const SignUpPage = () => {
                 <LuUserRoundPlus className="text-gray-400" />
               </div>
               <InputComponent
-                id="username"
+                id="userName"
                 label="Username"
                 type="text"
                 register={register}
               />
             </div>
-            {errors.username && (
+            {errors.userName && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.username.message}
+                {errors.userName.message}
               </p>
             )}
           </div>
