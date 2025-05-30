@@ -12,7 +12,7 @@ export const signUpSchema = yup.object().shape({
     .required('Last name is required')
     .min(2, 'Last name must be at least 2 characters'),
 
-  username: yup
+  userName: yup
     .string()
     .required('Username is required')
     .min(3, 'Username must be at least 3 characters'),
