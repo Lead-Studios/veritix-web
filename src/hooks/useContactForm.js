@@ -29,6 +29,7 @@ export const useContactForm = () => {
       console.error('EmailJS Error:', err);
       const errorMessage = err.message || 'Failed to send message. Please try again.';
       setSubmitStatus('error');
+      toast.dismiss()
       toast.error(errorMessage);
       return false;
     } finally {

@@ -36,6 +36,7 @@ const SignUpPage = () => {
       console.log(data);
       reset();
     } catch (error) {
+      toast.dismiss()
       console.error('Sign-up error:', error);
       toast.error('Login failed. Please check your credentials.');
     }

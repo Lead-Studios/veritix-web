@@ -26,8 +26,9 @@ export default function ForgotForm() {
       navigate('/reset-password');
       toast.success('Password reset link sent to your email!');
     } catch (error) {
+      toast.dismiss()
       console.error('Forgot password error:', error);
-      // toast.error('Forgot password failed. Please try again.');
+      toast.error('Forgot password failed. Please try again.');
     }
   };
 

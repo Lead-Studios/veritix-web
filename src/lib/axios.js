@@ -43,6 +43,7 @@ const createAxiosInstance = (isAuthenticated = true) => {
 
             return instance(originalRequest);
           } catch (refreshError) {
+            toast.dismiss()
             toast.error('Session expired. Please login again.');
             handleLogout();
             return Promise.reject(refreshError);

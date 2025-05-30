@@ -26,9 +26,11 @@ export default function SignInForm() {
       if (response.status === 200) {
         navigate('/');
       } else {
+        toast.dismiss()
         toast.error('Login failed. Please try again.');
       }
     } catch (error) {
+      toast.dismiss()
       console.error('Login error:', error);
       toast.error('Login failed. Please try again.');
     }
