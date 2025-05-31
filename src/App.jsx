@@ -16,12 +16,14 @@ import ForgotForm from "./pages/auth/Forgot-Password";
 import PasswordReset from "./pages/auth/Reset-Password";
 import EventDetail from "./components/events/EventDetail";
 import ScrollToTop from "./components/ScrollToTop";
+import { AuthProvider } from "./hooks/auth";
 
 const queryClient = new QueryClient();
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <>
+      <AuthProvider>
         <ScrollToTop />
         <Routes>
           {/* Landing pages with Navbar */}
@@ -44,7 +46,7 @@ function App() {
             <Route path="/reset-password" element={<PasswordReset />} />
           </Route>
         </Routes>
-      </>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
