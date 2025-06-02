@@ -28,7 +28,8 @@ const SignUpForm = () => {
     try {
       // Simulate API call or processing
       const response = await signUp.mutateAsync(data);
-      if (response.status === 200) {
+
+      if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully!");
         navigate("/signin");
         reset();
@@ -76,16 +77,16 @@ const SignUpForm = () => {
 
           {/* Username */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-[#121212] mb-3">
+            <label htmlFor="userName" className="block text-sm font-medium text-[#121212] mb-3">
               Username
             </label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <LuUserRoundPlus className="text-gray-400" />
               </div>
-              <InputComponent id="username" label="Username" type="text" register={register} />
+              <InputComponent id="userName" label="Username" type="text" register={register} />
             </div>
-            {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>}
+            {errors.userName && <p className="text-red-500 text-xs mt-1">{errors.userName.message}</p>}
           </div>
 
           {/* Email */}
