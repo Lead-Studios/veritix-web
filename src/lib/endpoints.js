@@ -1,5 +1,5 @@
 export const apiEndpoints = {
-  login: "/auth/login",
+  login: "/auth/sign-in",
   register: "/users",
   forgotPassword: "/auth/forgot-password",
   resetPassword: "/auth/reset-password",

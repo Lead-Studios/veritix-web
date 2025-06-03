@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     // Check if user is stored in localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser).user);
       setIsAuthenticated(true);
     }
   }, []);
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     const response = await api.post(apiEndpoints.login, credentials);
     if (response.data) {
-      setUser(response.data);
+      setUser(response.data.user);
       setIsAuthenticated(true);
       localStorage.setItem("user", JSON.stringify(response.data));
     }

@@ -67,7 +67,7 @@ function Navbar() {
               Connect Wallet
             </Link>
             {isAuthenticated ? (
-              <span className="text-white">Hello, {user?.userName || "User"}</span>
+              <span className="text-white">Hello, {user?.userName || user?.username || "User"}</span>
             ) : (
               <Link
                 to="/signup"
@@ -112,7 +112,7 @@ function Navbar() {
             Connect Wallet
           </Link>
           {isAuthenticated ? (
-            <span className="text-white text-center">Hello, {user?.userName || "User"}</span>
+            <span className="text-white text-center">Hello, {user?.userName || user?.username || "User"}</span>
           ) : (
             <Link
               to="/signup"
