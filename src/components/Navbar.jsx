@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import PropTypes from "prop-types";
+import { useAuth } from "../hooks/useAuth"; // Changed from "../hooks/auth" to "../hooks/useAuth"
 
 function NavLink({ to, children, onClick }) {
   const location = useLocation();
@@ -47,6 +48,7 @@ NavLink.propTypes = {
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -85,13 +87,19 @@ function Navbar() {
               <span className="relative z-10">Connect Wallet</span>
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </Link>
-            <Link
-              to="/signup"
-              className="relative group bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-full font-medium transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95 overflow-hidden"
-            >
-              <span className="relative z-10">Sign Up</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700"></div>
-            </Link>
+            {isAuthenticated ? (
+              <span className="text-white font-medium px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                Hello, {user?.userName || user?.username || "User"}
+              </span>
+            ) : (
+              <Link
+                to="/signup"
+                className="relative group bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-full font-medium transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95 overflow-hidden"
+              >
+                <span className="relative z-10">Sign Up</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700"></div>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button with animation */}
@@ -167,13 +175,19 @@ function Navbar() {
             >
               Connect Wallet
             </Link>
-            <Link
-              to="/sign-up"
-              className="block bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full font-medium text-center transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:scale-105 active:scale-95"
-              onClick={toggleMobileMenu}
-            >
-              Sign Up
-            </Link>
+            {isAuthenticated ? (
+              <div className="text-white text-center font-medium px-4 py-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                Hello, {user?.userName || user?.username || "User"}
+              </div>
+            ) : (
+              <Link
+                to="/signup"
+                className="block bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full font-medium text-center transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:scale-105 active:scale-95"
+                onClick={toggleMobileMenu}
+              >
+                Sign Up
+              </Link>
+            )}
           </div>
         </div>
       </div>
