@@ -1,20 +1,14 @@
-import { 
-  FaMusic, 
-  FaCampground, 
-  FaLaptopCode, 
-  FaGamepad, 
-  FaUtensils, 
-  FaGlassCheers, 
-  FaRunning, 
-  FaPaintBrush, 
-  FaFilm, 
-  FaUsers, 
-  FaGem, 
-  FaUmbrellaBeach 
+import {
+  FaMusic,
+  FaFootballBall,
+  FaTheaterMasks,
+  FaLaugh,
+  FaCalendarAlt,
+  FaMicrophone,
+  FaUsers,
+  FaGem,
+  FaUmbrellaBeach,
 } from "react-icons/fa";
-
-// Placeholder image for events
-const placeholderImage = "/Images/placeholder.png";
 
 export const categories = [
   {
@@ -24,105 +18,95 @@ export const categories = [
     icon: FaMusic,
     imageUrl: "/Images/categories/concert.jpg",
     count: 235,
-    events: ["e1", "e2"]
+    events: ["e1", "e2"],
   },
   {
     id: "cat-2",
-    name: "FESTIVALS",
-    description: "Multi-day music & cultural events",
-    icon: FaCampground,
-    imageUrl: "/Images/categories/festivals.jpg",
-    count: 119,
-    events: ["e1"]
+    name: "SPORTS",
+    description: "Athletic competitions and games",
+    icon: FaFootballBall,
+    imageUrl: "/Images/categories/sports.jpg",
+    count: 189,
+    events: [],
   },
   {
     id: "cat-3",
-    name: "WORKSHOPS",
-    description: "Educational & skill-building",
-    icon: FaLaptopCode,
-    imageUrl: "/Images/categories/workshops.jpg",
-    count: 84,
-    events: ["e2"]
+    name: "THEATER",
+    description: "Dramatic performances and plays",
+    icon: FaTheaterMasks,
+    imageUrl: "/Images/categories/theater.jpg",
+    count: 156,
+    events: [],
   },
   {
     id: "cat-4",
-    name: "GAMING",
-    description: "Esports & gaming tournaments",
-    icon: FaGamepad,
-    imageUrl: "/Images/categories/gaming.jpg",
-    count: 150,
-    events: ["e1"]
+    name: "COMEDY",
+    description: "Stand-up and comedy shows",
+    icon: FaLaugh,
+    imageUrl: "/Images/categories/comedy.jpg",
+    count: 98,
+    events: [],
   },
   {
     id: "cat-5",
-    name: "DINING",
-    description: "Food tastings & culinary events",
-    icon: FaUtensils,
-    imageUrl: "/Images/categories/dining.jpg",
-    count: 78,
-    events: ["e2"]
+    name: "FESTIVALS",
+    description: "Multi-day cultural celebrations",
+    icon: FaCalendarAlt,
+    imageUrl: "/Images/categories/festivals.jpg",
+    count: 67,
+    events: [],
   },
   {
     id: "cat-6",
-    name: "NIGHTLIFE",
-    description: "Club events & parties",
-    icon: FaGlassCheers,
-    imageUrl: "/Images/categories/nightlife.jpg",
-    count: 324,
-    events: ["e1"]
+    name: "CONFERENCES",
+    description: "Professional and educational events",
+    icon: FaMicrophone,
+    imageUrl: "/Images/categories/conferences.jpg",
+    count: 134,
+    events: [],
   },
   {
     id: "cat-7",
-    name: "FITNESS",
-    description: "Workouts & wellness activities",
-    icon: FaRunning,
-    imageUrl: "/Images/categories/fitness.jpg",
-    count: 94,
-    events: ["e2"]
+    name: "NETWORKING",
+    description: "Professional networking events",
+    icon: FaUsers,
+    imageUrl: "/Images/categories/networking.jpg",
+    count: 89,
+    events: [],
   },
   {
     id: "cat-8",
-    name: "ARTS",
-    description: "Exhibitions & creative events",
-    icon: FaPaintBrush,
-    imageUrl: "/Images/categories/arts.jpg",
-    count: 174,
-    events: ["e1"]
+    name: "EXHIBITIONS",
+    description: "Art and cultural exhibitions",
+    icon: FaGem,
+    imageUrl: "/Images/categories/exhibitions.jpg",
+    count: 76,
+    events: [],
   },
   {
     id: "cat-9",
-    name: "CINEMA",
-    description: "Film screenings & premieres",
-    icon: FaFilm,
-    imageUrl: "/Images/categories/cinema.jpg",
-    count: 67,
-    events: ["e2"]
-  },
-  {
-    id: "cat-10",
-    name: "MEETUPS",
-    description: "Networking & social gatherings",
-    icon: FaUsers,
-    imageUrl: "/Images/categories/meetups.jpg",
-    count: 56,
-    events: ["e1"]
-  },
-  {
-    id: "cat-11",
-    name: "EXCLUSIVE",
-    description: "VIP & limited access events",
-    icon: FaGem,
-    imageUrl: "/Images/categories/exclusive.jpg",
-    count: 36,
-    events: ["e2"]
-  },
-  {
-    id: "cat-12",
-    name: "BEACH",
-    description: "Seaside parties & activities",
+    name: "OUTDOOR",
+    description: "Outdoor activities and adventures",
     icon: FaUmbrellaBeach,
-    imageUrl: "/Images/categories/beach.jpg",
-    count: 122,
-    events: ["e1"]
-  }
-]; 
+    imageUrl: "/Images/categories/outdoor.jpg",
+    count: 112,
+    events: [],
+  },
+];
+
+// Helper function to get category by ID
+export const getCategoryById = (id) => {
+  return categories.find((category) => category.id === id);
+};
+
+// Helper function to get categories with events
+export const getCategoriesWithEvents = () => {
+  return categories.filter(
+    (category) => category.events && category.events.length > 0
+  );
+};
+
+// Helper function to get total event count
+export const getTotalEventCount = () => {
+  return categories.reduce((total, category) => total + category.count, 0);
+};

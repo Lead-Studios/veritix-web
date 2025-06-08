@@ -9,11 +9,11 @@ function ScrollToTop() {
     // Scroll to top with smooth behavior
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   }, [pathname]);
 
-  return null; // This component doesn't render anything
+  return null;
 }
 
-export default ScrollToTop; 
+export default ScrollToTop;
