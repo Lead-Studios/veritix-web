@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import image from "../assets/image.png";
 import { motion, useAnimation } from "framer-motion";
-import { useInView } from "react-intersection-observer"; 
+import { useInView } from "react-intersection-observer";
 
 function Home() {
-  const controls = useAnimation(); 
+  const controls = useAnimation();
   const [ref, inView] = useInView({
-    threshold: 0.2, 
-    triggerOnce: true, 
+    threshold: 0.2,
+    triggerOnce: true,
   });
 
   // Variants for the animation
@@ -19,7 +19,7 @@ function Home() {
       transition: {
         duration: 0.8,
         ease: "easeInOut",
-        staggerChildren: 0.3, 
+        staggerChildren: 0.3,
       },
     },
     exit: {
@@ -46,34 +46,35 @@ function Home() {
     },
   };
 
-  const textVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeInOut" },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: { duration: 0.4, ease: "easeInOut" },
-    },
-  };
+  // Remove this entire block:
+  // const textVariants = {
+  //   hidden: { opacity: 0, y: -20 },
+  //   visible: {
+  //     opacity: 1,
+  //     y: 0,
+  //     transition: { duration: 0.6, ease: "easeInOut" },
+  //   },
+  //   exit: {
+  //     opacity: 0,
+  //     y: -20,
+  //     transition: { duration: 0.4, ease: "easeInOut" },
+  //   },
+  // };
 
   // Trigger animation when the section comes into view
   useEffect(() => {
     if (inView) {
-      controls.start("visible"); 
+      controls.start("visible");
     }
   }, [controls, inView]);
 
   return (
     <motion.div
-      ref={ref} 
+      ref={ref}
       className="bg-[#000625] flex flex-col items-center justify-center px-4 py-12 sm:py-20"
       variants={containerVariants}
       initial="hidden"
-      animate={controls} 
+      animate={controls}
       exit="exit"
     >
       {/* Main Content */}

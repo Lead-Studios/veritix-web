@@ -16,38 +16,42 @@ import ForgotForm from "./pages/auth/Forgot-Password";
 import PasswordReset from "./pages/auth/Reset-Password";
 import EventDetail from "./components/events/EventDetail";
 import ScrollToTop from "./components/ScrollToTop";
-import { AuthProvider } from "./hooks/auth";
 
 const queryClient = new QueryClient();
+// Add this import
+import { AuthProvider } from "./hooks/auth";
 
+// Wrap your app with AuthProvider
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ScrollToTop />
-        <Routes>
-          {/* Landing pages with Navbar */}
-          <Route element={<LandingLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/explore" element={<Events />} />
-            <Route path="/how-it-works" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/category/:id" element={<CategoryDetail />} />
-            <Route path="/create-ticket" element={<CreateTicket />} />
-            <Route path="/event/:eventId" element={<EventDetail />} />
-          </Route>
-          {/* Auth pages without Navbar */}
-          <Route element={<AuthLayout />}>
-            <Route path="/signin" element={<SignInForm />} />
-            <Route path="/signup" element={<SignUpForm />} />
-            <Route path="/forgot-password" element={<ForgotForm />} />
-            <Route path="/reset-password" element={<PasswordReset />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <>
+          <ScrollToTop />
+          <Routes>
+            {/* Landing pages with Navbar */}
+            <Route element={<LandingLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/explore" element={<Events />} />
+              <Route path="/how-it-works" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/category/:id" element={<CategoryDetail />} />
+              <Route path="/create-ticket" element={<CreateTicket />} />
+              <Route path="/event/:eventId" element={<EventDetail />} />
+            </Route>
+            {/* Auth pages without Navbar */}
+            <Route element={<AuthLayout />}>
+              <Route path="/signin" element={<SignInForm />} />
+              <Route path="/signup" element={<SignUpForm />} />
+              <Route path="/forgot-password" element={<ForgotForm />} />
+              <Route path="/reset-password" element={<PasswordReset />} />
+            </Route>
+          </Routes>
+        </>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }
 

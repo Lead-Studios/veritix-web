@@ -1,4 +1,4 @@
-import React from "react";
+// import React xfrom "react";
 import CategoryList from "./CategoryList";
 
 const DiscoverCategories = () => {
@@ -14,11 +14,11 @@ const DiscoverCategories = () => {
             Find the perfect event that matches your interests and vibe
           </p>
         </div>
-        
+
         <CategoryList />
       </div>
     </div>
   );
 };
 
-export default DiscoverCategories; 
+export default DiscoverCategories;

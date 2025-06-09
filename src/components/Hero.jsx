@@ -1,9 +1,10 @@
-"use client"
-import React from 'react'
-import { motion } from 'framer-motion'
+"use client";
+// import React from "react";
+import { motion } from "framer-motion";
+import CreateEventButton from "./hero/CreateEventButton";
+import LearnMoreButton from "./hero/LearnMoreButton";
 
 const Hero = () => {
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -13,7 +14,7 @@ const Hero = () => {
         delayChildren: 0.3,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -25,10 +26,10 @@ const Hero = () => {
         duration: 0.5,
       },
     },
-  }
+  };
 
   return (
-    <section className="relative mx-auto overflow-hidden h-[600px] w-full pt-16 sm:pt-0">
+    <section className="relative mx-auto overflow-hidden h-[700px] sm:h-[650px] md:h-[600px] w-full pt-24 sm:pt-20 md:pt-16">
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#000625] to-[#455A64] w-full h-full">
         <img
@@ -39,9 +40,8 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 mx-auto flex h-full items-center px-4 py-12 md:px-6">
+      <div className="container relative z-10 mx-auto flex h-full items-center px-4 py-8 md:px-6">
         <div className="grid gap-6 md:grid-cols-2 md:gap-10 items-center">
-
           {/* Image Section */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -49,14 +49,13 @@ const Hero = () => {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="flex items-center justify-center px-4"
           >
-            <div className="relative w-full max-w-4xl overflow-hidden rounded-lg h-[250px] sm:h-[350px] md:h-[450px] lg:h-[500px]">
+            <div className="relative w-full max-w-4xl overflow-hidden rounded-lg h-[220px] sm:h-[320px] md:h-[400px] lg:h-[450px]">
               <img
                 src="/Images/hero.png"
                 alt="Hero"
                 className="h-full w-full object-cover"
               />
             </div>
-
           </motion.div>
 
           {/* Text Content Section */}
@@ -76,45 +75,49 @@ const Hero = () => {
             >
               Discover, Own, and Trade{" "}
               <span className="block sm:inline">
-                <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent">Event Tickets</span> Reimagined
+                <motion.span
+                  className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent"
+                  animate={{
+                    opacity: [1, 0.7, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  whileHover={{
+                    scale: 1.05,
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  Event Tickets
+                </motion.span>{" "}
+                Reimagined
               </span>
             </motion.h1>
 
             {/* Subtitle */}
             <motion.p
               variants={itemVariants}
-              className="w-full max-w-lg mx-auto mt-4 text-center rounded-[50px] px-4 py-3 text-[16px] sm:text-[18px] md:text-[20px] leading-[130%] text-white font-[400] font-[Poly] tracking-[0%]"
+              className="w-full max-w-lg mx-auto mt-6 mb-8 text-center rounded-[50px] px-4 py-3 text-[16px] sm:text-[18px] md:text-[20px] leading-[130%] text-white font-[400] font-[Poly] tracking-[0%]"
             >
-              Discover real-life events, mint NFT tickets, and earn rewards with crypto.
+              Discover real-life events, mint NFT tickets, and earn rewards with
+              crypto.
             </motion.p>
 
             {/* Buttons */}
-            <div className='flex justify-center sm:flex-row'>
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap justify-center md:justify-start mt-6 gap-4 md:gap-6"
+              className="flex flex-row justify-center items-center gap-3 sm:gap-4 md:gap-6 mt-2"
             >
-              <a
-                href="/create-ticket"
-                className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] sm:text-center rounded-[50px] px-[18px] py-[14px] bg-gradient-to-r from-blue-500 to-indigo-600 text-white md:text-lg font-medium shadow-md hover:from-blue-600 hover:to-indigo-700 transition"
-              >
-                Create Event
-              </a>
-              <a
-                 href="#"
-                 className="flex items-center justify-center md:w-[158px] md:h-[57px] h-[40px] rounded-[50px] px-[18px] py-[14px] gap-[24px] border-2 border-blue-500 text-blue-500 text-sm text-center md:text-lg font-medium shadow-md hover:bg-blue-500 hover:text-white transition"
-
-               >
-                 Learn More
-               </a>
+              <CreateEventButton href="/create-ticket" />
+              <LearnMoreButton href="#learn-more" text="Learn More" />
             </motion.div>
-            </div>
-
           </motion.div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;
