@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VeriTix Web (Frontend)
 
-## Getting Started
+**VeriTix Web** is the **frontend application** for **VeriTix**, a blockchain-powered ticketing platform built on the **Stellar ecosystem**.
 
-First, run the development server:
+This repository contains the **user-facing web application** used by:
+- Event attendees (ticket purchase, ownership, verification)
+- Event organizers (event setup, ticket rules, analytics)
+- Gate operators (ticket validation at entry)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+> ⚠️ **Important:**  
+> This repo is **frontend-only**. Blockchain logic, smart contracts, and backend services live in separate repositories.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔍 What Is VeriTix?
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+VeriTix is a **decentralized ticketing system** designed to eliminate fraud, prevent scalping, and give organizers full control over how tickets are issued, transferred, and verified.
 
-## Learn More
+Unlike traditional ticketing platforms, VeriTix anchors ticket ownership and verification data on the **Stellar blockchain**, ensuring transparency and tamper resistance while keeping fees low.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧭 What This Repo Contains (Scope)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### ✅ Frontend Responsibilities
+- Event discovery & ticket purchase UI
+- Wallet connection and user authentication flows
+- Ticket display (QR / on-chain reference)
+- Ticket verification interface (for event entry)
+- Organizer dashboards (events, tickets, rules)
+- Communication with the backend APIs
+- UX states for blockchain-related actions (pending, confirmed, failed)
 
-## Deploy on Vercel
+### ❌ What This Repo Does NOT Contain
+- Stellar smart contracts
+- Backend APIs or database logic
+- Indexers or off-chain workers
+- Payment rails or custodial logic
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+These live in **separate backend / protocol repositories**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🏗️ Architecture Overview
+
+```text
+User Browser
+     ↓
+VeriTix Web (Next.js / TypeScript)
+     ↓
+Backend API (Auth, Tickets, Events)
+     ↓
+Stellar Network (Anchoring & Verification)
