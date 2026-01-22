@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import ContactInfo from "./components/ContactInfo";
 import ContactForm from "./components/ContactForm";
-import Navbar from "@/src/components/Navbar";
+ 
 
 export default function ContactPage() {
   return (
