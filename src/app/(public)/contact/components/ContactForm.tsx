@@ -46,7 +46,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-8">
+    <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8">
       <h2 className="text-xl font-semibold mb-1">Send us a message</h2>
       <p className="text-sm text-white/60 mb-6">
         Fill out the form below and our team will get back to you shortly.
@@ -58,43 +58,44 @@ export default function ContactForm() {
             label="Name"
             value={formData.name}
             error={errors.name}
+            placeholder="Your name"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <Input
             label="Email"
             value={formData.email}
             error={errors.email}
+            placeholder="your.email@example.com"
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
           />
         </div>
-
         <Input
           label="Subject"
           value={formData.subject}
           error={errors.subject}
+          placeholder="your.email@example.com"
           onChange={(e) =>
             setFormData({ ...formData, subject: e.target.value })
           }
         />
-
         <Textarea
           label="Message"
           value={formData.message}
           error={errors.message}
+          placeholder="Please describe your inquiry in details....."
           onChange={(e) =>
             setFormData({ ...formData, message: e.target.value })
           }
         />
-
         {success && <p className="text-green-400 text-sm">{success}</p>}
-
+        {/* contact-form-graadient-btn */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           disabled={loading}
-          className="w-full py-3 rounded-lg font-medium bg-gradient-to-r from-purple-500 to-blue-500"
+          className="w-full py-3 rounded-lg font-medium bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]"
         >
           {loading ? "Sending..." : "Send Message"}
         </motion.button>

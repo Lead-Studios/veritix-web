@@ -8,7 +8,7 @@ import Navbar from "@/src/components/Navbar";
 export default function ContactPage() {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
 
       <div className="min-h-screen  bg-gradient-to-br from-[#020617] via-[#020617] to-[#0a1b3d] text-white">
         <main className="mx-auto max-w-7xl px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
