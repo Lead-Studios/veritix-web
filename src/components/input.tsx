@@ -1,21 +1,21 @@
-import { Control, useController } from "react-hook-form";
+import { Control, useController, FieldValues, FieldPath } from "react-hook-form";
 import { cn } from "../lib/cn";
 import usePasswordToggle from "../hooks/usePasswordToggle";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 
-type FormInputProps = {
-  name: string;
-  control: Control<any>;
+type FormInputProps<TFieldValues extends FieldValues = FieldValues> = {
+  name: FieldPath<TFieldValues>;
+  control: Control<TFieldValues>;
   label?: string;
   placeholder?: string;
   type?: string;
   disabled?: boolean;
   icon?: React.ReactNode;
-  showForgotPassword?: boolean
-};
+  showForgotPassword?: boolean;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name' | 'type' | 'disabled' | 'placeholder'>;
 
-export const Input = ({
+export const Input = <TFieldValues extends FieldValues = FieldValues>({
   name,
   control,
   label,
@@ -23,10 +23,10 @@ export const Input = ({
   type = "text",
   disabled = false,
   icon,
-  showForgotPassword
-}: FormInputProps) => {
-  const { showPassword, handleClickShowPassword } = usePasswordToggle()
-
+  showForgotPassword,
+  ...restProps
+}: FormInputProps<TFieldValues>) => {
+  const { showPassword, handleClickShowPassword } = usePasswordToggle();
   const {
     field,
     fieldState: { error },
@@ -41,17 +41,14 @@ export const Input = ({
     <div className="w-full space-y-3">
       {label && (
         <div className="flex justify-between">
-          <label
-            htmlFor={name}
-
-          >
+          <label htmlFor={name}>
             {label}
           </label>
-
-          {(isPassword && showForgotPassword) && <Link href="/forgot-password">Forgot Password?</Link>}
+          {(isPassword && showForgotPassword) && (
+            <Link href="/forgot-password">Forgot Password?</Link>
+          )}
         </div>
       )}
-
       <div>
         <div
           className={cn(
@@ -68,9 +65,9 @@ export const Input = ({
               {icon}
             </span>
           )}
-
           <input
             {...field}
+            {...restProps}
             id={name}
             type={isPassword && showPassword ? "text" : type}
             placeholder={placeholder}
@@ -81,7 +78,6 @@ export const Input = ({
               disabled && "cursor-not-allowed"
             )}
           />
-
           {isPassword && (
             <button
               type="button"
@@ -94,12 +90,10 @@ export const Input = ({
             </button>
           )}
         </div>
-
         {error && (
           <p className="text-xs text-red-600">{error.message}</p>
         )}
       </div>
-
     </div>
   );
 };
