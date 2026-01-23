@@ -5,6 +5,14 @@ body {
   height: 100%;
 }
 
+.contact-form-graadient{
+background: #000625;
+background: linear-gradient(157deg, rgba(0, 6, 37, 1) 30%, rgba(30, 58, 138, 1) 57%, rgba(0, 6, 37, 1) 90%);
+}
+.contact-form-graadient-btn{
+  background: #4D21FF;
+background: linear-gradient(90deg, rgba(77, 33, 255, 1) 0%, rgba(33, 212, 255, 1) 100%);
+}
 @theme {
   --color-primary-black: #013237;
   --color-primary-gray: #00000066;
