@@ -1,6 +1,45 @@
 @import 'tailwindcss';
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+  background-color: #0b1025;
+  color: #f6f7ff;
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
+
+.contact-form-graadient {
+  background: #000625;
+  background: linear-gradient(
+    157deg,
+    rgba(0, 6, 37, 1) 30%,
+    rgba(30, 58, 138, 1) 57%,
+    rgba(0, 6, 37, 1) 90%
+  );
+}
+
+.contact-form-graadient-btn {
+  background: #4d21ff;
+  background: linear-gradient(
+    90deg,
+    rgba(77, 33, 255, 1) 0%,
+    rgba(33, 212, 255, 1) 100%
+  );
 }
