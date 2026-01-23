@@ -1,14 +1,14 @@
 'use client'
 
-import { StatusBadge } from '@/src/components/dashboard/StatusBadge'
-import { HeroContent } from '@/src/components/dashboard/HeroContent'
-import { CTAButton } from '@/src/components/dashboard/CTAButton'
-import { ScrollColumn } from '@/src/components/dashboard/ScrollColumn'
-import { Card, CardHeader, StatDisplay } from '@/src/components/dashboard/Card'
-import { EventImage } from '@/src/components/dashboard/EventImage'
-import { RevenueChart } from '@/src/components/dashboard/charts/RevenueChart'
-import { PerformanceChart } from '@/src/components/dashboard/charts/PerformanceChart'
-import { revenueData, barData, eventImages } from '@/src/components/dashboard/constants'
+import { StatusBadge } from '@/components/dashboard/StatusBadge'
+import { HeroContent } from '@/components/dashboard/HeroContent'
+import { CTAButton } from '@/components/dashboard/CTAButton'
+import { ScrollColumn } from '@/components/dashboard/ScrollColumn'
+import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card'
+import { EventImage } from '@/components/dashboard/EventImage'
+import { RevenueChart } from '@/components/dashboard/charts/RevenueChart'
+import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart'
+import { revenueData, barData, eventImages } from '@/components/dashboard/constants'
 
 export default function DashboardPage() {
   return (
