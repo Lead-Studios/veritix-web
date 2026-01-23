@@ -75,7 +75,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
 
               {/* Button */}
               <div className="flex items-center justify-end mt-4">
-                <button className="px-6 py-2.5 bg-linear-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                <button className="px-6 py-2.5 bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
                   Get Tickets
                 </button>
               </div>

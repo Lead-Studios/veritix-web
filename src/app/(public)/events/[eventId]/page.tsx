@@ -322,7 +322,7 @@ export default function EventDetailsPage() {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setIsModalOpen(true)}
-                    className="w-full max-w-129.75 py-3.5 lg:py-4.25 lg:px-17.25 lg:h-15 lg:rounded-lg bg-linear-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 mx-auto block"
+                    className="w-full max-w-[519px] py-3.5 lg:py-4.25 lg:px-17.25 lg:h-15 lg:rounded-lg  bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 mx-auto block"
                   >
                     Connect Wallet to Purchase
                   </motion.button>
@@ -345,18 +345,19 @@ export default function EventDetailsPage() {
               >
                 <h3 className="text-base font-bold text-white mb-4">Event Organizer</h3>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-[#6B8CFF] to-[#5AB9EA] flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6B8CFF] to-[#5AB9EA] flex items-center justify-center text-white font-bold text-sm">
                     {event.organizer.name.charAt(0)}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 ">
                       <h4 className="font-semibold text-white text-sm">{event.organizer.name}</h4>
-                      {event.organizer.verified && (
-                        <span className="text-white text-xs">
-                          <HiCheck className="inline w-4 h-4 mr-1" /> Verified Organizer</span>
-                      )}
+                   
                     </div>
-                    <p className="text-xs text-gray-400">{event.organizer.description}</p>
+                    <p className="text-xs text-[#FFFFFF]">{event.organizer.description}</p>
+                       {event.organizer.verified && (
+                        <span className="text-white text-sm">
+                          <HiCheck className="inline w-4 h-4 mr-1 bg-green-400 border border-green-400 rounded-sm" /> Verified Organizer</span>
+                      )}
                   </div>
                 </div>
               </motion.div>

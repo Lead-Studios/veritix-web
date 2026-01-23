@@ -46,6 +46,8 @@ html {
   scroll-behavior: smooth;
 }
 
+
+
 body {
   font-family: var(--font-body), sans-serif;
   background-color: #0b1025;
@@ -74,3 +76,5 @@ body {
     rgba(33, 212, 255, 1) 100%
   );
 }
+
+

@@ -7,7 +7,14 @@ module.exports = {
     "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+       colors: {
+      'primary-black': '#013237',
+      'primary-gray': '#00000066',
+      'primary-light-blue': '#E6EAFF',
+      'primary-dark-blue': '#000625',
+    },
+    },
   },
   plugins: [],
 };
