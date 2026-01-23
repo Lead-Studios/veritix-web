@@ -69,7 +69,7 @@ export default function Location({ formData, updateFormData }: LocationProps) {
             value={formData.venueName}
             onChange={(e) => updateFormData({ venueName: e.target.value })}
             placeholder="Enter Venue name"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
           />
         </div>
 
@@ -83,7 +83,7 @@ export default function Location({ formData, updateFormData }: LocationProps) {
             value={formData.address}
             onChange={(e) => updateFormData({ address: e.target.value })}
             placeholder="Enter full address"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
           />
         </div>
 
@@ -98,7 +98,7 @@ export default function Location({ formData, updateFormData }: LocationProps) {
               value={formData.city}
               onChange={(e) => updateFormData({ city: e.target.value })}
               placeholder="City"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
           <div>
@@ -110,7 +110,7 @@ export default function Location({ formData, updateFormData }: LocationProps) {
               value={formData.state}
               onChange={(e) => updateFormData({ state: e.target.value })}
               placeholder="State"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function Location({ formData, updateFormData }: LocationProps) {
               value={formData.zipCode}
               onChange={(e) => updateFormData({ zipCode: e.target.value })}
               placeholder="Zip Code"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
         </div>

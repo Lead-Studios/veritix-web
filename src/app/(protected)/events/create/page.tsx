@@ -121,7 +121,7 @@ export default function CreateEventPage() {
       </header>
 
       {/* Main Title Section */}
-      <div className="px-8 py-6 bg-gradient-to-r from-[#0a0e21] to-purple-900/20">
+      <div className="px-8 py-6 bg-gradient-to-r from-[#0a0e21] to-blue-900/20">
         <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-blue-200 bg-clip-text text-transparent mb-2">
           Create New Event
         </h2>

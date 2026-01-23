@@ -46,7 +46,7 @@ export default function BasicInformation({
             value={formData.title}
             onChange={(e) => updateFormData({ title: e.target.value })}
             placeholder="Give your event a catchy title"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
           />
         </div>
 
@@ -60,7 +60,7 @@ export default function BasicInformation({
             onChange={(e) => updateFormData({ description: e.target.value })}
             placeholder="Describe your event in details"
             rows={4}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none"
           />
         </div>
 
