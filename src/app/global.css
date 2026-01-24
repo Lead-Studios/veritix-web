@@ -153,4 +153,79 @@
 .animate-scroll-down-once {
   animation: scroll-down-once 2s ease-out forwards;
   will-change: transform;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Proxima Nova', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+
+body {
+  font-family: var(--font-body), sans-serif;
+  background-color: #0b1025;
+  color: #f6f7ff;
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
+
+.contact-form-graadient {
+  background: #000625;
+  background: linear-gradient(
+    157deg,
+    rgba(0, 6, 37, 1) 30%,
+    rgba(30, 58, 138, 1) 57%,
+    rgba(0, 6, 37, 1) 90%
+  );
+}
+
+.contact-form-graadient-btn {
+  background: #4d21ff;
+  background: linear-gradient(
+    90deg,
+    rgba(77, 33, 255, 1) 0%,
+    rgba(33, 212, 255, 1) 100%
+  );
+}
+
+
