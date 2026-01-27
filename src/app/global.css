@@ -209,13 +209,13 @@ html {
 }
 
 body {
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-body), "Proxima Nova", sans-serif;
   background-color: #0b1025;
   color: #f6f7ff;
 }
 
 .font-display {
-  font-family: var(--font-display), serif;
+  font-family: var(--font-display), "Proxima Nova", serif;
 }
 
 .contact-form-graadient {

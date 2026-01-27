@@ -1,5 +1,5 @@
-import AuthLayout from "@/src/components/auth/auth-layout";
-import SignUpForm from "@/src/components/auth/signup-form";
+import AuthLayout from "@/components/auth/auth-layout";
+import SignUpForm from "@/components/auth/signup-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

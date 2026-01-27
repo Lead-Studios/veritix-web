@@ -1,5 +1,5 @@
-import AuthLayout from "@/src/components/auth/auth-layout";
-import ForgotPasswordForm from "@/src/components/auth/forgot-password-form";
+import AuthLayout from "@/components/auth/auth-layout";
+import ForgotPasswordForm from "@/components/auth/forgot-password-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
