@@ -38,11 +38,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
-        {children}
-      <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] text-white`}>
+    
         {children}
         <ToastContainer />
       </body>
     </html>
-  );
+  )
 }

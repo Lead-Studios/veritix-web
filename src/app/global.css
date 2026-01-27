@@ -1,5 +1,10 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+/* @import "tw-animate-css"; */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -117,15 +122,16 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 }
-
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
+
 
 @keyframes scroll-up-once {
   0% {
@@ -153,6 +159,7 @@
 .animate-scroll-down-once {
   animation: scroll-down-once 2s ease-out forwards;
   will-change: transform;
+}
 *,
 *::before,
 *::after {
@@ -160,29 +167,33 @@
 }
 
 @font-face {
-  font-family: 'Proxima Nova';
-  src: url('/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf') format('truetype');
+  font-family: "Proxima Nova";
+  src: url("/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf")
+    format("truetype");
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Proxima Nova';
-  src: url('/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf') format('truetype');
+  font-family: "Proxima Nova";
+  src: url("/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf")
+    format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Proxima Nova';
-  src: url('/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf') format('truetype');
+  font-family: "Proxima Nova";
+  src: url("/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf")
+    format("truetype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Proxima Nova';
-  src: url('/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf') format('truetype');
+  font-family: "Proxima Nova";
+  src: url("/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf")
+    format("truetype");
   font-weight: 800;
   font-style: normal;
 }
@@ -190,14 +201,12 @@
 html,
 body {
   height: 100%;
-  font-family: 'Proxima Nova', sans-serif;
+  font-family: "Proxima Nova", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
 }
-
-
 
 body {
   font-family: var(--font-body), sans-serif;
@@ -227,5 +236,3 @@ body {
     rgba(33, 212, 255, 1) 100%
   );
 }
-
-
