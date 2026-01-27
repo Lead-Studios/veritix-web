@@ -4,9 +4,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
-import TabSelector from '@/src/components/TabSelector';
-import WalletConnectModal from '@/src/components/events/WalletConnectModal';
-import { getEventById } from '@/src/types/MockEvents';
+import TabSelector from '@/components/TabSelector';
+import WalletConnectModal from '@/components/events/WalletConnectModal';
+import { getEventById } from '@/mocks/events';
 type TabType = 'about' | 'schedule' | 'performers';
 
 export default function EventDetailsPage() {

@@ -3,11 +3,11 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
-import CategoryFilter from '@/src/components/events/CategoryFilter';
-import FilterInput from '@/src/components/events/FilterInput';
-import TabSelector from '@/src/components/TabSelector';
-import { getFeaturedEvents, mockEvents } from '@/src/types/MockEvents';
-import EventCard from '@/src/components/events/EventCard';
+import CategoryFilter from '@/components/events/CategoryFilter';
+import FilterInput from '@/components/events/FilterInput';
+import TabSelector from '@/components/TabSelector';
+import { getFeaturedEvents, mockEvents } from '@/mocks/events';
+import EventCard from '@/components/events/EventCard';
 type ViewMode = 'upcoming' | 'featured';
 
 export default function EventsPage() {

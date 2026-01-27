@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Event } from '@/src/types/event';
+import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
 import { HiCalendar, HiClock, HiLocationMarker } from 'react-icons/hi';
 

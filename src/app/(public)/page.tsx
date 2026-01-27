@@ -13,103 +13,14 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { FaDiscord, FaFacebookF, FaXTwitter } from "react-icons/fa6";
+import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
 
 const MotionLink = motion(Link);
-
-const trendingEvents = [
-  {
-    id: 1,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "$50",
-    category: "Music",
-    image: "/djparty.png",
-  },
-  {
-    id: 2,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "0.05ETH",
-    category: "Music",
-    image: "/djparty.png",
-  },
-  {
-    id: 3,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "$50",
-    category: "Music",
-    image: "/djparty.png",
-  },
-  {
-    id: 4,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "$50",
-    category: "Music",
-    image: "/djparty.png",
-  },
-  {
-    id: 5,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "$50",
-    category: "Music",
-    image: "/djparty.png",
-  },
-  {
-    id: 6,
-    title: "Metaverse Festival",
-    location: "Abuja, Nigeria",
-    date: "Oct 21, 2025",
-    time: "7:00PM",
-    price: "$50",
-    category: "Music",
-    image: "/djparty.png",
-  },
-];
-
-const steps = [
-  {
-    id: 1,
-    title: "Find Your Vibe",
-    description:
-      "Discover live concerts, NFT drops, or virtual meetups. Whether you love music, sports, or art, we've got you covered. Filter or dive in and explore!",
-  },
-  {
-    id: 2,
-    title: "Choose Your Adventure",
-    description:
-      "Found your event? Pick your ticket-General, VIP, or NFT. Own, trade, or flex your NFT tickets. Your choice, your style!",
-  },
-  {
-    id: 3,
-    title: "Lock It In",
-    description:
-      "Secure your spot with seamless checkout and keep your ticket in your wallet for easy access anytime.",
-  },
-  {
-    id: 4,
-    title: "Show Up, Stand Out",
-    description:
-      "Attend your event, earn rewards, and show off your collection as proof of the moments you've owned.",
-  },
-];
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.7, ease: "easeOut" },
+  transition: { duration: 0.7 },
   viewport: { once: true, amount: 0.2 },
 };
 
@@ -400,10 +311,10 @@ export default function Home() {
                 <div className="flex items-start">
                   <div>
                     <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                      {steps[0].title}
+                      {howItWorksSteps[0].title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
-                      {steps[0].description}
+                      {howItWorksSteps[0].description}
                     </p>
                   </div>
                 </div>
@@ -417,10 +328,10 @@ export default function Home() {
                 <div className="flex items-start">
                   <div>
                     <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                      {steps[1].title}
+                      {howItWorksSteps[1].title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
-                      {steps[1].description}
+                      {howItWorksSteps[1].description}
                     </p>
                   </div>
                 </div>
@@ -431,7 +342,7 @@ export default function Home() {
                       Lock It In
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
-                      {steps[2].description}
+                      {howItWorksSteps[2].description}
                     </p>
                   </div>
                 </div>
@@ -465,7 +376,7 @@ export default function Home() {
                       Show Up, Stand Out
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
-                      {steps[3].description}
+                      {howItWorksSteps[3].description}
                     </p>
                   </div>
                 </div>
@@ -485,10 +396,10 @@ export default function Home() {
                 </span>
                 <div>
                   <h3 className="text-2xl font-bold text-white">
-                    {steps[0].title}
+                    {howItWorksSteps[0].title}
                   </h3>
                   <p className="mt-2 text-sm text-white/70">
-                    {steps[0].description}
+                    {howItWorksSteps[0].description}
                   </p>
                 </div>
               </div>
@@ -499,10 +410,10 @@ export default function Home() {
                 </span>
                 <div>
                   <h3 className="text-2xl font-bold text-white">
-                    {steps[1].title}
+                    {howItWorksSteps[1].title}
                   </h3>
                   <p className="mt-2 text-sm text-white/70">
-                    {steps[1].description}
+                    {howItWorksSteps[1].description}
                   </p>
                 </div>
               </div>
@@ -514,7 +425,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-2xl font-bold text-white">Lock It In</h3>
                   <p className="mt-2 text-sm text-white/70">
-                    {steps[2].description}
+                    {howItWorksSteps[2].description}
                   </p>
                 </div>
               </div>
@@ -528,7 +439,7 @@ export default function Home() {
                     Show Up, Stand Out
                   </h3>
                   <p className="mt-2 text-sm text-white/70">
-                    {steps[3].description}
+                    {howItWorksSteps[3].description}
                   </p>
                 </div>
               </div>
