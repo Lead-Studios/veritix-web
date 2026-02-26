@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { Input } from "../input";
+import { Input } from "../ui/input";
 import { TbUserPlus } from "react-icons/tb";
 import { Button } from "../button";
 import Link from "next/link";
@@ -13,16 +13,16 @@ import { FcGoogle } from "react-icons/fc";
 import { IoWallet } from "react-icons/io5";
 
 const signUpSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  username: z.string().min(3, 'Username must be at least 3 characters'),
-  email: z.email('Please enter a valid email address'),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.email("Please enter a valid email address"),
   password: z
     .string("Password is required")
-    .min(6, 'Password must be at least 6 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
+    .min(6, "Password must be at least 6 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
 type FormValues = z.infer<typeof signUpSchema>;
@@ -38,18 +38,18 @@ export default function SignUpForm() {
 
   const onSubmit = async (data: FormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('Sign up data:', data);
-    toast.success('Account created successfully! (Demo)');
+    console.log("Sign up data:", data);
+    toast.success("Account created successfully! (Demo)");
   };
 
   const handleGoogleSignUp = () => {
-    console.log('Google sign up clicked');
-    toast.success('Google sign up (Demo)');
+    console.log("Google sign up clicked");
+    toast.success("Google sign up (Demo)");
   };
 
   const handleWalletSignUp = () => {
-    console.log('Wallet sign up clicked');
-    toast.success('Wallet sign up (Demo)');
+    console.log("Wallet sign up clicked");
+    toast.success("Wallet sign up (Demo)");
   };
 
   const containerVariants = {
@@ -58,9 +58,9 @@ export default function SignUpForm() {
       opacity: 1,
       transition: {
         duration: 0.5,
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -68,8 +68,8 @@ export default function SignUpForm() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4 }
-    }
+      transition: { duration: 0.4 },
+    },
   };
 
   return (
@@ -157,11 +157,10 @@ export default function SignUpForm() {
                 disabled={isSubmitting}
                 className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
               >
-                {isSubmitting ? 'Creating Account...' : 'Sign Up'}
+                {isSubmitting ? "Creating Account..." : "Sign Up"}
               </Button>
             </motion.div>
           </motion.div>
-
         </motion.form>
       </div>
 
@@ -215,15 +214,9 @@ export default function SignUpForm() {
         </motion.div>
       </motion.div>
 
-      <motion.p
-        className="text-center lg:text-xl mt-6"
-        variants={itemVariants}
-      >
-        Already have an account?{' '}
-        <Link
-          href="/login"
-          className="font-bold"
-        >
+      <motion.p className="text-center lg:text-xl mt-6" variants={itemVariants}>
+        Already have an account?{" "}
+        <Link href="/login" className="font-bold">
           Sign in
         </Link>
       </motion.p>
