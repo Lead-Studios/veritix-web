@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import Image from "next/image";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 
@@ -9,6 +9,16 @@ interface EventSummaryProps {
 }
 
 export default function EventSummary({ formData }: EventSummaryProps) {
+  const coverImageUrl = useMemo(
+    () => (formData.coverImage ? URL.createObjectURL(formData.coverImage) : null),
+    [formData.coverImage]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (coverImageUrl) URL.revokeObjectURL(coverImageUrl);
+    };
+  }, [coverImageUrl]);
   const formatDate = (date: string, time: string) => {
     if (!date) return "Not set yet";
     const dateObj = new Date(date);
@@ -74,7 +84,7 @@ export default function EventSummary({ formData }: EventSummaryProps) {
         <div className="w-full h-32 bg-gray-800 rounded-lg overflow-hidden relative">
           {formData.coverImage ? (
             <Image
-              src={URL.createObjectURL(formData.coverImage)}
+              src={coverImageUrl!}
               alt="Event cover"
               fill
               unoptimized

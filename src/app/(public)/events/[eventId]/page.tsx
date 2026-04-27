@@ -15,6 +15,22 @@ export default function EventDetailsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('about');
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: event?.name, url });
+      } catch {
+        // user cancelled or error — do nothing
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }
+  };
 
   const event = getEventById(params.eventId as string);
 
@@ -83,9 +99,11 @@ export default function EventDetailsPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={handleShare}
+                    aria-label={shareCopied ? 'Link copied!' : 'Share event'}
                     className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all duration-300"
                   >
-                    <HiShare className="w-5 h-5" />
+                    {shareCopied ? <HiCheck className="w-5 h-5 text-green-400" /> : <HiShare className="w-5 h-5" />}
                   </motion.button>
 
                   <motion.button
