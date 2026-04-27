@@ -51,3 +51,56 @@ VeriTix Web (Next.js / TypeScript)
 Backend API (Auth, Tickets, Events)
      ↓
 Stellar Network (Anchoring & Verification)
+
+
+---
+
+## 🚀 Local Development Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and fill in the values. The table below describes each variable:
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | Yes | Base URL of the VeriTix backend API (e.g. `http://localhost:4000/api`) |
+| `NEXT_PUBLIC_STELLAR_NETWORK` | Yes | Stellar network: `testnet` or `mainnet` |
+| `NEXT_PUBLIC_HORIZON_URL` | No | Custom Horizon server URL; leave blank to use the SDK default |
+| `AUTH_SECRET` | Yes | Long random string used to sign server-side session tokens |
+| `NEXT_PUBLIC_ENABLE_WALLET_CONNECT` | No | Set to `true` to enable the wallet-connect UI flow |
+
+> **Next.js convention:** variables prefixed with `NEXT_PUBLIC_` are embedded in the browser bundle and visible to end users. Variables without that prefix are server-side only and never sent to the client.
+
+### 3. Run the dev server
+
+```bash
+npm run dev
+```
+
+### 4. Run tests
+
+```bash
+npm test
+```
+
+---
+
+## 🧪 Testing
+
+Tests live in `src/__tests__/` and follow the `*.test.tsx` naming convention. The project uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+
+Place new test files alongside the code they test or inside `src/__tests__/`. Run the full suite with:
+
+```bash
+npm test
+```
