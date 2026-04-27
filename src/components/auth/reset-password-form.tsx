@@ -1,13 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { Input } from "../ui/input";
 import { TbUserPlus } from "react-icons/tb";
 import { Button } from "../button";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import PasswordStrengthGuide from "./PasswordStrengthGuide";
 
 const resetPasswordSchema = z
   .object({
@@ -34,6 +35,8 @@ export default function ResetPasswordForm() {
   } = useForm({
     resolver: zodResolver(resetPasswordSchema),
   });
+
+  const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
 
   const onSubmit = async (data: FormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -102,6 +105,7 @@ export default function ResetPasswordForm() {
               type="password"
               placeholder="Please enter a new password"
             />
+            <PasswordStrengthGuide password={passwordValue} />
           </motion.div>
 
           <motion.div variants={itemVariants}>

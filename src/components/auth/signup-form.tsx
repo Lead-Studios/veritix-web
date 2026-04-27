@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { Input } from "../ui/input";
 import { TbUserPlus } from "react-icons/tb";
@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { IoWallet } from "react-icons/io5";
+import PasswordStrengthGuide from "./PasswordStrengthGuide";
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -35,6 +36,8 @@ export default function SignUpForm() {
   } = useForm<FormValues>({
     resolver: zodResolver(signUpSchema),
   });
+
+  const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
 
   const onSubmit = async (data: FormValues) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -145,6 +148,7 @@ export default function SignUpForm() {
               type="password"
               placeholder="Enter your Password"
             />
+            <PasswordStrengthGuide password={passwordValue} />
           </motion.div>
 
           <motion.div variants={itemVariants}>
