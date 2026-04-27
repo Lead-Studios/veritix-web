@@ -1,22 +1,36 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
 import TabSelector from '@/components/TabSelector';
 import WalletConnectModal from '@/components/events/WalletConnectModal';
-import { getEventById } from '@/mocks/events';
+import { fetchEventById } from '@/lib/eventsApi';
+import type { Event } from '@/types/event';
 type TabType = 'about' | 'schedule' | 'performers';
 
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const [event, setEvent] = useState<Event | null | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<TabType>('about');
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const event = getEventById(params.eventId as string);
+  useEffect(() => {
+    fetchEventById(params.eventId as string)
+      .then(setEvent)
+      .catch(() => setEvent(null));
+  }, [params.eventId]);
+
+  if (event === undefined) {
+    return (
+      <div className="min-h-screen bg-primary-dark-blue flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#4D21FF] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!event) {
     return (

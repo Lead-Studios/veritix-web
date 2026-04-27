@@ -26,7 +26,7 @@ export function exportAttendeesCSV(attendees: Attendee[]): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `attendees-${eventId}.csv`;
+  a.download = `attendees-${Date.now()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
