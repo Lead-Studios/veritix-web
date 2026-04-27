@@ -97,6 +97,13 @@ npm test
 
 ## 🧪 Testing
 
+Integration and E2E tests live in `src/__tests__/` and cover:
+
+- **Event discovery** — search, category filters, tab switching
+- **Event creation** — organizer multi-step form submission
+- **Ticket verification** — valid, invalid, and already-used ticket flows
+
+Run tests with:
 Tests live in `src/__tests__/` and follow the `*.test.tsx` naming convention. The project uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
 
 Place new test files alongside the code they test or inside `src/__tests__/`. Run the full suite with:
@@ -104,3 +111,18 @@ Place new test files alongside the code they test or inside `src/__tests__/`. Ru
 ```bash
 npm test
 ```
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Forms | react-hook-form + Zod |
+| Animations | Framer Motion |
+| Notifications | react-toastify |
+| Charts | Recharts |
+| Icons | lucide-react, react-icons |

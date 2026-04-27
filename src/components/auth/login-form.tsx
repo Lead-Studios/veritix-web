@@ -9,6 +9,7 @@ import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { loginUser } from "@/lib/auth";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -29,9 +30,12 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Login data:", data);
-    toast.success("Login successful! (Demo)");
+    try {
+      await loginUser({ email: data.email, password: data.password });
+      toast.success("Login successful!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Login failed. Please try again.");
+    }
   };
 
   const containerVariants = {
