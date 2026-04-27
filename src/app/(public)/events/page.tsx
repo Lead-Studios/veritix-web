@@ -8,6 +8,7 @@ import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
 import { getFeaturedEvents, mockEvents } from '@/mocks/events';
 import EventCard from '@/components/events/EventCard';
+import { EmptyState } from '@/components/EmptyState';
 type ViewMode = 'upcoming' | 'featured';
 
 export default function EventsPage() {
@@ -147,24 +148,19 @@ export default function EventsPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="flex flex-col items-center justify-center py-20 space-y-4"
             >
-              <div className="text-4xl sm:text-6xl">🔍</div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white">No events found</h3>
-              <p className="text-gray-400 text-center max-w-md text-sm sm:text-base">
-                Try adjusting your filters or search query to find more events
-              </p>
-              <motion.button
-                onClick={() => {
-                  setActiveFilters([]);
-                  setSearchQuery('');
+              <EmptyState
+                variant="search"
+                title="No events found"
+                description="Try adjusting your filters or search query to find more events"
+                action={{
+                  label: "Clear Filters",
+                  onClick: () => {
+                    setActiveFilters([]);
+                    setSearchQuery('');
+                  },
                 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="mt-6 px-6 sm:px-8 py-3 bg-linear-to-r from-[#6B8CFF] to-[#5AB9EA] text-white font-semibold rounded-xl transition-all duration-300"
-              >
-                Clear Filters
-              </motion.button>
+              />
             </motion.div>
           )}
         </AnimatePresence>

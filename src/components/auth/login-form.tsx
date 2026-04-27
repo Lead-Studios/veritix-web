@@ -23,8 +23,9 @@ type FormValues = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     control,
+    setError,
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -34,7 +35,8 @@ export default function LoginForm() {
       await loginUser({ email: data.email, password: data.password });
       toast.success("Login successful!");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Login failed. Please try again.");
+      const message = err instanceof Error ? err.message : "Login failed. Please try again.";
+      setError("root", { message });
     }
   };
 
@@ -115,6 +117,11 @@ export default function LoginForm() {
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
             >
+              {errors.root && (
+                <p role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+                  {errors.root.message}
+                </p>
+              )}
               <Button disabled={isSubmitting} className="w-full py-4">
                 {isSubmitting ? "Signing In..." : "Sign In"}
               </Button>
