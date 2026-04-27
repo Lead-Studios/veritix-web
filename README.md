@@ -51,145 +51,47 @@ VeriTix Web (Next.js / TypeScript)
 Backend API (Auth, Tickets, Events)
      ↓
 Stellar Network (Anchoring & Verification)
-```
+
 
 ---
 
-## 🗺️ Route Map
+## 🚀 Local Development Setup
 
-### Public Routes (`src/app/(public)/`)
-
-| Route | Description |
-|---|---|
-| `/` | Landing page — hero, features, CTA |
-| `/login` | User login form |
-| `/sign-up` | New account registration |
-| `/forgot-password` | Request a password-reset link |
-| `/reset-password` | Set a new password via reset link |
-| `/events` | Public event discovery with search & filters |
-| `/events/[eventId]` | Individual event detail & ticket purchase |
-| `/verify` | Public ticket verification (gate operators) |
-| `/contact` | Contact / support form |
-
-### Protected Routes (`src/app/(protected)/`)
-
-> Require an authenticated session.
-
-| Route | Description |
-|---|---|
-| `/dashboard` | Organizer overview — stats, charts, recent activity |
-| `/events/create` | Multi-step event creation wizard |
-| `/events/create/my-event` | Draft / saved event editor |
-| `/events/manage` | List and manage all organizer events |
-| `/events/manage/[eventId]` | Edit or delete a specific event |
-| `/tickets` | Attendee ticket wallet |
-| `/verify` | Authenticated ticket verification scanner |
-
----
-
-## 🧩 Frontend Module Structure
-
-```
-src/
-├── app/                        # Next.js App Router pages
-│   ├── (public)/               # Unauthenticated routes
-│   └── (protected)/            # Authenticated routes
-│
-├── components/
-│   ├── auth/                   # Auth forms & layout
-│   │   ├── login-form.tsx      # Login — calls /api/auth/login
-│   │   ├── signup-form.tsx     # Registration with password strength guide
-│   │   ├── reset-password-form.tsx  # Password reset with strength guide
-│   │   ├── forgot-password-form.tsx # Forgot-password email request
-│   │   ├── PasswordStrengthGuide.tsx # Reusable password requirement checklist
-│   │   ├── auth-layout.tsx     # Shared auth page wrapper
-│   │   └── back-button.tsx     # Navigation helper
-│   │
-│   ├── events/                 # Event-related UI
-│   │   ├── EventCard.tsx       # Card shown in event listings
-│   │   ├── CategoryFilter.tsx  # Active-filter chips
-│   │   ├── FilterInput.tsx     # Search / location / date inputs
-│   │   ├── SearchFilters.tsx   # Combined filter bar
-│   │   ├── WalletConnectModal.tsx  # Wallet connection dialog
-│   │   ├── create/             # Multi-step event creation sub-forms
-│   │   │   ├── BasicInformation.tsx
-│   │   │   ├── DateAndTime.tsx
-│   │   │   ├── Location.tsx
-│   │   │   ├── TicketInformation.tsx
-│   │   │   ├── BlockchainSetting.tsx
-│   │   │   └── EventSummary.tsx
-│   │   └── ui/                 # Shared event-form primitives
-│   │       ├── ImageUpload.tsx
-│   │       ├── RadioButton.tsx
-│   │       └── Toggle.tsx
-│   │
-│   ├── dashboard/              # Organizer dashboard widgets
-│   │   ├── Card.tsx
-│   │   ├── CTAButton.tsx
-│   │   ├── HeroContent.tsx
-│   │   ├── ScrollColumn.tsx
-│   │   ├── StatusBadge.tsx
-│   │   ├── EventImage.tsx
-│   │   └── charts/
-│   │       ├── PerformanceChart.tsx
-│   │       └── RevenueChart.tsx
-│   │
-│   └── ui/                     # Generic design-system primitives
-│       ├── button.tsx
-│       ├── input.tsx
-│       ├── Badge.tsx
-│       ├── Loader.tsx
-│       └── Modal.tsx
-│
-├── features/                   # Feature-level page shells (dashboard tabs)
-│   ├── auth/
-│   ├── events/
-│   ├── tickets/
-│   ├── verification/
-│   ├── analyics/
-│   └── profile/
-│
-├── lib/                        # Utilities & API helpers
-│   ├── auth.ts                 # loginUser() — calls real auth endpoint
-│   ├── utils.ts / cn.ts        # Tailwind class helpers
-│   ├── ticketValidation.ts     # Client-side ticket rule helpers
-│   ├── ticketVerification.ts   # Verification flow helpers
-│   └── ...                     # Other domain helpers
-│
-├── hooks/
-│   └── usePasswordToggle.ts    # Show/hide password toggle hook
-│
-├── mocks/
-│   ├── events.ts               # Mock event data for development
-│   └── landing.ts              # Mock landing-page data
-│
-└── types/
-    ├── event.ts                # Event-related TypeScript types
-    └── landing.ts              # Landing-page types
-```
-
----
-
-## 🚀 Getting Started
+### 1. Install dependencies
 
 ```bash
 npm install
+```
+
+### 2. Configure environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and fill in the values. The table below describes each variable:
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | Yes | Base URL of the VeriTix backend API (e.g. `http://localhost:4000/api`) |
+| `NEXT_PUBLIC_STELLAR_NETWORK` | Yes | Stellar network: `testnet` or `mainnet` |
+| `NEXT_PUBLIC_HORIZON_URL` | No | Custom Horizon server URL; leave blank to use the SDK default |
+| `AUTH_SECRET` | Yes | Long random string used to sign server-side session tokens |
+| `NEXT_PUBLIC_ENABLE_WALLET_CONNECT` | No | Set to `true` to enable the wallet-connect UI flow |
+
+> **Next.js convention:** variables prefixed with `NEXT_PUBLIC_` are embedded in the browser bundle and visible to end users. Variables without that prefix are server-side only and never sent to the client.
+
+### 3. Run the dev server
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+### 4. Run tests
 
-### Environment Variables
-
-Create a `.env.local` file at the project root:
-
-```env
-NEXT_PUBLIC_API_URL=https://your-backend-api.example.com
+```bash
+npm test
 ```
-
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | Base URL for the backend REST API |
 
 ---
 
@@ -202,6 +104,9 @@ Integration and E2E tests live in `src/__tests__/` and cover:
 - **Ticket verification** — valid, invalid, and already-used ticket flows
 
 Run tests with:
+Tests live in `src/__tests__/` and follow the `*.test.tsx` naming convention. The project uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+
+Place new test files alongside the code they test or inside `src/__tests__/`. Run the full suite with:
 
 ```bash
 npm test
