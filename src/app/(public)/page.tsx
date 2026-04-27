@@ -68,7 +68,7 @@ export default function Home() {
               Connect Wallet
             </MotionLink>
             <MotionLink
-              href="/register"
+              href="/sign-up"
               className="rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-6 py-2 text-sm font-semibold text-white"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
