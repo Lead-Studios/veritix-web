@@ -27,16 +27,23 @@ const fadeUp = {
 export default function Home() {
   return (
     <div id="top" className="min-h-screen bg-[#0b1025] text-white">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded"
+      >
+        Skip to main content
+      </a>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0f24]/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5">
           <Link
             href="/"
             className="text-2xl font-semibold tracking-wide text-white"
+            aria-label="VeriTix home"
           >
             VeriTix
           </Link>
 
-          <nav className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
+          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
             <Link href="/" className="flex flex-col text-white">
               Home
               <span className="mt-2 block h-[2px] w-8 rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff]" />
@@ -79,6 +86,7 @@ export default function Home() {
         </div>
       </header>
 
+      <main id="main-content">
       <section className="relative overflow-hidden">
         <Image
           src="/concert.png"
@@ -482,6 +490,8 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
+
+      </main>
 
       <footer className="border-t border-white/10 bg-[#050a1f] py-16">
         <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1.3fr]">
