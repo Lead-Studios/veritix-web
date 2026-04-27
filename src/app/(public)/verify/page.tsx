@@ -287,7 +287,7 @@ export default function VerifyPage() {
               >
                 <div className="bg-[#4D21FF] px-6 py-4">
                   <h2 className="text-base font-bold text-white">Scan QR Code</h2>
-                  <p className="text-blue-200 text-xs mt-0.5">Point camera at attendee's ticket QR</p>
+                  <p className="text-blue-200 text-xs mt-0.5">Point camera at attendee&apos;s ticket QR</p>
                 </div>
                 <div className="p-8">
                   <ScanFrame />

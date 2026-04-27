@@ -23,7 +23,7 @@ export default function EventDetailsPage() {
       <div className="min-h-screen bg-primary-dark-blue flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-white">Event Not Found</h1>
-          <p className="text-gray-400">The event you're looking for doesn't exist.</p>
+          <p className="text-gray-400">The event you&apos;re looking for doesn&apos;t exist.</p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -225,7 +225,7 @@ export default function EventDetailsPage() {
 
                 <div className="p-2 ">
                   <p className="text-gray-300 leading-relaxed">
-                    Whether you're a hardcore raver, casual music fan, or just looking to soak up the sun with good vibes, the Summer Dance Festival is your ticket to a weekend of freedom, connection, and movement. Let's dance the summer away!
+                    Whether you&apos;re a hardcore raver, casual music fan, or just looking to soak up the sun with good vibes, the Summer Dance Festival is your ticket to a weekend of freedom, connection, and movement. Let&apos;s dance the summer away!
                   </p>
                 </div>
               </motion.div>

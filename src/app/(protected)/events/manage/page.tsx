@@ -92,7 +92,7 @@ export default function ManageEventPage() {
             Event Not Found
           </h2>
           <p className="text-gray-600 mb-6">
-            This event doesn't exist or has been removed.
+            This event doesn&apos;t exist or has been removed.
           </p>
           <button
             onClick={() => router.push("/events")}
@@ -128,7 +128,7 @@ export default function ManageEventPage() {
             Access Denied
           </h2>
           <p className="text-gray-600 mb-6">
-            You don't have permission to manage this event.
+            You don&apos;t have permission to manage this event.
           </p>
           <button
             onClick={() => router.push("/events")}
