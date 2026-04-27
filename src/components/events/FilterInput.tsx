@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 
 interface FilterInputProps {
   icon: React.ComponentType<{ className?: string }>;
