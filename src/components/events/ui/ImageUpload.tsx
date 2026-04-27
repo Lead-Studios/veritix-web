@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 
 interface ImageUploadProps {
   file: File | null;
@@ -71,10 +72,13 @@ export default function ImageUpload({
 
       {file ? (
         <div className="relative w-full h-full group">
-          <img
+          <Image
             src={URL.createObjectURL(file)}
             alt="Upload preview"
-            className="w-full h-full object-cover"
+            fill
+            unoptimized
+            className="object-cover"
+            sizes="100vw"
           />
           <button
             onClick={handleRemove}

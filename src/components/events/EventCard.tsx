@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { HiCalendar, HiClock, HiLocationMarker } from 'react-icons/hi';
 
 interface EventCardProps {
@@ -29,10 +30,12 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
           <div className="flex flex-col sm:flex-row gap-0">
             {/* Event Image - Top on mobile, Left on larger */}
             <div className="relative w-full sm:w-48 h-48 sm:h-auto shrink-0 overflow-hidden">
-              <img
+              <Image
                 src={event.image}
                 alt={event.name}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 12rem"
               />
               {/* Pattern overlay for texture */}
               <div className="absolute inset-0 opacity-20" style={{

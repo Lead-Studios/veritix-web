@@ -95,7 +95,7 @@ export default function BlockchainSetting({
             Creator Royalty
           </label>
           <p className="text-sm text-gray-400 mb-4">
-            Percentage you'll receive from secondary sales.
+            Percentage you&apos;ll receive from secondary sales.
           </p>
           <div className="flex items-center gap-4">
             <div className="flex-1">

@@ -93,7 +93,7 @@ export default function CreateEventPage() {
             Event Created!
           </h2>
           <p className="text-gray-600 mb-6">
-            Your event "{formData.name}" has been successfully created.
+            Your event &ldquo;{formData.name}&rdquo; has been successfully created.
           </p>
           <button
             onClick={() => {

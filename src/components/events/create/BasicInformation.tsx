@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import ImageUpload from "../ui/ImageUpload";
 
@@ -13,17 +13,8 @@ export default function BasicInformation({
   formData,
   updateFormData,
 }: BasicInformationProps) {
-  const galleryInputRef = useRef<HTMLInputElement>(null);
-
   const handleCoverImageChange = (file: File | null) => {
     updateFormData({ coverImage: file });
-  };
-
-  const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      updateFormData({ gallery: [...formData.gallery, ...files] });
-    }
   };
 
   return (

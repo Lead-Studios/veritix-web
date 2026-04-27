@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 
 interface EventSummaryProps {
@@ -70,12 +71,15 @@ export default function EventSummary({ formData }: EventSummaryProps) {
 
       <div className="space-y-4">
         {/* Cover Image Preview */}
-        <div className="w-full h-32 bg-gray-800 rounded-lg overflow-hidden">
+        <div className="w-full h-32 bg-gray-800 rounded-lg overflow-hidden relative">
           {formData.coverImage ? (
-            <img
+            <Image
               src={URL.createObjectURL(formData.coverImage)}
               alt="Event cover"
-              className="w-full h-full object-cover"
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="100vw"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-500">
