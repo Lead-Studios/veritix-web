@@ -16,7 +16,7 @@ export async function fetchEventAttendees(eventId: string): Promise<Attendee[]> 
   return res.json();
 }
 
-export function exportAttendeesCSV(attendees: Attendee[]): void {
+export function exportAttendeesCSV(attendees: Attendee[], eventId = "event"): void {
   const headers = ["Name", "Email", "Ticket Type", "Order ID", "Checked In", "Purchased At"];
   const rows = attendees.map((a) => [
     a.name, a.email, a.ticketType, a.orderId, String(a.checkedIn), a.purchasedAt,

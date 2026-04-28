@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: "",
@@ -13,36 +15,49 @@ export default function ContactForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const e: Record<string, string> = {};
-
     if (!formData.name) e.name = "Name is required";
     if (!formData.email) e.email = "Email is required";
-    else if (!/^\S+@\S+\.\S+$/.test(formData.email))
-      e.email = "Invalid email address";
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) e.email = "Invalid email address";
     if (!formData.subject) e.subject = "Subject is required";
     if (!formData.message) e.message = "Message is required";
-
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess("");
+    setApiError("");
 
     if (!validate()) return;
 
     setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    setTimeout(() => {
-      setLoading(false);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setApiError(err?.message || "Failed to send your message. Please try again.");
+        return;
+      }
+
       setSuccess("Your message has been sent successfully.");
       setFormData({ name: "", email: "", subject: "", message: "" });
       setErrors({});
-    }, 1200);
+    } catch {
+      setApiError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,36 +81,30 @@ export default function ContactForm() {
             value={formData.email}
             error={errors.email}
             placeholder="your.email@example.com"
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
         <Input
           label="Subject"
           value={formData.subject}
           error={errors.subject}
-          placeholder="your.email@example.com"
-          onChange={(e) =>
-            setFormData({ ...formData, subject: e.target.value })
-          }
+          placeholder="How can we help?"
+          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
         />
         <Textarea
           label="Message"
           value={formData.message}
           error={errors.message}
           placeholder="Please describe your inquiry in details....."
-          onChange={(e) =>
-            setFormData({ ...formData, message: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
         />
         {success && <p className="text-green-400 text-sm">{success}</p>}
-        {/* contact-form-graadient-btn */}
+        {apiError && <p className="text-red-400 text-sm">{apiError}</p>}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           disabled={loading}
-          className="w-full py-3 rounded-lg font-medium bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]"
+          className="w-full py-3 rounded-lg font-medium bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] disabled:opacity-60"
         >
           {loading ? "Sending..." : "Send Message"}
         </motion.button>
