@@ -18,6 +18,8 @@ export default function EventDetailsPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [selectedTicketIndex, setSelectedTicketIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -308,7 +310,8 @@ export default function EventDetailsPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-5 rounded-xl bg-[#00062580]/50 border hover:border-white/10 transition-all duration-300 ${index === 0 ? 'border-[#4D21FF]' : 'border-[#E0E0E033]/20'}`}
+                        onClick={() => { setSelectedTicketIndex(index); setQuantity(1); }}
+                        className={`p-5 rounded-xl bg-[#00062580]/50 border hover:border-white/10 transition-all duration-300 cursor-pointer ${selectedTicketIndex === index ? 'border-[#4D21FF]' : 'border-[#E0E0E033]/20'}`}
                       >
                         <div className="flex items-start justify-between mb-3">
                           <h3 className="text-base font-bold text-white">{ticket.name}</h3>
@@ -337,7 +340,11 @@ export default function EventDetailsPage() {
                               {ticket.price} ETH
                             </div>
                           </div>
-                          <p className="text-xs text-gray-300">{ticket.remaining} remaining</p>
+                          {ticket.remaining === 0 ? (
+                            <span className="text-xs font-semibold text-red-400">Sold out</span>
+                          ) : (
+                            <p className="text-xs text-gray-300">{ticket.remaining} remaining</p>
+                          )}
                         </div>
                       </motion.div>
                     ))}
@@ -349,14 +356,56 @@ export default function EventDetailsPage() {
                   </div>
                 )}
 
+                {event.ticketOptions && event.ticketOptions.length > 0 && (() => {
+                  const selected = event.ticketOptions![selectedTicketIndex];
+                  const isSoldOut = selected.remaining === 0;
+                  const maxQty = Math.min(selected.remaining, 10);
+                  const totalPrice = (selected.price * quantity).toFixed(4);
+                  return (
+                    <div className="border border-[#E0E0E033]/20 rounded-xl p-4 mb-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-300">Quantity</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            aria-label="Decrease quantity"
+                            disabled={quantity <= 1 || isSoldOut}
+                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition"
+                          >
+                            −
+                          </button>
+                          <span className="text-white font-semibold w-6 text-center">{quantity}</span>
+                          <button
+                            type="button"
+                            aria-label="Increase quantity"
+                            disabled={quantity >= maxQty || isSoldOut}
+                            onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
+                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">{selected.name} × {quantity}</span>
+                        <span className="text-white font-bold">{totalPrice} ETH</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="space-y-4 p-6">
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setIsModalOpen(true)}
-                    className="w-full max-w-[519px] py-3.5 lg:py-4.25 lg:px-17.25 lg:h-15 lg:rounded-lg  bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 mx-auto block"
+                    disabled={!!(event.ticketOptions && event.ticketOptions[selectedTicketIndex]?.remaining === 0)}
+                    className="w-full max-w-[519px] py-3.5 lg:py-4.25 lg:px-17.25 lg:h-15 lg:rounded-lg  bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold rounded-xl hover:opacity-90 transition-all duration-300 mx-auto block disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Connect Wallet to Purchase
+                    {event.ticketOptions && event.ticketOptions[selectedTicketIndex]?.remaining === 0
+                      ? 'Sold Out'
+                      : 'Connect Wallet to Purchase'}
                   </motion.button>
 
                   <p className="text-xs text-gray-500 leading-relaxed p-6 align-left max-w-xl">

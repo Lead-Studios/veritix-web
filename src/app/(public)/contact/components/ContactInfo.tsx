@@ -1,4 +1,5 @@
 import { Phone, Mail, MapPin, Linkedin, Twitter, Github } from "lucide-react";
+import { contactDetails, socialLinks } from "@/lib/contactConfig";
 
 export default function ContactInfo() {
   return (
@@ -15,24 +16,36 @@ export default function ContactInfo() {
         <InfoItem
           icon={<Phone size={18} />}
           title="Phone"
-          value="+1 (555) 123-4567"
+          value={contactDetails.phone}
         />
         <InfoItem
           icon={<Mail size={18} />}
           title="Email"
-          value="support@veritix.io"
+          value={contactDetails.email}
         />
         <InfoItem
           icon={<MapPin size={18} />}
           title="Location"
-          value="123 Blockchain Avenue, San Francisco, CA 94105"
+          value={contactDetails.address}
         />
       </div>
 
       <div className="flex gap-4 mt-10">
-        <SocialIcon icon={<Linkedin size={18} />} />
-        <SocialIcon icon={<Twitter size={18} />} />
-        <SocialIcon icon={<Github size={18} />} />
+        <SocialIcon
+          icon={<Linkedin size={18} />}
+          href={socialLinks.linkedin}
+          label="LinkedIn"
+        />
+        <SocialIcon
+          icon={<Twitter size={18} />}
+          href={socialLinks.twitter}
+          label="Twitter"
+        />
+        <SocialIcon
+          icon={<Github size={18} />}
+          href={socialLinks.github}
+          label="GitHub"
+        />
       </div>
     </>
   );
@@ -60,10 +73,24 @@ function InfoItem({
   );
 }
 
-function SocialIcon({ icon }: { icon: React.ReactNode }) {
+function SocialIcon({
+  icon,
+  href,
+  label,
+}: {
+  icon: React.ReactNode;
+  href: string;
+  label: string;
+}) {
   return (
-    <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 hover:bg-blue-500/20 transition cursor-pointer">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 hover:bg-blue-500/20 transition"
+    >
       {icon}
-    </div>
+    </a>
   );
 }
