@@ -1,23 +1,15 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-
-export default async function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
-
-  if (!token) {
-    redirect("/login");
-  }
-
 "use client";
 
-import { useSession } from "@/hooks/useSession";
+import React from "react";
+import { useAuthState } from "@/hooks/useAuthState";
+import AuthLoadingShell from "@/components/auth/AuthLoadingShell";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  useSession();
+  const { isLoading } = useAuthState();
+
+  if (isLoading) {
+    return <AuthLoadingShell />;
+  }
+
   return <>{children}</>;
 }

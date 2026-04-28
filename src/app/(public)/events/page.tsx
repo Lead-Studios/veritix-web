@@ -19,6 +19,8 @@ export default function EventsPage() {
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   useEffect(() => {
     fetchEvents()
@@ -44,8 +46,23 @@ export default function EventsPage() {
       );
     }
 
+    if (locationFilter.trim()) {
+      const location = locationFilter.toLowerCase();
+      list = list.filter((e) => 
+        e.location.toLowerCase().includes(location) ||
+        e.venue.toLowerCase().includes(location)
+      );
+    }
+
+    if (dateFilter.trim()) {
+      const date = dateFilter.toLowerCase();
+      list = list.filter((e) => 
+        e.date.toLowerCase().includes(date)
+      );
+    }
+
     return list;
-  }, [events, activeFilters, viewMode, searchQuery]);
+  }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   const removeFilter = (filter: string) => {
     setActiveFilters((prev) => prev.filter((f) => f !== filter));
@@ -97,6 +114,8 @@ export default function EventsPage() {
               <FilterInput
                 icon={HiLocationMarker}
                 placeholder="Location"
+                value={locationFilter}
+                onChange={setLocationFilter}
                 focusColor="#6B8CFF"
                 rounded="rounded-lg"
                 inputClassName="py-3"
@@ -106,6 +125,8 @@ export default function EventsPage() {
               <FilterInput
                 icon={HiCalendar}
                 placeholder="Date"
+                value={dateFilter}
+                onChange={setDateFilter}
                 focusColor="#6B8CFF"
                 rounded="rounded-lg"
                 inputClassName="py-3"
@@ -162,54 +183,18 @@ export default function EventsPage() {
                   onClick: () => {
                     setActiveFilters([]);
                     setSearchQuery('');
+                    setLocationFilter('');
+                    setDateFilter('');
                   },
                 }}
               />
             </motion.div>
           )}
         </AnimatePresence>
-        {loading ? (
+        {loading && (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-2 border-[#6B8CFF] border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : (
-          <AnimatePresence mode="wait">
-            {filteredEvents.length > 0 ? (
-              <motion.div
-                key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-5"
-              >
-                {filteredEvents.map((event, index) => (
-                  <EventCard key={event.id} event={event} index={index} />
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex flex-col items-center justify-center py-20 space-y-4"
-              >
-                <div className="text-4xl sm:text-6xl">🔍</div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white">No events found</h3>
-                <p className="text-gray-400 text-center max-w-md text-sm sm:text-base">
-                  Try adjusting your filters or search query to find more events
-                </p>
-                <motion.button
-                  onClick={() => { setActiveFilters([]); setSearchQuery(''); }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="mt-6 px-6 sm:px-8 py-3 bg-linear-to-r from-[#6B8CFF] to-[#5AB9EA] text-white font-semibold rounded-xl transition-all duration-300"
-                >
-                  Clear Filters
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         )}
       </section>
     </div>
