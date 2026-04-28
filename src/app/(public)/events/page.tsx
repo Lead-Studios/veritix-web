@@ -1,45 +1,54 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
 import CategoryFilter from '@/components/events/CategoryFilter';
 import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
-import { getFeaturedEvents, mockEvents } from '@/mocks/events';
+import { fetchEvents } from '@/lib/eventsApi';
 import EventCard from '@/components/events/EventCard';
 import { EmptyState } from '@/components/EmptyState';
+import type { Event } from '@/types/event';
+
 type ViewMode = 'upcoming' | 'featured';
 
 export default function EventsPage() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter events based on active filters
-  const filteredEvents = useMemo(() => {
-    let events = viewMode === 'featured' ? getFeaturedEvents() : mockEvents;
+  useEffect(() => {
+    fetchEvents()
+      .then(setEvents)
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-    // Filter by categories
+  const filteredEvents = useMemo(() => {
+    let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
+
     if (activeFilters.length > 0) {
-      events = events.filter(event => activeFilters.includes(event.category));
+      list = list.filter((e) => activeFilters.includes(e.category));
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      events = events.filter(event =>
-        event.name.toLowerCase().includes(query) ||
-        event.location.toLowerCase().includes(query) ||
-        event.venue.toLowerCase().includes(query)
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (e) =>
+          e.name.toLowerCase().includes(q) ||
+          e.location.toLowerCase().includes(q) ||
+          e.venue.toLowerCase().includes(q),
       );
     }
 
-    return events;
-  }, [activeFilters, viewMode, searchQuery]);
+    return list;
+  }, [events, activeFilters, viewMode, searchQuery]);
 
   const removeFilter = (filter: string) => {
-    setActiveFilters(prev => prev.filter(f => f !== filter));
+    setActiveFilters((prev) => prev.filter((f) => f !== filter));
   };
 
   return (
@@ -63,9 +72,7 @@ export default function EventsPage() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-center"
               >
-                <span className="text-[#6B8CFF]">
-                  FESTIVAL
-                </span>
+                <span className="text-[#6B8CFF]">FESTIVAL</span>
               </motion.h1>
             </div>
           </motion.div>
@@ -106,17 +113,14 @@ export default function EventsPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CategoryFilter
-              activeFilters={activeFilters}
-              onRemoveFilter={removeFilter}
-            />
+            <CategoryFilter activeFilters={activeFilters} onRemoveFilter={removeFilter} />
             <motion.p
               key={filteredEvents.length}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-gray-400 font-medium text-sm"
             >
-              {filteredEvents.length} events found
+              {loading ? 'Loading…' : `${filteredEvents.length} events found`}
             </motion.p>
           </div>
         </div>
@@ -164,6 +168,49 @@ export default function EventsPage() {
             </motion.div>
           )}
         </AnimatePresence>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-[#6B8CFF] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            {filteredEvents.length > 0 ? (
+              <motion.div
+                key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-5"
+              >
+                {filteredEvents.map((event, index) => (
+                  <EventCard key={event.id} event={event} index={index} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex flex-col items-center justify-center py-20 space-y-4"
+              >
+                <div className="text-4xl sm:text-6xl">🔍</div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">No events found</h3>
+                <p className="text-gray-400 text-center max-w-md text-sm sm:text-base">
+                  Try adjusting your filters or search query to find more events
+                </p>
+                <motion.button
+                  onClick={() => { setActiveFilters([]); setSearchQuery(''); }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="mt-6 px-6 sm:px-8 py-3 bg-linear-to-r from-[#6B8CFF] to-[#5AB9EA] text-white font-semibold rounded-xl transition-all duration-300"
+                >
+                  Clear Filters
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </section>
     </div>
   );

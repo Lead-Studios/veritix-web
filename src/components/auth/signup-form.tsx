@@ -33,6 +33,7 @@ export default function SignUpForm() {
     handleSubmit,
     formState: { isSubmitting },
     control,
+    setError
   } = useForm<FormValues>({
     resolver: zodResolver(signUpSchema),
   });
@@ -40,10 +41,40 @@ export default function SignUpForm() {
   const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
 
   const onSubmit = async (data: FormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Sign up data:", data);
-    toast.success("Account created successfully! (Demo)");
-  };
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      if (result?.errors && typeof result.errors === "object") {
+        Object.entries(result.errors).forEach(([field, message]) => {
+          // react-hook-form field error injection
+          // @ts-ignore
+          setError(field as keyof FormValues, {
+            type: "server",
+            message: String(message),
+          });
+        });
+      }
+
+      throw new Error(result?.message || "Registration failed");
+    }
+
+    toast.success("Account created successfully");
+
+    // router.push("/login");
+
+  } catch (error: any) {
+    toast.error(error.message || "Something went wrong");
+  }
+};
 
   const handleGoogleSignUp = () => {
     console.log("Google sign up clicked");
