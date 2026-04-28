@@ -1,6 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { Manrope, Playfair_Display } from "next/font/google";
 import "./global.css";
+import { AuthProvider } from "@/context/authContext";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] text-white antialiased`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <ToastContainer />
       </body>
     </html>
