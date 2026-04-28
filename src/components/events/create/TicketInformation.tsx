@@ -186,19 +186,26 @@ export default function TicketInformation({
                 {ticket.resellable && (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Resell Price Limit ($)
+                      Resell Price Limit (% of original price)
                     </label>
-                    <input
-                      type="text"
-                      value={ticket.resellPriceLimit}
-                      onChange={(e) =>
-                        updateTicket(index, { resellPriceLimit: e.target.value })
-                      }
-                      placeholder="e.g. 75"
-                      className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        max="1000"
+                        value={ticket.resellPriceLimit}
+                        onChange={(e) =>
+                          updateTicket(index, { resellPriceLimit: e.target.value })
+                        }
+                        placeholder="e.g. 150"
+                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 pr-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                        %
+                      </span>
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Maximum percentage of original price (0-100%)
+                      Maximum resale price as a percentage of the original ticket price (e.g. 150 = up to 1.5× original)
                     </p>
                   </div>
                 )}
