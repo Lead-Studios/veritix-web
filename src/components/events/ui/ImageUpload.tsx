@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import Image from "next/image";
 
 interface ImageUploadProps {
@@ -19,6 +19,17 @@ export default function ImageUpload({
   recommendedSize,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const previewUrl = useMemo(
+    () => (file ? URL.createObjectURL(file) : null),
+    [file]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -73,7 +84,7 @@ export default function ImageUpload({
       {file ? (
         <div className="relative w-full h-full group">
           <Image
-            src={URL.createObjectURL(file)}
+            src={previewUrl!}
             alt="Upload preview"
             fill
             unoptimized

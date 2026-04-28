@@ -8,6 +8,7 @@ import { TbUserPlus } from "react-icons/tb";
 import { Button } from "../button";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { forgotPassword } from "@/lib/auth";
 
 const forgotPasswordSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -25,9 +26,12 @@ export default function ForgotPasswordForm() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Forgot Password data:", data);
-    toast.success("Magic link sent successful! (Demo)");
+    try {
+      await forgotPassword(data.email);
+      toast.success("Magic link sent! Check your inbox.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send reset link. Please try again.");
+    }
   };
 
   const containerVariants = {

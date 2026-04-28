@@ -590,24 +590,24 @@ export default function Home() {
             <h4 className="text-sm font-semibold text-white">Legal</h4>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
               <li>
-                <a href="#top" className="transition hover:text-white">
+                <Link href="/privacy" className="transition hover:text-white">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#top" className="transition hover:text-white">
+                <Link href="/terms" className="transition hover:text-white">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#top" className="transition hover:text-white">
+                <Link href="/cookies" className="transition hover:text-white">
                   Cookie Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#top" className="transition hover:text-white">
+                <Link href="/events/create" className="transition hover:text-white">
                   Host Events
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
