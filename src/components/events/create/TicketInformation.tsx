@@ -192,7 +192,7 @@ export default function TicketInformation({
                       <input
                         type="number"
                         min="0"
-                        max="100"
+                        max="1000"
                         value={ticket.resellPriceLimit}
                         onChange={(e) =>
                           updateTicket(index, { resellPriceLimit: e.target.value })
