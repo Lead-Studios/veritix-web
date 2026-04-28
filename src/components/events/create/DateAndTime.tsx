@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 
 interface DateAndTimeProps {
@@ -8,18 +8,50 @@ interface DateAndTimeProps {
   updateFormData: (updates: Partial<EventFormData>) => void;
 }
 
+function getDateTimeError(
+  startDate: string,
+  startTime: string,
+  endDate: string,
+  endTime: string
+): string | null {
+  if (!startDate || !endDate) return null;
+  const start = new Date(`${startDate}T${startTime || "00:00"}`);
+  const end = new Date(`${endDate}T${endTime || "00:00"}`);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return null;
+  if (end <= start) return "End date/time must be after start date/time.";
+  return null;
+}
+
 export default function DateAndTime({
   formData,
   updateFormData,
 }: DateAndTimeProps) {
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const dateTimeError = useMemo(
+    () =>
+      getDateTimeError(
+        formData.startDate,
+        formData.startTime,
+        formData.endDate,
+        formData.endTime
+      ),
+    [formData.startDate, formData.startTime, formData.endDate, formData.endTime]
+  );
+
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
           2
         </div>
-        <h2 className="text-2xl font-bold text-white">Date & Time</h2>
+        <h2 className="text-2xl font-bold text-white">Date &amp; Time</h2>
       </div>
+
+      <p className="text-xs text-gray-400 mb-4">
+        All times are in your local timezone:{" "}
+        <span className="text-blue-400 font-medium">{userTimezone}</span>
+      </p>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Start Date */}
@@ -59,6 +91,7 @@ export default function DateAndTime({
             <input
               type="date"
               value={formData.endDate}
+              min={formData.startDate || undefined}
               onChange={(e) => updateFormData({ endDate: e.target.value })}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]"
             />
@@ -134,6 +167,12 @@ export default function DateAndTime({
           </div>
         </div>
       </div>
+
+      {dateTimeError && (
+        <p role="alert" className="mt-4 text-sm text-red-400">
+          {dateTimeError}
+        </p>
+      )}
     </section>
   );
 }

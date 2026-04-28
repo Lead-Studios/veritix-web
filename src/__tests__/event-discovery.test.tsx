@@ -57,7 +57,7 @@ describe("Event Discovery", () => {
 
   it("switches to Featured tab and shows events", async () => {
     await waitFor(() => screen.getAllByText(/Summer Dance Festival/i));
-    fireEvent.click(screen.getByRole("button", { name: /^featured$/i }));
+    fireEvent.click(screen.getByRole("tab", { name: /^featured$/i }));
     await waitFor(() => expect(screen.getByText(/events found/i)).toBeTruthy());
   });
 });

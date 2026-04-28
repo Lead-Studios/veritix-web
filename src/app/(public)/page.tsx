@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { FaDiscord, FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
+import NewsletterForm from "@/components/NewsletterForm";
 
 const MotionLink = motion(Link);
 
@@ -620,23 +621,7 @@ export default function Home() {
               Get updates on trending events, exclusive NFT drops, and crypto
               rewards.
             </p>
-            <form className="flex items-center gap-3">
-              <div className="flex flex-1 rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] p-[1px]">
-                <div className="flex w-full items-center rounded-full bg-[#0b1025] px-4 py-2">
-                  <input
-                    type="email"
-                    placeholder="Enter your email address..."
-                    className="flex-1 bg-transparent text-xs text-white placeholder:text-white/50 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                className="whitespace-nowrap rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-4 py-2 text-xs font-semibold text-white"
-              >
-                Subscribe Now
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
       </footer>
