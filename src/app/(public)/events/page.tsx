@@ -8,6 +8,7 @@ import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
 import { fetchEvents } from '@/lib/eventsApi';
 import EventCard from '@/components/events/EventCard';
+import { EmptyState } from '@/components/EmptyState';
 import type { Event } from '@/types/event';
 
 type ViewMode = 'upcoming' | 'featured';
@@ -132,6 +133,41 @@ export default function EventsPage() {
       />
 
       <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
+        <AnimatePresence mode="wait">
+          {filteredEvents.length > 0 ? (
+            <motion.div
+              key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-5"
+            >
+              {filteredEvents.map((event, index) => (
+                <EventCard key={event.id} event={event} index={index} />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
+              <EmptyState
+                variant="search"
+                title="No events found"
+                description="Try adjusting your filters or search query to find more events"
+                action={{
+                  label: "Clear Filters",
+                  onClick: () => {
+                    setActiveFilters([]);
+                    setSearchQuery('');
+                  },
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-8 h-8 border-2 border-[#6B8CFF] border-t-transparent rounded-full animate-spin" />
