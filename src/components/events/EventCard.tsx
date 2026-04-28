@@ -22,70 +22,76 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
     >
-      <Link 
-        href={`/events/${event.id}`}
-        className="group block"
-      >
-        <div className="relative overflow-hidden rounded-xl bg-primary-dark-blue/50 border border-[#E0E0E0]/20  hover:border-white/10 transition-all duration-300">
-          <div className="flex flex-col sm:flex-row gap-0">
-            {/* Event Image - Top on mobile, Left on larger */}
-            <div className="relative w-full sm:w-48 h-48 sm:h-auto shrink-0 overflow-hidden">
-              <Image
-                src={event.image}
-                alt={event.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, 12rem"
-              />
-              {/* Pattern overlay for texture */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.2) 1px, transparent 0)`,
-                backgroundSize: '16px 16px'
-              }} />
+      <div className="relative overflow-hidden rounded-xl bg-primary-dark-blue/50 border border-[#E0E0E0]/20 hover:border-white/10 transition-all duration-300 group">
+        <div className="flex flex-col sm:flex-row gap-0">
+          {/* Event Image - Top on mobile, Left on larger */}
+          <div className="relative w-full sm:w-48 h-48 sm:h-auto shrink-0 overflow-hidden">
+            <Link 
+              href={`/events/${event.id}`}
+              className="absolute inset-0 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-inset"
+              aria-label={`View details for ${event.name}`}
+            />
+            <Image
+              src={event.image}
+              alt={event.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, 12rem"
+            />
+            {/* Pattern overlay for texture */}
+            <div className="absolute inset-0 opacity-20" style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.2) 1px, transparent 0)`,
+              backgroundSize: '16px 16px'
+            }} />
+          </div>
+
+          {/* Event Details - Bottom on mobile, Right on larger */}
+          <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
+            <div className="space-y-3">
+              {/* Event Name and Price - Same Line */}
+              <div className="flex items-start justify-between gap-3">
+                <Link 
+                  href={`/events/${event.id}`}
+                  className="text-xl font-semibold text-white group-hover:text-gray-200 transition-colors flex-1 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428] rounded"
+                >
+                  {event.name}
+                </Link>
+                <div className="text-xl font-bold text-[#6B8CFF] whitespace-nowrap">
+                  {event.price}
+                </div>
+              </div>
+
+              {/* Event Info */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-6 text-gray-400 text-sm">
+                  <HiCalendar className="w-4 h-4 shrink-0" />
+                  <span>{event.date}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <HiClock className="w-4 h-4 shrink-0" />
+                  <span>{event.time}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <HiLocationMarker className="w-4 h-4 shrink-0" />
+                  <span>{event.location}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Event Details - Bottom on mobile, Right on larger */}
-            <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
-              <div className="space-y-3">
-                {/* Event Name and Price - Same Line */}
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-xl font-semibold text-white group-hover:text-gray-200 transition-colors flex-1">
-                    {event.name}
-                  </h3>
-                  <div className="text-xl font-bold text-[#6B8CFF] whitespace-nowrap">
-                    {event.price}
-                  </div>
-                </div>
-
-                {/* Event Info */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-6 text-gray-400 text-sm">
-                    <HiCalendar className="w-4 h-4 shrink-0" />
-                    <span>{event.date}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <HiClock className="w-4 h-4 shrink-0" />
-                    <span>{event.time}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <HiLocationMarker className="w-4 h-4 shrink-0" />
-                    <span>{event.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Button */}
-              <div className="flex items-center justify-end mt-4">
-                <button className="px-6 py-2.5 bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
-                  Get Tickets
-                </button>
-              </div>
+            {/* Button */}
+            <div className="flex items-center justify-end mt-4">
+              <Link 
+                href={`/events/${event.id}`}
+                className="px-6 py-2.5 bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428]"
+              >
+                Get Tickets
+              </Link>
             </div>
           </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }
