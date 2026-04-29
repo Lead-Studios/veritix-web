@@ -16,6 +16,7 @@ type ViewMode = 'upcoming' | 'featured';
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,10 +25,31 @@ export default function EventsPage() {
 
   useEffect(() => {
     fetchEvents()
-      .then(setEvents)
-      .catch(() => setEvents([]))
+      .then((data) => {
+        setEvents(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load events. Please try again.');
+        setEvents([]);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    fetchEvents()
+      .then((data) => {
+        setEvents(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load events. Please try again.');
+        setEvents([]);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
@@ -141,7 +163,7 @@ export default function EventsPage() {
               animate={{ opacity: 1 }}
               className="text-gray-400 font-medium text-sm"
             >
-              {loading ? 'Loading…' : `${filteredEvents.length} events found`}
+              {!error && `${filteredEvents.length} events found`}
             </motion.p>
           </div>
         </div>
@@ -154,47 +176,87 @@ export default function EventsPage() {
       />
 
       <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
-        <AnimatePresence mode="wait">
-          {filteredEvents.length > 0 ? (
-            <motion.div
-              key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-5"
-            >
-              {filteredEvents.map((event, index) => (
-                <EventCard key={event.id} event={event} index={index} />
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-            >
-              <EmptyState
-                variant="search"
-                title="No events found"
-                description="Try adjusting your filters or search query to find more events"
-                action={{
-                  label: "Clear Filters",
-                  onClick: () => {
-                    setActiveFilters([]);
-                    setSearchQuery('');
-                    setLocationFilter('');
-                    setDateFilter('');
-                  },
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Loading State */}
         {loading && (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-[#6B8CFF] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-20 space-y-4"
+          >
+            <div className="w-12 h-12 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
+            <p className="text-gray-400 text-sm">Loading events...</p>
+          </motion.div>
+        )}
+
+        {/* Error State */}
+        {!loading && error && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center py-20 space-y-4"
+          >
+            <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
+              <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="text-center space-y-2">
+              <h3 className="text-white font-semibold text-lg">Unable to load events</h3>
+              <p className="text-gray-400 text-sm max-w-md">{error}</p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleRetry}
+              className="px-6 py-3 rounded-xl bg-[#6B8CFF] hover:bg-[#5a7bef] text-white font-semibold transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Try Again
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* Events List */}
+        {!loading && !error && (
+          <AnimatePresence mode="wait">
+            {filteredEvents.length > 0 ? (
+              <motion.div
+                key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-5"
+              >
+                {filteredEvents.map((event, index) => (
+                  <EventCard key={event.id} event={event} index={index} />
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <EmptyState
+                  variant="search"
+                  title="No events found"
+                  description="Try adjusting your filters or search query to find more events"
+                  action={{
+                    label: "Clear Filters",
+                    onClick: () => {
+                      setActiveFilters([]);
+                      setSearchQuery('');
+                      setLocationFilter('');
+                      setDateFilter('');
+                    },
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </section>
     </div>

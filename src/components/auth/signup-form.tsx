@@ -76,14 +76,25 @@ export default function SignUpForm() {
   }
 };
 
-  const handleGoogleSignUp = () => {
-    console.log("Google sign up clicked");
-    toast.success("Google sign up (Demo)");
+  const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+  const walletEnabled = process.env.NEXT_PUBLIC_WALLET_AUTH_ENABLED === "true";
+
+  const handleGoogleSignUp = async () => {
+    try {
+      // Redirect to Google OAuth flow
+      window.location.href = "/api/auth/google";
+    } catch (error: any) {
+      toast.error("Google sign-up failed. Please try again or use email registration.");
+    }
   };
 
-  const handleWalletSignUp = () => {
-    console.log("Wallet sign up clicked");
-    toast.success("Wallet sign up (Demo)");
+  const handleWalletSignUp = async () => {
+    try {
+      // Redirect to wallet connection flow
+      window.location.href = "/api/auth/wallet";
+    } catch (error: any) {
+      toast.error("Wallet sign-up failed. Please ensure your wallet is connected and try again.");
+    }
   };
 
   const containerVariants = {
@@ -199,55 +210,63 @@ export default function SignUpForm() {
         </motion.form>
       </div>
 
-      <motion.div
-        className="flex items-center gap-4 my-4"
-        variants={itemVariants}
-      >
-        <div className="flex-1 h-px bg-primary-black"></div>
-        <span className="text-sm lg:text-xl">or register with</span>
-        <div className="flex-1 h-px bg-primary-black"></div>
-      </motion.div>
-
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
-        variants={itemVariants}
-      >
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Button
-            onClick={handleGoogleSignUp}
-            variant="outline"
-            disabled={isSubmitting}
-            className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
+      {(googleEnabled || walletEnabled) && (
+        <>
+          <motion.div
+            className="flex items-center gap-4 my-4"
+            variants={itemVariants}
           >
-            <div className="flex items-center gap-2">
-              <FcGoogle />
-              <p className="text-sm font-medium">Google</p>
-            </div>
-          </Button>
-        </motion.div>
+            <div className="flex-1 h-px bg-primary-black"></div>
+            <span className="text-sm lg:text-xl">or register with</span>
+            <div className="flex-1 h-px bg-primary-black"></div>
+          </motion.div>
 
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Button
-            onClick={handleWalletSignUp}
-            variant="outline"
-            disabled={isSubmitting}
-            className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
+            variants={itemVariants}
           >
-            <div className="flex items-center gap-2">
-              <IoWallet />
-              <p className="text-sm font-medium">Wallet</p>
-            </div>
-          </Button>
-        </motion.div>
-      </motion.div>
+            {googleEnabled && (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  onClick={handleGoogleSignUp}
+                  variant="outline"
+                  disabled={isSubmitting}
+                  className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <FcGoogle />
+                    <p className="text-sm font-medium">Google</p>
+                  </div>
+                </Button>
+              </motion.div>
+            )}
+
+            {walletEnabled && (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  onClick={handleWalletSignUp}
+                  variant="outline"
+                  disabled={isSubmitting}
+                  className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <IoWallet />
+                    <p className="text-sm font-medium">Wallet</p>
+                  </div>
+                </Button>
+              </motion.div>
+            )}
+          </motion.div>
+        </>
+      )}
 
       <motion.p className="text-center lg:text-xl mt-6" variants={itemVariants}>
         Already have an account?{" "}

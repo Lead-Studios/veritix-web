@@ -42,7 +42,7 @@ const VALID_TICKETS: Record<string, {
   },
 };
 
-type VerifyState = 'idle' | 'loading' | 'success' | 'failure' | 'already-used';
+type VerifyState = 'idle' | 'loading' | 'success' | 'failure' | 'already-used' | 'service-error';
 
 // ─── Scan Frame Animation ─────────────────────────────────────────────────────
 function ScanFrame() {
@@ -95,14 +95,17 @@ function ResultCard({
   state,
   ticketCode,
   onReset,
+  onRetry,
 }: {
   state: VerifyState;
   ticketCode: string;
   onReset: () => void;
+  onRetry?: () => void;
 }) {
   const ticket = VALID_TICKETS[ticketCode.toUpperCase()];
   const isSuccess = state === 'success';
   const isAlreadyUsed = state === 'already-used';
+  const isServiceError = state === 'service-error';
 
   return (
     <AnimatePresence mode="wait">
@@ -117,6 +120,8 @@ function ResultCard({
             ? 'border-emerald-500/40 bg-emerald-900/20'
             : isAlreadyUsed
             ? 'border-amber-500/40 bg-amber-900/20'
+            : isServiceError
+            ? 'border-orange-500/40 bg-orange-900/20'
             : 'border-red-500/40 bg-red-900/20'
         }`}
       >
@@ -127,6 +132,8 @@ function ResultCard({
               ? 'bg-emerald-500'
               : isAlreadyUsed
               ? 'bg-amber-500'
+              : isServiceError
+              ? 'bg-orange-500'
               : 'bg-red-500'
           }`}
         >
@@ -135,6 +142,10 @@ function ResultCard({
               <HiCheck className="w-5 h-5 text-white" />
             ) : isAlreadyUsed ? (
               <HiRefresh className="w-5 h-5 text-white" />
+            ) : isServiceError ? (
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
             ) : (
               <HiX className="w-5 h-5 text-white" />
             )}
@@ -144,6 +155,8 @@ function ResultCard({
               ? 'Valid Ticket — Entry Granted'
               : isAlreadyUsed
               ? 'Already Used'
+              : isServiceError
+              ? 'Service Unavailable'
               : 'Invalid Ticket'}
           </span>
         </div>
@@ -166,24 +179,40 @@ function ResultCard({
               <p className="text-gray-300 text-sm">
                 {isAlreadyUsed
                   ? 'This ticket has already been scanned. Please check with your supervisor.'
+                  : isServiceError
+                  ? 'Unable to connect to verification service. Please check your connection and try again.'
                   : 'No ticket found matching this code. Verify the code and try again.'}
               </p>
-              <p className="text-gray-500 text-xs font-mono">{ticketCode.toUpperCase()}</p>
+              {!isServiceError && (
+                <p className="text-gray-500 text-xs font-mono">{ticketCode.toUpperCase()}</p>
+              )}
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="px-6 pb-6">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onReset}
-            className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-          >
-            <HiRefresh className="w-4 h-4" />
-            Verify Another Ticket
-          </motion.button>
+        <div className="px-6 pb-6 space-y-3">
+          {isServiceError && onRetry ? (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onRetry}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] hover:opacity-90 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <HiRefresh className="w-4 h-4" />
+              Retry Verification
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onReset}
+              className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <HiRefresh className="w-4 h-4" />
+              Verify Another Ticket
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </AnimatePresence>
@@ -211,9 +240,24 @@ export default function VerifyPage() {
     if (!code.trim()) return;
     setVerifyState('loading');
 
-    // Simulate async check
+    // Simulate async check with potential service failure
     setTimeout(() => {
       const upper = code.trim().toUpperCase();
+      
+      // Deterministic service error for testing
+      if (upper === 'TKT-SERVICE-ERR') {
+        setVerifyState('service-error');
+        return;
+      }
+
+      // Simulate random service failure (10% chance for other codes)
+      const simulateServiceError = Math.random() < 0.1;
+      
+      if (simulateServiceError) {
+        setVerifyState('service-error');
+        return;
+      }
+
       if (usedCodes.has(upper)) {
         setVerifyState('already-used');
       } else if (VALID_TICKETS[upper]) {
@@ -231,8 +275,23 @@ export default function VerifyPage() {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  const handleRetry = () => {
+    setVerifyState('loading');
+    setTimeout(() => {
+      const upper = code.trim().toUpperCase();
+      if (usedCodes.has(upper)) {
+        setVerifyState('already-used');
+      } else if (VALID_TICKETS[upper]) {
+        usedCodes.add(upper);
+        setVerifyState('success');
+      } else {
+        setVerifyState('failure');
+      }
+    }, 900);
+  };
+
   const isChecking = verifyState === 'loading';
-  const hasResult = ['success', 'failure', 'already-used'].includes(verifyState);
+  const hasResult = ['success', 'failure', 'already-used', 'service-error'].includes(verifyState);
 
   return (
     <div className="min-h-screen bg-primary-dark-blue">
@@ -370,6 +429,12 @@ export default function VerifyPage() {
                     >
                       TKT-INVALID-000
                     </button>
+                    <button
+                      onClick={() => setCode('TKT-SERVICE-ERR')}
+                      className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-orange-500/20 hover:text-orange-300 transition-colors"
+                    >
+                      SERVICE ERROR TEST
+                    </button>
                   </div>
                 </div>
               </div>
@@ -382,6 +447,7 @@ export default function VerifyPage() {
               state={verifyState}
               ticketCode={code}
               onReset={handleReset}
+              onRetry={handleRetry}
             />
           )}
 
