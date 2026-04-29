@@ -3,15 +3,18 @@
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import Toggle from "../ui/Toggle";
+import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 
 interface TicketInformationProps {
   formData: EventFormData;
   updateFormData: (updates: Partial<EventFormData>) => void;
+  errors?: CreateEventFormErrors;
 }
 
 export default function TicketInformation({
   formData,
   updateFormData,
+  errors = {},
 }: TicketInformationProps) {
   const addTicketType = () => {
     updateFormData({
@@ -91,22 +94,26 @@ export default function TicketInformation({
               {/* Ticket Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Ticket Name
+                  Ticket Name <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={ticket.name}
                   onChange={(e) => updateTicket(index, { name: e.target.value })}
                   placeholder="e.g. VIP, General admission"
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  aria-invalid={!!errors[`tickets.${index}.name`]}
+                  className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.name`] ? "border-red-500" : "border-gray-600"}`}
                 />
+                {errors[`tickets.${index}.name`] && (
+                  <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.name`]}</p>
+                )}
               </div>
 
               {/* Quantity and Price */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Quantity Available
+                    Quantity Available <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="number"
@@ -117,20 +124,28 @@ export default function TicketInformation({
                       })
                     }
                     min="0"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    aria-invalid={!!errors[`tickets.${index}.quantity`]}
+                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.quantity`] ? "border-red-500" : "border-gray-600"}`}
                   />
+                  {errors[`tickets.${index}.quantity`] && (
+                    <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.quantity`]}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Price (ETH)
+                    Price (ETH) <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={ticket.price}
                     onChange={(e) => updateTicket(index, { price: e.target.value })}
                     placeholder="e.g. 0.05"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    aria-invalid={!!errors[`tickets.${index}.price`]}
+                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.price`] ? "border-red-500" : "border-gray-600"}`}
                   />
+                  {errors[`tickets.${index}.price`] && (
+                    <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.price`]}</p>
+                  )}
                 </div>
               </div>
 

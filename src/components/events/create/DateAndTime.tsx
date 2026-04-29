@@ -2,10 +2,12 @@
 
 import React, { useMemo } from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
+import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 
 interface DateAndTimeProps {
   formData: EventFormData;
   updateFormData: (updates: Partial<EventFormData>) => void;
+  errors?: CreateEventFormErrors;
 }
 
 function getDateTimeError(
@@ -25,6 +27,7 @@ function getDateTimeError(
 export default function DateAndTime({
   formData,
   updateFormData,
+  errors = {},
 }: DateAndTimeProps) {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -38,6 +41,8 @@ export default function DateAndTime({
       ),
     [formData.startDate, formData.startTime, formData.endDate, formData.endTime]
   );
+
+  const displayError = errors.endDate || dateTimeError;
 
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
@@ -57,35 +62,27 @@ export default function DateAndTime({
         {/* Start Date */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Start Date
+            Start Date <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <input
               type="date"
               value={formData.startDate}
               onChange={(e) => updateFormData({ startDate: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]"
+              aria-invalid={!!errors.startDate}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark] ${errors.startDate ? "border-red-500" : "border-gray-700"}`}
             />
-            <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
+          {errors.startDate && <p role="alert" className="mt-1 text-xs text-red-400">{errors.startDate}</p>}
         </div>
 
         {/* End Date */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            End Date
+            End Date <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <input
@@ -93,20 +90,11 @@ export default function DateAndTime({
               value={formData.endDate}
               min={formData.startDate || undefined}
               onChange={(e) => updateFormData({ endDate: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]"
+              aria-invalid={!!errors.endDate}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark] ${errors.endDate ? "border-red-500" : "border-gray-700"}`}
             />
-            <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
         </div>
@@ -114,63 +102,47 @@ export default function DateAndTime({
         {/* Start Time */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Start Time
+            Start Time <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <input
               type="time"
               value={formData.startTime}
               onChange={(e) => updateFormData({ startTime: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]"
+              aria-invalid={!!errors.startTime}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark] ${errors.startTime ? "border-red-500" : "border-gray-700"}`}
             />
-            <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
+          {errors.startTime && <p role="alert" className="mt-1 text-xs text-red-400">{errors.startTime}</p>}
         </div>
 
         {/* End Time */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            End Time
+            End Time <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <input
               type="time"
               value={formData.endTime}
               onChange={(e) => updateFormData({ endTime: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark]"
+              aria-invalid={!!errors.endTime}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 pl-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 [color-scheme:dark] ${errors.endTime ? "border-red-500" : "border-gray-700"}`}
             />
-            <svg
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
+          {errors.endTime && <p role="alert" className="mt-1 text-xs text-red-400">{errors.endTime}</p>}
         </div>
       </div>
 
-      {dateTimeError && (
+      {displayError && (
         <p role="alert" className="mt-4 text-sm text-red-400">
-          {dateTimeError}
+          {displayError}
         </p>
       )}
     </section>
