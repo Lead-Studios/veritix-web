@@ -3,15 +3,18 @@
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import RadioButton from "../ui/RadioButton";
+import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 
 interface BlockchainSettingProps {
   formData: EventFormData;
   updateFormData: (updates: Partial<EventFormData>) => void;
+  errors?: CreateEventFormErrors;
 }
 
 export default function BlockchainSetting({
   formData,
   updateFormData,
+  errors = {},
 }: BlockchainSettingProps) {
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
@@ -71,7 +74,7 @@ export default function BlockchainSetting({
         {/* Treasury Address */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Treasury Address
+            Treasury Address <span className="text-red-400">*</span>
           </label>
           <div>
             <input
@@ -81,11 +84,15 @@ export default function BlockchainSetting({
                 updateFormData({ treasuryAddress: e.target.value })
               }
               placeholder="e.g. 0x5..."
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              aria-invalid={!!errors.treasuryAddress}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.treasuryAddress ? "border-red-500" : "border-gray-700"}`}
             />
             <p className="text-xs text-gray-500 mt-1">
               where funds will be sent
             </p>
+            {errors.treasuryAddress && (
+              <p role="alert" className="mt-1 text-xs text-red-400">{errors.treasuryAddress}</p>
+            )}
           </div>
         </div>
 

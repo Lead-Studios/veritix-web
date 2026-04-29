@@ -7,16 +7,20 @@ import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiChe
 import TabSelector from '@/components/TabSelector';
 import WalletConnectModal from '@/components/events/WalletConnectModal';
 import { fetchEventById } from '@/lib/eventsApi';
+import { useFavorite } from '@/hooks/useFavorite';
 import type { Event } from '@/types/event';
+import type { WalletConnection } from '@/components/events/WalletConnectModal';
 type TabType = 'about' | 'schedule' | 'performers';
 
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const eventId = params.eventId as string;
   const [event, setEvent] = useState<Event | null | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<TabType>('about');
-  const [isLiked, setIsLiked] = useState(false);
+  const { isLiked, isPending, error: favoriteError, toggle: toggleFavorite } = useFavorite(eventId);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [connectedWallet, setConnectedWallet] = useState<WalletConnection | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [selectedTicketIndex, setSelectedTicketIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -125,13 +129,17 @@ export default function EventDetailsPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsLiked(!isLiked)}
+                    onClick={toggleFavorite}
+                    disabled={isPending}
+                    aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+                    aria-pressed={isLiked}
                     className={`
                       p-2.5 rounded-full backdrop-blur-sm transition-all duration-300
                       ${isLiked
                         ? 'bg-pink-500 text-white'
                         : 'bg-white/10 text-white hover:bg-white/20'
                       }
+                      ${isPending ? 'opacity-60 cursor-not-allowed' : ''}
                     `}
                   >
                     <HiHeart className="w-5 h-5" />
@@ -145,6 +153,11 @@ export default function EventDetailsPage() {
 
       {/* Event Info Bar */}
       <section className="relative ">
+        {favoriteError && (
+          <div role="alert" className="bg-red-900/80 text-red-200 text-sm px-4 py-2 text-center">
+            {favoriteError}
+          </div>
+        )}
         <div className="container mx-auto px-6 sm:px-6 lg:px-8 py-5">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 lg:gap-1">
             <motion.div
@@ -405,7 +418,9 @@ export default function EventDetailsPage() {
                   >
                     {event.ticketOptions && event.ticketOptions[selectedTicketIndex]?.remaining === 0
                       ? 'Sold Out'
-                      : 'Connect Wallet to Purchase'}
+                      : connectedWallet
+                        ? `Purchase (${connectedWallet.address.slice(0, 6)}…${connectedWallet.address.slice(-4)})`
+                        : 'Connect Wallet to Purchase'}
                   </motion.button>
 
                   <p className="text-xs text-gray-500 leading-relaxed p-6 align-left max-w-xl">
@@ -449,7 +464,14 @@ export default function EventDetailsPage() {
         </div>
       </section>
 
-      <WalletConnectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <WalletConnectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConnected={(wallet) => {
+          setConnectedWallet(wallet);
+          setIsModalOpen(false);
+        }}
+      />
     </div>
   );
 }

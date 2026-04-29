@@ -3,13 +3,16 @@
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import RadioButton from "../ui/RadioButton";
+import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 
 interface LocationProps {
   formData: EventFormData;
   updateFormData: (updates: Partial<EventFormData>) => void;
+  errors?: CreateEventFormErrors;
 }
 
-export default function Location({ formData, updateFormData }: LocationProps) {
+export default function Location({ formData, updateFormData, errors = {} }: LocationProps) {
+  const needsVenue = formData.eventType !== "online";
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-3 mb-6">
@@ -62,15 +65,17 @@ export default function Location({ formData, updateFormData }: LocationProps) {
         {/* Venue Name */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Venue Name
+            Venue Name {needsVenue && <span className="text-red-400">*</span>}
           </label>
           <input
             type="text"
             value={formData.venueName}
             onChange={(e) => updateFormData({ venueName: e.target.value })}
             placeholder="Enter Venue name"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+            aria-invalid={!!errors.venueName}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.venueName ? "border-red-500" : "border-gray-700"}`}
           />
+          {errors.venueName && <p role="alert" className="mt-1 text-xs text-red-400">{errors.venueName}</p>}
         </div>
 
         {/* Address */}
@@ -91,15 +96,17 @@ export default function Location({ formData, updateFormData }: LocationProps) {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              City
+              City {needsVenue && <span className="text-red-400">*</span>}
             </label>
             <input
               type="text"
               value={formData.city}
               onChange={(e) => updateFormData({ city: e.target.value })}
               placeholder="City"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              aria-invalid={!!errors.city}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.city ? "border-red-500" : "border-gray-700"}`}
             />
+            {errors.city && <p role="alert" className="mt-1 text-xs text-red-400">{errors.city}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">

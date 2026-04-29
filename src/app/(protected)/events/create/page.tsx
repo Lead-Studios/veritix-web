@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import BasicInformation from "@/components/events/create/BasicInformation";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
 import TicketInformation from "@/components/events/create/TicketInformation";
 import BlockchainSetting from "@/components/events/create/BlockchainSetting";
 import EventSummary from "@/components/events/create/EventSummary";
+import {
+  createEventSchema,
+  parseCreateEventErrors,
+  sectionForField,
+  sectionIdForField,
+  type CreateEventFormErrors,
+} from "@/lib/createEventValidation";
+import { submitCreateEvent } from "@/lib/createEventSubmit";
 
 export interface EventFormData {
   // Basic Information
@@ -14,13 +22,13 @@ export interface EventFormData {
   description: string;
   coverImage: File | null;
   gallery: File[];
-  
+
   // Date & Time
   startDate: string;
   endDate: string;
   startTime: string;
   endTime: string;
-  
+
   // Location
   eventType: "physical" | "online" | "hybrid";
   venueName: string;
@@ -28,7 +36,7 @@ export interface EventFormData {
   city: string;
   state: string;
   zipCode: string;
-  
+
   // Ticket Information
   tickets: Array<{
     name: string;
@@ -39,7 +47,7 @@ export interface EventFormData {
     resellable: boolean;
     resellPriceLimit: string;
   }>;
-  
+
   // Blockchain Setting
   blockchainNetwork: "ethereum" | "polygon" | "solana";
   treasuryAddress: string;
@@ -79,20 +87,59 @@ const initialFormData: EventFormData = {
 
 export default function CreateEventPage() {
   const [formData, setFormData] = useState<EventFormData>(initialFormData);
+  const [errors, setErrors] = useState<CreateEventFormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
 
   const updateFormData = (updates: Partial<EventFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const handleCreateEvent = () => {
-    // TODO: Implement event creation logic
-    console.log("Creating event:", formData);
+  const validate = (): CreateEventFormErrors | null => {
+    const result = createEventSchema.safeParse(formData);
+    if (result.success) return null;
+    return parseCreateEventErrors(result.error.issues);
+  };
+
+  const scrollToFirstError = (errs: CreateEventFormErrors) => {
+    const firstField = Object.keys(errs)[0];
+    if (!firstField) return;
+    const sectionId = sectionIdForField(firstField);
+    const target = sectionId
+      ? document.getElementById(sectionId)
+      : errorSummaryRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleCreateEvent = async () => {
+    const errs = validate();
+    if (errs) {
+      setErrors(errs);
+      // Scroll to error summary first, then to first broken section
+      errorSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => scrollToFirstError(errs), 400);
+      return;
+    }
+
+    setErrors({});
+    setIsSubmitting(true);
+    try {
+      await submitCreateEvent(formData);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to create event.";
+      setErrors({ _form: msg });
+      errorSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSaveDraft = () => {
-    // TODO: Implement save draft logic
     console.log("Saving draft:", formData);
   };
+
+  const errorEntries = Object.entries(errors).filter(([k]) => k !== "_form");
+  const hasErrors = errorEntries.length > 0 || !!errors._form;
 
   return (
     <div className="min-h-screen bg-[#0a0e21] text-white">
@@ -134,46 +181,118 @@ export default function CreateEventPage() {
       <div className="flex gap-8 px-8 py-6">
         {/* Left Column - Form */}
         <div className="flex-1 space-y-8 overflow-y-auto max-h-[calc(100vh-120px)] pr-4">
-          <BasicInformation
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-          <DateAndTime formData={formData} updateFormData={updateFormData} />
-          <Location formData={formData} updateFormData={updateFormData} />
-          <TicketInformation
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-          <BlockchainSetting
-            formData={formData}
-            updateFormData={updateFormData}
-          />
+          {/* Error Summary — issues #153 + #154 */}
+          {hasErrors && (
+            <div
+              ref={errorSummaryRef}
+              role="alert"
+              aria-live="assertive"
+              className="bg-red-950/60 border border-red-700 rounded-xl p-5 space-y-3"
+            >
+              <p className="text-red-300 font-semibold text-sm">
+                Please fix the following errors before submitting:
+              </p>
+              {errors._form && (
+                <p className="text-red-400 text-sm">{errors._form}</p>
+              )}
+              {errorEntries.length > 0 && (
+                <ul className="space-y-1 list-disc list-inside">
+                  {errorEntries.map(([field, msg]) => {
+                    const sectionId = sectionIdForField(field);
+                    const section = sectionForField(field);
+                    return (
+                      <li key={field} className="text-red-400 text-sm">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const el = sectionId ? document.getElementById(sectionId) : null;
+                            el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }}
+                          className="underline hover:text-red-300 text-left"
+                        >
+                          {section}
+                        </button>
+                        {": "}
+                        {msg}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
+
+          <div id="section-basic">
+            <BasicInformation
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
+          <div id="section-datetime">
+            <DateAndTime
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
+          <div id="section-location">
+            <Location
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
+          <div id="section-tickets">
+            <TicketInformation
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
+          <div id="section-blockchain">
+            <BlockchainSetting
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
         </div>
 
         {/* Right Column - Event Summary & Actions */}
         <div className="w-96 flex-shrink-0 space-y-6">
           <EventSummary formData={formData} />
-          
+
           {/* Action Buttons */}
           <div className="space-y-4">
             <button
               onClick={handleCreateEvent}
-              className="w-full bg-gradient-to-r from-blue-700 to-blue-200 hover:from-blue-800 hover:to-blue-300 text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-blue-700 to-blue-200 hover:from-blue-800 hover:to-blue-300 text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              Create Event
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Creating…
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Create Event
+                </>
+              )}
             </button>
             <button
               onClick={handleSaveDraft}

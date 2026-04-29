@@ -3,15 +3,18 @@
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import ImageUpload from "../ui/ImageUpload";
+import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 
 interface BasicInformationProps {
   formData: EventFormData;
   updateFormData: (updates: Partial<EventFormData>) => void;
+  errors?: CreateEventFormErrors;
 }
 
 export default function BasicInformation({
   formData,
   updateFormData,
+  errors = {},
 }: BasicInformationProps) {
   const handleCoverImageChange = (file: File | null) => {
     updateFormData({ coverImage: file });
@@ -30,35 +33,45 @@ export default function BasicInformation({
         {/* Event Title */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Event Title
+            Event Title <span className="text-red-400">*</span>
           </label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => updateFormData({ title: e.target.value })}
             placeholder="Give your event a catchy title"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+            aria-invalid={!!errors.title}
+            aria-describedby={errors.title ? "error-title" : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.title ? "border-red-500" : "border-gray-700"}`}
           />
+          {errors.title && (
+            <p id="error-title" role="alert" className="mt-1 text-xs text-red-400">{errors.title}</p>
+          )}
         </div>
 
         {/* Event Description */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Event Description
+            Event Description <span className="text-red-400">*</span>
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => updateFormData({ description: e.target.value })}
             placeholder="Describe your event in details"
             rows={4}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none"
+            aria-invalid={!!errors.description}
+            aria-describedby={errors.description ? "error-description" : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none ${errors.description ? "border-red-500" : "border-gray-700"}`}
           />
+          {errors.description && (
+            <p id="error-description" role="alert" className="mt-1 text-xs text-red-400">{errors.description}</p>
+          )}
         </div>
 
         {/* Event Cover Image */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Event Cover Image
+            Event Cover Image <span className="text-red-400">*</span>
           </label>
           <ImageUpload
             file={formData.coverImage}
@@ -66,6 +79,9 @@ export default function BasicInformation({
             aspectRatio="wide"
             recommendedSize="1920 x 630 pixels"
           />
+          {errors.coverImage && (
+            <p role="alert" className="mt-1 text-xs text-red-400">{errors.coverImage}</p>
+          )}
         </div>
 
         {/* Event Gallery */}
