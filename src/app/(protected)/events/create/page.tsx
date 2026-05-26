@@ -220,31 +220,9 @@ export default function CreateEventPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-8 px-8 py-6">
+      <div className="flex flex-col xl:flex-row gap-8 px-4 sm:px-8 py-6">
         {/* Left Column - Form */}
-        <div className="flex-1 space-y-8 overflow-y-auto max-h-[calc(100vh-120px)] pr-4">
-          {/* Draft restored banner */}
-          {draftRestored && (
-            <div
-              role="status"
-              className="flex items-center justify-between bg-blue-950/60 border border-blue-700 rounded-xl px-5 py-3 text-sm text-blue-300"
-            >
-              <span>Draft restored from your last session.</span>
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.removeItem(DRAFT_KEY);
-                  setFormData(initialFormData);
-                  setDraftRestored(false);
-                  setIsDirty(false);
-                }}
-                className="ml-4 underline hover:text-blue-100"
-              >
-                Discard
-              </button>
-            </div>
-          )}
-
+        <div className="flex-1 space-y-8 min-w-0">
           {/* Error Summary — issues #153 + #154 */}
           {hasErrors && (
             <div
@@ -324,7 +302,7 @@ export default function CreateEventPage() {
         </div>
 
         {/* Right Column - Event Summary & Actions */}
-        <div className="w-96 flex-shrink-0 space-y-6">
+        <div className="w-full xl:w-96 xl:flex-shrink-0 space-y-6">
           <EventSummary formData={formData} />
 
           {/* Action Buttons */}

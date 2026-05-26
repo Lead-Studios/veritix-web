@@ -124,6 +124,42 @@ export default function EventSummary({ formData }: EventSummaryProps) {
           <p className="text-base text-white">{getTicketTypes()}</p>
         </div>
 
+        {/* Ticket totals & pricing */}
+        {formData.tickets.length > 0 && (
+          <div>
+            <p className="text-sm font-medium text-gray-400 mb-2">Pricing Overview</p>
+            <div className="space-y-1">
+              {formData.tickets.filter((t) => t.name).map((t, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span className="text-gray-300 truncate max-w-[60%]">{t.name || 'Unnamed'}</span>
+                  <span className="text-white font-medium">
+                    {t.price ? `${t.price} ETH` : 'Free'} &times; {t.quantity || 0}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Draft completeness */}
+        <div>
+          <p className="text-sm font-medium text-gray-400 mb-2">Completeness</p>
+          <div className="space-y-1">
+            {[
+              { label: 'Title', done: !!formData.title },
+              { label: 'Dates', done: !!(formData.startDate && formData.endDate) },
+              { label: 'Location', done: !!(formData.eventType === 'online' || formData.venueName || formData.address) },
+              { label: 'Tickets', done: formData.tickets.some((t) => t.name) },
+              { label: 'Treasury address', done: !!formData.treasuryAddress },
+            ].map(({ label, done }) => (
+              <div key={label} className="flex items-center gap-2 text-xs">
+                <span className={done ? 'text-green-400' : 'text-gray-500'}>{done ? '✓' : '○'}</span>
+                <span className={done ? 'text-gray-300' : 'text-gray-500'}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Blockchain */}
         <div>
           <p className="text-sm font-medium text-gray-400 mb-1">Blockchain</p>

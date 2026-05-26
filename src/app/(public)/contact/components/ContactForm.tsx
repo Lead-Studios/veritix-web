@@ -60,6 +60,23 @@ export default function ContactForm() {
     }
   };
 
+  if (success) {
+    return (
+      <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8 flex flex-col items-center justify-center gap-4 text-center min-h-[320px]">
+        <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
+          <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-white">Message Sent!</h2>
+        <p className="text-white/60 text-sm">{success}</p>
+        <button onClick={() => setSuccess("")} className="mt-2 text-sm text-[#21D4FF] hover:underline">
+          Send another message
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8">
       <h2 className="text-xl font-semibold mb-1">Send us a message</h2>
