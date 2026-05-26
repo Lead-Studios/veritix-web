@@ -10,6 +10,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { loginUser } from "@/lib/auth";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -21,6 +22,8 @@ const loginSchema = z.object({
 type FormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     handleSubmit,
     formState: { isSubmitting, errors },
@@ -34,6 +37,8 @@ export default function LoginForm() {
     try {
       await loginUser({ email: data.email, password: data.password });
       toast.success("Login successful!");
+      const next = searchParams.get("next");
+      router.push(next && next.startsWith("/") ? next : "/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed. Please try again.";
       setError("root", { message });
