@@ -161,7 +161,7 @@ export default function EventsPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CategoryFilter activeFilters={activeFilters} onRemoveFilter={removeFilter} />
+            <CategoryFilter activeFilters={activeFilters} onRemoveFilter={removeFilter} onClearAll={() => setActiveFilters([])} />
             <motion.p
               key={filteredEvents.length}
               initial={{ opacity: 0 }}
