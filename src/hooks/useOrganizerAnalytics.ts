@@ -1,5 +1,23 @@
 import { useState, useEffect } from "react";
 
+export interface TicketTypeBreakdown {
+  type: string;
+  count: number;
+  revenue: number;
+}
+
+export interface DemographicItem {
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface Demographics {
+  region: DemographicItem[];
+  deviceType: DemographicItem[];
+  referralSource: DemographicItem[];
+}
+
 export interface OrganizerAnalytics {
   revenue: { day: string; revenue: number }[];
   performance: { day: string; value: number }[];
@@ -8,6 +26,8 @@ export interface OrganizerAnalytics {
   nextSettlementDays: number;
   checkInsLive: boolean;
   doorsOpenInMinutes: number;
+  ticketBreakdown?: TicketTypeBreakdown[];
+  demographics?: Demographics;
 }
 
 async function fetchOrganizerAnalytics(): Promise<OrganizerAnalytics> {
