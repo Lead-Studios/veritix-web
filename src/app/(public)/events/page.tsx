@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
 import CategoryFilter from '@/components/events/CategoryFilter';
@@ -10,6 +10,8 @@ import { fetchEvents } from '@/lib/eventsApi';
 import EventCard from '@/components/events/EventCard';
 import { EmptyState } from '@/components/EmptyState';
 import type { Event } from '@/types/event';
+
+const PAGE_SIZE = 9;
 
 type ViewMode = 'upcoming' | 'featured';
 
@@ -22,6 +24,10 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchEvents()
@@ -53,38 +59,37 @@ export default function EventsPage() {
 
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
-
-    if (activeFilters.length > 0) {
-      list = list.filter((e) => activeFilters.includes(e.category));
-    }
-
+    if (activeFilters.length > 0) list = list.filter((e) => activeFilters.includes(e.category));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (e) =>
-          e.name.toLowerCase().includes(q) ||
-          e.location.toLowerCase().includes(q) ||
-          e.venue.toLowerCase().includes(q),
-      );
+      list = list.filter((e) => e.name.toLowerCase().includes(q) || e.location.toLowerCase().includes(q) || e.venue.toLowerCase().includes(q));
     }
-
     if (locationFilter.trim()) {
-      const location = locationFilter.toLowerCase();
-      list = list.filter((e) => 
-        e.location.toLowerCase().includes(location) ||
-        e.venue.toLowerCase().includes(location)
-      );
+      const loc = locationFilter.toLowerCase();
+      list = list.filter((e) => e.location.toLowerCase().includes(loc) || e.venue.toLowerCase().includes(loc));
     }
-
-    if (dateFilter.trim()) {
-      const date = dateFilter.toLowerCase();
-      list = list.filter((e) => 
-        e.date.toLowerCase().includes(date)
-      );
-    }
-
+    if (dateFilter.trim()) list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
     return list;
   }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+
+  // Reset visible count when filters change
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+
+  // Infinite scroll via IntersectionObserver
+  const loadMore = useCallback(() => {
+    setVisibleCount((c) => Math.min(c + PAGE_SIZE, filteredEvents.length));
+  }, [filteredEvents.length]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => { if (entries[0].isIntersecting) loadMore(); }, { threshold: 0.1 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const visibleEvents = filteredEvents.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredEvents.length;
 
   const removeFilter = (filter: string) => {
     setActiveFilters((prev) => prev.filter((f) => f !== filter));
@@ -230,9 +235,14 @@ export default function EventsPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-5"
               >
-                {filteredEvents.map((event, index) => (
+                {visibleEvents.map((event, index) => (
                   <EventCard key={event.id} event={event} index={index} />
                 ))}
+                {hasMore && (
+                  <div ref={sentinelRef} className="flex justify-center py-6">
+                    <div className="w-8 h-8 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
+                  </div>
+                )}
               </motion.div>
             ) : (
               <motion.div
