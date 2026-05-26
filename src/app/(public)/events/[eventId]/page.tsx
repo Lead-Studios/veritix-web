@@ -282,11 +282,28 @@ export default function EventDetailsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center py-20"
+                className="space-y-4 p-4"
               >
-                <div className="text-6xl mb-4">📅</div>
-                <h3 className="text-2xl font-bold text-white mb-2">Schedule Coming Soon</h3>
-                <p className="text-gray-400">Event schedule will be announced closer to the date</p>
+                {event.schedule && event.schedule.length > 0 ? (
+                  <>
+                    <h2 className="text-2xl font-bold text-white mb-4">Schedule</h2>
+                    {event.schedule.map((item, i) => (
+                      <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div className="text-[#4D21FF] font-semibold text-sm w-24 shrink-0">{item.time}</div>
+                        <div>
+                          <p className="text-white font-semibold">{item.title}</p>
+                          {item.description && <p className="text-gray-400 text-sm mt-1">{item.description}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="text-center py-20">
+                    <div className="text-6xl mb-4">📅</div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Schedule Coming Soon</h3>
+                    <p className="text-gray-400">Event schedule will be announced closer to the date</p>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -294,11 +311,34 @@ export default function EventDetailsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center py-20"
+                className="space-y-4 p-4"
               >
-                <div className="text-6xl mb-4">🎤</div>
-                <h3 className="text-2xl font-bold text-white mb-2">Performers Coming Soon</h3>
-                <p className="text-gray-400">Lineup will be announced soon</p>
+                {event.performers && event.performers.length > 0 ? (
+                  <>
+                    <h2 className="text-2xl font-bold text-white mb-4">Performers</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {event.performers.map((performer, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 border border-white/10 text-center">
+                          {performer.image ? (
+                            <img src={performer.image} alt={performer.name} className="w-16 h-16 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4D21FF] to-[#21D4FF] flex items-center justify-center text-white font-bold text-xl">
+                              {performer.name.charAt(0)}
+                            </div>
+                          )}
+                          <p className="text-white font-semibold text-sm">{performer.name}</p>
+                          <p className="text-gray-400 text-xs">{performer.role}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-20">
+                    <div className="text-6xl mb-4">🎤</div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Performers Coming Soon</h3>
+                    <p className="text-gray-400">Lineup will be announced soon</p>
+                  </div>
+                )}
               </motion.div>
             )}
           </div>
