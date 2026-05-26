@@ -3,6 +3,8 @@
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 import { HeroContent } from '@/components/dashboard/HeroContent'
 import { CTAButton } from '@/components/dashboard/CTAButton'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import { RecentActivity } from '@/components/dashboard/RecentActivity'
 import { ScrollColumn } from '@/components/dashboard/ScrollColumn'
 import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card'
 import { EventImage } from '@/components/dashboard/EventImage'
@@ -51,10 +53,12 @@ export default function DashboardPage() {
             subtitle="Streamline your event's processes with our easy-to-use dashboard"
           />
 
-          <div className="mb-12 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mb-8 flex flex-col sm:flex-row justify-center gap-4">
             <CTAButton href="/events/create" text="Get Started" variant="primary" />
             <CTAButton href="/events" text="Discover events" variant="secondary" />
           </div>
+
+          <QuickActions />
 
           <div className="grid gap-1 lg:grid-cols-3 h-[500px] gap-4 lg:gap-1">
             {/* Left Column - Revenue */}
@@ -159,6 +163,10 @@ export default function DashboardPage() {
                 </div>
               </Card>
             </ScrollColumn>
+          </div>
+
+          <div className="mt-8">
+            <RecentActivity />
           </div>
         </div>
       </div>
