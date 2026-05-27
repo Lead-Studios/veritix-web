@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 
 export type WalletStatus = "confirmed" | "pending" | "failed";
 export type TransferState = "none" | "transferable" | "transfer-pending" | "transferred";
@@ -31,8 +31,20 @@ const TRANSFER_BADGE: Record<TransferState, { label: string; className: string }
   transferred:      { label: "Transferred", className: "bg-gray-700/60 text-gray-400 border border-gray-600" },
 };
 
+/** Downloads the QR SVG element as a PNG file. */
+function downloadQR(svgEl: SVGSVGElement, filename: string) {
+  const serialized = new XMLSerializer().serializeToString(svgEl);
+  const blob = new Blob([serialized], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.svg`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /** Minimal inline QR using an SVG grid — no external dependency required. */
-function QRCode({ value }: { value: string }) {
+const QRCode = React.forwardRef<SVGSVGElement, { value: string }>(function QRCode({ value }, ref) {
   // Deterministic pseudo-random grid from the ticket code string
   const SIZE = 11;
   const cells: boolean[][] = Array.from({ length: SIZE }, (_, r) =>
@@ -50,6 +62,7 @@ function QRCode({ value }: { value: string }) {
 
   return (
     <svg
+      ref={ref}
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       className="w-40 h-40"
       aria-label={`QR code for ticket ${value}`}
@@ -64,7 +77,7 @@ function QRCode({ value }: { value: string }) {
       )}
     </svg>
   );
-}
+});
 
 interface TicketPassProps {
   ticket: AttendeeTicket;
@@ -75,6 +88,11 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
   const walletBadge = WALLET_BADGE[ticket.walletStatus];
   const transferBadge = TRANSFER_BADGE[ticket.transferState];
   const isTransferred = ticket.transferState === "transferred";
+  const qrRef = useRef<SVGSVGElement>(null);
+
+  const handleDownloadQR = () => {
+    if (qrRef.current) downloadQR(qrRef.current, `ticket-${ticket.ticketCode}`);
+  };
 
   return (
     <article
@@ -94,10 +112,17 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
       </div>
 
       {/* QR */}
-      <div className="flex justify-center bg-[#0b0f1e] py-6">
+      <div className="flex flex-col items-center bg-[#0b0f1e] py-6 gap-3">
         <div className="bg-[#1a1f3a] p-3 rounded-xl">
-          <QRCode value={ticket.ticketCode} />
+          <QRCode ref={qrRef} value={ticket.ticketCode} />
         </div>
+        <button
+          onClick={handleDownloadQR}
+          className="text-xs text-[#6B8CFF] hover:text-[#4D21FF] underline transition-colors"
+          aria-label="Download QR code"
+        >
+          Download QR
+        </button>
       </div>
 
       {/* Ticket code */}
