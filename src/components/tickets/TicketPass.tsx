@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
+import { WalletPassCTA } from "./WalletPassCTA";
 
 export type WalletStatus = "confirmed" | "pending" | "failed";
 export type TransferState = "none" | "transferable" | "transfer-pending" | "transferred";
@@ -175,6 +176,13 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
           <p className="text-xs text-gray-500 text-center">
             This ticket has been transferred to another wallet.
           </p>
+        </div>
+      )}
+
+      {/* Apple / Google Wallet pass CTA */}
+      {!isTransferred && (
+        <div className="px-5 pb-5">
+          <WalletPassCTA ticketId={ticket.id} />
         </div>
       )}
     </article>
