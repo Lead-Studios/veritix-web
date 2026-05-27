@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 import { HeroContent } from '@/components/dashboard/HeroContent'
 import { CTAButton } from '@/components/dashboard/CTAButton'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import { RecentActivity } from '@/components/dashboard/RecentActivity'
 import { ScrollColumn } from '@/components/dashboard/ScrollColumn'
 import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card'
 import { EventImage } from '@/components/dashboard/EventImage'
@@ -91,6 +93,21 @@ export default function DashboardPage() {
             </button>
           </div>
 
+          <QuickActions />
+
+          <div className="grid gap-1 lg:grid-cols-3 h-[500px] gap-4 lg:gap-1">
+            {/* Left Column - Revenue */}
+            <ScrollColumn animationClass="animate-scroll-up-once">
+              <Card>
+                <CardHeader
+                  title="Revenue"
+                  subtitle="A quick look at earnings this week"
+                  extraInfo="Weekly Summary"
+                />
+              </Card>
+
+              <Card>
+                <div className="mb-4">
           {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
 
@@ -203,6 +220,9 @@ export default function DashboardPage() {
             </ScrollColumn>
           </div>
 
+          <div className="mt-8">
+            <RecentActivity />
+          </div>
           {/* Ticket Type Breakdown — Issue #219 */}
           {!loading && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
             <div className="mt-10">
