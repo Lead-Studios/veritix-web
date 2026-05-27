@@ -16,6 +16,10 @@ export interface AttendeeTicket {
   walletStatus: WalletStatus;
   transferState: TransferState;
   ownerAddress?: string;
+  /** Stellar transaction hash for the on-chain confirmation */
+  txHash?: string;
+  /** Stellar network: testnet or mainnet */
+  network?: "testnet" | "mainnet";
 }
 
 const WALLET_BADGE: Record<WalletStatus, { label: string; className: string }> = {
@@ -149,6 +153,22 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
           </span>
         )}
       </div>
+
+      {/* On-chain confirmation status */}
+      {ticket.txHash && (
+        <div className="px-5 pb-4">
+          <p className="text-xs text-gray-500 mb-1">On-chain confirmation</p>
+          <a
+            href={`https://stellar.expert/explorer/${ticket.network ?? "testnet"}/tx/${ticket.txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-[#6B8CFF] hover:text-[#4D21FF] break-all underline"
+            aria-label="View transaction on Stellar Explorer"
+          >
+            {ticket.txHash}
+          </a>
+        </div>
+      )}
 
       {/* Transfer action */}
       {ticket.transferState === "transferable" && onTransfer && (
