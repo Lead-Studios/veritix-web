@@ -84,31 +84,42 @@ export default function ContactForm() {
         Fill out the form below and our team will get back to you shortly.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div className="grid md:grid-cols-2 gap-4">
           <Input
+            id="contact-name"
             label="Name"
             value={formData.name}
             error={errors.name}
             placeholder="Your name"
+            autoComplete="name"
+            inputMode="text"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <Input
+            id="contact-email"
             label="Email"
             value={formData.email}
             error={errors.email}
             placeholder="your.email@example.com"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
         <Input
+          id="contact-subject"
           label="Subject"
           value={formData.subject}
           error={errors.subject}
           placeholder="How can we help?"
+          autoComplete="off"
+          inputMode="text"
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
         />
         <Textarea
+          id="contact-message"
           label="Message"
           value={formData.message}
           error={errors.message}
@@ -133,42 +144,52 @@ export default function ContactForm() {
 /* Small UI helpers stay here (no over-splitting) */
 
 function Input({
+  id,
   label,
   error,
   ...props
 }: {
+  id: string;
   label: string;
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
-      <label className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
       <input
+        id={id}
         {...props}
+        aria-describedby={error ? `${id}-error` : undefined}
+        aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none focus:border-blue-500"
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   );
 }
 
 function Textarea({
+  id,
   label,
   error,
   ...props
 }: {
+  id: string;
   label: string;
   error?: string;
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <div>
-      <label className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
       <textarea
+        id={id}
         {...props}
         rows={4}
+        aria-describedby={error ? `${id}-error` : undefined}
+        aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none resize-none focus:border-blue-500"
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   );
 }
