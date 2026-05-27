@@ -5,9 +5,10 @@ import { motion } from 'framer-motion';
 interface CategoryFilterProps {
   activeFilters: string[];
   onRemoveFilter: (filter: string) => void;
+  onClearAll?: () => void;
 }
 
-export default function CategoryFilter({ activeFilters, onRemoveFilter }: CategoryFilterProps) {
+export default function CategoryFilter({ activeFilters, onRemoveFilter, onClearAll }: CategoryFilterProps) {
   if (activeFilters.length === 0) return null;
 
   return (
@@ -24,12 +25,23 @@ export default function CategoryFilter({ activeFilters, onRemoveFilter }: Catego
           <span className="capitalize">{filter}</span>
           <button
             onClick={() => onRemoveFilter(filter)}
+            aria-label={`Remove ${filter} filter`}
             className="ml-1 hover:text-gray-300 transition-colors"
           >
             ✕
           </button>
         </motion.div>
       ))}
+      {activeFilters.length > 1 && onClearAll && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={onClearAll}
+          className="px-4 py-2 text-sm font-medium text-[#6B8CFF] hover:text-white border border-[#6B8CFF]/40 rounded-full transition-colors"
+        >
+          Clear all
+        </motion.button>
+      )}
     </div>
   );
 }

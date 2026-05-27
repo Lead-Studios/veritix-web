@@ -60,6 +60,23 @@ export default function ContactForm() {
     }
   };
 
+  if (success) {
+    return (
+      <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8 flex flex-col items-center justify-center gap-4 text-center min-h-[320px]">
+        <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
+          <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-white">Message Sent!</h2>
+        <p className="text-white/60 text-sm">{success}</p>
+        <button onClick={() => setSuccess("")} className="mt-2 text-sm text-[#21D4FF] hover:underline">
+          Send another message
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8">
       <h2 className="text-xl font-semibold mb-1">Send us a message</h2>
@@ -67,31 +84,42 @@ export default function ContactForm() {
         Fill out the form below and our team will get back to you shortly.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div className="grid md:grid-cols-2 gap-4">
           <Input
+            id="contact-name"
             label="Name"
             value={formData.name}
             error={errors.name}
             placeholder="Your name"
+            autoComplete="name"
+            inputMode="text"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <Input
+            id="contact-email"
             label="Email"
             value={formData.email}
             error={errors.email}
             placeholder="your.email@example.com"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
         <Input
+          id="contact-subject"
           label="Subject"
           value={formData.subject}
           error={errors.subject}
           placeholder="How can we help?"
+          autoComplete="off"
+          inputMode="text"
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
         />
         <Textarea
+          id="contact-message"
           label="Message"
           value={formData.message}
           error={errors.message}
@@ -116,42 +144,52 @@ export default function ContactForm() {
 /* Small UI helpers stay here (no over-splitting) */
 
 function Input({
+  id,
   label,
   error,
   ...props
 }: {
+  id: string;
   label: string;
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
-      <label className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
       <input
+        id={id}
         {...props}
+        aria-describedby={error ? `${id}-error` : undefined}
+        aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none focus:border-blue-500"
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   );
 }
 
 function Textarea({
+  id,
   label,
   error,
   ...props
 }: {
+  id: string;
   label: string;
   error?: string;
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <div>
-      <label className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
       <textarea
+        id={id}
         {...props}
         rows={4}
+        aria-describedby={error ? `${id}-error` : undefined}
+        aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none resize-none focus:border-blue-500"
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   );
 }
