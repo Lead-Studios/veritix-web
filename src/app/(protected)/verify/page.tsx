@@ -236,6 +236,9 @@ export default function VerifyPage() {
   const [usedCodes] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Autofocus input on mount
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
   const handleVerify = () => {
     if (!code.trim()) return;
     setVerifyState('loading');
@@ -272,7 +275,7 @@ export default function VerifyPage() {
   const handleReset = () => {
     setCode('');
     setVerifyState('idle');
-    setTimeout(() => inputRef.current?.focus(), 100);
+    inputRef.current?.focus();
   };
 
   const handleRetry = () => {
@@ -382,6 +385,7 @@ export default function VerifyPage() {
                     onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
                     placeholder="e.g. TKT-2024-ALPHA-001"
                     disabled={isChecking}
+                    autoFocus
                     className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 font-mono text-sm focus:outline-none focus:border-[#4D21FF] transition-colors disabled:opacity-50"
                   />
                 </div>
