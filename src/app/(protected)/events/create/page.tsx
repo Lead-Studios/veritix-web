@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import BasicInformation from "@/components/events/create/BasicInformation";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
@@ -15,6 +15,9 @@ import {
   type CreateEventFormErrors,
 } from "@/lib/createEventValidation";
 import { submitCreateEvent } from "@/lib/createEventSubmit";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
+
+const DRAFT_KEY = "veritix_event_draft";
 
 export interface EventFormData {
   // Basic Information
@@ -89,10 +92,41 @@ export default function CreateEventPage() {
   const [formData, setFormData] = useState<EventFormData>(initialFormData);
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
+  // Restore draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<EventFormData>;
+        // coverImage and gallery are File objects — can't be serialised, skip them
+        const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
+        setFormData((prev) => ({ ...prev, ...rest }));
+        setDraftRestored(true);
+      }
+    } catch {
+      // ignore corrupt data
+    }
+  }, []);
+
+  useUnsavedChanges(isDirty);
+
   const updateFormData = (updates: Partial<EventFormData>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
+    setFormData((prev) => {
+      const next = { ...prev, ...updates };
+      // Persist serialisable fields to localStorage
+      try {
+        const { coverImage: _ci, gallery: _g, ...serialisable } = next;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
+      } catch {
+        // quota exceeded or SSR — ignore
+      }
+      return next;
+    });
+    setIsDirty(true);
   };
 
   const validate = (): CreateEventFormErrors | null => {
@@ -125,6 +159,8 @@ export default function CreateEventPage() {
     setIsSubmitting(true);
     try {
       await submitCreateEvent(formData);
+      setIsDirty(false);
+      localStorage.removeItem(DRAFT_KEY);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to create event.";
       setErrors({ _form: msg });
@@ -135,7 +171,13 @@ export default function CreateEventPage() {
   };
 
   const handleSaveDraft = () => {
-    console.log("Saving draft:", formData);
+    try {
+      const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
+      setIsDirty(false);
+    } catch {
+      // ignore
+    }
   };
 
   const errorEntries = Object.entries(errors).filter(([k]) => k !== "_form");
