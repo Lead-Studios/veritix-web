@@ -59,7 +59,27 @@ export const createEventSchema = z
       }
     }
 
-    // Physical/hybrid events need a venue
+    // Treasury address format validation per network
+    if (data.treasuryAddress) {
+      const addr = data.treasuryAddress.trim();
+      const evmRe = /^0x[0-9a-fA-F]{40}$/;
+      const solanaRe = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      const examples: Record<string, string> = {
+        ethereum: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+        polygon: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+        solana: 'So11111111111111111111111111111111111111112',
+      };
+      const valid =
+        (data.blockchainNetwork === 'solana' && solanaRe.test(addr)) ||
+        (['ethereum', 'polygon'].includes(data.blockchainNetwork) && evmRe.test(addr));
+      if (!valid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Invalid ${data.blockchainNetwork} address. Example: ${examples[data.blockchainNetwork]}`,
+          path: ['treasuryAddress'],
+        });
+      }
+    }
     if (data.eventType !== "online") {
       if (!data.venueName?.trim()) {
         ctx.addIssue({

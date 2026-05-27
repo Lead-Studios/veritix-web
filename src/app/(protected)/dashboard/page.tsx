@@ -10,7 +10,18 @@ import { EventImage } from '@/components/dashboard/EventImage'
 import { RevenueChart } from '@/components/dashboard/charts/RevenueChart'
 import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart'
 import { EmptyState } from '@/components/EmptyState'
+import { TicketTypeChart } from '@/components/dashboard/charts/TicketTypeChart'
+import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
+import { eventImages } from '@/components/dashboard/constants'
+import {
+  demoRevenueData,
+  demoPerformanceData,
+  demoTotalEarned,
+  demoPayoutsQueued,
+  demoNextSettlementDays,
+} from '@/components/dashboard/demoData'
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
+import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
 
 function formatCurrency(n: number) {
   return `₦ ${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
@@ -52,6 +63,8 @@ export default function DashboardPage() {
     alt: e.name,
   })) ?? []
 
+  const hasData = !loading && data !== null
+
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
@@ -68,6 +81,14 @@ export default function DashboardPage() {
           <div className="mb-8 flex flex-col sm:flex-row justify-center gap-4">
             <CTAButton href="/events/create" text="Get Started" variant="primary" />
             <CTAButton href="/events" text="Discover events" variant="secondary" />
+            <button
+              onClick={() => data && exportAnalyticsCsv(data)}
+              disabled={!hasData}
+              title={!hasData ? "No analytics data available to export" : undefined}
+              className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-[#21D4FF] transition hover:bg-[#4D21FF]/20 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Export CSV
+            </button>
           </div>
 
           {/* Loading skeleton */}
@@ -171,6 +192,33 @@ export default function DashboardPage() {
                   </div>
                 </Card>
               </ScrollColumn>
+                  )}
+                </div>
+                <div className="mt-4 border-t pt-4 border-[#4D21FF]">
+                  <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
+                  <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
+                  <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
+                </div>
+              </Card>
+            </ScrollColumn>
+          </div>
+
+          {/* Ticket Type Breakdown — Issue #219 */}
+          {!loading && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+            <div className="mt-10">
+              <Card>
+                <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
+                <div className="mt-4">
+                  <TicketTypeChart data={data.ticketBreakdown} />
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Demographics — Issue #221 */}
+          {!loading && data?.demographics && (
+            <div className="mt-10">
+              <DemographicsSection demographics={data.demographics} />
             </div>
           )}
         </div>

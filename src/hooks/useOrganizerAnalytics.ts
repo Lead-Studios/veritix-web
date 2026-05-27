@@ -1,5 +1,23 @@
 import { useState, useEffect } from "react";
 
+export interface TicketTypeBreakdown {
+  type: string;
+  count: number;
+  revenue: number;
+}
+
+export interface DemographicItem {
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface Demographics {
+  region: DemographicItem[];
+  deviceType: DemographicItem[];
+  referralSource: DemographicItem[];
+}
+
 export interface OrganizerAnalytics {
   revenue: { day: string; revenue: number }[];
   performance: { day: string; value: number }[];
@@ -10,6 +28,8 @@ export interface OrganizerAnalytics {
   doorsOpenInMinutes: number;
   totalEvents: number;
   events?: { id: string; name: string; coverImage?: string | null }[];
+  ticketBreakdown?: TicketTypeBreakdown[];
+  demographics?: Demographics;
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
