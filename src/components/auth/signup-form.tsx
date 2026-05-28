@@ -9,6 +9,7 @@ import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { containerVariants, itemVariants } from "@/lib/animations/motionVariants";
 import { FcGoogle } from "react-icons/fc";
 import { IoWallet } from "react-icons/io5";
 import PasswordStrengthGuide from "./PasswordStrengthGuide";
@@ -97,25 +98,7 @@ export default function SignUpForm() {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.1,
-      },
-    },
-  };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
-  };
 
   return (
     <motion.div

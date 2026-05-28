@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
 import { Loader } from "@/components/ui/Loader";
+import { Breadcrumb } from "@/components/ui";
 
 // Fetch ticket from API; falls back to a demo stub when the endpoint is unavailable.
 async function fetchTicket(ticketId: string): Promise<AttendeeTicket> {
@@ -56,14 +57,24 @@ export default function TicketPassPage() {
 
   return (
     <main className="min-h-screen bg-[#101428] flex items-center justify-center px-4 py-12">
-      <TicketPass
-        ticket={ticket}
-        onTransfer={
-          ticket.transferState === "transferable"
-            ? () => alert("Transfer flow coming soon.")
-            : undefined
-        }
-      />
+      <div className="w-full max-w-lg">
+        <Breadcrumb
+          className="mb-6 text-white/70"
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Tickets", href: "/tickets" },
+            { label: ticket.eventName },
+          ]}
+        />
+        <TicketPass
+          ticket={ticket}
+          onTransfer={
+            ticket.transferState === "transferable"
+              ? () => alert("Transfer flow coming soon.")
+              : undefined
+          }
+        />
+      </div>
     </main>
   );
 }
