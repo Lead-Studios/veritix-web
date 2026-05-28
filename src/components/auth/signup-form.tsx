@@ -68,7 +68,8 @@ export default function SignUpForm() {
     }
 
     toast.success("Account created successfully");
-
+    // Show email verification prompt
+    toast.info("Please check your email to verify your account before signing in.", { autoClose: 8000 });
     // router.push("/login");
 
   } catch (error: any) {

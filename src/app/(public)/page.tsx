@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import {
   Calendar,
   Clock,
@@ -15,6 +16,9 @@ import {
 import { FaDiscord, FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
 import NewsletterForm from "@/components/NewsletterForm";
+
+// Lazy-load below-the-fold newsletter form to reduce initial bundle
+const LazyNewsletterForm = dynamic(() => import("@/components/NewsletterForm"), { ssr: false });
 
 const MotionLink = motion(Link);
 

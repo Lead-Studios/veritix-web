@@ -12,7 +12,12 @@ import { EventImage } from '@/components/dashboard/EventImage'
 import { RevenueChart } from '@/components/dashboard/charts/RevenueChart'
 import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart'
 import { EmptyState } from '@/components/EmptyState'
-import { TicketTypeChart } from '@/components/dashboard/charts/TicketTypeChart'
+import dynamic from 'next/dynamic'
+// Code-split Recharts-based chart away from the initial dashboard bundle
+const TicketTypeChart = dynamic(
+  () => import('@/components/dashboard/charts/TicketTypeChart').then((m) => m.TicketTypeChart),
+  { ssr: false, loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" /> }
+)
 import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
 import { eventImages } from '@/components/dashboard/constants'
 import {

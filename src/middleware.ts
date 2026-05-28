@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { canAccessVerificationTools } from "@/lib/verificationAccess";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only guard routes under the (protected) route group.
-  // Next.js strips the group segment from the URL, so we match the actual
-  // path segments that live inside (protected): /dashboard, /events/*, /tickets, /verify
   const isProtected =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/tickets") ||
     pathname.startsWith("/verify") ||
-    // /events under protected — distinguish from public /events by checking
-    // whether the request is for the organiser sub-paths
     pathname.startsWith("/events/create") ||
     pathname.startsWith("/events/manage");
 
@@ -23,6 +19,19 @@ export function middleware(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Role-based guard for /verify — only staff, organizer, or admin may access
+  if (pathname.startsWith("/verify")) {
+    const roleCookie = request.cookies.get("user_role")?.value as
+      | "attendee"
+      | "organizer"
+      | "staff"
+      | "admin"
+      | null;
+    if (!canAccessVerificationTools(roleCookie ?? null)) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
 
   return NextResponse.next();

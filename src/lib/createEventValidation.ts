@@ -107,6 +107,18 @@ export const createEventSchema = z
       }
     }
 
+    // Duplicate ticket type names (case-insensitive)
+    const ticketNames = data.tickets.map((t) => t.name.trim().toLowerCase());
+    ticketNames.forEach((name, idx) => {
+      if (name && ticketNames.indexOf(name) !== idx) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Ticket type names must be unique (case-insensitive).",
+          path: [`tickets.${idx}.name`],
+        });
+      }
+    });
+
     // Streaming URL is required for online/hybrid events and must be a valid URL.
     if (data.eventType === "online" || data.eventType === "hybrid") {
       const url = data.streamingUrl?.trim() ?? "";

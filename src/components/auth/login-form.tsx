@@ -11,12 +11,14 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
   password: z
     .string("Please enter your password")
     .min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof loginSchema>;
@@ -28,14 +30,16 @@ export default function LoginForm() {
     handleSubmit,
     formState: { isSubmitting, errors },
     control,
+    register,
     setError,
-  } = useForm({
+  } = useForm<FormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { rememberMe: false },
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
-      await loginUser({ email: data.email, password: data.password });
+      await loginUser({ email: data.email, password: data.password, rememberMe: data.rememberMe });
       toast.success("Login successful!");
       const next = searchParams.get("next");
       router.push(next && next.startsWith("/") ? next : "/dashboard");
@@ -47,31 +51,12 @@ export default function LoginForm() {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.12,
-      },
-    },
+    visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.12 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
-  };
-
-  const headerVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.5 },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
   return (
@@ -83,7 +68,7 @@ export default function LoginForm() {
     >
       <motion.h2
         className="text-3xl md:text-4xl text-center font-bold text-gray-900 mb-8"
-        variants={headerVariants}
+        variants={itemVariants}
       >
         Welcome Back
       </motion.h2>
@@ -116,12 +101,20 @@ export default function LoginForm() {
             />
           </motion.div>
 
+          <motion.div variants={itemVariants} className="flex items-center gap-2">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              {...register("rememberMe")}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-gray-700 select-none cursor-pointer">
+              Remember me
+            </label>
+          </motion.div>
+
           <motion.div variants={itemVariants}>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
               {errors.root && (
                 <p role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
                   {errors.root.message}
@@ -141,6 +134,25 @@ export default function LoginForm() {
           Sign Up
         </Link>
       </motion.p>
+
+      {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true" && (
+        <motion.div variants={itemVariants} className="mt-4">
+          <div className="flex items-center gap-4 my-4">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="text-sm text-gray-500">or</span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full py-3 flex items-center justify-center gap-2"
+            onClick={() => { window.location.href = "/api/auth/google"; }}
+          >
+            <FcGoogle size={20} />
+            <span className="text-sm font-medium">Continue with Google</span>
+          </Button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
