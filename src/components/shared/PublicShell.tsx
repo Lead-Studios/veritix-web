@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FaDiscord, FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import NewsletterForm from "@/components/NewsletterForm";
+import { StellarNetworkBadge } from "@/components/shared/StellarNetworkBadge";
 
 export default function PublicShell({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export default function PublicShell({ children }: { children: React.ReactNode })
             <Link href="/contact" className="transition hover:text-white">Contact</Link>
           </nav>
           <div className="flex items-center gap-3">
+            <StellarNetworkBadge />
             <Link href="/login" className="hidden text-sm text-white/80 transition hover:text-white sm:inline-flex">
               Login
             </Link>
