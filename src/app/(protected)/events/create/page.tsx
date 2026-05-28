@@ -39,6 +39,8 @@ export interface EventFormData {
   city: string;
   state: string;
   zipCode: string;
+  latitude: number | null;
+  longitude: number | null;
 
   // Ticket Information
   tickets: Array<{
@@ -72,6 +74,8 @@ const initialFormData: EventFormData = {
   city: "",
   state: "",
   zipCode: "",
+  latitude: null,
+  longitude: null,
   tickets: [
     {
       name: "",

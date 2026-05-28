@@ -36,6 +36,8 @@ export const createEventSchema = z
     city: z.string().optional(),
     state: z.string().optional(),
     zipCode: z.string().optional(),
+    latitude: z.number().nullable().optional(),
+    longitude: z.number().nullable().optional(),
 
     // Tickets
     tickets: z.array(ticketSchema).min(1, "At least one ticket type is required"),
@@ -86,6 +88,13 @@ export const createEventSchema = z
           code: z.ZodIssueCode.custom,
           message: "Venue name is required for physical/hybrid events",
           path: ["venueName"],
+        });
+      }
+      if (!data.address?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Address is required for physical/hybrid events",
+          path: ["address"],
         });
       }
       if (!data.city?.trim()) {

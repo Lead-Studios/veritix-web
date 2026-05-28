@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import RadioButton from "../ui/RadioButton";
 import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import { searchLocations, type LocationResult } from "@/lib/locationSearch";
 
 interface LocationProps {
   formData: EventFormData;
@@ -13,6 +14,111 @@ interface LocationProps {
 
 export default function Location({ formData, updateFormData, errors = {} }: LocationProps) {
   const needsVenue = formData.eventType !== "online";
+
+  // ---- Address autocomplete state ----
+  const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const skipNextSearch = useRef(false);
+
+  // Debounced search whenever the address text changes
+  useEffect(() => {
+    if (skipNextSearch.current) {
+      // Skip the next search after a suggestion is selected programmatically
+      skipNextSearch.current = false;
+      return;
+    }
+    const query = formData.address.trim();
+    if (query.length < 3) {
+      setSuggestions([]);
+      setSearched(false);
+      setIsSearching(false);
+      return;
+    }
+    let cancelled = false;
+    setIsSearching(true);
+    const handle = setTimeout(async () => {
+      try {
+        const results = await searchLocations(query);
+        if (cancelled) return;
+        setSuggestions(results);
+        setSearched(true);
+        setActiveIdx(-1);
+      } catch {
+        if (!cancelled) {
+          setSuggestions([]);
+          setSearched(true);
+        }
+      } finally {
+        if (!cancelled) setIsSearching(false);
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [formData.address]);
+
+  // Click-outside dismissal
+  useEffect(() => {
+    const handleDocClick = (e: MouseEvent) => {
+      if (!wrapperRef.current) return;
+      if (!wrapperRef.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleDocClick);
+    return () => document.removeEventListener("mousedown", handleDocClick);
+  }, []);
+
+  const handleSelectSuggestion = (s: LocationResult) => {
+    skipNextSearch.current = true;
+    updateFormData({
+      address: s.address.street || s.displayName,
+      city: s.address.city || formData.city,
+      latitude: s.lat,
+      longitude: s.lng,
+    });
+    setIsOpen(false);
+    setSuggestions([]);
+    setActiveIdx(-1);
+  };
+
+  const handleAddressChange = (value: string) => {
+    // Manual entry — clear previously-selected coordinates so they don't
+    // misrepresent the freshly-typed address.
+    updateFormData({
+      address: value,
+      latitude: null,
+      longitude: null,
+    });
+    setIsOpen(true);
+  };
+
+  const handleAddressKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen || suggestions.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => (i + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === "Enter" && activeIdx >= 0) {
+      e.preventDefault();
+      handleSelectSuggestion(suggestions[activeIdx]);
+    } else if (e.key === "Escape") {
+      setIsOpen(false);
+    }
+  };
+
+  const showNoResultsHint =
+    isOpen &&
+    !isSearching &&
+    searched &&
+    suggestions.length === 0 &&
+    formData.address.trim().length >= 3;
+
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-3 mb-6">
@@ -80,16 +186,81 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
 
         {/* Address */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Address
+          <label
+            htmlFor="event-address"
+            className="block text-sm font-medium text-gray-300 mb-2"
+          >
+            Address {needsVenue && <span className="text-red-400">*</span>}
           </label>
-          <input
-            type="text"
-            value={formData.address}
-            onChange={(e) => updateFormData({ address: e.target.value })}
-            placeholder="Enter full address"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-          />
+          <div className="relative" ref={wrapperRef}>
+            <input
+              id="event-address"
+              type="text"
+              value={formData.address}
+              onChange={(e) => handleAddressChange(e.target.value)}
+              onFocus={() => {
+                if (suggestions.length > 0 || formData.address.trim().length >= 3) {
+                  setIsOpen(true);
+                }
+              }}
+              onKeyDown={handleAddressKeyDown}
+              placeholder="Start typing an address…"
+              autoComplete="off"
+              role="combobox"
+              aria-expanded={isOpen}
+              aria-autocomplete="list"
+              aria-controls="address-suggestions"
+              aria-activedescendant={
+                activeIdx >= 0 ? `address-suggestion-${activeIdx}` : undefined
+              }
+              aria-invalid={!!errors.address}
+              aria-describedby={errors.address ? "error-address" : undefined}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.address ? "border-red-500" : "border-gray-700"}`}
+            />
+            {isSearching && (
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"
+                aria-live="polite"
+              >
+                Searching…
+              </span>
+            )}
+            {isOpen && suggestions.length > 0 && (
+              <ul
+                id="address-suggestions"
+                role="listbox"
+                className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-lg"
+              >
+                {suggestions.map((s, idx) => (
+                  <li
+                    key={`${s.lat},${s.lng},${idx}`}
+                    id={`address-suggestion-${idx}`}
+                    role="option"
+                    aria-selected={idx === activeIdx}
+                    onMouseDown={(e) => {
+                      // Use mouseDown so we beat the input blur
+                      e.preventDefault();
+                      handleSelectSuggestion(s);
+                    }}
+                    onMouseEnter={() => setActiveIdx(idx)}
+                    className={`px-4 py-2 text-sm text-white cursor-pointer ${idx === activeIdx ? "bg-blue-700" : "hover:bg-gray-800"}`}
+                  >
+                    {s.displayName}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {showNoResultsHint && (
+              <p className="mt-1 text-xs text-gray-400">
+                No matches found — you can keep typing the address manually.
+              </p>
+            )}
+          </div>
+          {errors.address && (
+            <p id="error-address" role="alert" className="mt-1 text-xs text-red-400">
+              {errors.address}
+            </p>
+          )}
         </div>
 
         {/* City, State, Zip Code */}
