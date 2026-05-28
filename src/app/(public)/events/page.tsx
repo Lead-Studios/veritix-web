@@ -6,19 +6,16 @@ import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
 import CategoryFilter from '@/components/events/CategoryFilter';
 import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
-import { fetchEvents } from '@/lib/eventsApi';
+import { useEvents } from '@/hooks/useEvents';
 import EventCard from '@/components/events/EventCard';
 import { EmptyState } from '@/components/EmptyState';
-import type { Event } from '@/types/event';
 
 const PAGE_SIZE = 9;
 
 type ViewMode = 'upcoming' | 'featured';
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { events, loading, error } = useEvents();
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,36 +23,6 @@ export default function EventsPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  };
 
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
@@ -209,17 +176,6 @@ export default function EventsPage() {
               <h3 className="text-white font-semibold text-lg">Unable to load events</h3>
               <p className="text-gray-400 text-sm max-w-md">{error}</p>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleRetry}
-              className="px-6 py-3 rounded-xl bg-[#6B8CFF] hover:bg-[#5a7bef] text-white font-semibold transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Try Again
-            </motion.button>
           </motion.div>
         )}
 
