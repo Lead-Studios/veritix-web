@@ -6,6 +6,8 @@ import { AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
 import { Modal } from "@/components/ui";
 import { performEventAction } from "@/lib/eventActions";
+import TabSelector from "@/components/TabSelector";
+import AttendeesTab from "@/components/events/manage/AttendeesTab";
 
 interface Event {
   id: string;
@@ -13,12 +15,16 @@ interface Event {
   status: string;
 }
 
+const TABS = ["Overview", "Attendees"] as const;
+type Tab = (typeof TABS)[number];
+
 export default function ManageEventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("Overview");
 
   useEffect(() => {
     if (!eventId) return;
@@ -54,26 +60,44 @@ export default function ManageEventPage() {
 
   return (
     <main className="min-h-screen bg-[#101428] px-4 py-10 text-white">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-bold">Manage: {event.name}</h1>
         <p className="mt-2 text-[#21D4FF]/80">Status: {event.status}</p>
 
-        {/* Danger zone — Cancel Event */}
-        <section className="mt-10 rounded-xl border border-red-700/50 bg-red-950/20 p-6">
-          <h2 className="text-lg font-semibold text-red-300">Danger zone</h2>
-          <p className="mt-1 text-sm text-red-200/80">
-            Cancelling this event is irreversible. All ticket holders will be
-            refunded and notified automatically.
-          </p>
-          <button
-            type="button"
-            onClick={() => setConfirmOpen(true)}
-            disabled={isCancelled}
-            className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+        <TabSelector<Tab>
+          tabs={TABS as unknown as Tab[]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          className="!px-0"
+        />
+
+        {activeTab === "Overview" && (
+          <section
+            role="tabpanel"
+            aria-label="Overview"
+            className="mt-6 rounded-xl border border-red-700/50 bg-red-950/20 p-6"
           >
-            {isCancelled ? "Event already cancelled" : "Cancel Event"}
-          </button>
-        </section>
+            <h2 className="text-lg font-semibold text-red-300">Danger zone</h2>
+            <p className="mt-1 text-sm text-red-200/80">
+              Cancelling this event is irreversible. All ticket holders will be
+              refunded and notified automatically.
+            </p>
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              disabled={isCancelled}
+              className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isCancelled ? "Event already cancelled" : "Cancel Event"}
+            </button>
+          </section>
+        )}
+
+        {activeTab === "Attendees" && (
+          <div role="tabpanel" aria-label="Attendees" className="mt-6">
+            <AttendeesTab eventId={event.id} />
+          </div>
+        )}
       </div>
 
       {/* Themed cancellation confirmation modal */}
