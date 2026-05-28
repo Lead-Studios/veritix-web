@@ -120,7 +120,7 @@ describe("WalletAddressDisplay", () => {
     render(
       <WalletAddressDisplay address={MOCK_PROFILE.walletAddress} />
     );
-    // Full address is in the DOM (hidden on small, shown on sm+)
+
     expect(screen.getAllByText(MOCK_PROFILE.walletAddress).length).toBeGreaterThan(0);
   });
 
