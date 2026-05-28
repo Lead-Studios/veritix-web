@@ -1,0 +1,65 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`StatusBadge > snapshot — active 1`] = `
+<div
+  aria-label="Status: Active"
+  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-[#4D21FF] bg-[#000625]"
+>
+  <span
+    class="inline-block h-2 w-2 rounded-full bg-[#21D4FF]"
+  />
+  <span
+    class="text-sm text-[#21D4FF]"
+  >
+    Active
+  </span>
+</div>
+`;
+
+exports[`StatusBadge > snapshot — cancelled 1`] = `
+<div
+  aria-label="Status: Cancelled"
+  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-red-700 bg-red-950/30"
+>
+  <span
+    class="inline-block h-2 w-2 rounded-full bg-red-400"
+  />
+  <span
+    class="text-sm text-red-400"
+  >
+    Cancelled
+  </span>
+</div>
+`;
+
+exports[`StatusBadge > snapshot — draft 1`] = `
+<div
+  aria-label="Status: Draft"
+  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-yellow-600 bg-yellow-950/30"
+>
+  <span
+    class="inline-block h-2 w-2 rounded-full bg-yellow-400"
+  />
+  <span
+    class="text-sm text-yellow-400"
+  >
+    Draft
+  </span>
+</div>
+`;
+
+exports[`StatusBadge > snapshot — ended 1`] = `
+<div
+  aria-label="Status: Ended"
+  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-gray-600 bg-gray-900/30"
+>
+  <span
+    class="inline-block h-2 w-2 rounded-full bg-gray-400"
+  />
+  <span
+    class="text-sm text-gray-400"
+  >
+    Ended
+  </span>
+</div>
+`;

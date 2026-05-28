@@ -80,15 +80,19 @@ export default function BlockchainSetting({
             <input
               type="text"
               value={formData.treasuryAddress}
-              onChange={(e) =>
-                updateFormData({ treasuryAddress: e.target.value })
+              onChange={(e) => updateFormData({ treasuryAddress: e.target.value })}
+              placeholder={
+                formData.blockchainNetwork === 'solana'
+                  ? 'e.g. So11111111111111111111111111111111111111112'
+                  : 'e.g. 0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed'
               }
-              placeholder="e.g. 0x5..."
               aria-invalid={!!errors.treasuryAddress}
               className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.treasuryAddress ? "border-red-500" : "border-gray-700"}`}
             />
             <p className="text-xs text-gray-500 mt-1">
-              where funds will be sent
+              {formData.blockchainNetwork === 'solana'
+                ? 'Solana base-58 address (32–44 characters)'
+                : `${formData.blockchainNetwork.charAt(0).toUpperCase() + formData.blockchainNetwork.slice(1)} address starting with 0x (42 characters)`}
             </p>
             {errors.treasuryAddress && (
               <p role="alert" className="mt-1 text-xs text-red-400">{errors.treasuryAddress}</p>

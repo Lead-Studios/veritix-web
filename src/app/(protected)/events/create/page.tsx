@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import BasicInformation from "@/components/events/create/BasicInformation";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
@@ -15,6 +16,9 @@ import {
   type CreateEventFormErrors,
 } from "@/lib/createEventValidation";
 import { submitCreateEvent } from "@/lib/createEventSubmit";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
+
+const DRAFT_KEY = "veritix_event_draft";
 
 export interface EventFormData {
   // Basic Information
@@ -36,6 +40,9 @@ export interface EventFormData {
   city: string;
   state: string;
   zipCode: string;
+  latitude: number | null;
+  longitude: number | null;
+  streamingUrl: string;
 
   // Ticket Information
   tickets: Array<{
@@ -69,6 +76,9 @@ const initialFormData: EventFormData = {
   city: "",
   state: "",
   zipCode: "",
+  latitude: null,
+  longitude: null,
+  streamingUrl: "",
   tickets: [
     {
       name: "",
@@ -86,13 +96,45 @@ const initialFormData: EventFormData = {
 };
 
 export default function CreateEventPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState<EventFormData>(initialFormData);
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
+  // Restore draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as Partial<EventFormData>;
+        // coverImage and gallery are File objects — can't be serialised, skip them
+        const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
+        setFormData((prev) => ({ ...prev, ...rest }));
+        setDraftRestored(true);
+      }
+    } catch {
+      // ignore corrupt data
+    }
+  }, []);
+
+  useUnsavedChanges(isDirty);
+
   const updateFormData = (updates: Partial<EventFormData>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
+    setFormData((prev) => {
+      const next = { ...prev, ...updates };
+      // Persist serialisable fields to localStorage
+      try {
+        const { coverImage: _ci, gallery: _g, ...serialisable } = next;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
+      } catch {
+        // quota exceeded or SSR — ignore
+      }
+      return next;
+    });
+    setIsDirty(true);
   };
 
   const validate = (): CreateEventFormErrors | null => {
@@ -125,6 +167,9 @@ export default function CreateEventPage() {
     setIsSubmitting(true);
     try {
       await submitCreateEvent(formData);
+      setIsDirty(false);
+      localStorage.removeItem(DRAFT_KEY);
+      router.push("/events/manage");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to create event.";
       setErrors({ _form: msg });
@@ -135,7 +180,13 @@ export default function CreateEventPage() {
   };
 
   const handleSaveDraft = () => {
-    console.log("Saving draft:", formData);
+    try {
+      const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
+      setIsDirty(false);
+    } catch {
+      // ignore
+    }
   };
 
   const errorEntries = Object.entries(errors).filter(([k]) => k !== "_form");
@@ -178,9 +229,9 @@ export default function CreateEventPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-8 px-8 py-6">
+      <div className="flex flex-col xl:flex-row gap-8 px-4 sm:px-8 py-6">
         {/* Left Column - Form */}
-        <div className="flex-1 space-y-8 overflow-y-auto max-h-[calc(100vh-120px)] pr-4">
+        <div className="flex-1 space-y-8 min-w-0">
           {/* Error Summary — issues #153 + #154 */}
           {hasErrors && (
             <div
@@ -260,7 +311,7 @@ export default function CreateEventPage() {
         </div>
 
         {/* Right Column - Event Summary & Actions */}
-        <div className="w-96 flex-shrink-0 space-y-6">
+        <div className="w-full xl:w-96 xl:flex-shrink-0 space-y-6">
           <EventSummary formData={formData} />
 
           {/* Action Buttons */}

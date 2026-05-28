@@ -36,6 +36,9 @@ export const createEventSchema = z
     city: z.string().optional(),
     state: z.string().optional(),
     zipCode: z.string().optional(),
+    latitude: z.number().nullable().optional(),
+    longitude: z.number().nullable().optional(),
+    streamingUrl: z.string().optional(),
 
     // Tickets
     tickets: z.array(ticketSchema).min(1, "At least one ticket type is required"),
@@ -59,7 +62,27 @@ export const createEventSchema = z
       }
     }
 
-    // Physical/hybrid events need a venue
+    // Treasury address format validation per network
+    if (data.treasuryAddress) {
+      const addr = data.treasuryAddress.trim();
+      const evmRe = /^0x[0-9a-fA-F]{40}$/;
+      const solanaRe = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      const examples: Record<string, string> = {
+        ethereum: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+        polygon: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
+        solana: 'So11111111111111111111111111111111111111112',
+      };
+      const valid =
+        (data.blockchainNetwork === 'solana' && solanaRe.test(addr)) ||
+        (['ethereum', 'polygon'].includes(data.blockchainNetwork) && evmRe.test(addr));
+      if (!valid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Invalid ${data.blockchainNetwork} address. Example: ${examples[data.blockchainNetwork]}`,
+          path: ['treasuryAddress'],
+        });
+      }
+    }
     if (data.eventType !== "online") {
       if (!data.venueName?.trim()) {
         ctx.addIssue({
@@ -68,12 +91,40 @@ export const createEventSchema = z
           path: ["venueName"],
         });
       }
+      if (!data.address?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Address is required for physical/hybrid events",
+          path: ["address"],
+        });
+      }
       if (!data.city?.trim()) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "City is required for physical/hybrid events",
           path: ["city"],
         });
+      }
+    }
+
+    // Streaming URL is required for online/hybrid events and must be a valid URL.
+    if (data.eventType === "online" || data.eventType === "hybrid") {
+      const url = data.streamingUrl?.trim() ?? "";
+      if (!url) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Streaming URL is required for online events",
+          path: ["streamingUrl"],
+        });
+      } else {
+        const parsed = z.string().url().safeParse(url);
+        if (!parsed.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Streaming URL must be a valid URL (e.g. https://example.com)",
+            path: ["streamingUrl"],
+          });
+        }
       }
     }
   });
@@ -96,7 +147,7 @@ export function parseCreateEventErrors(
 export function sectionForField(field: string): string {
   if (["title", "description", "coverImage"].includes(field)) return "Basic Information";
   if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "Date & Time";
-  if (["venueName", "address", "city", "state", "zipCode"].includes(field)) return "Location";
+  if (["venueName", "address", "city", "state", "zipCode", "streamingUrl"].includes(field)) return "Location";
   if (field.startsWith("tickets")) return "Ticket Information";
   if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "Blockchain Setting";
   return "General";
@@ -106,7 +157,7 @@ export function sectionForField(field: string): string {
 export function sectionIdForField(field: string): string {
   if (["title", "description", "coverImage"].includes(field)) return "section-basic";
   if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "section-datetime";
-  if (["venueName", "address", "city", "state", "zipCode"].includes(field)) return "section-location";
+  if (["venueName", "address", "city", "state", "zipCode", "streamingUrl"].includes(field)) return "section-location";
   if (field.startsWith("tickets")) return "section-tickets";
   if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "section-blockchain";
   return "";

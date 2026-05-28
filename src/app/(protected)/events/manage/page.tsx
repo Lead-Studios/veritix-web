@@ -1,410 +1,415 @@
-"use client";
+'use client'
 
-import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { MoreVertical } from 'lucide-react'
+import { Modal } from '@/components/ui'
+import { StatusBadge, EventStatus } from '@/components/dashboard/StatusBadge'
+import {
+  prepareDuplicateDraft,
+  type DuplicableEventData,
+} from '@/lib/duplicateEvent'
 
-// Mock data
-const MOCK_EVENTS = {
-  "1": {
-    id: "1",
-    name: "Summer Music Festival",
-    date: "2026-07-15",
-    time: "18:00",
-    location: "Central Park, New York",
-    description:
-      "An unforgettable evening of live music featuring top artists.",
-    ticketPrice: 45.0,
-    totalTickets: 500,
-    soldTickets: 342,
-    revenue: 15390.0,
-    ownerId: "user-123",
+interface ManagedEvent {
+  id: string
+  name: string
+  date: string
+  location: string
+  ticketsSold: number
+  totalTickets: number
+  status: EventStatus
+  /**
+   * Full source data used when duplicating this event into the create-event form.
+   * Stored alongside the row so the kebab menu's Duplicate action can pre-fill
+   * ticket types, pricing, treasury address, etc.
+   */
+  source: DuplicableEventData
+}
+
+type BulkAction = 'cancel' | 'duplicate'
+
+const INITIAL_EVENTS: ManagedEvent[] = [
+  {
+    id: '1', name: 'Summer Music Festival', date: '2026-07-15', location: 'Central Park, NY',
+    ticketsSold: 342, totalTickets: 500, status: 'active',
+    source: {
+      title: 'Summer Music Festival',
+      description: 'A weekend of live music in Central Park.',
+      startDate: '2026-07-15', endDate: '2026-07-17',
+      startTime: '14:00', endTime: '23:00',
+      eventType: 'physical',
+      venueName: 'Central Park Great Lawn', address: 'Central Park', city: 'New York', state: 'NY', zipCode: '10024',
+      tickets: [
+        { name: 'General Admission', quantity: 400, price: '75', description: 'Standing access', transferable: true, resellable: true, resellPriceLimit: '110' },
+        { name: 'VIP', quantity: 100, price: '200', description: 'Front-stage + lounge', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'ethereum',
+      treasuryAddress: '0xA1B2C3d4E5F60718293a4b5C6D7E8f9A0b1C2D3e',
+      creatorRoyalty: 5,
+    },
   },
-  "2": {
-    id: "2",
-    name: "Tech Conference 2026",
-    date: "2026-08-20",
-    time: "09:00",
-    location: "Convention Center, San Francisco",
-    description: "Join industry leaders for cutting-edge tech insights.",
-    ticketPrice: 299.0,
-    totalTickets: 200,
-    soldTickets: 156,
-    revenue: 46644.0,
-    ownerId: "user-456",
+  {
+    id: '2', name: 'Tech Conference 2026', date: '2026-08-20', location: 'Convention Center, SF',
+    ticketsSold: 156, totalTickets: 200, status: 'active',
+    source: {
+      title: 'Tech Conference 2026',
+      description: 'Annual gathering of builders shipping on Stellar.',
+      startDate: '2026-08-20', endDate: '2026-08-21',
+      startTime: '09:00', endTime: '18:00',
+      eventType: 'hybrid',
+      venueName: 'Moscone West', address: '800 Howard St', city: 'San Francisco', state: 'CA', zipCode: '94103',
+      tickets: [
+        { name: 'Standard', quantity: 150, price: '120', description: 'Talks + expo', transferable: true, resellable: false, resellPriceLimit: '' },
+        { name: 'Workshop Pass', quantity: 50, price: '250', description: 'Hands-on labs', transferable: false, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'polygon',
+      treasuryAddress: '0xB2C3D4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F',
+      creatorRoyalty: 3,
+    },
   },
-};
+  {
+    id: '3', name: 'Lagos Art Fair', date: '2026-06-01', location: 'Eko Hotel, Lagos',
+    ticketsSold: 80, totalTickets: 300, status: 'draft',
+    source: {
+      title: 'Lagos Art Fair',
+      description: 'Contemporary West African art showcase.',
+      startDate: '2026-06-01', endDate: '2026-06-03',
+      startTime: '10:00', endTime: '20:00',
+      eventType: 'physical',
+      venueName: 'Eko Hotel & Suites', address: 'Plot 1415 Adetokunbo Ademola St', city: 'Lagos', state: 'Lagos', zipCode: '101241',
+      tickets: [
+        { name: 'Day Pass', quantity: 250, price: '15', description: 'Single-day access', transferable: true, resellable: true, resellPriceLimit: '25' },
+        { name: 'Weekend Pass', quantity: 50, price: '40', description: 'All three days', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'ethereum',
+      treasuryAddress: '0xC3D4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F50',
+      creatorRoyalty: 2,
+    },
+  },
+  {
+    id: '4', name: 'Afrobeats Night Out', date: '2025-12-31', location: 'O2 Arena, London',
+    ticketsSold: 600, totalTickets: 600, status: 'ended',
+    source: {
+      title: 'Afrobeats Night Out',
+      description: 'Year-end Afrobeats showcase featuring top artists.',
+      startDate: '2025-12-31', endDate: '2026-01-01',
+      startTime: '20:00', endTime: '02:00',
+      eventType: 'physical',
+      venueName: 'The O2 Arena', address: 'Peninsula Square', city: 'London', state: '', zipCode: 'SE10 0DX',
+      tickets: [
+        { name: 'Standing', quantity: 500, price: '60', description: 'General floor', transferable: true, resellable: true, resellPriceLimit: '90' },
+        { name: 'Seated Premium', quantity: 100, price: '120', description: 'Reserved seating', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'polygon',
+      treasuryAddress: '0xD4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F5061',
+      creatorRoyalty: 4,
+    },
+  },
+  {
+    id: '5', name: 'Web3 Summit', date: '2026-03-10', location: 'Dubai World Trade Centre',
+    ticketsSold: 0, totalTickets: 400, status: 'cancelled',
+    source: {
+      title: 'Web3 Summit',
+      description: 'Cross-chain protocols and ecosystem updates.',
+      startDate: '2026-03-10', endDate: '2026-03-12',
+      startTime: '09:00', endTime: '17:00',
+      eventType: 'physical',
+      venueName: 'Dubai World Trade Centre', address: 'Sheikh Zayed Rd', city: 'Dubai', state: '', zipCode: '00000',
+      tickets: [
+        { name: 'Attendee', quantity: 350, price: '180', description: 'Full summit access', transferable: true, resellable: false, resellPriceLimit: '' },
+        { name: 'Investor', quantity: 50, price: '500', description: 'Includes private dinner', transferable: false, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'solana',
+      treasuryAddress: '0xE5F60718293a4b5C6D7E8f9A0b1C2D3e4F506172',
+      creatorRoyalty: 3,
+    },
+  },
+]
 
-const CURRENT_USER_ID = "user-123"; // Mock current user
+const STATUS_LABELS: Record<EventStatus, string> = {
+  active:    'Active',
+  draft:     'Draft',
+  ended:     'Ended',
+  cancelled: 'Cancelled',
+}
 
-export default function ManageEventPage() {
-  const params = useParams();
-  const router = useRouter();
-  const eventId = params.eventId as string;
+export default function ManageEventsPage() {
+  const router = useRouter()
+  const [events, setEvents] = useState<ManagedEvent[]>(INITIAL_EVENTS)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState<'' | BulkAction>('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const [event, setEvent] = useState<(typeof MOCK_EVENTS)["1"] | null>(null);
-  const [isOwner, setIsOwner] = useState(false);
-  const [loading, setLoading] = useState(true);
-
+  // Close kebab menu on outside click or Escape
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockEvent = MOCK_EVENTS[eventId as keyof typeof MOCK_EVENTS];
-
-      if (!mockEvent) {
-        setLoading(false);
-        return;
+    if (!openMenuId) return
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null)
       }
+    }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenMenuId(null)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [openMenuId])
 
-      setEvent(mockEvent);
-      setIsOwner(mockEvent.ownerId === CURRENT_USER_ID);
-      setLoading(false);
-    }, 500);
-  }, [eventId]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-600">Loading...</div>
-      </div>
-    );
+  const handleDuplicateRow = (event: ManagedEvent) => {
+    setOpenMenuId(null)
+    prepareDuplicateDraft(event.source)
+    router.push('/events/create')
   }
 
-  if (!event) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Event Not Found
-          </h2>
-          <p className="text-gray-600 mb-6">
-            This event doesn&apos;t exist or has been removed.
-          </p>
-          <button
-            onClick={() => router.push("/events")}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
-          >
-            Back to Events
-          </button>
-        </div>
-      </div>
-    );
+  const selectedCount = selectedIds.size
+  const allSelected = events.length > 0 && selectedCount === events.length
+  const someSelected = selectedCount > 0 && !allSelected
+
+  const selectedEvents = useMemo(
+    () => events.filter((e) => selectedIds.has(e.id)),
+    [events, selectedIds],
+  )
+
+  const toggleRow = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
-  if (!isOwner) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-yellow-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Access Denied
-          </h2>
-          <p className="text-gray-600 mb-6">
-            You don&apos;t have permission to manage this event.
-          </p>
-          <button
-            onClick={() => router.push("/events")}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
-          >
-            Back to Events
-          </button>
-        </div>
-      </div>
-    );
+  const toggleAll = () => {
+    setSelectedIds((prev) =>
+      prev.size === events.length ? new Set() : new Set(events.map((e) => e.id)),
+    )
   }
 
-  const soldPercentage = (event.soldTickets / event.totalTickets) * 100;
-  const availableTickets = event.totalTickets - event.soldTickets;
+  const handleApply = () => {
+    if (!bulkAction || selectedCount === 0) return
+    // Cancel is irreversible — require explicit confirmation.
+    if (bulkAction === 'cancel') {
+      setConfirmOpen(true)
+      return
+    }
+    runBulkAction(bulkAction)
+  }
+
+  const runBulkAction = (action: BulkAction) => {
+    if (action === 'cancel') {
+      setEvents((prev) =>
+        prev.map((e) => (selectedIds.has(e.id) ? { ...e, status: 'cancelled' } : e)),
+      )
+    } else if (action === 'duplicate') {
+      setEvents((prev) => {
+        const copies: ManagedEvent[] = prev
+          .filter((e) => selectedIds.has(e.id))
+          .map((e) => ({
+            ...e,
+            id: `${e.id}-copy-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            name: `${e.name} (Copy)`,
+            ticketsSold: 0,
+            status: 'draft',
+          }))
+        return [...prev, ...copies]
+      })
+    }
+    setSelectedIds(new Set())
+    setBulkAction('')
+    setConfirmOpen(false)
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push("/events")}
-            className="text-purple-600 hover:text-purple-700 mb-4 flex items-center gap-2"
+    <div className="min-h-screen bg-[#101428] py-10 px-4">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-white">Manage Events</h1>
+          <Link
+            href="/events/create"
+            className="rounded-lg bg-[linear-gradient(135deg,#4D21FF_0%,#21D4FF_100%)] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF]"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Events
+            + Create Event
+          </Link>
+        </div>
+
+        {/* Bulk-action toolbar */}
+        <div
+          className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#4D21FF]/30 bg-[#000625] px-4 py-3"
+          role="toolbar"
+          aria-label="Bulk actions"
+        >
+          <span className="text-sm text-[#21D4FF]/80" aria-live="polite">
+            {selectedCount > 0
+              ? `${selectedCount} selected`
+              : 'Select rows to enable bulk actions'}
+          </span>
+
+          <label htmlFor="bulk-action" className="sr-only">
+            Bulk action
+          </label>
+          <select
+            id="bulk-action"
+            value={bulkAction}
+            onChange={(e) => setBulkAction(e.target.value as '' | BulkAction)}
+            disabled={selectedCount === 0}
+            className="ml-auto rounded-lg border border-[#4D21FF]/40 bg-[#101428] px-3 py-2 text-sm text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="">Bulk action…</option>
+            <option value="cancel">Cancel</option>
+            <option value="duplicate">Duplicate</option>
+          </select>
+
+          <button
+            type="button"
+            onClick={handleApply}
+            disabled={selectedCount === 0 || !bulkAction}
+            className="rounded-lg bg-[linear-gradient(135deg,#4D21FF_0%,#21D4FF_100%)] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Apply
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">Manage Event</h1>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+        <div className="overflow-x-auto rounded-xl border border-[#4D21FF]/30 bg-[#000625]">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#4D21FF]/30 text-left text-xs uppercase tracking-wider text-[#21D4FF]">
+                <th className="px-4 py-4">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all events"
+                    className="h-4 w-4 cursor-pointer accent-[#4D21FF]"
+                    checked={allSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someSelected
+                    }}
+                    onChange={toggleAll}
                   />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Tickets Sold</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {event.soldTickets}
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              of {event.totalTickets} total
-            </p>
-          </div>
+                </th>
+                <th className="px-6 py-4">Event</th>
+                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4">Location</th>
+                <th className="px-6 py-4">Tickets Sold</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#4D21FF]/20">
+              {events.map((event) => {
+                const checked = selectedIds.has(event.id)
+                return (
+                  <tr
+                    key={event.id}
+                    className={`transition-colors hover:bg-[#4D21FF]/5 ${checked ? 'bg-[#4D21FF]/10' : ''}`}
+                  >
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select ${event.name}`}
+                        className="h-4 w-4 cursor-pointer accent-[#4D21FF]"
+                        checked={checked}
+                        onChange={() => toggleRow(event.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-4 font-medium text-white">{event.name}</td>
+                    <td className="px-6 py-4 text-[#21D4FF]/80">
+                      {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-4 text-[#21D4FF]/80">{event.location}</td>
+                    <td className="px-6 py-4 text-[#21D4FF]/80">
+                      {event.ticketsSold} / {event.totalTickets}
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={event.status} text={STATUS_LABELS[event.status]} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div
+                        ref={openMenuId === event.id ? menuRef : undefined}
+                        className="relative inline-block text-left"
+                      >
+                        <button
+                          type="button"
+                          aria-label={`Open actions for ${event.name}`}
+                          aria-haspopup="menu"
+                          aria-expanded={openMenuId === event.id}
+                          onClick={() =>
+                            setOpenMenuId((prev) => (prev === event.id ? null : event.id))
+                          }
+                          className="rounded-md p-1.5 text-[#21D4FF]/80 transition-colors hover:bg-[#4D21FF]/20 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${event.revenue.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Available</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {availableTickets}
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {soldPercentage.toFixed(0)}% sold
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-orange-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Ticket Price</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ${event.ticketPrice}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Event Details */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Event Details
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Event Name
-                  </p>
-                  <p className="text-lg text-gray-900">{event.name}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Date</p>
-                    <p className="text-gray-900">
-                      {new Date(event.date).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Time</p>
-                    <p className="text-gray-900">{event.time}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Location</p>
-                  <p className="text-gray-900">{event.location}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Description
-                  </p>
-                  <p className="text-gray-900">{event.description}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Sales Progress */}
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Sales Progress
-              </h2>
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">Tickets Sold</span>
-                  <span className="font-medium text-gray-900">
-                    {soldPercentage.toFixed(1)}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full transition-all"
-                    style={{ width: `${soldPercentage}%` }}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {event.soldTickets}
-                  </p>
-                  <p className="text-xs text-gray-600">Sold</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {availableTickets}
-                  </p>
-                  <p className="text-xs text-gray-600">Available</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {event.totalTickets}
-                  </p>
-                  <p className="text-xs text-gray-600">Total</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <button className="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition font-medium">
-                  Edit Event
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 transition font-medium">
-                  View Public Page
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 transition font-medium">
-                  Download Report
-                </button>
-                <button className="w-full border border-red-300 text-red-600 px-4 py-3 rounded-lg hover:bg-red-50 transition font-medium">
-                  Cancel Event
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-6">
-              <h3 className="font-bold text-gray-900 mb-2">Event Status</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm text-gray-700">Active & Selling</span>
-              </div>
-              <p className="text-xs text-gray-600 mt-3">
-                Your event is live and accepting ticket purchases.
-              </p>
-            </div>
-          </div>
+                        {openMenuId === event.id && (
+                          <div
+                            role="menu"
+                            aria-label={`${event.name} actions`}
+                            className="absolute right-0 z-20 mt-1 w-44 overflow-hidden rounded-lg border border-[#4D21FF]/40 bg-[#0b1025] shadow-[0_20px_40px_rgba(10,16,40,0.7)]"
+                          >
+                            <Link
+                              role="menuitem"
+                              href={`/events/manage/${event.id}`}
+                              onClick={() => setOpenMenuId(null)}
+                              className="block px-4 py-2 text-sm text-white transition-colors hover:bg-[#4D21FF]/30 focus-visible:bg-[#4D21FF]/30 focus-visible:outline-none"
+                            >
+                              Manage
+                            </Link>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => handleDuplicateRow(event)}
+                              className="block w-full px-4 py-2 text-left text-sm text-white transition-colors hover:bg-[#4D21FF]/30 focus-visible:bg-[#4D21FF]/30 focus-visible:outline-none"
+                            >
+                              Duplicate
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
+
+      {/* Confirmation dialog for irreversible bulk actions */}
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Cancel selected events?"
+        description={`This will cancel ${selectedCount} event${selectedCount === 1 ? '' : 's'}. This action cannot be undone.`}
+        size="sm"
+      >
+        <ul className="mb-5 max-h-40 list-disc overflow-auto rounded-lg border border-white/10 bg-white/5 px-6 py-3 text-sm text-white/80">
+          {selectedEvents.map((e) => (
+            <li key={e.id}>{e.name}</li>
+          ))}
+        </ul>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(false)}
+            className="rounded-lg border border-white/20 bg-transparent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+          >
+            Keep events
+          </button>
+          <button
+            type="button"
+            onClick={() => runBulkAction('cancel')}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+          >
+            Yes, cancel events
+          </button>
+        </div>
+      </Modal>
     </div>
-  );
+  )
 }

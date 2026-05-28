@@ -538,7 +538,7 @@ export default function Home() {
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="transition hover:text-white">
+                <Link href="/events/create" className="transition hover:text-white">
                   Organiser
                 </Link>
               </li>
