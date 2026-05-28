@@ -14,6 +14,8 @@ interface LocationProps {
 
 export default function Location({ formData, updateFormData, errors = {} }: LocationProps) {
   const needsVenue = formData.eventType !== "online";
+  const showStreamingUrl =
+    formData.eventType === "online" || formData.eventType === "hybrid";
 
   // ---- Address autocomplete state ----
   const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
@@ -169,29 +171,32 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
         </div>
 
         {/* Venue Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Venue Name {needsVenue && <span className="text-red-400">*</span>}
-          </label>
-          <input
-            type="text"
-            value={formData.venueName}
-            onChange={(e) => updateFormData({ venueName: e.target.value })}
-            placeholder="Enter Venue name"
-            aria-invalid={!!errors.venueName}
-            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.venueName ? "border-red-500" : "border-gray-700"}`}
-          />
-          {errors.venueName && <p role="alert" className="mt-1 text-xs text-red-400">{errors.venueName}</p>}
-        </div>
+        {needsVenue && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Venue Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.venueName}
+              onChange={(e) => updateFormData({ venueName: e.target.value })}
+              placeholder="Enter Venue name"
+              aria-invalid={!!errors.venueName}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.venueName ? "border-red-500" : "border-gray-700"}`}
+            />
+            {errors.venueName && <p role="alert" className="mt-1 text-xs text-red-400">{errors.venueName}</p>}
+          </div>
+        )}
 
         {/* Address */}
-        <div>
-          <label
-            htmlFor="event-address"
-            className="block text-sm font-medium text-gray-300 mb-2"
-          >
-            Address {needsVenue && <span className="text-red-400">*</span>}
-          </label>
+        {needsVenue && (
+          <div>
+            <label
+              htmlFor="event-address"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
+              Address <span className="text-red-400">*</span>
+            </label>
           <div className="relative" ref={wrapperRef}>
             <input
               id="event-address"
@@ -261,80 +266,118 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
               {errors.address}
             </p>
           )}
-        </div>
+          </div>
+        )}
 
         {/* City, State, Zip Code */}
-        <div className="grid grid-cols-3 gap-4">
+        {needsVenue && (
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                City <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => updateFormData({ city: e.target.value })}
+                placeholder="City"
+                aria-invalid={!!errors.city}
+                className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.city ? "border-red-500" : "border-gray-700"}`}
+              />
+              {errors.city && <p role="alert" className="mt-1 text-xs text-red-400">{errors.city}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                State
+              </label>
+              <input
+                type="text"
+                value={formData.state}
+                onChange={(e) => updateFormData({ state: e.target.value })}
+                placeholder="State"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Zip Code
+              </label>
+              <input
+                type="text"
+                value={formData.zipCode}
+                onChange={(e) => updateFormData({ zipCode: e.target.value })}
+                placeholder="Zip Code"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Streaming URL — online & hybrid only */}
+        {showStreamingUrl && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              City {needsVenue && <span className="text-red-400">*</span>}
+            <label
+              htmlFor="event-streaming-url"
+              className="block text-sm font-medium text-gray-300 mb-2"
+            >
+              Streaming URL <span className="text-red-400">*</span>
             </label>
             <input
-              type="text"
-              value={formData.city}
-              onChange={(e) => updateFormData({ city: e.target.value })}
-              placeholder="City"
-              aria-invalid={!!errors.city}
-              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.city ? "border-red-500" : "border-gray-700"}`}
+              id="event-streaming-url"
+              type="url"
+              inputMode="url"
+              value={formData.streamingUrl}
+              onChange={(e) => updateFormData({ streamingUrl: e.target.value })}
+              placeholder="https://zoom.us/j/… or https://meet.google.com/…"
+              aria-invalid={!!errors.streamingUrl}
+              aria-describedby={
+                errors.streamingUrl ? "error-streaming-url" : "hint-streaming-url"
+              }
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.streamingUrl ? "border-red-500" : "border-gray-700"}`}
             />
-            {errors.city && <p role="alert" className="mt-1 text-xs text-red-400">{errors.city}</p>}
+            <p id="hint-streaming-url" className="mt-1 text-xs text-gray-500">
+              Provide a link attendees will use to join the event (Zoom, Meet, YouTube Live, etc.).
+            </p>
+            {errors.streamingUrl && (
+              <p id="error-streaming-url" role="alert" className="mt-1 text-xs text-red-400">
+                {errors.streamingUrl}
+              </p>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              State
-            </label>
-            <input
-              type="text"
-              value={formData.state}
-              onChange={(e) => updateFormData({ state: e.target.value })}
-              placeholder="State"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Zip Code
-            </label>
-            <input
-              type="text"
-              value={formData.zipCode}
-              onChange={(e) => updateFormData({ zipCode: e.target.value })}
-              placeholder="Zip Code"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
-          </div>
-        </div>
+        )}
 
         {/* Map Placeholder */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Map
-          </label>
-          <div className="w-full h-64 bg-gray-800 border-2 border-dashed border-gray-700 rounded-lg flex flex-col items-center justify-center">
-            <svg
-              className="w-12 h-12 text-gray-600 mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <p className="text-gray-500 text-sm">
-              Map integration will appear here
-            </p>
+        {needsVenue && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Map
+            </label>
+            <div className="w-full h-64 bg-gray-800 border-2 border-dashed border-gray-700 rounded-lg flex flex-col items-center justify-center">
+              <svg
+                className="w-12 h-12 text-gray-600 mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <p className="text-gray-500 text-sm">
+                Map integration will appear here
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
