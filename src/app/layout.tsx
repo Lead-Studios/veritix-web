@@ -2,6 +2,7 @@ import { ToastContainer } from "react-toastify";
 import { Manrope, Playfair_Display } from "next/font/google";
 import "./global.css";
 import { AuthProvider } from "@/context/authContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -26,13 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] text-white antialiased`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] dark:bg-[#0b1025] text-white antialiased`}>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
         <ToastContainer />
       </body>
     </html>
-  )
+  );
 }

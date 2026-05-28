@@ -57,8 +57,7 @@ export default function SignUpForm() {
     if (!res.ok) {
       if (result?.errors && typeof result.errors === "object") {
         Object.entries(result.errors).forEach(([field, message]) => {
-          // react-hook-form field error injection
-          // @ts-ignore
+          // @ts-expect-error – field keys come from the server
           setError(field as keyof FormValues, {
             type: "server",
             message: String(message),
@@ -71,10 +70,10 @@ export default function SignUpForm() {
 
     toast.success("Account created successfully");
 
-    // router.push("/login");
+    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
 
-  } catch (error: any) {
-    toast.error(error.message || "Something went wrong");
+  } catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : "Something went wrong");
   }
 };
 
@@ -83,18 +82,16 @@ export default function SignUpForm() {
 
   const handleGoogleSignUp = async () => {
     try {
-      // Redirect to Google OAuth flow
       window.location.href = "/api/auth/google";
-    } catch (error: any) {
+    } catch {
       toast.error("Google sign-up failed. Please try again or use email registration.");
     }
   };
 
   const handleWalletSignUp = async () => {
     try {
-      // Redirect to wallet connection flow
       window.location.href = "/api/auth/wallet";
-    } catch (error: any) {
+    } catch {
       toast.error("Wallet sign-up failed. Please ensure your wallet is connected and try again.");
     }
   };

@@ -29,6 +29,7 @@ export default function LoginForm() {
     handleSubmit,
     formState: { isSubmitting, errors },
     control,
+    register,
     setError,
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -121,7 +122,7 @@ export default function LoginForm() {
             <input
               type="checkbox"
               id="rememberMe"
-              {...(control as any).register?.("rememberMe")}
+              {...register("rememberMe")}
               className="h-4 w-4 cursor-pointer accent-[#4D21FF]"
             />
             <label htmlFor="rememberMe" className="text-sm text-gray-600 cursor-pointer select-none">
