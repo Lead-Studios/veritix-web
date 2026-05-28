@@ -23,6 +23,33 @@ const recurrenceSchema = z.object({
   until: z.string().optional().default(""),
 });
 
+export const DUPLICATE_TICKET_NAME_MESSAGE =
+  "Duplicate ticket name. Each ticket type must have a unique name.";
+
+/**
+ * Returns the indices of tickets whose (trimmed, lower-cased) name collides
+ * with another ticket's name. Both the first occurrence and every later
+ * duplicate are flagged so the user can resolve the conflict from either side.
+ * Empty / whitespace-only names are ignored.
+ */
+export function findDuplicateTicketIndices(
+  tickets: Array<{ name: string }>
+): Set<number> {
+  const firstSeen = new Map<string, number>();
+  const duplicates = new Set<number>();
+  tickets.forEach((t, i) => {
+    const key = t.name.trim().toLowerCase();
+    if (!key) return;
+    if (firstSeen.has(key)) {
+      duplicates.add(i);
+      duplicates.add(firstSeen.get(key)!);
+    } else {
+      firstSeen.set(key, i);
+    }
+  });
+  return duplicates;
+}
+
 export const createEventSchema = z
   .object({
     // Basic Information
@@ -129,7 +156,19 @@ export const createEventSchema = z
         }
       }
     }
+
+    // Ticket names must be unique (case-insensitive). Empty/whitespace-only
+    // names are skipped here — the per-ticket required-name rule handles those.
+    const duplicateIndices = findDuplicateTicketIndices(data.tickets);
+    duplicateIndices.forEach((i) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: DUPLICATE_TICKET_NAME_MESSAGE,
+        path: ["tickets", i, "name"],
+      });
+    });
   });
+
 
 export type CreateEventFormErrors = Partial<Record<string, string>>;
 

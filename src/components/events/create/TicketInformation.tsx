@@ -3,7 +3,11 @@
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import Toggle from "../ui/Toggle";
-import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import {
+  DUPLICATE_TICKET_NAME_MESSAGE,
+  findDuplicateTicketIndices,
+  type CreateEventFormErrors,
+} from "@/lib/createEventValidation";
 
 interface TicketInformationProps {
   formData: EventFormData;
@@ -16,6 +20,18 @@ export default function TicketInformation({
   updateFormData,
   errors = {},
 }: TicketInformationProps) {
+  // Compute duplicate ticket-name indices live so the error surfaces while the
+  // organiser is still typing — not only on submit. Server-side / submit-time
+  // duplicates also flow through the `errors` prop, so we merge both views.
+  const duplicateIndices = React.useMemo(
+    () => findDuplicateTicketIndices(formData.tickets),
+    [formData.tickets]
+  );
+
+  const nameErrorFor = (index: number): string | undefined => {
+    if (duplicateIndices.has(index)) return DUPLICATE_TICKET_NAME_MESSAGE;
+    return errors[`tickets.${index}.name`];
+  };
   const addTicketType = () => {
     updateFormData({
       tickets: [
@@ -101,11 +117,20 @@ export default function TicketInformation({
                   value={ticket.name}
                   onChange={(e) => updateTicket(index, { name: e.target.value })}
                   placeholder="e.g. VIP, General admission"
-                  aria-invalid={!!errors[`tickets.${index}.name`]}
-                  className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.name`] ? "border-red-500" : "border-gray-600"}`}
+                  aria-invalid={!!nameErrorFor(index)}
+                  aria-describedby={
+                    nameErrorFor(index) ? `error-ticket-${index}-name` : undefined
+                  }
+                  className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${nameErrorFor(index) ? "border-red-500" : "border-gray-600"}`}
                 />
-                {errors[`tickets.${index}.name`] && (
-                  <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.name`]}</p>
+                {nameErrorFor(index) && (
+                  <p
+                    id={`error-ticket-${index}-name`}
+                    role="alert"
+                    className="mt-1 text-xs text-red-400"
+                  >
+                    {nameErrorFor(index)}
+                  </p>
                 )}
               </div>
 
