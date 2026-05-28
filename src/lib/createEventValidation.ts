@@ -13,6 +13,16 @@ const ticketSchema = z.object({
   resellPriceLimit: z.string().optional(),
 });
 
+const recurrenceSchema = z.object({
+  frequency: z.enum(["none", "daily", "weekly", "monthly", "custom"]),
+  interval: z.number().int().min(1, "Interval must be at least 1").max(365),
+  customUnit: z.enum(["day", "week", "month"]),
+  daysOfWeek: z.array(z.number().int().min(0).max(6)),
+  endType: z.enum(["never", "count", "date"]),
+  count: z.number().int().min(1).max(365),
+  until: z.string().optional().default(""),
+});
+
 export const createEventSchema = z
   .object({
     // Basic Information
@@ -44,6 +54,9 @@ export const createEventSchema = z
     blockchainNetwork: z.enum(["ethereum", "polygon", "solana"]),
     treasuryAddress: z.string().min(1, "Treasury address is required"),
     creatorRoyalty: z.number().min(0).max(10),
+
+    // Recurrence (optional — frequency=none means a single occurrence)
+    recurrence: recurrenceSchema,
   })
   .superRefine((data, ctx) => {
     // End must be after start
@@ -96,6 +109,26 @@ export const createEventSchema = z
         });
       }
     }
+
+    // Recurrence cross-field checks (only when actually repeating)
+    if (data.recurrence && data.recurrence.frequency !== "none") {
+      const r = data.recurrence;
+      if (r.endType === "date") {
+        if (!r.until) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "End date is required when 'On date' is selected",
+            path: ["recurrence", "until"],
+          });
+        } else if (data.startDate && r.until < data.startDate) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Recurrence end date must be on or after the start date",
+            path: ["recurrence", "until"],
+          });
+        }
+      }
+    }
   });
 
 export type CreateEventFormErrors = Partial<Record<string, string>>;
@@ -115,6 +148,7 @@ export function parseCreateEventErrors(
 /** Returns a human-readable section label for a field path */
 export function sectionForField(field: string): string {
   if (["title", "description", "coverImage"].includes(field)) return "Basic Information";
+  if (field.startsWith("recurrence")) return "Recurrence";
   if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "Date & Time";
   if (["venueName", "address", "city", "state", "zipCode"].includes(field)) return "Location";
   if (field.startsWith("tickets")) return "Ticket Information";
@@ -125,6 +159,7 @@ export function sectionForField(field: string): string {
 /** Returns the section id (data-section attribute) for a field */
 export function sectionIdForField(field: string): string {
   if (["title", "description", "coverImage"].includes(field)) return "section-basic";
+  if (field.startsWith("recurrence")) return "section-recurrence";
   if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "section-datetime";
   if (["venueName", "address", "city", "state", "zipCode"].includes(field)) return "section-location";
   if (field.startsWith("tickets")) return "section-tickets";

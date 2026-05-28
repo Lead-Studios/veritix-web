@@ -15,7 +15,13 @@ export async function submitCreateEvent(
     } else if (Array.isArray(value)) {
       value.forEach((v) => body.append(key, v instanceof File ? v : String(v)));
     } else if (value !== null && value !== undefined) {
-      body.append(key, String(value));
+      // Plain objects (e.g. recurrence config) need to be serialised so the
+      // backend can parse them — String(obj) would otherwise produce "[object Object]".
+      if (typeof value === "object") {
+        body.append(key, JSON.stringify(value));
+      } else {
+        body.append(key, String(value));
+      }
     }
   });
 

@@ -2,11 +2,13 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import BasicInformation from "@/components/events/create/BasicInformation";
+import Recurrence from "@/components/events/create/Recurrence";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
 import TicketInformation from "@/components/events/create/TicketInformation";
 import BlockchainSetting from "@/components/events/create/BlockchainSetting";
 import EventSummary from "@/components/events/create/EventSummary";
+import { DEFAULT_RECURRENCE, type RecurrenceConfig } from "@/lib/recurrence";
 import {
   createEventSchema,
   parseCreateEventErrors,
@@ -55,6 +57,9 @@ export interface EventFormData {
   blockchainNetwork: "ethereum" | "polygon" | "solana";
   treasuryAddress: string;
   creatorRoyalty: number;
+
+  // Recurrence (optional — defaults to a single, non-repeating occurrence)
+  recurrence: RecurrenceConfig;
 }
 
 const initialFormData: EventFormData = {
@@ -86,6 +91,7 @@ const initialFormData: EventFormData = {
   blockchainNetwork: "ethereum",
   treasuryAddress: "",
   creatorRoyalty: 3,
+  recurrence: { ...DEFAULT_RECURRENCE },
 };
 
 export default function CreateEventPage() {
@@ -266,6 +272,13 @@ export default function CreateEventPage() {
 
           <div id="section-basic">
             <BasicInformation
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
+          <div id="section-recurrence">
+            <Recurrence
               formData={formData}
               updateFormData={updateFormData}
               errors={errors}
