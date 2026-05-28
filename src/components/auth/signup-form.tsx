@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { IoWallet } from "react-icons/io5";
 import PasswordStrengthGuide from "./PasswordStrengthGuide";
+import { useRouter } from "next/navigation";
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -29,6 +30,7 @@ const signUpSchema = z.object({
 type FormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
+  const router = useRouter();
   const {
     handleSubmit,
     formState: { isSubmitting },

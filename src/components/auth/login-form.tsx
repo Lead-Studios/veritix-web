@@ -17,6 +17,7 @@ const loginSchema = z.object({
   password: z
     .string("Please enter your password")
     .min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof loginSchema>;
@@ -35,7 +36,7 @@ export default function LoginForm() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      await loginUser({ email: data.email, password: data.password });
+      await loginUser({ email: data.email, password: data.password, rememberMe: data.rememberMe ?? false });
       toast.success("Login successful!");
       const next = searchParams.get("next");
       router.push(next && next.startsWith("/") ? next : "/dashboard");
@@ -114,6 +115,18 @@ export default function LoginForm() {
               type="password"
               showForgotPassword
             />
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              {...(control as any).register?.("rememberMe")}
+              className="h-4 w-4 cursor-pointer accent-[#4D21FF]"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-gray-600 cursor-pointer select-none">
+              Remember me
+            </label>
           </motion.div>
 
           <motion.div variants={itemVariants}>
