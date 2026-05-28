@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import BasicInformation from "@/components/events/create/BasicInformation";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
@@ -95,6 +96,7 @@ const initialFormData: EventFormData = {
 };
 
 export default function CreateEventPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState<EventFormData>(initialFormData);
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -167,6 +169,7 @@ export default function CreateEventPage() {
       await submitCreateEvent(formData);
       setIsDirty(false);
       localStorage.removeItem(DRAFT_KEY);
+      router.push("/events/manage");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to create event.";
       setErrors({ _form: msg });
