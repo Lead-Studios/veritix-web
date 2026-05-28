@@ -31,6 +31,11 @@ vi.mock("@/lib/auth", () => ({
   getToken: vi.fn().mockReturnValue(null),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
+}));
+
 import LoginForm from "../components/auth/login-form";
 import SignUpForm from "../components/auth/signup-form";
 import ForgotPasswordForm from "../components/auth/forgot-password-form";

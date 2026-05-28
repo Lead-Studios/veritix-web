@@ -3,6 +3,7 @@
 import React from "react";
 import { useAuthState } from "@/hooks/useAuthState";
 import AuthLoadingShell from "@/components/auth/AuthLoadingShell";
+import { OrganizerNavbar } from "@/components/shared/OrganizerNavbar";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { isLoading } = useAuthState();
@@ -11,5 +12,10 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     return <AuthLoadingShell />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <OrganizerNavbar />
+      {children}
+    </>
+  );
 }

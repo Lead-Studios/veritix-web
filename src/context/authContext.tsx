@@ -1,9 +1,16 @@
-import { useEffect } from 'react';
+"use client";
 
-const AuthContext = createContext(null);
+import { createContext, useState, useEffect } from 'react';
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+interface AuthContextValue {
+  user: unknown;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,8 +29,8 @@ export const AuthProvider = ({ children }) => {
           },
         });
 
-        const user = await res.json();
-        setUser(user);
+        const userData = await res.json();
+        setUser(userData);
       } catch {
         localStorage.removeItem("token");
       } finally {
