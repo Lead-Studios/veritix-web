@@ -1,9 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { MoreVertical } from 'lucide-react'
 import { Modal } from '@/components/ui'
 import { StatusBadge, EventStatus } from '@/components/dashboard/StatusBadge'
+import {
+  prepareDuplicateDraft,
+  type DuplicableEventData,
+} from '@/lib/duplicateEvent'
 
 interface ManagedEvent {
   id: string
@@ -13,16 +19,112 @@ interface ManagedEvent {
   ticketsSold: number
   totalTickets: number
   status: EventStatus
+  /**
+   * Full source data used when duplicating this event into the create-event form.
+   * Stored alongside the row so the kebab menu's Duplicate action can pre-fill
+   * ticket types, pricing, treasury address, etc.
+   */
+  source: DuplicableEventData
 }
 
 type BulkAction = 'cancel' | 'duplicate'
 
 const INITIAL_EVENTS: ManagedEvent[] = [
-  { id: '1', name: 'Summer Music Festival',  date: '2026-07-15', location: 'Central Park, NY',          ticketsSold: 342, totalTickets: 500, status: 'active' },
-  { id: '2', name: 'Tech Conference 2026',   date: '2026-08-20', location: 'Convention Center, SF',     ticketsSold: 156, totalTickets: 200, status: 'active' },
-  { id: '3', name: 'Lagos Art Fair',         date: '2026-06-01', location: 'Eko Hotel, Lagos',          ticketsSold: 80,  totalTickets: 300, status: 'draft' },
-  { id: '4', name: 'Afrobeats Night Out',    date: '2025-12-31', location: 'O2 Arena, London',          ticketsSold: 600, totalTickets: 600, status: 'ended' },
-  { id: '5', name: 'Web3 Summit',            date: '2026-03-10', location: 'Dubai World Trade Centre',  ticketsSold: 0,   totalTickets: 400, status: 'cancelled' },
+  {
+    id: '1', name: 'Summer Music Festival', date: '2026-07-15', location: 'Central Park, NY',
+    ticketsSold: 342, totalTickets: 500, status: 'active',
+    source: {
+      title: 'Summer Music Festival',
+      description: 'A weekend of live music in Central Park.',
+      startDate: '2026-07-15', endDate: '2026-07-17',
+      startTime: '14:00', endTime: '23:00',
+      eventType: 'physical',
+      venueName: 'Central Park Great Lawn', address: 'Central Park', city: 'New York', state: 'NY', zipCode: '10024',
+      tickets: [
+        { name: 'General Admission', quantity: 400, price: '75', description: 'Standing access', transferable: true, resellable: true, resellPriceLimit: '110' },
+        { name: 'VIP', quantity: 100, price: '200', description: 'Front-stage + lounge', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'ethereum',
+      treasuryAddress: '0xA1B2C3d4E5F60718293a4b5C6D7E8f9A0b1C2D3e',
+      creatorRoyalty: 5,
+    },
+  },
+  {
+    id: '2', name: 'Tech Conference 2026', date: '2026-08-20', location: 'Convention Center, SF',
+    ticketsSold: 156, totalTickets: 200, status: 'active',
+    source: {
+      title: 'Tech Conference 2026',
+      description: 'Annual gathering of builders shipping on Stellar.',
+      startDate: '2026-08-20', endDate: '2026-08-21',
+      startTime: '09:00', endTime: '18:00',
+      eventType: 'hybrid',
+      venueName: 'Moscone West', address: '800 Howard St', city: 'San Francisco', state: 'CA', zipCode: '94103',
+      tickets: [
+        { name: 'Standard', quantity: 150, price: '120', description: 'Talks + expo', transferable: true, resellable: false, resellPriceLimit: '' },
+        { name: 'Workshop Pass', quantity: 50, price: '250', description: 'Hands-on labs', transferable: false, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'polygon',
+      treasuryAddress: '0xB2C3D4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F',
+      creatorRoyalty: 3,
+    },
+  },
+  {
+    id: '3', name: 'Lagos Art Fair', date: '2026-06-01', location: 'Eko Hotel, Lagos',
+    ticketsSold: 80, totalTickets: 300, status: 'draft',
+    source: {
+      title: 'Lagos Art Fair',
+      description: 'Contemporary West African art showcase.',
+      startDate: '2026-06-01', endDate: '2026-06-03',
+      startTime: '10:00', endTime: '20:00',
+      eventType: 'physical',
+      venueName: 'Eko Hotel & Suites', address: 'Plot 1415 Adetokunbo Ademola St', city: 'Lagos', state: 'Lagos', zipCode: '101241',
+      tickets: [
+        { name: 'Day Pass', quantity: 250, price: '15', description: 'Single-day access', transferable: true, resellable: true, resellPriceLimit: '25' },
+        { name: 'Weekend Pass', quantity: 50, price: '40', description: 'All three days', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'ethereum',
+      treasuryAddress: '0xC3D4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F50',
+      creatorRoyalty: 2,
+    },
+  },
+  {
+    id: '4', name: 'Afrobeats Night Out', date: '2025-12-31', location: 'O2 Arena, London',
+    ticketsSold: 600, totalTickets: 600, status: 'ended',
+    source: {
+      title: 'Afrobeats Night Out',
+      description: 'Year-end Afrobeats showcase featuring top artists.',
+      startDate: '2025-12-31', endDate: '2026-01-01',
+      startTime: '20:00', endTime: '02:00',
+      eventType: 'physical',
+      venueName: 'The O2 Arena', address: 'Peninsula Square', city: 'London', state: '', zipCode: 'SE10 0DX',
+      tickets: [
+        { name: 'Standing', quantity: 500, price: '60', description: 'General floor', transferable: true, resellable: true, resellPriceLimit: '90' },
+        { name: 'Seated Premium', quantity: 100, price: '120', description: 'Reserved seating', transferable: true, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'polygon',
+      treasuryAddress: '0xD4E5F60718293a4b5C6D7E8f9A0b1C2D3e4F5061',
+      creatorRoyalty: 4,
+    },
+  },
+  {
+    id: '5', name: 'Web3 Summit', date: '2026-03-10', location: 'Dubai World Trade Centre',
+    ticketsSold: 0, totalTickets: 400, status: 'cancelled',
+    source: {
+      title: 'Web3 Summit',
+      description: 'Cross-chain protocols and ecosystem updates.',
+      startDate: '2026-03-10', endDate: '2026-03-12',
+      startTime: '09:00', endTime: '17:00',
+      eventType: 'physical',
+      venueName: 'Dubai World Trade Centre', address: 'Sheikh Zayed Rd', city: 'Dubai', state: '', zipCode: '00000',
+      tickets: [
+        { name: 'Attendee', quantity: 350, price: '180', description: 'Full summit access', transferable: true, resellable: false, resellPriceLimit: '' },
+        { name: 'Investor', quantity: 50, price: '500', description: 'Includes private dinner', transferable: false, resellable: false, resellPriceLimit: '' },
+      ],
+      blockchainNetwork: 'solana',
+      treasuryAddress: '0xE5F60718293a4b5C6D7E8f9A0b1C2D3e4F506172',
+      creatorRoyalty: 3,
+    },
+  },
 ]
 
 const STATUS_LABELS: Record<EventStatus, string> = {
@@ -33,10 +135,38 @@ const STATUS_LABELS: Record<EventStatus, string> = {
 }
 
 export default function ManageEventsPage() {
+  const router = useRouter()
   const [events, setEvents] = useState<ManagedEvent[]>(INITIAL_EVENTS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkAction, setBulkAction] = useState<'' | BulkAction>('')
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Close kebab menu on outside click or Escape
+  useEffect(() => {
+    if (!openMenuId) return
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenMenuId(null)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [openMenuId])
+
+  const handleDuplicateRow = (event: ManagedEvent) => {
+    setOpenMenuId(null)
+    prepareDuplicateDraft(event.source)
+    router.push('/events/create')
+  }
 
   const selectedCount = selectedIds.size
   const allSelected = events.length > 0 && selectedCount === events.length
@@ -199,12 +329,48 @@ export default function ManageEventsPage() {
                       <StatusBadge status={event.status} text={STATUS_LABELS[event.status]} />
                     </td>
                     <td className="px-6 py-4">
-                      <Link
-                        href={`/events/manage/${event.id}`}
-                        className="text-[#4D21FF] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+                      <div
+                        ref={openMenuId === event.id ? menuRef : undefined}
+                        className="relative inline-block text-left"
                       >
-                        Manage →
-                      </Link>
+                        <button
+                          type="button"
+                          aria-label={`Open actions for ${event.name}`}
+                          aria-haspopup="menu"
+                          aria-expanded={openMenuId === event.id}
+                          onClick={() =>
+                            setOpenMenuId((prev) => (prev === event.id ? null : event.id))
+                          }
+                          className="rounded-md p-1.5 text-[#21D4FF]/80 transition-colors hover:bg-[#4D21FF]/20 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+
+                        {openMenuId === event.id && (
+                          <div
+                            role="menu"
+                            aria-label={`${event.name} actions`}
+                            className="absolute right-0 z-20 mt-1 w-44 overflow-hidden rounded-lg border border-[#4D21FF]/40 bg-[#0b1025] shadow-[0_20px_40px_rgba(10,16,40,0.7)]"
+                          >
+                            <Link
+                              role="menuitem"
+                              href={`/events/manage/${event.id}`}
+                              onClick={() => setOpenMenuId(null)}
+                              className="block px-4 py-2 text-sm text-white transition-colors hover:bg-[#4D21FF]/30 focus-visible:bg-[#4D21FF]/30 focus-visible:outline-none"
+                            >
+                              Manage
+                            </Link>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => handleDuplicateRow(event)}
+                              className="block w-full px-4 py-2 text-left text-sm text-white transition-colors hover:bg-[#4D21FF]/30 focus-visible:bg-[#4D21FF]/30 focus-visible:outline-none"
+                            >
+                              Duplicate
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )
