@@ -10,6 +10,7 @@ import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 

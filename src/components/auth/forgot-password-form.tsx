@@ -8,6 +8,7 @@ import { TbUserPlus } from "react-icons/tb";
 import { Button } from "../button";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
 import { forgotPassword } from "@/lib/auth";
 
 const forgotPasswordSchema = z.object({
@@ -34,34 +35,7 @@ export default function ForgotPasswordForm() {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.12,
-      },
-    },
-  };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
-  };
-
-  const headerVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
 
   return (
     <motion.div
