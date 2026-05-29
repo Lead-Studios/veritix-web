@@ -1,7 +1,7 @@
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WalletAddressDisplay } from "../components/profile/WalletAddressDisplay";
-import { useProfile } from "../hooks/useProfile";
+import { WalletAddressDisplay } from "@/components/profile/WalletAddressDisplay";
+import { useProfile } from "@/hooks/useProfile";
 
 const MOCK_PROFILE = {
   id: "u1",

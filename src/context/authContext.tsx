@@ -1,5 +1,16 @@
 "use client";
 
+import { createContext, useState, useEffect } from 'react';
+
+interface AuthContextValue {
+  user: unknown;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<unknown>(null);
 import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext<{
@@ -33,6 +44,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await fetch("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        const userData = await res.json();
+        setUser(userData);
         const data = await res.json();
         setUser(data);
       } catch {

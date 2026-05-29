@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { RevenueChart } from '@/components/dashboard/charts/RevenueChart';
 import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart';
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Preset = '7d' | '30d' | '90d' | 'all';
@@ -79,13 +80,6 @@ function DateRangePicker() {
         />
       </div>
     </div>
-  );
-}
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
-function Skeleton({ className = '' }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded-xl bg-white/5 ${className}`} />
   );
 }
 

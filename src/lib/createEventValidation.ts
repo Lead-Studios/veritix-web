@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const ticketSchema = z.object({
   name: z.string().min(1, "Ticket name is required"),
-  quantity: z.number({ invalid_type_error: "Quantity must be a number" }).int().min(1, "Quantity must be at least 1"),
+  quantity: z.number({ error: "Quantity must be a number" }).int().min(1, "Quantity must be at least 1"),
   price: z
     .string()
     .min(1, "Price is required")

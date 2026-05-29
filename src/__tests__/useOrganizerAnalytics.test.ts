@@ -10,6 +10,7 @@ const mockData: OrganizerAnalytics = {
   nextSettlementDays: 3,
   checkInsLive: true,
   doorsOpenInMinutes: 30,
+  totalEvents: 5,
   ticketBreakdown: [{ type: "VIP", count: 10, revenue: 50000 }],
   demographics: {
     region: [{ label: "Lagos", count: 8, percentage: 80 }],
