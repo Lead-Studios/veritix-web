@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
 import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
@@ -11,7 +12,7 @@ interface EventCardProps {
   index?: number;
 }
 
-export default function EventCard({ event, index = 0 }: EventCardProps) {
+function EventCard({ event, index = 0 }: EventCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -28,6 +29,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
           <div className="relative w-full sm:w-48 h-48 sm:h-auto shrink-0 overflow-hidden">
             <Link 
               href={`/events/${event.id}`}
+              prefetch
               className="absolute inset-0 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-inset"
               aria-label={`View details for ${event.name}`}
             />
@@ -52,6 +54,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
               <div className="flex items-start justify-between gap-3">
                 <Link 
                   href={`/events/${event.id}`}
+                  prefetch
                   className="text-xl font-semibold text-white group-hover:text-gray-200 transition-colors flex-1 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428] rounded"
                 >
                   {event.name}
@@ -84,6 +87,7 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
             <div className="flex items-center justify-end mt-4">
               <Link 
                 href={`/events/${event.id}`}
+                prefetch
                 className="px-6 py-2.5 bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428]"
               >
                 Get Tickets
@@ -95,3 +99,5 @@ export default function EventCard({ event, index = 0 }: EventCardProps) {
     </motion.div>
   );
 }
+
+export default memo(EventCard);
