@@ -13,6 +13,11 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
+}));
+
 vi.mock("react-toastify", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("framer-motion", () => {
@@ -29,6 +34,11 @@ vi.mock("@/lib/auth", () => ({
   forgotPassword: vi.fn().mockResolvedValue(undefined),
   logout: vi.fn(),
   getToken: vi.fn().mockReturnValue(null),
+}));
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
 }));
 
 import LoginForm from "../components/auth/login-form";
