@@ -50,6 +50,7 @@ export default function DashboardPage() {
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
   const eventImgs = data?.events?.slice(0, 4).map((e) => ({
+  const eventImages = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
   })) ?? []

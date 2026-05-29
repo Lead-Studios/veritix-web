@@ -1,19 +1,11 @@
-import { Variants, Transition, Easing } from "framer-motion";
+export * from './motionVariants';
+import type { Variants } from 'framer-motion';
 
-export { fadeIn, fadeInUp } from "./motionVariants";
-
-export function resolveMotionVariants(
-  variants: Variants,
-  prefersReducedMotion: boolean | null
-): Variants {
+export function resolveMotionVariants(variants: Variants, prefersReducedMotion: boolean | null): Variants {
   if (!prefersReducedMotion) return variants;
-  return Object.fromEntries(
-    Object.entries(variants).map(([key, value]) => [key, value])
-  );
+  return { hidden: {}, visible: {} };
 }
 
-export function getTransition(prefersReducedMotion: boolean | null): Transition {
-  return prefersReducedMotion
-    ? { duration: 0 }
-    : { duration: 0.4, ease: "easeOut" as Easing };
+export function getTransition(prefersReducedMotion: boolean | null): { duration: number; ease?: [number, number, number, number] } {
+  return prefersReducedMotion ? { duration: 0 } : { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] };
 }

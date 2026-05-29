@@ -4,6 +4,11 @@ import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
 import ImageUpload from "../ui/ImageUpload";
 import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import {
+  MAX_GALLERY_IMAGES,
+  getGalleryLimitMessage,
+  isGalleryFull,
+} from "@/lib/galleryLimit";
 
 interface BasicInformationProps {
   formData: EventFormData;
@@ -86,18 +91,27 @@ export default function BasicInformation({
 
         {/* Event Gallery */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Event Gallery (Optional)
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-300">
+              Event Gallery (Optional)
+            </label>
+            <span
+              className="text-xs text-gray-400"
+              aria-live="polite"
+              data-testid="gallery-counter"
+            >
+              {formData.gallery.length} / {MAX_GALLERY_IMAGES} images uploaded
+            </span>
+          </div>
           <div className="grid grid-cols-3 gap-4">
-            {[0, 1, 2].map((index) => (
+            {formData.gallery.map((file, index) => (
               <ImageUpload
                 key={index}
-                file={formData.gallery[index] || null}
-                onChange={(file) => {
+                file={file}
+                onChange={(next) => {
                   const newGallery = [...formData.gallery];
-                  if (file) {
-                    newGallery[index] = file;
+                  if (next) {
+                    newGallery[index] = next;
                   } else {
                     newGallery.splice(index, 1);
                   }
@@ -107,7 +121,30 @@ export default function BasicInformation({
                 size="small"
               />
             ))}
+            {!isGalleryFull(formData.gallery.length) && (
+              <ImageUpload
+                key={`add-${formData.gallery.length}`}
+                file={null}
+                onChange={(next) => {
+                  if (!next) return;
+                  updateFormData({
+                    gallery: [...formData.gallery, next],
+                  });
+                }}
+                aspectRatio="square"
+                size="small"
+              />
+            )}
           </div>
+          {isGalleryFull(formData.gallery.length) && (
+            <p
+              className="mt-2 text-xs text-amber-400"
+              role="status"
+              data-testid="gallery-limit-message"
+            >
+              {getGalleryLimitMessage()} Remove an image to upload another.
+            </p>
+          )}
         </div>
       </div>
     </section>
