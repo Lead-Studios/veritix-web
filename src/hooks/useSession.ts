@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getToken, logout } from "@/lib/auth";
 
-function isTokenExpired(token: string): boolean {
+/**
+ * Checks whether the stored JWT is expired.
+ * Returns true if the token is missing or its `exp` claim is in the past.
+ */
+export function isTokenExpired(token: string): boolean {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
@@ -14,6 +18,26 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
+/**
+ * Returns the expiry timestamp (ms) from a JWT, or null if unreadable.
+ */
+export function getTokenExpiry(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * useSession – guards authenticated surfaces.
+ *
+ * - Redirects to /login immediately if no token is present.
+ * - Redirects to /login (with ?expired=1) when the token has expired.
+ * - Shows a toast when the session expires.
+ * - Polls every 60 s so long-lived pages catch expiry without a page reload.
+ */
 export function useSession() {
   const router = useRouter();
 
@@ -26,11 +50,11 @@ export function useSession() {
       }
       if (isTokenExpired(token)) {
         logout();
-        toast.warn("Your session has expired. Please sign in again.");
+        toast.error("Your session has expired. Please sign in again.");
         router.replace("/login?expired=1");
       }
     } catch {
-      // Never crash — silently redirect to login
+      logout();
       router.replace("/login");
     }
   }, [router]);

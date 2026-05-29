@@ -4,6 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { classifyVerificationError } from '@/lib/verificationErrors';
 
 type ScanResult = { status: 'valid' | 'invalid' | 'used'; message: string } | null;
+type CsvSummary = { succeeded: number; failed: number; errors: string[] } | null;
+
+function parseCsv(text: string): string[] {
+  return text
+    .split('\n')
+    .map((line) => line.trim().replace(/^["']|["']$/g, ''))
+    .filter(Boolean);
+}
 
 export default function VerificationPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -13,6 +21,11 @@ export default function VerificationPage() {
   const [result, setResult] = useState<ScanResult>(null);
   const [loading, setLoading] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
+
+  // CSV bulk check-in state
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [csvSummary, setCsvSummary] = useState<CsvSummary>(null);
+  const csvInputRef = useRef<HTMLInputElement>(null);
 
   const verify = async (ticketId: string) => {
     if (!ticketId.trim()) return;
@@ -34,6 +47,53 @@ export default function VerificationPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      setCsvSummary({ succeeded: 0, failed: 0, errors: ['File must be a .csv'] });
+      return;
+    }
+
+    const text = await file.text();
+    const codes = parseCsv(text);
+    if (codes.length === 0) {
+      setCsvSummary({ succeeded: 0, failed: 0, errors: ['CSV is empty or has no valid rows.'] });
+      return;
+    }
+
+    setCsvLoading(true);
+    setCsvSummary(null);
+
+    let succeeded = 0;
+    const errors: string[] = [];
+
+    await Promise.all(
+      codes.map(async (code) => {
+        try {
+          const res = await fetch('/api/tickets/check-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+          });
+          if (res.ok) {
+            succeeded++;
+          } else {
+            const data = await res.json().catch(() => ({}));
+            errors.push(`${code}: ${data.message ?? 'Failed'}`);
+          }
+        } catch {
+          errors.push(`${code}: Network error`);
+        }
+      })
+    );
+
+    setCsvSummary({ succeeded, failed: errors.length, errors });
+    setCsvLoading(false);
+    // reset input so same file can be re-uploaded
+    if (csvInputRef.current) csvInputRef.current.value = '';
   };
 
   const startCamera = async () => {
@@ -124,6 +184,42 @@ export default function VerificationPage() {
           {result.message}
         </div>
       )}
+
+      {/* Bulk CSV check-in */}
+      <div className="w-full max-w-sm space-y-3 border-t border-white/10 pt-6">
+        <p className="text-sm text-white/60">Bulk Check-in via CSV</p>
+        <p className="text-xs text-white/40">Upload a CSV file with one ticket code per row.</p>
+        <input
+          ref={csvInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleCsvUpload}
+          disabled={csvLoading}
+          className="hidden"
+          id="csv-upload"
+          aria-label="Upload check-ins CSV"
+        />
+        <label
+          htmlFor="csv-upload"
+          className={`flex items-center justify-center w-full py-3 rounded-xl border border-dashed border-white/20 text-sm font-semibold cursor-pointer transition hover:border-[#21d4ff] hover:text-[#21d4ff] ${csvLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {csvLoading ? 'Processing…' : 'Upload CSV'}
+        </label>
+
+        {csvSummary && (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-2 text-sm">
+            <p className="text-green-400 font-medium">✓ {csvSummary.succeeded} check-in{csvSummary.succeeded !== 1 ? 's' : ''} succeeded</p>
+            {csvSummary.failed > 0 && (
+              <>
+                <p className="text-red-400 font-medium">✗ {csvSummary.failed} failed</p>
+                <ul className="text-xs text-red-300/80 space-y-1 max-h-32 overflow-y-auto">
+                  {csvSummary.errors.map((err, i) => <li key={i}>{err}</li>)}
+                </ul>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

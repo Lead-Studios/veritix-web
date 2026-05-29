@@ -125,7 +125,7 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-          3
+          4
         </div>
         <h2 className="text-2xl font-bold text-white">Location</h2>
       </div>

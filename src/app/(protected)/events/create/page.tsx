@@ -3,13 +3,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import BasicInformation from "@/components/events/create/BasicInformation";
+import Recurrence from "@/components/events/create/Recurrence";
 import DateAndTime from "@/components/events/create/DateAndTime";
 import Location from "@/components/events/create/Location";
 import TicketInformation from "@/components/events/create/TicketInformation";
 import BlockchainSetting from "@/components/events/create/BlockchainSetting";
 import EventSummary from "@/components/events/create/EventSummary";
+import { DEFAULT_RECURRENCE, type RecurrenceConfig } from "@/lib/recurrence";
 import {
   createEventSchema,
+  findDuplicateTicketIndices,
   parseCreateEventErrors,
   sectionForField,
   sectionIdForField,
@@ -59,6 +62,9 @@ export interface EventFormData {
   blockchainNetwork: "ethereum" | "polygon" | "solana";
   treasuryAddress: string;
   creatorRoyalty: number;
+
+  // Recurrence (optional — defaults to a single, non-repeating occurrence)
+  recurrence: RecurrenceConfig;
 }
 
 const initialFormData: EventFormData = {
@@ -93,6 +99,7 @@ const initialFormData: EventFormData = {
   blockchainNetwork: "ethereum",
   treasuryAddress: "",
   creatorRoyalty: 3,
+  recurrence: { ...DEFAULT_RECURRENCE },
 };
 
 export default function CreateEventPage() {
@@ -192,6 +199,11 @@ export default function CreateEventPage() {
   const errorEntries = Object.entries(errors).filter(([k]) => k !== "_form");
   const hasErrors = errorEntries.length > 0 || !!errors._form;
 
+  // Block submission while there are duplicate ticket-type names. Computed
+  // live from formData so the button updates as the organiser types.
+  const hasDuplicateTicketNames =
+    findDuplicateTicketIndices(formData.tickets).size > 0;
+
   return (
     <div className="min-h-screen bg-[#0a0e21] text-white">
       {/* Header */}
@@ -280,6 +292,13 @@ export default function CreateEventPage() {
               errors={errors}
             />
           </div>
+          <div id="section-recurrence">
+            <Recurrence
+              formData={formData}
+              updateFormData={updateFormData}
+              errors={errors}
+            />
+          </div>
           <div id="section-datetime">
             <DateAndTime
               formData={formData}
@@ -318,7 +337,13 @@ export default function CreateEventPage() {
           <div className="space-y-4">
             <button
               onClick={handleCreateEvent}
-              disabled={isSubmitting}
+              disabled={isSubmitting || hasDuplicateTicketNames}
+              aria-disabled={isSubmitting || hasDuplicateTicketNames}
+              title={
+                hasDuplicateTicketNames
+                  ? "Resolve duplicate ticket-type names before creating the event"
+                  : undefined
+              }
               className="w-full bg-gradient-to-r from-blue-700 to-blue-200 hover:from-blue-800 hover:to-blue-300 text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (

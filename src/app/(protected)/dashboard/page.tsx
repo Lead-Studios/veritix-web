@@ -19,23 +19,12 @@ const TicketTypeChart = dynamic(
   { ssr: false, loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" /> }
 )
 import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
-import { eventImages } from '@/components/dashboard/constants'
-import {
-  demoRevenueData,
-  demoPerformanceData,
-  demoTotalEarned,
-  demoPayoutsQueued,
-  demoNextSettlementDays,
-} from '@/components/dashboard/demoData'
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
 import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 function formatCurrency(n: number) {
   return `₦ ${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
-}
-
-function SkeletonBlock({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-white/10 ${className}`} />
 }
 
 function DashboardSkeleton() {
@@ -43,9 +32,9 @@ function DashboardSkeleton() {
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {[0, 1, 2].map((i) => (
         <div key={i} className="flex flex-col gap-4">
-          <SkeletonBlock className="h-24" />
-          <SkeletonBlock className="h-48" />
-          <SkeletonBlock className="h-20" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-48" />
+          <Skeleton className="h-20" />
         </div>
       ))}
     </div>
@@ -57,6 +46,7 @@ export default function DashboardPage() {
   const router = useRouter()
 
   const hasEvents = !loading && (data?.totalEvents ?? 0) > 0
+  const hasData = !loading && data !== null
 
   const revenueData = data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? []
   const barData = data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? []
@@ -64,13 +54,11 @@ export default function DashboardPage() {
   const payoutsQueued = data?.payoutsQueued ?? 0
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
-  // Use real event images from API, fall back to empty array (EventImage handles placeholder)
+  const eventImgs = data?.events?.slice(0, 4).map((e) => ({
   const eventImages = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
   })) ?? []
-
-  const hasData = !loading && data !== null
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
@@ -100,19 +88,6 @@ export default function DashboardPage() {
 
           <QuickActions />
 
-          <div className="grid gap-1 lg:grid-cols-3 h-[500px] gap-4 lg:gap-1">
-            {/* Left Column - Revenue */}
-            <ScrollColumn animationClass="animate-scroll-up-once">
-              <Card>
-                <CardHeader
-                  title="Revenue"
-                  subtitle="A quick look at earnings this week"
-                  extraInfo="Weekly Summary"
-                />
-              </Card>
-
-              <Card>
-                <div className="mb-4">
           {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
 
@@ -180,7 +155,7 @@ export default function DashboardPage() {
                     <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {eventImages.map((image, index) => (
+                    {eventImgs.map((image, index) => (
                       <EventImage key={index} src={image.src} alt={image.alt} />
                     ))}
                   </div>
@@ -214,21 +189,14 @@ export default function DashboardPage() {
                   </div>
                 </Card>
               </ScrollColumn>
-                  )}
-                </div>
-                <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                  <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                  <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                  <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
-                </div>
-              </Card>
-            </ScrollColumn>
-          </div>
+            </div>
+          )}
 
           <div className="mt-8">
             <RecentActivity />
           </div>
-          {/* Ticket Type Breakdown — Issue #219 */}
+
+          {/* Ticket Type Breakdown */}
           {!loading && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
@@ -240,7 +208,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Demographics — Issue #221 */}
+          {/* Demographics */}
           {!loading && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
