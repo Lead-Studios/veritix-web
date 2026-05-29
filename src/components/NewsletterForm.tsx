@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { z } from "zod";
 
 const NEWSLETTER_ENDPOINT =
   process.env.NEXT_PUBLIC_NEWSLETTER_ENDPOINT ?? "/api/newsletter";
+
+const emailSchema = z.string().email("Please enter a valid email address");
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -12,7 +15,13 @@ export default function NewsletterForm() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    
+    const validationResult = emailSchema.safeParse(email);
+    if (!validationResult.success) {
+      setStatus("error");
+      setErrorMsg(validationResult.error.issues[0]?.message || "Invalid email address");
+      return;
+    }
 
     setStatus("loading");
     setErrorMsg("");
@@ -21,7 +30,7 @@ export default function NewsletterForm() {
       const res = await fetch(NEWSLETTER_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: validationResult.data }),
       });
 
       if (!res.ok) {

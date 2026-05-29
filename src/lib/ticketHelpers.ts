@@ -26,3 +26,18 @@ export function groupTicketsByStatus(tickets: UserTicket[]) {
     { active: [], used: [], cancelled: [], expired: [] }
   );
 }
+
+export function resolveStatusLabel(status: UserTicket["status"]): string {
+  const labels: Record<UserTicket["status"], string> = {
+    active: "Active",
+    used: "Used",
+    cancelled: "Cancelled",
+    expired: "Expired",
+  };
+  return labels[status] || "Unknown";
+}
+
+export function formatTicketPrice(price: number): string {
+  if (price === 0) return "Free";
+  return `${price.toFixed(2)} ETH`;
+}

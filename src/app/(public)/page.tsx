@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import {
   Calendar,
   Clock,
@@ -13,6 +14,7 @@ import {
   Share2,
   Ticket,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
 
@@ -39,6 +41,20 @@ const fadeUp = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const [searchQ, setSearchQ] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchQ.trim()) params.set("q", searchQ.trim());
+    if (searchLocation.trim()) params.set("location", searchLocation.trim());
+    if (searchDate.trim()) params.set("date", searchDate.trim());
+    router.push(`/events?${params.toString()}`);
+  };
+
   return (
     <div id="top" className="min-h-screen bg-[#0b1025] text-white">
       <a
@@ -140,6 +156,48 @@ export default function Home() {
               Discover real-life events, mint NFT tickets, and earn rewards with
               crypto.
             </p>
+
+            <form onSubmit={handleSearchSubmit} className="mt-8 w-full max-w-2xl mx-auto lg:mx-0 rounded-2xl md:rounded-full bg-[#101428]/80 border border-white/10 p-2 md:p-3 shadow-xl backdrop-blur flex flex-col md:flex-row gap-2 md:gap-0 md:items-center">
+              <div className="flex-1 flex items-center px-3 border-b md:border-b-0 md:border-r border-white/10 pb-2 md:pb-0">
+                <Search className="text-[#6f7bff] mr-2 h-5 w-5 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search events, artists..."
+                  value={searchQ}
+                  onChange={(e) => setSearchQ(e.target.value)}
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  aria-label="Event name or keyword"
+                />
+              </div>
+              <div className="flex-1 flex items-center px-3 border-b md:border-b-0 md:border-r border-white/10 pb-2 md:pb-0">
+                <MapPin className="text-[#6f7bff] mr-2 h-5 w-5 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Location..."
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  aria-label="Event location"
+                />
+              </div>
+              <div className="flex-1 flex items-center px-3 pb-2 md:pb-0">
+                <Calendar className="text-[#6f7bff] mr-2 h-5 w-5 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Date..."
+                  value={searchDate}
+                  onChange={(e) => setSearchDate(e.target.value)}
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  aria-label="Event date"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full md:w-auto rounded-xl md:rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95 shadow-md flex items-center justify-center gap-2"
+              >
+                <span>Search</span>
+              </button>
+            </form>
 
             <div className="flex flex-wrap items-center justify-center gap-4 lg:justify-start">
               <MotionLink
