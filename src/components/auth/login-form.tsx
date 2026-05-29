@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { Input } from "../ui/input";
 import { TbUserPlus } from "react-icons/tb";
+import { FcGoogle } from "react-icons/fc";
 import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -45,33 +46,27 @@ export default function LoginForm() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    try {
+      window.location.href = "/api/auth/google";
+    } catch {
+      toast.error("Google sign-in failed. Please try again.");
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.12,
-      },
-    },
+    visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.12 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
   const headerVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.5 },
-    },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
   };
 
   return (
@@ -134,6 +129,29 @@ export default function LoginForm() {
           </motion.div>
         </motion.form>
       </div>
+
+      <motion.div className="flex items-center gap-4 my-4" variants={itemVariants}>
+        <div className="flex-1 h-px bg-primary-black" />
+        <span className="text-sm lg:text-xl">or continue with</span>
+        <div className="flex-1 h-px bg-primary-black" />
+      </motion.div>
+
+      <motion.div variants={itemVariants}>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outline"
+            disabled={isSubmitting}
+            className="w-full py-4"
+            type="button"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <FcGoogle size={20} />
+              <span className="text-sm font-medium">Continue with Google</span>
+            </div>
+          </Button>
+        </motion.div>
+      </motion.div>
 
       <motion.p className="text-center lg:text-xl mt-6" variants={itemVariants}>
         Don&apos;t have an account?{" "}

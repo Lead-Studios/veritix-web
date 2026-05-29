@@ -24,6 +24,34 @@ export default function EventsPage() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    fetchEvents()
+      .then((data) => {
+        setEvents(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load events. Please try again.');
+        setEvents([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    fetchEvents()
+      .then((data) => {
+        setEvents(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load events. Please try again.');
+        setEvents([]);
+      })
+      .finally(() => setLoading(false));
+  };
+
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
     if (activeFilters.length > 0) list = list.filter((e) => activeFilters.includes(e.category));

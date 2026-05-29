@@ -1,3 +1,14 @@
+"use client";
+
+import { createContext, useState, useEffect } from "react";
+
+export const AuthContext = createContext<{
+  user: { id: string; email: string; name?: string } | null;
+  loading: boolean;
+} | null>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
 'use client';
 
 import React, { createContext, useState, useEffect } from 'react';
@@ -10,7 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const bootstrap = async () => {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
 
       if (!token) {
         setLoading(false);
@@ -19,15 +31,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         const res = await fetch("/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        const user = await res.json();
-        setUser(user);
+        const data = await res.json();
+        setUser(data);
       } catch {
-        localStorage.removeItem("token");
+        localStorage.removeItem("auth_token");
+        sessionStorage.removeItem("auth_token");
       } finally {
         setLoading(false);
       }
