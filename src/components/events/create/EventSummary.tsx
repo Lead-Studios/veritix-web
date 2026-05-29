@@ -3,6 +3,7 @@
 import React, { useMemo, useEffect } from "react";
 import Image from "next/image";
 import { EventFormData } from "@/app/(protected)/events/create/page";
+import { describeRecurrence } from "@/lib/recurrence";
 
 interface EventSummaryProps {
   formData: EventFormData;
@@ -110,6 +111,14 @@ export default function EventSummary({ formData }: EventSummaryProps) {
         <div>
           <p className="text-sm font-medium text-gray-400 mb-1">Date & Time</p>
           <p className="text-base text-white">{getDateRange()}</p>
+        </div>
+
+        {/* Recurrence */}
+        <div>
+          <p className="text-sm font-medium text-gray-400 mb-1">Recurrence</p>
+          <p className="text-base text-white">
+            {describeRecurrence(formData.recurrence)}
+          </p>
         </div>
 
         {/* Location */}

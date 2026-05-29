@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +13,10 @@ import {
   HiRefresh,
   HiSearch,
 } from 'react-icons/hi';
+import {
+  getVerificationErrorMessage,
+  type VerificationErrorType,
+} from '@/lib/verificationErrors';
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const VALID_TICKETS: Record<string, {
@@ -42,7 +47,25 @@ const VALID_TICKETS: Record<string, {
   },
 };
 
-type VerifyState = 'idle' | 'loading' | 'success' | 'failure' | 'already-used' | 'service-error';
+type VerifyState =
+  | 'idle'
+  | 'loading'
+  | 'success'
+  | 'failure'
+  | 'already-used'
+  | 'service-error'
+  | 'network-error'
+  | 'unknown-error';
+
+// Maps the page-level VerifyState onto the canonical VerificationErrorType
+// codes defined in src/lib/verificationErrors.ts. Unknown states fall through
+// to the generic message via getVerificationErrorMessage's fallback.
+const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> = {
+  failure: 'invalid-ticket',
+  'already-used': 'already-used',
+  'service-error': 'service-failure',
+  'network-error': 'network-error',
+};
 
 // ─── Scan Frame Animation ─────────────────────────────────────────────────────
 function ScanFrame() {
@@ -106,6 +129,15 @@ function ResultCard({
   const isSuccess = state === 'success';
   const isAlreadyUsed = state === 'already-used';
   const isServiceError = state === 'service-error';
+  const isNetworkError = state === 'network-error';
+
+  // Pull a user-friendly, actionable message bundle from the central
+  // mapping so all error UIs stay consistent. Unknown states get the
+  // generic fallback from getVerificationErrorMessage automatically.
+  const errorMessage = !isSuccess
+    ? getVerificationErrorMessage(STATE_TO_ERROR_TYPE[state])
+    : null;
+  const showRetry = Boolean(errorMessage?.retryable && onRetry);
 
   return (
     <AnimatePresence mode="wait">
@@ -115,12 +147,15 @@ function ResultCard({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.92, y: -20 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
+        role="status"
+        aria-live="polite"
+        data-state={state}
         className={`rounded-2xl border overflow-hidden ${
           isSuccess
             ? 'border-emerald-500/40 bg-emerald-900/20'
             : isAlreadyUsed
             ? 'border-amber-500/40 bg-amber-900/20'
-            : isServiceError
+            : isServiceError || isNetworkError
             ? 'border-orange-500/40 bg-orange-900/20'
             : 'border-red-500/40 bg-red-900/20'
         }`}
@@ -132,7 +167,7 @@ function ResultCard({
               ? 'bg-emerald-500'
               : isAlreadyUsed
               ? 'bg-amber-500'
-              : isServiceError
+              : isServiceError || isNetworkError
               ? 'bg-orange-500'
               : 'bg-red-500'
           }`}
@@ -142,7 +177,7 @@ function ResultCard({
               <HiCheck className="w-5 h-5 text-white" />
             ) : isAlreadyUsed ? (
               <HiRefresh className="w-5 h-5 text-white" />
-            ) : isServiceError ? (
+            ) : isServiceError || isNetworkError ? (
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
@@ -152,12 +187,8 @@ function ResultCard({
           </div>
           <span className="font-bold text-white text-lg">
             {isSuccess
-              ? 'Valid Ticket — Entry Granted'
-              : isAlreadyUsed
-              ? 'Already Used'
-              : isServiceError
-              ? 'Service Unavailable'
-              : 'Invalid Ticket'}
+              ? 'Valid Ticket \u2014 Entry Granted'
+              : errorMessage?.title}
           </span>
         </div>
 
@@ -176,14 +207,8 @@ function ResultCard({
             </>
           ) : (
             <div className="text-center py-4 space-y-2">
-              <p className="text-gray-300 text-sm">
-                {isAlreadyUsed
-                  ? 'This ticket has already been scanned. Please check with your supervisor.'
-                  : isServiceError
-                  ? 'Unable to connect to verification service. Please check your connection and try again.'
-                  : 'No ticket found matching this code. Verify the code and try again.'}
-              </p>
-              {!isServiceError && (
+              <p className="text-gray-300 text-sm">{errorMessage?.description}</p>
+              {!isServiceError && !isNetworkError && ticketCode && (
                 <p className="text-gray-500 text-xs font-mono">{ticketCode.toUpperCase()}</p>
               )}
             </div>
@@ -192,7 +217,7 @@ function ResultCard({
 
         {/* Actions */}
         <div className="px-6 pb-6 space-y-3">
-          {isServiceError && onRetry ? (
+          {showRetry ? (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -200,7 +225,7 @@ function ResultCard({
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] hover:opacity-90 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
             >
               <HiRefresh className="w-4 h-4" />
-              Retry Verification
+              {errorMessage?.actionLabel ?? 'Retry verification'}
             </motion.button>
           ) : (
             <motion.button
@@ -210,7 +235,9 @@ function ResultCard({
               className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
             >
               <HiRefresh className="w-4 h-4" />
-              Verify Another Ticket
+              {isSuccess
+                ? 'Verify Another Ticket'
+                : errorMessage?.actionLabel ?? 'Verify another ticket'}
             </motion.button>
           )}
         </div>
@@ -294,7 +321,14 @@ export default function VerifyPage() {
   };
 
   const isChecking = verifyState === 'loading';
-  const hasResult = ['success', 'failure', 'already-used', 'service-error'].includes(verifyState);
+  const hasResult = [
+    'success',
+    'failure',
+    'already-used',
+    'service-error',
+    'network-error',
+    'unknown-error',
+  ].includes(verifyState);
 
   return (
     <div className="min-h-screen bg-primary-dark-blue">
