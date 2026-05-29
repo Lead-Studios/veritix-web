@@ -16,6 +16,18 @@ export async function fetchEventAttendees(eventId: string): Promise<Attendee[]> 
   return res.json();
 }
 
+export async function checkInAttendee(
+  eventId: string,
+  attendeeId: string
+): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(
+    `/api/events/${eventId}/attendees/${attendeeId}/check-in`,
+    { method: "POST" }
+  );
+  if (!res.ok) return { success: false, message: "Check-in failed. Please try again." };
+  return { success: true, message: "Attendee checked in." };
+}
+
 export function exportAttendeesCSV(attendees: Attendee[], eventId = "event"): void {
   const headers = ["Name", "Email", "Ticket Type", "Order ID", "Checked In", "Purchased At"];
   const rows = attendees.map((a) => [
