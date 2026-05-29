@@ -77,7 +77,6 @@ export default function SignUpForm() {
   }
 };
 
-  const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
   const walletEnabled = process.env.NEXT_PUBLIC_WALLET_AUTH_ENABLED === "true";
 
   const handleGoogleSignUp = async () => {
@@ -193,7 +192,7 @@ export default function SignUpForm() {
         </motion.form>
       </div>
 
-      {(googleEnabled || walletEnabled) && (
+      {(true || walletEnabled) && (
         <>
           <motion.div
             className="flex items-center gap-4 my-4"
@@ -208,8 +207,7 @@ export default function SignUpForm() {
             className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
             variants={itemVariants}
           >
-            {googleEnabled && (
-              <motion.div
+            <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2 }}
@@ -226,7 +224,6 @@ export default function SignUpForm() {
                   </div>
                 </Button>
               </motion.div>
-            )}
 
             {walletEnabled && (
               <motion.div
