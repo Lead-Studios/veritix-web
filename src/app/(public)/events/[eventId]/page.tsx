@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
 import TabSelector from '@/components/TabSelector';
+import { Breadcrumb } from '@/components/ui';
 import WalletConnectModal from '@/components/events/WalletConnectModal';
 import { AppImage } from '@/components/shared/AppImage';
 import { fetchEventById } from '@/lib/eventsApi';
@@ -111,6 +112,13 @@ export default function EventDetailsPage() {
                 <HiArrowLeft className="w-5 h-5" />
                 <span>Back</span>
               </motion.button>
+              <Breadcrumb
+                className="text-white/70"
+                items={[
+                  { label: "Events", href: "/events" },
+                  { label: event.name },
+                ]}
+              />
               <div className="flex items-start justify-between">
                 <h1 className="text-4xl sm:text-5xl font-bold text-white">
                   {event.name}
