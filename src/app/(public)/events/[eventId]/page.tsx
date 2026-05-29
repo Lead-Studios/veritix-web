@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
 import TabSelector from '@/components/TabSelector';
 import WalletConnectModal from '@/components/events/WalletConnectModal';
+import { AppImage } from '@/components/shared/AppImage';
 import { fetchEventById } from '@/lib/eventsApi';
 import { useFavorite } from '@/hooks/useFavorite';
 import type { Event } from '@/types/event';
@@ -320,7 +321,14 @@ export default function EventDetailsPage() {
                       {event.performers.map((performer, i) => (
                         <div key={i} className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 border border-white/10 text-center">
                           {performer.image ? (
-                            <img src={performer.image} alt={performer.name} className="w-16 h-16 rounded-full object-cover" />
+                            <AppImage
+                              src={performer.image}
+                              alt={performer.name}
+                              width={64}
+                              height={64}
+                              className="w-16 h-16 rounded-full object-cover"
+                              sizes="64px"
+                            />
                           ) : (
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4D21FF] to-[#21D4FF] flex items-center justify-center text-white font-bold text-xl">
                               {performer.name.charAt(0)}
