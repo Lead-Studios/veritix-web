@@ -10,8 +10,10 @@ import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -32,13 +34,14 @@ export default function LoginForm() {
     control,
     register,
     setError,
-  } = useForm({
+  } = useForm<FormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { rememberMe: false },
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
-      await loginUser({ email: data.email, password: data.password, rememberMe: data.rememberMe ?? false });
+      await loginUser({ email: data.email, password: data.password, rememberMe: data.rememberMe });
       toast.success("Login successful!");
       const next = searchParams.get("next");
       router.push(next && next.startsWith("/") ? next : "/dashboard");
@@ -80,7 +83,7 @@ export default function LoginForm() {
     >
       <motion.h2
         className="text-3xl md:text-4xl text-center font-bold text-gray-900 mb-8"
-        variants={headerVariants}
+        variants={itemVariants}
       >
         Welcome Back
       </motion.h2>
@@ -115,22 +118,18 @@ export default function LoginForm() {
 
           <motion.div variants={itemVariants} className="flex items-center gap-2">
             <input
-              type="checkbox"
               id="rememberMe"
+              type="checkbox"
               {...register("rememberMe")}
-              className="h-4 w-4 cursor-pointer accent-[#4D21FF]"
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <label htmlFor="rememberMe" className="text-sm text-gray-600 cursor-pointer select-none">
+            <label htmlFor="rememberMe" className="text-sm text-gray-700 select-none cursor-pointer">
               Remember me
             </label>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
               {errors.root && (
                 <p role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
                   {errors.root.message}
@@ -173,6 +172,25 @@ export default function LoginForm() {
           Sign Up
         </Link>
       </motion.p>
+
+      {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true" && (
+        <motion.div variants={itemVariants} className="mt-4">
+          <div className="flex items-center gap-4 my-4">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="text-sm text-gray-500">or</span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full py-3 flex items-center justify-center gap-2"
+            onClick={() => { window.location.href = "/api/auth/google"; }}
+          >
+            <FcGoogle size={20} />
+            <span className="text-sm font-medium">Continue with Google</span>
+          </Button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

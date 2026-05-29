@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { classifyVerificationError } from '@/lib/verificationErrors';
 
 type ScanResult = { status: 'valid' | 'invalid' | 'used'; message: string } | null;
 type CsvSummary = { succeeded: number; failed: number; errors: string[] } | null;
@@ -33,9 +34,16 @@ export default function VerificationPage() {
     try {
       const res = await fetch(`/api/verify/${encodeURIComponent(ticketId.trim())}`, { method: 'POST' });
       const data = await res.json().catch(() => ({}));
-      setResult({ status: data.status ?? (res.ok ? 'valid' : 'invalid'), message: data.message ?? (res.ok ? 'Ticket is valid.' : 'Invalid ticket.') });
+      if (res.ok) {
+        setResult({ status: data.status ?? 'valid', message: data.message ?? 'Ticket is valid.' });
+      } else {
+        const err = classifyVerificationError(res.status, data.code);
+        const status = err.type === 'already-used' ? 'used' : 'invalid';
+        setResult({ status, message: err.message });
+      }
     } catch {
-      setResult({ status: 'invalid', message: 'Network error. Please try again.' });
+      const err = classifyVerificationError(null);
+      setResult({ status: 'invalid', message: err.message });
     } finally {
       setLoading(false);
     }

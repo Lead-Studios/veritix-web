@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
 import { Modal } from "@/components/ui";
+import { Breadcrumb } from "@/components/ui";
 import { performEventAction } from "@/lib/eventActions";
 import TabSelector from "@/components/TabSelector";
 import AttendeesTab from "@/components/events/manage/AttendeesTab";
@@ -160,6 +161,14 @@ export default function ManageEventPage() {
       <div className="mx-auto max-w-5xl">
         <h1 className="text-3xl font-bold">Manage: {event.name}</h1>
         <p className="mt-2 text-[#21D4FF]/80">Status: {event.status}</p>
+        <Breadcrumb
+          className="mt-3 text-white/60"
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Events", href: "/events/manage" },
+            { label: event.name },
+          ]}
+        />
 
         <TabSelector<Tab>
           tabs={TABS as unknown as Tab[]}
