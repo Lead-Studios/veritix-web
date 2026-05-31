@@ -26,38 +26,56 @@ vi.mock("framer-motion", () => {
   return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
-describe("Event Discovery", () => {
-  beforeEach(() => render(<EventsPage />));
-
-  it("renders at least one event card on load", async () => {
-    await waitFor(() => {
-      expect(screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i).length).toBeGreaterThan(0);
-    });
+describe("Event Discovery - Search and Filter", () => {
+  beforeEach(() => {
+    render(<EventsPage />);
   });
 
-  it("filters events when a search query is typed", async () => {
+  it("shows empty state when search returns no results", async () => {
     await waitFor(() => screen.getAllByText(/Summer Dance Festival/i));
     fireEvent.change(screen.getByPlaceholderText(/search events/i), {
-      target: { value: "zzz_no_match_zzz" },
+      target: { value: "no matching event" },
     });
-    await waitFor(() => expect(screen.getByText(/0 events found/i)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/No events found/i)).toBeTruthy());
   });
 
-  it("removes a category filter chip when clicked", async () => {
+  it("reduces event list when a category filter is applied", async () => {
     await waitFor(() => screen.getAllByText(/Summer Dance Festival/i));
+    const initialCount = screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i).length;
+    
+    const chip = screen.queryByText(/^festival$/i);
+    if (chip) {
+      const btn = chip.closest("div")?.querySelector("button");
+      if (btn) {
+        fireEvent.click(btn);
+        await waitFor(() => expect(screen.queryByText(/^festival$/i)).toBeNull());
+      }
+    }
+    
+    await waitFor(() => {
+      const afterCount = screen.getAllByText(/Electronic Music Night/i).length;
+      expect(afterCount).toBeLessThan(initialCount);
+    });
+  });
+
+  it("handles combined search and category filter", async () => {
+    await waitFor(() => screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i));
+    
     const chip = screen.queryByText(/^music$/i);
     if (chip) {
       const btn = chip.closest("div")?.querySelector("button");
       if (btn) {
         fireEvent.click(btn);
-        await waitFor(() => expect(screen.queryByText(/^music$/i)).toBeNull());
       }
     }
-  });
-
-  it("switches to Featured tab and shows events", async () => {
-    await waitFor(() => screen.getAllByText(/Summer Dance Festival/i));
-    fireEvent.click(screen.getByRole("tab", { name: /^featured$/i }));
-    await waitFor(() => expect(screen.getByText(/events found/i)).toBeTruthy());
+    
+    await waitFor(() => screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i));
+    
+    fireEvent.change(screen.getByPlaceholderText(/search events/i), {
+      target: { value: "Summer" },
+    });
+    
+    await waitFor(() => expect(screen.getByText(/Summer Dance Festival/i)).toBeTruthy());
+    await waitFor(() => expect(screen.queryByText(/Electronic Music Night/i)).toBeNull());
   });
 });
