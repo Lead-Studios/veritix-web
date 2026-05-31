@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
+import { useSearchParams } from 'next/navigation';
 import CategoryFilter from '@/components/events/CategoryFilter';
 import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
@@ -14,43 +15,25 @@ const PAGE_SIZE = 9;
 
 type ViewMode = 'upcoming' | 'featured';
 
-export default function EventsPage() {
+function EventsPageContent() {
   const { events, loading, error } = useEvents();
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
+  const [locationFilter, setLocationFilter] = useState(() => searchParams.get('location') || '');
+  const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') || '');
+
+  // Sync state if URL query params change
+  useEffect(() => {
+    setSearchQuery(searchParams.get('q') || '');
+    setLocationFilter(searchParams.get('location') || '');
+    setDateFilter(searchParams.get('date') || '');
+  }, [searchParams]);
+
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  };
 
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
@@ -254,5 +237,18 @@ export default function EventsPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function EventsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#101428] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
+        <p className="text-gray-400 text-sm">Loading events page...</p>
+      </div>
+    }>
+      <EventsPageContent />
+    </Suspense>
   );
 }

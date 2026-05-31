@@ -33,3 +33,33 @@ export function validateAllTickets(tickets: TicketRow[]): Map<number, TicketVali
   });
   return result;
 }
+
+export interface TicketDetails {
+  id: string;
+  name: string;
+  price: number;
+  quantityLimit: number;
+  quantitySold: number;
+  expirationDate?: string;
+}
+
+export function validateTicketDetails(ticket: TicketDetails, purchaseQuantity: number): string[] {
+  const errors: string[] = [];
+  
+  if (purchaseQuantity < 1) {
+    errors.push("Purchase quantity must be at least 1.");
+  }
+  
+  if (ticket.expirationDate) {
+    const expDate = new Date(ticket.expirationDate);
+    if (!isNaN(expDate.getTime()) && expDate.getTime() < Date.now()) {
+      errors.push("Ticket has expired.");
+    }
+  }
+  
+  if (ticket.quantitySold + purchaseQuantity > ticket.quantityLimit) {
+    errors.push("Purchase quantity exceeds available ticket limit.");
+  }
+  
+  return errors;
+}
