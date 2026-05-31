@@ -2,10 +2,10 @@ import * as React from "react";
 import { cn } from "../lib/cn";
 
 type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "danger";
+  | "primarysolid"
+  | "secondarysolid"
+  | "outlinesolid"
+  | "dangersolid";
 
 type ButtonSize = "sm" | "md" | "lg";
 
@@ -18,13 +18,13 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
+  primarysolid:
     "bg-gradient-to-r from-[#000625] via-[#0A1854] to-[#1E3A8A] shadow-[0px_4px_12px_0px_rgba(0,6,37,0.3)] text-white",
-  secondary:
-    "",
-  outline:
+  secondarysolid:
+    "bg-gray-200 text-gray-800 hover:bg-gray-300",
+  outlinesolid:
     "border border-primary-black hover:bg-primary-black/10",
-  danger:
+  dangersolid:
     "bg-red-600 text-white hover:bg-red-700",
 };
 
@@ -40,7 +40,7 @@ export const Button = React.forwardRef<
 >(
   (
     {
-      variant = "primary",
+      variant = "primarysolid",
       size = "md",
       isLoading = false,
       leftIcon,
