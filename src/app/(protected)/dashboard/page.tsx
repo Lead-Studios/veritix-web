@@ -54,7 +54,16 @@ export default function DashboardPage() {
   const payoutsQueued = data?.payoutsQueued ?? 0
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
-  const eventImgs = data?.events?.slice(0, 4).map((e) => ({
+  // Compute week-over-week revenue trend from data.revenue
+  const revenueTrend = (() => {
+    const rev = data?.revenue ?? []
+    if (rev.length < 14) return null
+    const currentWeek = rev.slice(-7).reduce((sum, d) => sum + d.revenue, 0)
+    const lastWeek = rev.slice(-14, -7).reduce((sum, d) => sum + d.revenue, 0)
+    if (lastWeek === 0) return null
+    return ((currentWeek - lastWeek) / lastWeek) * 100
+  })()
+
   const eventImages = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
@@ -123,7 +132,13 @@ export default function DashboardPage() {
                   <div className="h-48 w-full min-h-[192px]">
                     <RevenueChart data={revenueData} />
                   </div>
-                  <p className="mt-4 text-xs text-[#21D4FF]">Trending by 18.6% in the past week ↗️</p>
+                  {revenueTrend === null ? (
+                    <p className="mt-4 text-xs text-gray-500">Insufficient data for trend</p>
+                  ) : (
+                    <p className={`mt-4 text-xs ${revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Trending by {Math.abs(revenueTrend).toFixed(1)}% {revenueTrend >= 0 ? '↗️' : '↘️'} this week
+                    </p>
+                  )}
                 </Card>
 
                 <Card>
@@ -155,7 +170,7 @@ export default function DashboardPage() {
                     <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {eventImgs.map((image, index) => (
+                    {eventImages.map((image, index) => (
                       <EventImage key={index} src={image.src} alt={image.alt} />
                     ))}
                   </div>
