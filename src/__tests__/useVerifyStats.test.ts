@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useVerifyStats } from '../hooks/useVerifyStats'
 
 const MOCK_STATS = { capacity: 500, totalScanned: 120, remaining: 380 }

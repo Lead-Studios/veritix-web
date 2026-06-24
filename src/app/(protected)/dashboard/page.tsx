@@ -54,7 +54,6 @@ export default function DashboardPage() {
   const payoutsQueued = data?.payoutsQueued ?? 0
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
-  const eventImgs = data?.events?.slice(0, 4).map((e) => ({
   const eventImages = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
@@ -155,7 +154,7 @@ export default function DashboardPage() {
                     <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {eventImgs.map((image, index) => (
+                    {eventImages.map((image, index) => (
                       <EventImage key={index} src={image.src} alt={image.alt} />
                     ))}
                   </div>

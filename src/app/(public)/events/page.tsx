@@ -27,8 +27,11 @@ function EventsPageContent() {
 
   // Sync state if URL query params change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery(searchParams.get('q') || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocationFilter(searchParams.get('location') || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDateFilter(searchParams.get('date') || '');
   }, [searchParams]);
 
@@ -51,6 +54,7 @@ function EventsPageContent() {
   }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Reset visible count when filters change
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Infinite scroll via IntersectionObserver

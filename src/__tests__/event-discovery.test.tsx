@@ -17,7 +17,8 @@ vi.mock("@/lib/eventsApi", () => ({
   fetchEventById: (id: string) => Promise.resolve(mockEvents.find((e) => e.id === id) ?? null),
 }));
 vi.mock("framer-motion", () => {
-  const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react") as typeof import("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
       ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
