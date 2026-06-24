@@ -1,39 +1,35 @@
-"use client";
+'use client';
 
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+}
 
 interface AuthContextValue {
-  user: unknown;
+  user: AuthUser | null;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<unknown>(null);
-import { createContext, useState, useEffect } from "react";
-
-export const AuthContext = createContext<{
-  user: { id: string; email: string; name?: string } | null;
-  loading: boolean;
-} | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
-'use client';
-
-import React, { createContext, useState, useEffect } from 'react';
-
-const AuthContext = createContext<{ user: unknown; loading: boolean } | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const bootstrap = async () => {
       const token =
-        localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
+        localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
 
       if (!token) {
         setLoading(false);
@@ -41,17 +37,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch('/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        const userData = await res.json();
+        const userData: AuthUser = await res.json();
         setUser(userData);
-        const data = await res.json();
-        setUser(data);
       } catch {
-        localStorage.removeItem("auth_token");
-        sessionStorage.removeItem("auth_token");
+        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('auth_token');
       } finally {
         setLoading(false);
       }
