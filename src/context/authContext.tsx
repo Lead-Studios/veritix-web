@@ -1,17 +1,6 @@
-"use client";
+'use client';
 
-import { createContext, useState, useEffect } from 'react';
-
-interface AuthContextValue {
-  user: unknown;
-  loading: boolean;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<unknown>(null);
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext<{
   user: { id: string; email: string; name?: string } | null;
@@ -20,14 +9,6 @@ export const AuthContext = createContext<{
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
-'use client';
-
-import React, { createContext, useState, useEffect } from 'react';
-
-const AuthContext = createContext<{ user: unknown; loading: boolean } | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +25,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await fetch("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        const userData = await res.json();
-        setUser(userData);
         const data = await res.json();
         setUser(data);
       } catch {

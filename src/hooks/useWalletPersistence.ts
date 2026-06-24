@@ -39,6 +39,7 @@ export function useWalletPersistence() {
 
   // Hydrate from sessionStorage on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setWalletState(readWallet());
   }, []);
 

@@ -21,11 +21,12 @@ vi.mock("next/navigation", () => ({
 vi.mock("react-toastify", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("framer-motion", () => {
-  const React = require("react");
-  const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
-  ["div", "form", "h2", "p"].forEach((tag) => {
-    motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);
-  });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react") as typeof import("react");
+  const tags = ["div", "form", "h2", "p"] as const;
+  const motion = Object.fromEntries(
+    tags.map((tag) => [tag, ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => React.createElement(tag, rest, children)])
+  );
   return { motion, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 

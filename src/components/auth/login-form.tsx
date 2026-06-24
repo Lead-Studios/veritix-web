@@ -13,7 +13,6 @@ import { motion } from "framer-motion";
 import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FcGoogle } from "react-icons/fc";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),

@@ -13,6 +13,8 @@ export const fadeIn: Variants = {
 export const slideUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
 export const fadeInDown: Variants = {
   hidden: { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0 },
@@ -20,7 +22,7 @@ export const fadeInDown: Variants = {
 
 export const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
 };
 
 export const slideInLeft: Variants = {
@@ -41,7 +43,20 @@ export const staggerContainer: Variants = {
   },
 };
 
-export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+export const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+export const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+export const headerVariants: Variants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0 },
 };

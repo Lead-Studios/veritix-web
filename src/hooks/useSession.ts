@@ -19,6 +19,18 @@ export function isTokenExpired(token: string): boolean {
 }
 
 /**
+ * Returns the expiry time of the token in milliseconds, or null if invalid.
+ */
+export function getTokenExpiry(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Returns milliseconds until the token expires, or 0 if already expired.
  */
 function msUntilExpiry(token: string): number {

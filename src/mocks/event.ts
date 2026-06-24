@@ -194,7 +194,7 @@ export const mockEvents: Event[] = [
     venue: "Central Park",
     price: "0.05 ETH",
     priceInEth: 0.05,
-    category: "vip",
+    category: "music",
     featured: false,
     attendees: 800,
     description:
@@ -229,7 +229,7 @@ export const mockEvents: Event[] = [
     venue: "Central Park",
     price: "0.05 ETH",
     priceInEth: 0.05,
-    category: "vip",
+    category: "music",
     featured: false,
     attendees: 800,
   },
