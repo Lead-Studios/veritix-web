@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useVerifyStats } from '@/hooks/useVerifyStats';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HiArrowLeft,
@@ -258,6 +258,9 @@ function Detail({ label, value, mono = false }: { label: string; value: string; 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function VerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get('eventId');
+  const { stats, loading: statsLoading } = useVerifyStats(eventId);
   const [code, setCode] = useState('');
   const [verifyState, setVerifyState] = useState<VerifyState>('idle');
   const [usedCodes] = useState<Set<string>>(new Set());
@@ -496,19 +499,52 @@ export default function VerifyPage() {
             transition={{ delay: 0.3 }}
             className="grid grid-cols-3 gap-3"
           >
-            {[
-              { label: 'Checked In', value: '1,284', color: 'text-emerald-400' },
-              { label: 'Capacity', value: '5,000', color: 'text-[#21D4FF]' },
-              { label: 'Remaining', value: '3,716', color: 'text-gray-400' },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
-              >
-                <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
-              </div>
-            ))}
+            {(() => {
+              if (!eventId) {
+                return (
+                  ['Checked In', 'Capacity', 'Remaining'].map((label) => (
+                    <div
+                      key={label}
+                      className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                      title="Select an event to see live stats"
+                    >
+                      <p className="text-xl font-bold text-gray-500">—</p>
+                      <p className="text-gray-500 text-xs mt-0.5">{label}</p>
+                    </div>
+                  ))
+                );
+              }
+
+              if (statsLoading) {
+                return (
+                  ['Checked In', 'Capacity', 'Remaining'].map((label) => (
+                    <div
+                      key={label}
+                      className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                    >
+                      <div className="h-7 w-16 mx-auto rounded bg-white/10 animate-pulse" />
+                      <p className="text-gray-500 text-xs mt-0.5">{label}</p>
+                    </div>
+                  ))
+                );
+              }
+
+              const statItems = [
+                { label: 'Checked In', value: stats?.totalScanned?.toLocaleString() ?? '—', color: 'text-emerald-400' },
+                { label: 'Capacity', value: stats?.capacity?.toLocaleString() ?? '—', color: 'text-[#21D4FF]' },
+                { label: 'Remaining', value: stats?.remaining?.toLocaleString() ?? '—', color: 'text-gray-400' },
+              ];
+
+              return statItems.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                >
+                  <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
+                </div>
+              ));
+            })()}
           </motion.div>
         </div>
       </section>
