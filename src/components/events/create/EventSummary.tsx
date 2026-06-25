@@ -10,14 +10,19 @@ interface EventSummaryProps {
 }
 
 export default function EventSummary({ formData }: EventSummaryProps) {
-  const coverImageUrl = useMemo(
-    () => (formData.coverImage ? URL.createObjectURL(formData.coverImage) : null),
-    [formData.coverImage]
-  );
+  const coverImageUrl = useMemo(() => {
+    if (!formData.coverImage) return null;
+    if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+      return URL.createObjectURL(formData.coverImage);
+    }
+    return null;
+  }, [formData.coverImage]);
 
   useEffect(() => {
     return () => {
-      if (coverImageUrl) URL.revokeObjectURL(coverImageUrl);
+      if (coverImageUrl && typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+        URL.revokeObjectURL(coverImageUrl);
+      }
     };
   }, [coverImageUrl]);
   const formatDate = (date: string, time: string) => {
@@ -83,9 +88,9 @@ export default function EventSummary({ formData }: EventSummaryProps) {
       <div className="space-y-4">
         {/* Cover Image Preview */}
         <div className="w-full h-32 bg-gray-800 rounded-lg overflow-hidden relative">
-          {formData.coverImage ? (
+          {formData.coverImage && coverImageUrl ? (
             <Image
-              src={coverImageUrl!}
+              src={coverImageUrl}
               alt="Event cover"
               fill
               unoptimized

@@ -21,14 +21,19 @@ export function isTokenExpired(token: string): boolean {
 /**
  * Returns milliseconds until the token expires, or 0 if already expired.
  */
-function msUntilExpiry(token: string): number {
+export function getTokenExpiry(token: string): number | null {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    if (typeof payload.exp !== "number") return 0;
-    return Math.max(0, payload.exp * 1000 - Date.now());
+    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
   } catch {
-    return 0;
+    return null;
   }
+}
+
+function msUntilExpiry(token: string): number {
+  const expiry = getTokenExpiry(token);
+  if (expiry === null) return 0;
+  return Math.max(0, expiry - Date.now());
 }
 
 /**

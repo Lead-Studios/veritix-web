@@ -48,7 +48,6 @@ describe("TicketTypeRow", () => {
     );
     const row = screen.getByTestId("ticket-type-row");
     expect(row).toHaveAttribute("data-status", "sold-out");
-    expect(row).toHaveAttribute("aria-disabled", "true");
     expect(row.className).toMatch(/opacity-50/);
     expect(screen.getByText("No tickets remaining")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Sold Out");

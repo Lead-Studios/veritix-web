@@ -2,6 +2,7 @@
  * Auth form tests – covers validation rules and submit-state behaviour
  * for the login and sign-up flows (issues #105 / FE-014).
  */
+import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
