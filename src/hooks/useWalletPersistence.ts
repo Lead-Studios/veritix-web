@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 export interface PersistedWallet {
   address: string;
@@ -35,12 +35,7 @@ function writeWallet(wallet: PersistedWallet | null): void {
  * expected behaviour for a wallet session.
  */
 export function useWalletPersistence() {
-  const [wallet, setWalletState] = useState<PersistedWallet | null>(null);
-
-  // Hydrate from sessionStorage on mount
-  useEffect(() => {
-    setWalletState(readWallet());
-  }, []);
+  const [wallet, setWalletState] = useState<PersistedWallet | null>(() => readWallet());
 
   const setWallet = useCallback((w: PersistedWallet | null) => {
     writeWallet(w);

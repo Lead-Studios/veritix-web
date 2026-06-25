@@ -15,7 +15,6 @@ export function TicketTypeRow({ ticket }: TicketTypeRowProps) {
     <li
       data-testid="ticket-type-row"
       data-status={status}
-      aria-disabled={isSoldOut || undefined}
       className={`flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#4D21FF]/30 bg-[#000625] px-5 py-4 transition-colors ${
         isSoldOut
           ? "opacity-50 grayscale"

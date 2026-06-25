@@ -1,40 +1,26 @@
 "use client";
 
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from "react";
 
 interface AuthContextValue {
-  user: unknown;
+  user: { id: string; email: string; name?: string } | null;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<unknown>(null);
-import { createContext, useState, useEffect } from "react";
-
-export const AuthContext = createContext<{
-  user: { id: string; email: string; name?: string } | null;
-  loading: boolean;
-} | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
-'use client';
-
-import React, { createContext, useState, useEffect } from 'react';
-
-const AuthContext = createContext<{ user: unknown; loading: boolean } | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<AuthContextValue["user"]>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+
     const bootstrap = async () => {
       const token =
         localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
 
+      if (!active) return;
       if (!token) {
         setLoading(false);
         return;
@@ -45,19 +31,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        if (!active) return;
         const userData = await res.json();
+        if (!active) return;
         setUser(userData);
-        const data = await res.json();
-        setUser(data);
       } catch {
         localStorage.removeItem("auth_token");
         sessionStorage.removeItem("auth_token");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
-    bootstrap();
+    void bootstrap();
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (

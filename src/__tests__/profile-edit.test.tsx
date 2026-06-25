@@ -4,7 +4,6 @@
  * and API error toast.
  */
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── mocks ────────────────────────────────────────────────────────────────────
@@ -14,7 +13,6 @@ vi.mock("react-toastify", () => ({
 }));
 
 vi.mock("framer-motion", () => {
-  const React = require("react");
   const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
   ["div", "form", "h2", "p"].forEach((tag) => {
     motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);

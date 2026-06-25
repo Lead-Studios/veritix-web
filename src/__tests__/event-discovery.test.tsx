@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import EventsPage from "@/app/(public)/events/page";
 import { mockEvents } from "@/mocks/events";
 
@@ -17,7 +16,6 @@ vi.mock("@/lib/eventsApi", () => ({
   fetchEventById: (id: string) => Promise.resolve(mockEvents.find((e) => e.id === id) ?? null),
 }));
 vi.mock("framer-motion", () => {
-  const React = require("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
       ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>

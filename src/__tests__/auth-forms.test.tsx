@@ -3,7 +3,6 @@
  * for the login and sign-up flows (issues #105 / FE-014).
  */
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── mocks ──────────────────────────────────────────────────────────────────
@@ -21,7 +20,6 @@ vi.mock("next/navigation", () => ({
 vi.mock("react-toastify", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("framer-motion", () => {
-  const React = require("react");
   const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
   ["div", "form", "h2", "p"].forEach((tag) => {
     motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);

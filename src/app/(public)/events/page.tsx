@@ -19,20 +19,32 @@ function EventsPageContent() {
   const { events, loading, error } = useEvents();
   const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
-  
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
   const [locationFilter, setLocationFilter] = useState(() => searchParams.get('location') || '');
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') || '');
 
-  // Sync state if URL query params change
-  useEffect(() => {
-    setSearchQuery(searchParams.get('q') || '');
-    setLocationFilter(searchParams.get('location') || '');
-    setDateFilter(searchParams.get('date') || '');
-  }, [searchParams]);
-
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const handleSearchQueryChange = (value: string) => {
+    setSearchQuery(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const handleLocationFilterChange = (value: string) => {
+    setLocationFilter(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const handleDateFilterChange = (value: string) => {
+    setDateFilter(value);
+    setVisibleCount(PAGE_SIZE);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setViewMode(tab === 'Upcoming Events' ? 'upcoming' : 'featured');
+    setVisibleCount(PAGE_SIZE);
+  };
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const filteredEvents = useMemo(() => {
@@ -49,9 +61,6 @@ function EventsPageContent() {
     if (dateFilter.trim()) list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
     return list;
   }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
-
-  // Reset visible count when filters change
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Infinite scroll via IntersectionObserver
   const loadMore = useCallback(() => {
@@ -71,6 +80,7 @@ function EventsPageContent() {
 
   const removeFilter = (filter: string) => {
     setActiveFilters((prev) => prev.filter((f) => f !== filter));
+    setVisibleCount(PAGE_SIZE);
   };
 
   return (
@@ -109,7 +119,7 @@ function EventsPageContent() {
                 icon={HiSearch}
                 placeholder="Search events, artists, or venues"
                 value={searchQuery}
-                onChange={setSearchQuery}
+                onChange={handleSearchQueryChange}
                 focusColor="#6B8CFF"
                 rounded="rounded-lg"
                 inputClassName="py-3"
@@ -120,7 +130,7 @@ function EventsPageContent() {
                 icon={HiLocationMarker}
                 placeholder="Location"
                 value={locationFilter}
-                onChange={setLocationFilter}
+                onChange={handleLocationFilterChange}
                 focusColor="#6B8CFF"
                 rounded="rounded-lg"
                 inputClassName="py-3"
@@ -131,7 +141,7 @@ function EventsPageContent() {
                 icon={HiCalendar}
                 placeholder="Date"
                 value={dateFilter}
-                onChange={setDateFilter}
+                onChange={handleDateFilterChange}
                 focusColor="#6B8CFF"
                 rounded="rounded-lg"
                 inputClassName="py-3"
@@ -139,7 +149,14 @@ function EventsPageContent() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CategoryFilter activeFilters={activeFilters} onRemoveFilter={removeFilter} onClearAll={() => setActiveFilters([])} />
+            <CategoryFilter
+              activeFilters={activeFilters}
+              onRemoveFilter={removeFilter}
+              onClearAll={() => {
+                setActiveFilters([]);
+                setVisibleCount(PAGE_SIZE);
+              }}
+            />
             <motion.p
               key={filteredEvents.length}
               initial={{ opacity: 0 }}
@@ -155,7 +172,7 @@ function EventsPageContent() {
       <TabSelector
         tabs={['Upcoming Events', 'Featured']}
         activeTab={viewMode === 'upcoming' ? 'Upcoming Events' : 'Featured'}
-        onTabChange={(tab) => setViewMode(tab === 'Upcoming Events' ? 'upcoming' : 'featured')}
+        onTabChange={handleTabChange}
       />
 
       <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">

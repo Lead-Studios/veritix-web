@@ -13,6 +13,7 @@ export const fadeIn: Variants = {
 export const slideUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 export const fadeInDown: Variants = {
   hidden: { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0 },

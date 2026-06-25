@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useRef, useMemo, useState } from "react";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_MB = 5;

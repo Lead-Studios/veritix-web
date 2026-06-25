@@ -1,3 +1,5 @@
+import React from "react";
+import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CreateEventPage from "@/app/(protected)/events/create/page";
@@ -8,7 +10,6 @@ vi.mock("next/link", () => ({
     <a href={href}>{children}</a>,
 }));
 vi.mock("framer-motion", () => {
-  const React = require("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
       ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>

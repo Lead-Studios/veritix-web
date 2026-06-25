@@ -23,7 +23,6 @@ export async function fetchEventById(id: string): Promise<Event | null> {
 
 export async function fetchOrganizerById(id: string): Promise<Organizer | null> {
   if (!API_BASE) {
-    const organizerNames = [...new Set(mockEvents.map(e => e.organizer?.name).filter(Boolean))];
     const organizerMap: Record<string, Organizer> = {
       "Rhythm Nation Collective": {
         id: "rhythm-nation-collective",

@@ -28,9 +28,6 @@ const LandingFooter = dynamic(
   { ssr: false, loading: () => <div className="bg-[#050a1f] py-16 h-48 animate-pulse" /> }
 );
 
-// Lazy-load below-the-fold newsletter form to reduce initial bundle
-const LazyNewsletterForm = dynamic(() => import("@/components/NewsletterForm"), { ssr: false });
-
 const MotionLink = motion(Link);
 
 const fadeUp = {

@@ -34,8 +34,6 @@ export default function ManageEventPage() {
     error: inventoryError,
     refresh,
   } = useEventInventory(eventId);
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
@@ -132,6 +130,8 @@ export default function ManageEventPage() {
         </section>
       </div>
     </div>
+  );
+
   const handleConfirmCancel = async () => {
     if (!event || submitting) return;
     setSubmitting(true);

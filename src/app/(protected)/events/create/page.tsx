@@ -116,7 +116,6 @@ export default function CreateEventPage() {
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [draftRestored, setDraftRestored] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
   // Restore draft from localStorage on mount
@@ -128,7 +127,6 @@ export default function CreateEventPage() {
         // coverImage and gallery are File objects — can't be serialised, skip them
         const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
         setFormData((prev) => ({ ...prev, ...rest }));
-        setDraftRestored(true);
       }
     } catch {
       // ignore corrupt data
