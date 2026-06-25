@@ -67,11 +67,6 @@ export default function LoginForm() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
-  const headerVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
-  };
-
   return (
     <motion.div
       className="flex flex-col justify-between h-full py-6"

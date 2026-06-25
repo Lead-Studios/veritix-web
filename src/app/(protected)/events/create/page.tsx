@@ -126,6 +126,8 @@ export default function CreateEventPage() {
         const saved = JSON.parse(raw) as Partial<EventFormData>;
         // coverImage and gallery are File objects — can't be serialised, skip them
         const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
+        void _ci;
+        void _g;
         setFormData((prev) => ({ ...prev, ...rest }));
       }
     } catch {
@@ -141,6 +143,8 @@ export default function CreateEventPage() {
       // Persist serialisable fields to localStorage
       try {
         const { coverImage: _ci, gallery: _g, ...serialisable } = next;
+        void _ci;
+        void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
         // quota exceeded or SSR — ignore
@@ -195,6 +199,8 @@ export default function CreateEventPage() {
   const handleSaveDraft = () => {
     try {
       const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
+      void _ci;
+      void _g;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       setIsDirty(false);
     } catch {
