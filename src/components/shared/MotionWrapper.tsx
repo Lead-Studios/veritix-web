@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { resolveMotionVariants, getTransition } from "@/lib/animations";
 import { useMotionPreferences } from "@/hooks/useMotionPreferences";
 
 type Props = {
   children: React.ReactNode;
-  variants: any;
+  variants: Variants;
   className?: string;
 };
 

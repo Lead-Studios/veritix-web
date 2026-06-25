@@ -34,22 +34,35 @@ export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavD
   // Fetch XLM balance from Horizon when dropdown opens
   useEffect(() => {
     if (!open || balance !== null) return;
-    setLoadingBalance(true);
-    const horizonBase =
-      network.toLowerCase().includes("test")
-        ? "https://horizon-testnet.stellar.org"
-        : "https://horizon.stellar.org";
+    let active = true;
 
-    fetch(`${horizonBase}/accounts/${address}`)
-      .then((r) => r.json())
-      .then((data) => {
+    const loadBalance = async () => {
+      setLoadingBalance(true);
+      const horizonBase =
+        network.toLowerCase().includes("test")
+          ? "https://horizon-testnet.stellar.org"
+          : "https://horizon.stellar.org";
+
+      try {
+        const response = await fetch(`${horizonBase}/accounts/${address}`);
+        const data = await response.json();
         const xlm = (data.balances as { asset_type: string; balance: string }[])?.find(
           (b) => b.asset_type === "native"
         );
+        if (!active) return;
         setBalance(xlm ? `${parseFloat(xlm.balance).toFixed(2)} XLM` : "—");
-      })
-      .catch(() => setBalance("—"))
-      .finally(() => setLoadingBalance(false));
+      } catch {
+        if (!active) return;
+        setBalance("—");
+      } finally {
+        if (active) setLoadingBalance(false);
+      }
+    };
+
+    void loadBalance();
+    return () => {
+      active = false;
+    };
   }, [open, address, network, balance]);
 
   return (

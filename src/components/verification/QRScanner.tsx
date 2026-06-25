@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { HiCamera, HiX, HiSwitchHorizontal, HiOutlinePause, HiOutlinePlay, HiQrcode } from "react-icons/hi";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { HiCamera, HiSwitchHorizontal, HiOutlinePause, HiOutlinePlay } from "react-icons/hi";
 
 interface QRScannerProps {
   onScan: (decoded: string) => void;
@@ -10,7 +10,14 @@ interface QRScannerProps {
   mode: "camera" | "manual";
 }
 
-const hasBarcodeDetector = typeof window !== "undefined" && "BarcodeDetector" in window;
+type BarcodeDetectorConstructor = new (options?: { formats?: string[] }) => {
+  detect(target: HTMLVideoElement | ImageBitmap | ImageData): Promise<Array<{ rawValue?: string }>>;
+};
+
+const hasBarcodeDetector =
+  typeof window !== "undefined" &&
+  "BarcodeDetector" in window &&
+  typeof (window as unknown as { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector === "function";
 
 function buildVideoConstraints() {
   return {
@@ -31,9 +38,7 @@ export default function QRScanner({ onScan, onError, onModeChange, mode }: QRSca
   const [scanning, setScanning] = useState(false);
   const [cameraSupported, setCameraSupported] = useState(false);
 
-  const isDesktop = useMemo(() => window?.innerWidth >= 1024, []);
-
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (scanLoopRef.current !== null) {
       window.clearInterval(scanLoopRef.current);
       scanLoopRef.current = null;
@@ -43,7 +48,7 @@ export default function QRScanner({ onScan, onError, onModeChange, mode }: QRSca
       streamRef.current = null;
     }
     setScanning(false);
-  };
+  }, []);
 
   const captureFrame = async (): Promise<Blob | null> => {
     const video = videoRef.current;
@@ -57,18 +62,24 @@ export default function QRScanner({ onScan, onError, onModeChange, mode }: QRSca
     return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
   };
 
-  const scanFrame = async () => {
+  const scanFrame = useCallback(async () => {
     if (!videoRef.current) return;
     if (hasBarcodeDetector) {
       try {
-        const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
-        const barcodes = await detector.detect(videoRef.current);
-        if (barcodes.length > 0 && barcodes[0].rawValue) {
-          onScan(barcodes[0].rawValue);
-          stopCamera();
+        const BarcodeDetectorClass = (window as unknown as {
+          BarcodeDetector?: BarcodeDetectorConstructor;
+        }).BarcodeDetector;
+
+        if (BarcodeDetectorClass) {
+          const detector = new BarcodeDetectorClass({ formats: ["qr_code"] });
+          const barcodes = await detector.detect(videoRef.current);
+          if (barcodes.length > 0 && barcodes[0].rawValue) {
+            onScan(barcodes[0].rawValue);
+            stopCamera();
+          }
+          return;
         }
-        return;
-      } catch (error) {
+      } catch {
         // fallback to manual scanning if the API throws
       }
     }
@@ -85,19 +96,24 @@ export default function QRScanner({ onScan, onError, onModeChange, mode }: QRSca
       if (!ctx) return;
       ctx.drawImage(imageBitmap, 0, 0);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const barcodeDetector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
-      const barcodes = await barcodeDetector.detect(imageData);
+      const BarcodeDetectorClass = (window as unknown as {
+        BarcodeDetector?: BarcodeDetectorConstructor;
+      }).BarcodeDetector;
+
+      if (!BarcodeDetectorClass) return;
+      const detector = new BarcodeDetectorClass({ formats: ["qr_code"] });
+      const barcodes = await detector.detect(imageData);
       if (barcodes.length > 0 && barcodes[0].rawValue) {
         onScan(barcodes[0].rawValue);
         stopCamera();
       }
-    } catch (err) {
+    } catch {
       onError("Unable to scan from the camera feed. Please use manual entry.");
       stopCamera();
     }
-  };
+  }, [onError, onScan, stopCamera]);
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(buildVideoConstraints());
       streamRef.current = stream;
@@ -108,19 +124,28 @@ export default function QRScanner({ onScan, onError, onModeChange, mode }: QRSca
       }
       setScanning(true);
       scanLoopRef.current = window.setInterval(scanFrame, 900);
-    } catch (error) {
+    } catch {
       setPermissionState("denied");
       onError("Camera access denied. Please use manual ticket entry instead.");
     }
-  };
+  }, [onError, scanFrame]);
 
   useEffect(() => {
-    setCameraSupported(!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
-    if (mode === "camera") {
-      startCamera();
-    }
-    return () => stopCamera();
-  }, [mode]);
+    let active = true;
+    const initCamera = async () => {
+      if (!active) return;
+      setCameraSupported(!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+      if (mode === "camera") {
+        await startCamera();
+      }
+    };
+
+    void initCamera();
+    return () => {
+      active = false;
+      stopCamera();
+    };
+  }, [mode, startCamera, stopCamera]);
 
   return (
     <div className="rounded-3xl border border-white/10 bg-[#020718]/80 p-6">

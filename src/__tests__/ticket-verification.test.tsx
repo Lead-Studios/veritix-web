@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -7,7 +8,6 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({ get: vi.fn(() => null) }),
 }));
 vi.mock("framer-motion", () => {
-  const React = require("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
       ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
@@ -17,15 +17,6 @@ vi.mock("framer-motion", () => {
 });
 
 import VerifyPage from "@/app/(protected)/verify/page";
-vi.mock("framer-motion", () => {
-  const React = require("react");
-  const proxy = new Proxy({}, {
-    get: (_t, tag: string) =>
-      ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
-        React.createElement(tag === "button" ? "button" : "div", rest, children),
-  });
-  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
-});
 
 const VALID_ID = "TKT-2024-ALPHA-001";
 const INVALID_ID = "TKT-INVALID-000";
