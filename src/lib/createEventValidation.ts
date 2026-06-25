@@ -68,13 +68,20 @@ export const createEventSchema = z
 
     // Location
     eventType: z.enum(["physical", "online", "hybrid"]),
+    category: z.enum(["music", "festival", "sports", "art", "theater", "comedy", "conference", "workshop"]),
     venueName: z.string().optional(),
     address: z.string().optional(),
     city: z.string().optional(),
+    countryCode: z
+      .string()
+      .min(2, "Country code is required")
+      .regex(/^[A-Za-z]{2}$/, "Country code must be a 2-letter ISO code"),
     state: z.string().optional(),
     zipCode: z.string().optional(),
     latitude: z.number().nullable().optional(),
     longitude: z.number().nullable().optional(),
+    capacity: z.number({ error: "Capacity must be a number" }).int().min(1, "Capacity must be at least 1"),
+    eventClosingDate: z.string().optional(),
     streamingUrl: z.string().optional(),
 
     // Tickets
@@ -98,6 +105,18 @@ export const createEventSchema = z
           code: z.ZodIssueCode.custom,
           message: "End date/time must be after start date/time",
           path: ["endDate"],
+        });
+      }
+    }
+
+    if (data.eventClosingDate) {
+      const start = data.startDate ? new Date(`${data.startDate}T${data.startTime || "00:00"}`) : null;
+      const closing = new Date(`${data.eventClosingDate}T00:00`);
+      if (start && !isNaN(start.getTime()) && !isNaN(closing.getTime()) && closing <= start) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Closing date must be after the event start date",
+          path: ["eventClosingDate"],
         });
       }
     }
@@ -216,10 +235,10 @@ export function parseCreateEventErrors(
 
 /** Returns a human-readable section label for a field path */
 export function sectionForField(field: string): string {
-  if (["title", "description", "coverImage"].includes(field)) return "Basic Information";
+  if (["title", "description", "coverImage", "category"].includes(field)) return "Basic Information";
   if (field.startsWith("recurrence")) return "Recurrence";
-  if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "Date & Time";
-  if (["venueName", "address", "city", "state", "zipCode", "streamingUrl"].includes(field)) return "Location";
+  if (["startDate", "startTime", "endDate", "endTime", "eventClosingDate"].includes(field)) return "Date & Time";
+  if (["venueName", "address", "city", "countryCode", "state", "zipCode", "capacity", "streamingUrl"].includes(field)) return "Location";
   if (field.startsWith("tickets")) return "Ticket Information";
   if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "Blockchain Setting";
   return "General";
@@ -227,10 +246,10 @@ export function sectionForField(field: string): string {
 
 /** Returns the section id (data-section attribute) for a field */
 export function sectionIdForField(field: string): string {
-  if (["title", "description", "coverImage"].includes(field)) return "section-basic";
+  if (["title", "description", "coverImage", "category"].includes(field)) return "section-basic";
   if (field.startsWith("recurrence")) return "section-recurrence";
-  if (["startDate", "startTime", "endDate", "endTime"].includes(field)) return "section-datetime";
-  if (["venueName", "address", "city", "state", "zipCode", "streamingUrl"].includes(field)) return "section-location";
+  if (["startDate", "startTime", "endDate", "endTime", "eventClosingDate"].includes(field)) return "section-datetime";
+  if (["venueName", "address", "city", "countryCode", "state", "zipCode", "capacity", "streamingUrl"].includes(field)) return "section-location";
   if (field.startsWith("tickets")) return "section-tickets";
   if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "section-blockchain";
   return "";

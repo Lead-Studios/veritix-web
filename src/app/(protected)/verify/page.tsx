@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HiArrowLeft,
@@ -13,6 +12,8 @@ import {
   HiRefresh,
   HiSearch,
 } from 'react-icons/hi';
+import QRScanner from '@/components/verification/QRScanner';
+import { useVerifyStats } from '@/hooks/useVerifyStats';
 import {
   getVerificationErrorMessage,
   type VerificationErrorType,
@@ -258,45 +259,59 @@ function Detail({ label, value, mono = false }: { label: string; value: string; 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function VerifyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get('eventId');
+  const { stats, loading: statsLoading } = useVerifyStats(eventId);
   const [code, setCode] = useState('');
   const [verifyState, setVerifyState] = useState<VerifyState>('idle');
   const [usedCodes] = useState<Set<string>>(new Set());
+  const [scannerError, setScannerError] = useState<string | null>(null);
+  const [mode, setMode] = useState<'camera' | 'manual'>('manual');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Autofocus input on mount
-  useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setMode(window.innerWidth < 768 ? 'camera' : 'manual');
+    inputRef.current?.focus();
+  }, []);
+
+  const verifyCode = (ticketCode: string) => {
+    const upper = ticketCode.trim().toUpperCase();
+    if (!upper) return;
+
+    // Deterministic service error for testing
+    if (upper === 'TKT-SERVICE-ERR') {
+      setVerifyState('service-error');
+      return;
+    }
+
+    const simulateServiceError = Math.random() < 0.1;
+    if (simulateServiceError) {
+      setVerifyState('service-error');
+      return;
+    }
+
+    if (usedCodes.has(upper)) {
+      setVerifyState('already-used');
+    } else if (VALID_TICKETS[upper]) {
+      usedCodes.add(upper);
+      setVerifyState('success');
+    } else {
+      setVerifyState('failure');
+    }
+  };
 
   const handleVerify = () => {
     if (!code.trim()) return;
     setVerifyState('loading');
+    setTimeout(() => verifyCode(code), 900);
+  };
 
-    // Simulate async check with potential service failure
-    setTimeout(() => {
-      const upper = code.trim().toUpperCase();
-      
-      // Deterministic service error for testing
-      if (upper === 'TKT-SERVICE-ERR') {
-        setVerifyState('service-error');
-        return;
-      }
-
-      // Simulate random service failure (10% chance for other codes)
-      const simulateServiceError = Math.random() < 0.1;
-      
-      if (simulateServiceError) {
-        setVerifyState('service-error');
-        return;
-      }
-
-      if (usedCodes.has(upper)) {
-        setVerifyState('already-used');
-      } else if (VALID_TICKETS[upper]) {
-        usedCodes.add(upper);
-        setVerifyState('success');
-      } else {
-        setVerifyState('failure');
-      }
-    }, 900);
+  const handleScan = (decoded: string) => {
+    setScannerError(null);
+    setCode(decoded);
+    setVerifyState('loading');
+    setTimeout(() => verifyCode(decoded), 900);
   };
 
   const handleReset = () => {
@@ -307,17 +322,7 @@ export default function VerifyPage() {
 
   const handleRetry = () => {
     setVerifyState('loading');
-    setTimeout(() => {
-      const upper = code.trim().toUpperCase();
-      if (usedCodes.has(upper)) {
-        setVerifyState('already-used');
-      } else if (VALID_TICKETS[upper]) {
-        usedCodes.add(upper);
-        setVerifyState('success');
-      } else {
-        setVerifyState('failure');
-      }
-    }, 900);
+    setTimeout(() => verifyCode(code), 900);
   };
 
   const isChecking = verifyState === 'loading';
@@ -372,9 +377,8 @@ export default function VerifyPage() {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="max-w-2xl mx-auto space-y-6">
 
-          {/* Scanner Placeholder Card */}
           <AnimatePresence>
-            {verifyState === 'idle' && (
+            {!hasResult && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -383,13 +387,23 @@ export default function VerifyPage() {
               >
                 <div className="bg-[#4D21FF] px-6 py-4">
                   <h2 className="text-base font-bold text-white">Scan QR Code</h2>
-                  <p className="text-blue-200 text-xs mt-0.5">Point camera at attendee&apos;s ticket QR</p>
+                  <p className="text-blue-200 text-xs mt-0.5">Use camera scanning or manual lookup</p>
                 </div>
-                <div className="p-8">
-                  <ScanFrame />
-                  <p className="text-center text-gray-500 text-xs mt-6">
-                    Camera scanning not required — enter code manually below
-                  </p>
+                <div className="p-8 space-y-4">
+                  <QRScanner
+                    mode={mode}
+                    onModeChange={(nextMode) => {
+                      setMode(nextMode);
+                      setScannerError(null);
+                    }}
+                    onScan={handleScan}
+                    onError={(message) => setScannerError(message)}
+                  />
+                  {scannerError && (
+                    <div className="rounded-2xl border border-red-500/30 bg-red-950/60 px-4 py-3 text-sm text-red-300">
+                      {scannerError}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -497,12 +511,41 @@ export default function VerifyPage() {
             className="grid grid-cols-3 gap-3"
           >
             {[
-              { label: 'Checked In', value: '1,284', color: 'text-emerald-400' },
-              { label: 'Capacity', value: '5,000', color: 'text-[#21D4FF]' },
-              { label: 'Remaining', value: '3,716', color: 'text-gray-400' },
+              {
+                label: 'Checked In',
+                value: eventId
+                  ? statsLoading
+                    ? 'Loading…'
+                    : stats?.totalScanned?.toLocaleString() ?? '—'
+                  : '—',
+                color: 'text-emerald-400',
+              },
+              {
+                label: 'Capacity',
+                value: eventId
+                  ? statsLoading
+                    ? 'Loading…'
+                    : stats?.capacity?.toLocaleString() ?? '—'
+                  : '—',
+                color: 'text-[#21D4FF]',
+              },
+              {
+                label: 'Remaining',
+                value: eventId
+                  ? statsLoading
+                    ? 'Loading…'
+                    : stats?.remaining?.toLocaleString() ?? '—'
+                  : '—',
+                color: 'text-gray-400',
+              },
             ].map((stat) => (
               <div
                 key={stat.label}
+                title={
+                  !eventId
+                    ? 'Select an event to see live stats'
+                    : undefined
+                }
                 className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
               >
                 <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>

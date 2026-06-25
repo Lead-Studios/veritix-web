@@ -73,6 +73,32 @@ export default function BasicInformation({
           )}
         </div>
 
+        {/* Event Category */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Category <span className="text-red-400">*</span>
+          </label>
+          <select
+            value={formData.category}
+            onChange={(e) => updateFormData({ category: e.target.value as EventFormData['category'] })}
+            aria-invalid={!!errors.category}
+            aria-describedby={errors.category ? "error-category" : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.category ? "border-red-500" : "border-gray-700"}`}
+          >
+            <option value="music">Music</option>
+            <option value="festival">Festival</option>
+            <option value="sports">Sports</option>
+            <option value="art">Art</option>
+            <option value="theater">Theater</option>
+            <option value="comedy">Comedy</option>
+            <option value="conference">Conference</option>
+            <option value="workshop">Workshop</option>
+          </select>
+          {errors.category && (
+            <p id="error-category" role="alert" className="mt-1 text-xs text-red-400">{errors.category}</p>
+          )}
+        </div>
+
         {/* Event Cover Image */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">

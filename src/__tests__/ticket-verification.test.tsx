@@ -1,9 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import VerifyPage from "@/app/(protected)/verify/page";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn(() => null) }),
+}));
+vi.mock("framer-motion", () => {
+  const React = require("react");
+  const proxy = new Proxy({}, {
+    get: (_t, tag: string) =>
+      ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
+        React.createElement(tag === "button" ? "button" : "div", rest, children),
+  });
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
+});
+
+import VerifyPage from "@/app/(protected)/verify/page";
 vi.mock("framer-motion", () => {
   const React = require("react");
   const proxy = new Proxy({}, {

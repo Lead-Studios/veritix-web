@@ -38,13 +38,17 @@ export interface EventFormData {
 
   // Location
   eventType: "physical" | "online" | "hybrid";
+  category: "music" | "festival" | "sports" | "art" | "theater" | "comedy" | "conference" | "workshop";
   venueName: string;
   address: string;
   city: string;
+  countryCode: string;
   state: string;
   zipCode: string;
   latitude: number | null;
   longitude: number | null;
+  capacity: number;
+  eventClosingDate: string;
   streamingUrl: string;
 
   // Ticket Information
@@ -77,13 +81,17 @@ const initialFormData: EventFormData = {
   startTime: "",
   endTime: "",
   eventType: "physical",
+  category: "conference",
   venueName: "",
   address: "",
   city: "",
+  countryCode: "NG",
   state: "",
   zipCode: "",
   latitude: null,
   longitude: null,
+  capacity: 100,
+  eventClosingDate: "",
   streamingUrl: "",
   tickets: [
     {

@@ -55,10 +55,25 @@ export default function DashboardPage() {
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
   const eventImgs = data?.events?.slice(0, 4).map((e) => ({
-  const eventImages = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
-  })) ?? []
+  })) ?? [];
+
+  const computeWeeklyTrend = () => {
+    if (!data?.revenue || data.revenue.length < 14) return null;
+    const lastWeek = data.revenue.slice(-14, -7);
+    const currentWeek = data.revenue.slice(-7);
+    const lastTotal = lastWeek.reduce((sum, item) => sum + item.revenue, 0);
+    const currentTotal = currentWeek.reduce((sum, item) => sum + item.revenue, 0);
+    if (lastTotal === 0) return null;
+    return ((currentTotal - lastTotal) / lastTotal) * 100;
+  };
+
+  const weeklyTrend = computeWeeklyTrend();
+  const trendText = weeklyTrend === null
+    ? 'Insufficient data for trend'
+    : `Trending by ${Math.abs(weeklyTrend).toFixed(1)}% ${weeklyTrend >= 0 ? '↗️' : '↘️'} this week`;
+  const trendColor = weeklyTrend === null ? 'text-gray-500' : weeklyTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
@@ -123,7 +138,7 @@ export default function DashboardPage() {
                   <div className="h-48 w-full min-h-[192px]">
                     <RevenueChart data={revenueData} />
                   </div>
-                  <p className="mt-4 text-xs text-[#21D4FF]">Trending by 18.6% in the past week ↗️</p>
+                  <p className={`mt-4 text-xs ${trendColor}`}>{trendText}</p>
                 </Card>
 
                 <Card>
@@ -174,8 +189,8 @@ export default function DashboardPage() {
                   <div className="mb-4 flex justify-between items-start">
                     <div>
                       <p className="text-xs uppercase text-[#21D4FF]">Trending</p>
-                      <p className="text-sm font-semibold text-[#21D4FF]">Trending by 38.2% ↗️</p>
-                      <p className="text-xs text-[#21D4FF]">Jan 14 - Jan 20 2026</p>
+                      <p className={`text-sm font-semibold ${trendColor}`}>{trendText}</p>
+                      <p className="text-xs text-[#21D4FF]">Past 7 days</p>
                     </div>
                     <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
                   </div>
@@ -184,7 +199,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
                     <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                    <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
+                    <p className="text-xl font-bold text-[#4D21D4FF]">{formatCurrency(totalEarned)}</p>
                     <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
                   </div>
                 </Card>
