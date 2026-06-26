@@ -34,6 +34,7 @@ export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavD
   // Fetch XLM balance from Horizon when dropdown opens
   useEffect(() => {
     if (!open || balance !== null) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingBalance(true);
     const horizonBase =
       network.toLowerCase().includes("test")

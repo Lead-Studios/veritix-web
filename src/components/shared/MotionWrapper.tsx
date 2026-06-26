@@ -6,7 +6,7 @@ import { useMotionPreferences } from "@/hooks/useMotionPreferences";
 
 type Props = {
   children: React.ReactNode;
-  variants: any;
+  variants: import('framer-motion').Variants;
   className?: string;
 };
 

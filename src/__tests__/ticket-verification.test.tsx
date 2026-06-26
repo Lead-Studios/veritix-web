@@ -5,6 +5,7 @@ import VerifyPage from "@/app/(protected)/verify/page";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("framer-motion", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
