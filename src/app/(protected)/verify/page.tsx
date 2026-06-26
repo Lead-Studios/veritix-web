@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useVerifyStats } from '@/hooks/useVerifyStats';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HiArrowLeft,
@@ -17,35 +18,7 @@ import {
   getVerificationErrorMessage,
   type VerificationErrorType,
 } from '@/lib/verificationErrors';
-
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const VALID_TICKETS: Record<string, {
-  holderName: string;
-  ticketType: string;
-  event: string;
-  date: string;
-  seat?: string;
-}> = {
-  'TKT-2024-ALPHA-001': {
-    holderName: 'Jordan Rivera',
-    ticketType: 'VIP Pass',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
-    seat: 'VIP Zone A',
-  },
-  'TKT-2024-BETA-042': {
-    holderName: 'Morgan Chen',
-    ticketType: 'General Admission',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
-  },
-  'TKT-2024-GAMMA-199': {
-    holderName: 'Alex Morales',
-    ticketType: 'Early Bird',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
-  },
-};
+import { verifyTicket, type VerificationResult } from '@/features/verification/api';
 
 type VerifyState =
   | 'idle'
@@ -57,9 +30,6 @@ type VerifyState =
   | 'network-error'
   | 'unknown-error';
 
-// Maps the page-level VerifyState onto the canonical VerificationErrorType
-// codes defined in src/lib/verificationErrors.ts. Unknown states fall through
-// to the generic message via getVerificationErrorMessage's fallback.
 const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> = {
   failure: 'invalid-ticket',
   'already-used': 'already-used',
@@ -67,27 +37,68 @@ const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> =
   'network-error': 'network-error',
 };
 
+// ─── Scan Frame Animation ─────────────────────────────────────────────────────
+function ScanFrame() {
+  return (
+    <div className="relative w-56 h-56 mx-auto">
+      {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => {
+        const isTop = corner.startsWith('top');
+        const isLeft = corner.endsWith('left');
+        return (
+          <div
+            key={corner}
+            className={`absolute w-8 h-8 ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'}`}
+          >
+            <div
+              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-full h-0.5`}
+            />
+            <div
+              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-0.5 h-full`}
+            />
+          </div>
+        );
+      })}
+
+      <motion.div
+        className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#21D4FF] to-transparent"
+        animate={{ top: ['10%', '90%', '10%'] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      <div className="absolute inset-4 opacity-10">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 20px), repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 20px)',
+          }}
+        />
+      </div>
+
+      <HiQrcode className="absolute inset-0 m-auto w-20 h-20 text-white/10" />
+    </div>
+  );
+}
+
 // ─── Result Card ──────────────────────────────────────────────────────────────
 function ResultCard({
   state,
   ticketCode,
+  ticketDetails,
   onReset,
   onRetry,
 }: {
   state: VerifyState;
   ticketCode: string;
+  ticketDetails: VerificationResult | null;
   onReset: () => void;
   onRetry?: () => void;
 }) {
-  const ticket = VALID_TICKETS[ticketCode.toUpperCase()];
   const isSuccess = state === 'success';
   const isAlreadyUsed = state === 'already-used';
   const isServiceError = state === 'service-error';
   const isNetworkError = state === 'network-error';
 
-  // Pull a user-friendly, actionable message bundle from the central
-  // mapping so all error UIs stay consistent. Unknown states get the
-  // generic fallback from getVerificationErrorMessage automatically.
   const errorMessage = !isSuccess
     ? getVerificationErrorMessage(STATE_TO_ERROR_TYPE[state])
     : null;
@@ -148,17 +159,15 @@ function ResultCard({
 
         {/* Ticket Details */}
         <div className="p-6 space-y-4">
-          {isSuccess && ticket ? (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <Detail label="Holder" value={ticket.holderName} />
-                <Detail label="Ticket Type" value={ticket.ticketType} />
-                <Detail label="Event" value={ticket.event} />
-                <Detail label="Date" value={ticket.date} />
-                {ticket.seat && <Detail label="Zone / Seat" value={ticket.seat} />}
-                <Detail label="Code" value={ticketCode.toUpperCase()} mono />
-              </div>
-            </>
+          {isSuccess && ticketDetails ? (
+            <div className="grid grid-cols-2 gap-4">
+              {ticketDetails.holderName && <Detail label="Holder" value={ticketDetails.holderName} />}
+              {ticketDetails.ticketType && <Detail label="Ticket Type" value={ticketDetails.ticketType} />}
+              {ticketDetails.event && <Detail label="Event" value={ticketDetails.event} />}
+              {ticketDetails.date && <Detail label="Date" value={ticketDetails.date} />}
+              {ticketDetails.seat && <Detail label="Zone / Seat" value={ticketDetails.seat} />}
+              <Detail label="Code" value={ticketCode.toUpperCase()} mono />
+            </div>
           ) : (
             <div className="text-center py-4 space-y-2">
               <p className="text-gray-300 text-sm">{errorMessage?.description}</p>
@@ -217,66 +226,62 @@ export default function VerifyPage() {
   const { stats, loading: statsLoading } = useVerifyStats(eventId);
   const [code, setCode] = useState('');
   const [verifyState, setVerifyState] = useState<VerifyState>('idle');
-  const [usedCodes] = useState<Set<string>>(new Set());
-  const [scannerError, setScannerError] = useState<string | null>(null);
-  const [mode, setMode] = useState<'camera' | 'manual'>(() =>
-    typeof window !== 'undefined' && window.innerWidth < 768 ? 'camera' : 'manual'
-  );
+  const [ticketDetails, setTicketDetails] = useState<VerificationResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
-  const verifyCode = (ticketCode: string) => {
-    const upper = ticketCode.trim().toUpperCase();
-    if (!upper) return;
+  const runVerify = async (ticketCode: string) => {
+    setVerifyState('loading');
+    setTicketDetails(null);
 
-    // Deterministic service error for testing
-    if (upper === 'TKT-SERVICE-ERR') {
-      setVerifyState('service-error');
-      return;
-    }
+    try {
+      const { ok, status, data } = await verifyTicket(ticketCode);
 
-    const simulateServiceError = Math.random() < 0.1;
-    if (simulateServiceError) {
-      setVerifyState('service-error');
-      return;
-    }
+      if (!ok) {
+        setVerifyState(status >= 500 ? 'service-error' : 'failure');
+        return;
+      }
 
-    if (usedCodes.has(upper)) {
-      setVerifyState('already-used');
-    } else if (VALID_TICKETS[upper]) {
-      usedCodes.add(upper);
-      setVerifyState('success');
-    } else {
-      setVerifyState('failure');
+      if (!data) {
+        setVerifyState('service-error');
+        return;
+      }
+
+      switch (data.status) {
+        case 'VALID':
+          setTicketDetails(data);
+          setVerifyState('success');
+          break;
+        case 'ALREADY_USED':
+          setVerifyState('already-used');
+          break;
+        case 'INVALID':
+        case 'CANCELLED':
+          setVerifyState('failure');
+          break;
+        default:
+          setVerifyState('failure');
+      }
+    } catch {
+      // fetch() threw — network unreachable
+      setVerifyState('network-error');
     }
   };
 
   const handleVerify = () => {
     if (!code.trim()) return;
-    setVerifyState('loading');
-    setTimeout(() => verifyCode(code), 900);
-  };
-
-  const handleScan = (decoded: string) => {
-    setScannerError(null);
-    setCode(decoded);
-    setVerifyState('loading');
-    setTimeout(() => verifyCode(decoded), 900);
+    runVerify(code);
   };
 
   const handleReset = () => {
     setCode('');
     setVerifyState('idle');
+    setTicketDetails(null);
     inputRef.current?.focus();
   };
 
-  const handleRetry = () => {
-    setVerifyState('loading');
-    setTimeout(() => verifyCode(code), 900);
-  };
+  const handleRetry = () => runVerify(code);
 
   const isChecking = verifyState === 'loading';
   const hasResult = [
@@ -292,7 +297,6 @@ export default function VerifyPage() {
     <div className="min-h-screen bg-primary-dark-blue">
       {/* Hero Header */}
       <section className="relative overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-[#4D21FF]/10 blur-3xl" />
           <div className="absolute -top-10 right-0 w-64 h-64 rounded-full bg-[#21D4FF]/10 blur-3xl" />
@@ -320,7 +324,7 @@ export default function VerifyPage() {
             </div>
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-white">Ticket Verification</h1>
-              <p className="text-gray-400 text-sm mt-0.5">Summer Dance Festival · Staff Portal</p>
+              <p className="text-gray-400 text-sm mt-0.5">Staff Portal</p>
             </div>
           </motion.div>
         </div>
@@ -414,34 +418,6 @@ export default function VerifyPage() {
                     </>
                   )}
                 </motion.button>
-
-                {/* Test hints */}
-                <div className="pt-2 border-t border-white/5">
-                  <p className="text-gray-600 text-xs mb-2">Try these demo codes:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.keys(VALID_TICKETS).map((k) => (
-                      <button
-                        key={k}
-                        onClick={() => setCode(k)}
-                        className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-[#4D21FF]/20 hover:text-white transition-colors"
-                      >
-                        {k}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => setCode('TKT-INVALID-000')}
-                      className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
-                    >
-                      TKT-INVALID-000
-                    </button>
-                    <button
-                      onClick={() => setCode('TKT-SERVICE-ERR')}
-                      className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-orange-500/20 hover:text-orange-300 transition-colors"
-                    >
-                      SERVICE ERROR TEST
-                    </button>
-                  </div>
-                </div>
               </div>
             </motion.div>
           )}
@@ -451,6 +427,7 @@ export default function VerifyPage() {
             <ResultCard
               state={verifyState}
               ticketCode={code}
+              ticketDetails={ticketDetails}
               onReset={handleReset}
               onRetry={handleRetry}
             />
@@ -463,48 +440,52 @@ export default function VerifyPage() {
             transition={{ delay: 0.3 }}
             className="grid grid-cols-3 gap-3"
           >
-            {[
-              {
-                label: 'Checked In',
-                value: eventId
-                  ? statsLoading
-                    ? 'Loading…'
-                    : stats?.totalScanned?.toLocaleString() ?? '—'
-                  : '—',
-                color: 'text-emerald-400',
-              },
-              {
-                label: 'Capacity',
-                value: eventId
-                  ? statsLoading
-                    ? 'Loading…'
-                    : stats?.capacity?.toLocaleString() ?? '—'
-                  : '—',
-                color: 'text-[#21D4FF]',
-              },
-              {
-                label: 'Remaining',
-                value: eventId
-                  ? statsLoading
-                    ? 'Loading…'
-                    : stats?.remaining?.toLocaleString() ?? '—'
-                  : '—',
-                color: 'text-gray-400',
-              },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                title={
-                  !eventId
-                    ? 'Select an event to see live stats'
-                    : undefined
-                }
-                className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
-              >
-                <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
-              </div>
-            ))}
+            {(() => {
+              if (!eventId) {
+                return (
+                  ['Checked In', 'Capacity', 'Remaining'].map((label) => (
+                    <div
+                      key={label}
+                      className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                      title="Select an event to see live stats"
+                    >
+                      <p className="text-xl font-bold text-gray-500">—</p>
+                      <p className="text-gray-500 text-xs mt-0.5">{label}</p>
+                    </div>
+                  ))
+                );
+              }
+
+              if (statsLoading) {
+                return (
+                  ['Checked In', 'Capacity', 'Remaining'].map((label) => (
+                    <div
+                      key={label}
+                      className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                    >
+                      <div className="h-7 w-16 mx-auto rounded bg-white/10 animate-pulse" />
+                      <p className="text-gray-500 text-xs mt-0.5">{label}</p>
+                    </div>
+                  ))
+                );
+              }
+
+              const statItems = [
+                { label: 'Checked In', value: stats?.totalScanned?.toLocaleString() ?? '—', color: 'text-emerald-400' },
+                { label: 'Capacity', value: stats?.capacity?.toLocaleString() ?? '—', color: 'text-[#21D4FF]' },
+                { label: 'Remaining', value: stats?.remaining?.toLocaleString() ?? '—', color: 'text-gray-400' },
+              ];
+
+              return statItems.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+                >
+                  <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
+                </div>
+              ));
+            })()}
           </motion.div>
         </div>
       </section>

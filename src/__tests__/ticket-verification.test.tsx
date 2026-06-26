@@ -8,6 +8,8 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({ get: vi.fn(() => null) }),
 }));
 vi.mock("framer-motion", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) =>
       ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>

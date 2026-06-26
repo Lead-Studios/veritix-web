@@ -15,6 +15,8 @@ vi.mock("react-toastify", () => ({
 }));
 
 vi.mock("framer-motion", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
   const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
   ["div", "form", "h2", "p"].forEach((tag) => {
     motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);

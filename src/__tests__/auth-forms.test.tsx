@@ -25,6 +25,12 @@ vi.mock("framer-motion", () => {
   ["div", "form", "h2", "p"].forEach((tag) => {
     motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);
   });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react") as typeof import("react");
+  const tags = ["div", "form", "h2", "p"] as const;
+  const motion = Object.fromEntries(
+    tags.map((tag) => [tag, ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => React.createElement(tag, rest, children)])
+  );
   return { motion, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 

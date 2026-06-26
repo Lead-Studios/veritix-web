@@ -25,23 +25,8 @@ vi.mock("@/lib/eventsApi", () => ({
   fetchEventById: (id: string) => Promise.resolve(mockEvents.find((e) => e.id === id) ?? null),
 }));
 vi.mock("framer-motion", () => {
-  function createMotionComponent(tag: string) {
-    function MotionComponent({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) {
-      const { whileHover, whileTap, initial, animate, transition, exit, prefetch, ...safeProps } = rest as Record<string, unknown>;
-      void whileHover;
-      void whileTap;
-      void initial;
-      void animate;
-      void transition;
-      void exit;
-      void prefetch;
-      return React.createElement(tag, safeProps, children);
-    }
-
-    MotionComponent.displayName = `Motion.${tag}`;
-    return MotionComponent;
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react") as typeof import("react");
   const proxy = new Proxy({}, {
     get: (_t, tag: string) => createMotionComponent(tag),
   });

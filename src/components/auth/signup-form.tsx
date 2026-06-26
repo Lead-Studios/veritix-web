@@ -58,7 +58,7 @@ export default function SignUpForm() {
     if (!res.ok) {
       if (result?.errors && typeof result.errors === "object") {
         Object.entries(result.errors).forEach(([field, message]) => {
-          // @ts-expect-error – field keys come from the server
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           setError(field as keyof FormValues, {
             type: "server",
             message: String(message),

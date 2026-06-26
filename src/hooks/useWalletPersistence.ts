@@ -35,7 +35,13 @@ function writeWallet(wallet: PersistedWallet | null): void {
  * expected behaviour for a wallet session.
  */
 export function useWalletPersistence() {
-  const [wallet, setWalletState] = useState<PersistedWallet | null>(() => readWallet());
+  const [wallet, setWalletState] = useState<PersistedWallet | null>(null);
+
+  // Hydrate from sessionStorage on mount
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setWalletState(readWallet());
+  }, []);
 
   const setWallet = useCallback((w: PersistedWallet | null) => {
     writeWallet(w);

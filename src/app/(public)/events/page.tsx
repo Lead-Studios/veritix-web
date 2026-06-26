@@ -24,6 +24,16 @@ function EventsPageContent() {
   const [locationFilter, setLocationFilter] = useState(() => searchParams.get('location') || '');
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') || '');
 
+  // Sync state if URL query params change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchQuery(searchParams.get('q') || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLocationFilter(searchParams.get('location') || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDateFilter(searchParams.get('date') || '');
+  }, [searchParams]);
+
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const handleSearchQueryChange = (value: string) => {
@@ -61,6 +71,10 @@ function EventsPageContent() {
     if (dateFilter.trim()) list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
     return list;
   }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+
+  // Reset visible count when filters change
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Infinite scroll via IntersectionObserver
   const loadMore = useCallback(() => {
