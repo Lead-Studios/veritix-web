@@ -65,6 +65,7 @@ export default function DashboardPage() {
   })()
 
   const eventImages = data?.events?.slice(0, 4).map((e) => ({
+  const eventImgs = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
   })) ?? []
