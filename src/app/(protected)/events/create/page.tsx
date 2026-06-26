@@ -38,13 +38,17 @@ export interface EventFormData {
 
   // Location
   eventType: "physical" | "online" | "hybrid";
+  category: "music" | "festival" | "sports" | "art" | "theater" | "comedy" | "conference" | "workshop";
   venueName: string;
   address: string;
   city: string;
+  countryCode: string;
   state: string;
   zipCode: string;
   latitude: number | null;
   longitude: number | null;
+  capacity: number;
+  eventClosingDate: string;
   streamingUrl: string;
 
   // Ticket Information
@@ -77,13 +81,17 @@ const initialFormData: EventFormData = {
   startTime: "",
   endTime: "",
   eventType: "physical",
+  category: "conference",
   venueName: "",
   address: "",
   city: "",
+  countryCode: "NG",
   state: "",
   zipCode: "",
   latitude: null,
   longitude: null,
+  capacity: 100,
+  eventClosingDate: "",
   streamingUrl: "",
   tickets: [
     {
@@ -108,7 +116,6 @@ export default function CreateEventPage() {
   const [errors, setErrors] = useState<CreateEventFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [draftRestored, setDraftRestored] = useState(false);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
   // Restore draft from localStorage on mount
@@ -119,8 +126,9 @@ export default function CreateEventPage() {
         const saved = JSON.parse(raw) as Partial<EventFormData>;
         // coverImage and gallery are File objects — can't be serialised, skip them
         const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
+        void _ci;
+        void _g;
         setFormData((prev) => ({ ...prev, ...rest }));
-        setDraftRestored(true);
       }
     } catch {
       // ignore corrupt data
@@ -135,6 +143,8 @@ export default function CreateEventPage() {
       // Persist serialisable fields to localStorage
       try {
         const { coverImage: _ci, gallery: _g, ...serialisable } = next;
+        void _ci;
+        void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
         // quota exceeded or SSR — ignore
@@ -189,6 +199,8 @@ export default function CreateEventPage() {
   const handleSaveDraft = () => {
     try {
       const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
+      void _ci;
+      void _g;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       setIsDirty(false);
     } catch {

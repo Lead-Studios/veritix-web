@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -30,6 +29,9 @@ export default function ManageEventPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("Overview");
   const {
     data: ticketTypes,
     loading: inventoryLoading,
@@ -77,6 +79,24 @@ export default function ManageEventPage() {
     }
   };
 
+  if (eventLoading) return <p>Loading event...</p>;
+  if (!event) return <p>Event not found.</p>;
+
+  const isCancelled = event.status === "cancelled";
+
+  return (
+    <main className="min-h-screen bg-[#101428] px-4 py-10 text-white">
+      <div className="mx-auto max-w-5xl">
+        <h1 className="text-3xl font-bold">Manage: {event.name}</h1>
+        <p className="mt-2 text-[#21D4FF]/80">Status: {event.status}</p>
+        <Breadcrumb
+          className="mt-3 text-white/60"
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Events", href: "/events/manage" },
+            { label: event.name },
+          ]}
+        />
   const isCancelled = event?.status === "cancelled";
 
   return (

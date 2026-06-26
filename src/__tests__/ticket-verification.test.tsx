@@ -1,9 +1,12 @@
+import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import VerifyPage from "@/app/(protected)/verify/page";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn(() => null) }),
+}));
 vi.mock("framer-motion", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
@@ -14,6 +17,8 @@ vi.mock("framer-motion", () => {
   });
   return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
+
+import VerifyPage from "@/app/(protected)/verify/page";
 
 const VALID_ID = "TKT-2024-ALPHA-001";
 const INVALID_ID = "TKT-INVALID-000";

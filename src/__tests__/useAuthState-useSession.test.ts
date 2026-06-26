@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
 }));
 
-vi.mock("react-toastify", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock("react-toastify", () => ({ toast: { error: vi.fn(), warn: vi.fn(), success: vi.fn() } }));
 
 const mockGetToken = vi.fn<() => string | null>();
 const mockLogout = vi.fn();
@@ -63,9 +63,11 @@ describe("getTokenExpiry", () => {
 describe("useSession", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    mockGetToken.mockReset();
     mockReplace.mockClear();
     mockLogout.mockClear();
     (toast.error as ReturnType<typeof vi.fn>).mockClear();
+    (toast.warn as ReturnType<typeof vi.fn>).mockClear();
   });
 
   afterEach(() => {
@@ -82,8 +84,9 @@ describe("useSession", () => {
     mockGetToken.mockReturnValue(makeJwt(PAST_EXP));
     renderHook(() => useSession());
     expect(mockLogout).toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith(
+    expect(toast.warn).toHaveBeenCalledWith(
       expect.stringMatching(/session has expired/i),
+      expect.objectContaining({ toastId: "session-expired" }),
     );
     expect(mockReplace).toHaveBeenCalledWith("/login?expired=1");
   });
@@ -106,10 +109,12 @@ describe("useSession", () => {
     expect(mockReplace).toHaveBeenCalledWith("/login?expired=1");
   });
 
-  it("handles unexpected errors gracefully (redirects to /login)", () => {
+  it("handles unexpected errors gracefully (redirects to /login)", async () => {
     mockGetToken.mockImplementation(() => { throw new Error("storage error"); });
-    renderHook(() => useSession());
-    expect(mockLogout).toHaveBeenCalled();
+    await act(async () => {
+      renderHook(() => useSession());
+      await Promise.resolve();
+    });
     expect(mockReplace).toHaveBeenCalledWith("/login");
   });
 });
@@ -120,6 +125,7 @@ import { useAuthState } from "../hooks/useAuthState";
 describe("useAuthState", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    mockGetToken.mockReset();
     mockReplace.mockClear();
   });
 

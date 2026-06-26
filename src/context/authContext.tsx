@@ -36,10 +36,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let active = true;
+
     const bootstrap = async () => {
       const token =
         localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
 
+      if (!active) return;
       if (!token) {
         setLoading(false);
         return;
@@ -57,11 +60,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.removeItem('auth_token');
         sessionStorage.removeItem('auth_token');
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
-    bootstrap();
+    void bootstrap();
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (

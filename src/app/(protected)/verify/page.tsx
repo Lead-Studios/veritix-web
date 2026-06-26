@@ -6,13 +6,14 @@ import { useVerifyStats } from '@/hooks/useVerifyStats';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HiArrowLeft,
-  HiQrcode,
   HiCheck,
   HiX,
   HiTicket,
   HiRefresh,
   HiSearch,
 } from 'react-icons/hi';
+import QRScanner from '@/components/verification/QRScanner';
+import { useVerifyStats } from '@/hooks/useVerifyStats';
 import {
   getVerificationErrorMessage,
   type VerificationErrorType,
@@ -333,9 +334,8 @@ export default function VerifyPage() {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="max-w-2xl mx-auto space-y-6">
 
-          {/* Scanner Placeholder Card */}
           <AnimatePresence>
-            {verifyState === 'idle' && (
+            {!hasResult && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -344,13 +344,23 @@ export default function VerifyPage() {
               >
                 <div className="bg-[#4D21FF] px-6 py-4">
                   <h2 className="text-base font-bold text-white">Scan QR Code</h2>
-                  <p className="text-blue-200 text-xs mt-0.5">Point camera at attendee&apos;s ticket QR</p>
+                  <p className="text-blue-200 text-xs mt-0.5">Use camera scanning or manual lookup</p>
                 </div>
-                <div className="p-8">
-                  <ScanFrame />
-                  <p className="text-center text-gray-500 text-xs mt-6">
-                    Camera scanning not required — enter code manually below
-                  </p>
+                <div className="p-8 space-y-4">
+                  <QRScanner
+                    mode={mode}
+                    onModeChange={(nextMode) => {
+                      setMode(nextMode);
+                      setScannerError(null);
+                    }}
+                    onScan={handleScan}
+                    onError={(message) => setScannerError(message)}
+                  />
+                  {scannerError && (
+                    <div className="rounded-2xl border border-red-500/30 bg-red-950/60 px-4 py-3 text-sm text-red-300">
+                      {scannerError}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

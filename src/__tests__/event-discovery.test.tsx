@@ -1,13 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import EventsPage from "@/app/(public)/events/page";
 import { mockEvents } from "@/mocks/events";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
+  usePathname: () => "/events",
+}));
 vi.mock("next/link", () => ({
-  default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) =>
-    <a href={href} {...rest}>{children}</a>,
+  default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => {
+    const { prefetch: _prefetch, ...props } = rest as Record<string, unknown>;
+    void _prefetch;
+    return <a href={href} {...props}>{children}</a>;
+  },
 }));
 vi.mock("next/image", () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
@@ -20,9 +28,7 @@ vi.mock("framer-motion", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react") as typeof import("react");
   const proxy = new Proxy({}, {
-    get: (_t, tag: string) =>
-      ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
-        React.createElement(tag, rest, children),
+    get: (_t, tag: string) => createMotionComponent(tag),
   });
   return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
@@ -42,16 +48,11 @@ describe("Event Discovery - Search and Filter", () => {
 
   it("reduces event list when a category filter is applied", async () => {
     await waitFor(() => screen.getAllByText(/Summer Dance Festival/i));
-    const initialCount = screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i).length;
+    const initialCount = screen.getAllByRole('link', { name: /Summer Dance Festival/i }).length;
     
-    const chip = screen.queryByText(/^festival$/i);
-    if (chip) {
-      const btn = chip.closest("div")?.querySelector("button");
-      if (btn) {
-        fireEvent.click(btn);
-        await waitFor(() => expect(screen.queryByText(/^festival$/i)).toBeNull());
-      }
-    }
+    const chip = screen.getByRole('button', { name: /^remove festival filter$/i });
+    fireEvent.click(chip);
+    await waitFor(() => expect(screen.queryByRole('button', { name: /^remove festival filter$/i })).toBeNull());
     
     await waitFor(() => {
       const afterCount = screen.getAllByText(/Electronic Music Night/i).length;
@@ -60,23 +61,18 @@ describe("Event Discovery - Search and Filter", () => {
   });
 
   it("handles combined search and category filter", async () => {
-    await waitFor(() => screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i));
+    await waitFor(() => screen.getAllByRole('link', { name: /Summer Dance Festival/i }));
     
-    const chip = screen.queryByText(/^music$/i);
-    if (chip) {
-      const btn = chip.closest("div")?.querySelector("button");
-      if (btn) {
-        fireEvent.click(btn);
-      }
-    }
-    
+    const removeMusicButton = screen.getByRole('button', { name: /remove music filter/i });
+    fireEvent.click(removeMusicButton);
+
     await waitFor(() => screen.getAllByText(/Summer Dance Festival|Electronic Music Night/i));
     
     fireEvent.change(screen.getByPlaceholderText(/search events/i), {
       target: { value: "Summer" },
     });
     
-    await waitFor(() => expect(screen.getByText(/Summer Dance Festival/i)).toBeTruthy());
-    await waitFor(() => expect(screen.queryByText(/Electronic Music Night/i)).toBeNull());
+    await waitFor(() => expect(screen.getAllByRole('link', { name: /Summer Dance Festival/i }).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.queryAllByRole('link', { name: /Electronic Music Night/i }).length).toBe(0));
   });
 });

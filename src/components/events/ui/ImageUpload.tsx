@@ -99,12 +99,13 @@ export default function ImageUpload({
     onChange(null);
   };
 
+  const aspectClass = aspectRatio === "wide" ? "aspect-video" : "aspect-square";
   const heightClass = size === "small" ? "h-24" : "h-48";
 
   return (
     <div className="w-full">
       <div
-        className={`relative border-2 border-dashed rounded-lg ${heightClass} w-full cursor-pointer transition-colors overflow-hidden ${
+        className={`relative border-2 border-dashed rounded-lg ${aspectClass} ${heightClass} w-full cursor-pointer transition-colors overflow-hidden ${
           error
             ? "border-red-500 hover:border-red-400"
             : "border-gray-700 hover:border-blue-600"

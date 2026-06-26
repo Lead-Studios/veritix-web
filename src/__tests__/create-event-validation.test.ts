@@ -6,6 +6,7 @@ import {
   sectionIdForField,
 } from "../lib/createEventValidation";
 import { submitCreateEvent } from "../lib/createEventSubmit";
+import { DEFAULT_RECURRENCE } from "../lib/recurrence";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -29,15 +30,20 @@ const validPhysicalData = {
   endDate: "2026-09-01",
   endTime: "18:00",
   eventType: "physical" as const,
+  category: "conference" as const,
   venueName: "Grand Hall",
   address: "123 Main St",
   city: "Lagos",
+  countryCode: "NG",
   state: "Lagos",
   zipCode: "100001",
   latitude: null,
   longitude: null,
+  capacity: 100,
+  eventClosingDate: "",
   streamingUrl: "",
   tickets: [baseTicket],
+  recurrence: DEFAULT_RECURRENCE,
   blockchainNetwork: "ethereum" as const,
   treasuryAddress: "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed",
   creatorRoyalty: 5,
@@ -52,7 +58,11 @@ function parse(data: object) {
 describe("createEventSchema", () => {
   // Required fields
   it("passes with valid physical event data", () => {
-    expect(parse(validPhysicalData).success).toBe(true);
+    const result = parse(validPhysicalData);
+    if (!result.success) {
+      console.error('createEventSchema validPhysicalData errors:', result.error.issues);
+    }
+    expect(result.success).toBe(true);
   });
 
   it("fails when title is empty", () => {
