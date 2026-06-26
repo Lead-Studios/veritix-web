@@ -1,5 +1,14 @@
 'use client';
 
+import React, { createContext, useState, useEffect } from 'react';
+
+export const AuthContext = createContext<{
+  user: { id: string; email: string; name?: string } | null;
+  loading: boolean;
+} | null>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthUser {
