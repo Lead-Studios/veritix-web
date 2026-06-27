@@ -125,8 +125,7 @@ export default function CreateEventPage() {
       if (raw) {
         const saved = JSON.parse(raw) as Partial<EventFormData>;
         // coverImage and gallery are File objects — can't be serialised, skip them
-        const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
-        void _ci;
+        const { gallery: _g, ...rest } = saved as EventFormData;
         void _g;
         setFormData((prev) => ({ ...prev, ...rest }));
       }

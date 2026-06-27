@@ -21,9 +21,7 @@ export default function BasicInformation({
   updateFormData,
   errors = {},
 }: BasicInformationProps) {
-  const handleCoverImageChange = (file: File | null) => {
-    updateFormData({ coverImage: file });
-  };
+
 
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
