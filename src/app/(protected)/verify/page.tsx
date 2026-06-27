@@ -439,6 +439,8 @@ export default function VerifyPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="grid grid-cols-3 gap-3"
+            role="status"
+            aria-label="Check-in statistics"
           >
             {(() => {
               if (!eventId) {

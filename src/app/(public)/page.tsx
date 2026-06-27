@@ -18,9 +18,10 @@ import {
 } from "lucide-react";
 import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
 
-const LandingTestimonials = dynamic(
-  () => import("@/components/landing/LandingTestimonials"),
-  { ssr: false, loading: () => <div className="bg-[#0b1025] py-20 h-64 animate-pulse" /> }
+import { WalletButton } from "@/components/navbar/WalletButton";
+ const LandingTestimonials = dynamic(
+   () => import("@/components/landing/LandingTestimonials"),
+   { ssr: false, loading: () => <div className="bg-[#0b1025] py-20 h-64 animate-pulse" /> }
 );
 
 const LandingFooter = dynamic(
@@ -567,5 +568,3 @@ export default function Home() {
     </div>
   );
 }
-
-
