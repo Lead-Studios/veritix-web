@@ -249,6 +249,12 @@ export default function VerifyPage() {
         return;
       }
 
+      if (data.banned) {
+        setTicketDetails(data);
+        setVerifyState('banned');
+        return;
+      }
+
       switch (data.status) {
         case 'VALID':
           setTicketDetails(data);
