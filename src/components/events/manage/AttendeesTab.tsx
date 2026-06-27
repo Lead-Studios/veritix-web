@@ -91,6 +91,39 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
     }
   };
 
+  const handleOpenBanDialog = (attendee: Attendee) => {
+    setSelectedAttendee(attendee);
+    setShowBanDialog(true);
+  };
+
+  const handleCloseBanDialog = () => {
+    setSelectedAttendee(null);
+    setShowBanDialog(false);
+  };
+
+  const handleBan = async (reason: string) => {
+    if (!selectedAttendee) return;
+    setBanningId(selectedAttendee.id);
+    handleCloseBanDialog();
+    try {
+      const result = await banAttendee(eventId, selectedAttendee.id, reason);
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+      setAttendees((prev) =>
+        prev.map((a) =>
+          a.id === selectedAttendee.id ? { ...a, banned: true, banReason: reason } : a,
+        ),
+      );
+      toast.success(`Banned ${selectedAttendee.name}.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Banning failed.");
+    } finally {
+      setBanningId(null);
+    }
+  };
+
   const handleExport = () => {
     if (attendees.length === 0) {
       toast.info("No attendees to export.");
