@@ -295,6 +295,7 @@ export default function VerifyPage() {
     'success',
     'failure',
     'already-used',
+    'banned',
     'service-error',
     'network-error',
     'unknown-error',
