@@ -27,7 +27,7 @@ export interface EventFormData {
   // Basic Information
   title: string;
   description: string;
-  coverImage: File | null;
+  coverImage: string;
   gallery: File[];
 
   // Date & Time
