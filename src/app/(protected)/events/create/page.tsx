@@ -27,7 +27,7 @@ export interface EventFormData {
   // Basic Information
   title: string;
   description: string;
-  coverImage: string;
+  coverImage: File | null;
   gallery: File[];
 
   // Date & Time
@@ -74,7 +74,7 @@ export interface EventFormData {
 const initialFormData: EventFormData = {
   title: "",
   description: "",
-  coverImage: "",
+  coverImage: null,
   gallery: [],
   startDate: "",
   endDate: "",
@@ -125,7 +125,8 @@ export default function CreateEventPage() {
       if (raw) {
         const saved = JSON.parse(raw) as Partial<EventFormData>;
         // coverImage and gallery are File objects — can't be serialised, skip them
-        const { gallery: _g, ...rest } = saved as EventFormData;
+        const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
+        void _ci;
         void _g;
         setFormData((prev) => ({ ...prev, ...rest }));
       }
