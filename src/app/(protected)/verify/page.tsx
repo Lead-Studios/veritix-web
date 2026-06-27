@@ -34,6 +34,7 @@ type VerifyState =
 const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> = {
   failure: 'invalid-ticket',
   'already-used': 'already-used',
+  banned: 'banned',
   'service-error': 'service-failure',
   'network-error': 'network-error',
 };
@@ -48,13 +49,19 @@ function ScanFrame() {
         return (
           <div
             key={corner}
-            className={`absolute w-8 h-8 ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'}`}
+            className={`absolute w-8 h-8 ${isTop ? 'top-0' : 'bottom-0'} ${
+              isLeft ? 'left-0' : 'right-0'
+            }`}
           >
             <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-full h-0.5`}
+              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${
+                isLeft ? 'left-0' : 'right-0'
+              } w-full h-0.5`}
             />
             <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-0.5 h-full`}
+              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${
+                isLeft ? 'left-0' : 'right-0'
+              } w-0.5 h-full`}
             />
           </div>
         );
@@ -97,6 +104,7 @@ function ResultCard({
 }) {
   const isSuccess = state === 'success';
   const isAlreadyUsed = state === 'already-used';
+  const isBanned = state === 'banned';
   const isServiceError = state === 'service-error';
   const isNetworkError = state === 'network-error';
 
@@ -104,6 +112,62 @@ function ResultCard({
     ? getVerificationErrorMessage(STATE_TO_ERROR_TYPE[state])
     : null;
   const showRetry = Boolean(errorMessage?.retryable && onRetry);
+
+  const baseBorder = 'border-red-500/40 bg-red-900/20';
+  const baseBg = 'bg-red-500';
+  const icon = <HiX className="w-5 h-5 text-white" />;
+
+  let borderColor, bgColor, statusIcon;
+
+  if (isSuccess) {
+    borderColor = 'border-emerald-500/40 bg-emerald-900/20';
+    bgColor = 'bg-emerald-500';
+    statusIcon = <HiCheck className="w-5 h-5 text-white" />;
+  } else if (isAlreadyUsed) {
+    borderColor = 'border-amber-500/40 bg-amber-900/20';
+    bgColor = 'bg-amber-500';
+    statusIcon = <HiRefresh className="w-5 h-5 text-white" />;
+  } else if (isBanned) {
+    borderColor = 'border-red-700/50 bg-red-950/40';
+    bgColor = 'bg-red-800';
+    statusIcon = (
+      <svg
+        className="w-5 h-5 text-white"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+        />
+      </svg>
+    );
+  } else if (isServiceError || isNetworkError) {
+    borderColor = 'border-orange-500/40 bg-orange-900/20';
+    bgColor = 'bg-orange-500';
+    statusIcon = (
+      <svg
+        className="w-5 h-5 text-white"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
+      </svg>
+    );
+  } else {
+    borderColor = baseBorder;
+    bgColor = baseBg;
+    statusIcon = icon;
+  }
 
   return (
     <AnimatePresence mode="wait">
@@ -116,45 +180,13 @@ function ResultCard({
         role="status"
         aria-live="polite"
         data-state={state}
-        className={`rounded-2xl border overflow-hidden ${
-          isSuccess
-            ? 'border-emerald-500/40 bg-emerald-900/20'
-            : isAlreadyUsed
-            ? 'border-amber-500/40 bg-amber-900/20'
-            : isServiceError || isNetworkError
-            ? 'border-orange-500/40 bg-orange-900/20'
-            : 'border-red-500/40 bg-red-900/20'
-        }`}
+        className={`rounded-2xl border overflow-hidden ${borderColor}`}
       >
         {/* Status Banner */}
-        <div
-          className={`px-6 py-4 flex items-center gap-3 ${
-            isSuccess
-              ? 'bg-emerald-500'
-              : isAlreadyUsed
-              ? 'bg-amber-500'
-              : isServiceError || isNetworkError
-              ? 'bg-orange-500'
-              : 'bg-red-500'
-          }`}
-        >
-          <div className="p-1 rounded-full bg-white/20">
-            {isSuccess ? (
-              <HiCheck className="w-5 h-5 text-white" />
-            ) : isAlreadyUsed ? (
-              <HiRefresh className="w-5 h-5 text-white" />
-            ) : isServiceError || isNetworkError ? (
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            ) : (
-              <HiX className="w-5 h-5 text-white" />
-            )}
-          </div>
+        <div className={`px-6 py-4 flex items-center gap-3 ${bgColor}`}>
+          <div className="p-1 rounded-full bg-white/20">{statusIcon}</div>
           <span className="font-bold text-white text-lg">
-            {isSuccess
-              ? 'Valid Ticket \u2014 Entry Granted'
-              : errorMessage?.title}
+            {isSuccess ? 'Valid Ticket \u2014 Entry Granted' : errorMessage?.title}
           </span>
         </div>
 
@@ -162,18 +194,31 @@ function ResultCard({
         <div className="p-6 space-y-4">
           {isSuccess && ticketDetails ? (
             <div className="grid grid-cols-2 gap-4">
-              {ticketDetails.holderName && <Detail label="Holder" value={ticketDetails.holderName} />}
-              {ticketDetails.ticketType && <Detail label="Ticket Type" value={ticketDetails.ticketType} />}
+              {ticketDetails.holderName && (
+                <Detail label="Holder" value={ticketDetails.holderName} />
+              )}
+              {ticketDetails.ticketType && (
+                <Detail label="Ticket Type" value={ticketDetails.ticketType} />
+              )}
               {ticketDetails.event && <Detail label="Event" value={ticketDetails.event} />}
               {ticketDetails.date && <Detail label="Date" value={ticketDetails.date} />}
-              {ticketDetails.seat && <Detail label="Zone / Seat" value={ticketDetails.seat} />}
+              {ticketDetails.seat && (
+                <Detail label="Zone / Seat" value={ticketDetails.seat} />
+              )}
               <Detail label="Code" value={ticketCode.toUpperCase()} mono />
             </div>
           ) : (
             <div className="text-center py-4 space-y-2">
               <p className="text-gray-300 text-sm">{errorMessage?.description}</p>
+              {isBanned && ticketDetails?.banReason && (
+                <p className="text-red-300/80 text-xs italic">
+                  Reason: {ticketDetails.banReason}
+                </p>
+              )}
               {!isServiceError && !isNetworkError && ticketCode && (
-                <p className="text-gray-500 text-xs font-mono">{ticketCode.toUpperCase()}</p>
+                <p className="text-gray-500 text-xs font-mono">
+                  {ticketCode.toUpperCase()}
+                </p>
               )}
             </div>
           )}
