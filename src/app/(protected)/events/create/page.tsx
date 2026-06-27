@@ -74,7 +74,7 @@ export interface EventFormData {
 const initialFormData: EventFormData = {
   title: "",
   description: "",
-  coverImage: null,
+  coverImage: "",
   gallery: [],
   startDate: "",
   endDate: "",
