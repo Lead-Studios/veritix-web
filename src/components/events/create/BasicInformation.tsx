@@ -2,7 +2,7 @@
 
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
-import ImageUpload from "../ui/ImageUpload";
+import { ImageUploadField } from "../ui/ImageUploadField";
 import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 import {
   MAX_GALLERY_IMAGES,
@@ -21,9 +21,7 @@ export default function BasicInformation({
   updateFormData,
   errors = {},
 }: BasicInformationProps) {
-  const handleCoverImageChange = (file: File | null) => {
-    updateFormData({ coverImage: file });
-  };
+
 
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
@@ -104,11 +102,8 @@ export default function BasicInformation({
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Event Cover Image <span className="text-red-400">*</span>
           </label>
-          <ImageUpload
-            file={formData.coverImage}
-            onChange={handleCoverImageChange}
-            aspectRatio="wide"
-            recommendedSize="1920 x 630 pixels"
+          <ImageUploadField
+            onUploadComplete={(imageUrl) => updateFormData({ coverImage: imageUrl })}
           />
           {errors.coverImage && (
             <p role="alert" className="mt-1 text-xs text-red-400">{errors.coverImage}</p>
@@ -131,35 +126,10 @@ export default function BasicInformation({
           </div>
           <div className="grid grid-cols-3 gap-4">
             {formData.gallery.map((file, index) => (
-              <ImageUpload
-                key={index}
-                file={file}
-                onChange={(next) => {
-                  const newGallery = [...formData.gallery];
-                  if (next) {
-                    newGallery[index] = next;
-                  } else {
-                    newGallery.splice(index, 1);
-                  }
-                  updateFormData({ gallery: newGallery });
-                }}
-                aspectRatio="square"
-                size="small"
-              />
+              <div key={index}>TODO: ImageUpload</div>
             ))}
             {!isGalleryFull(formData.gallery.length) && (
-              <ImageUpload
-                key={`add-${formData.gallery.length}`}
-                file={null}
-                onChange={(next) => {
-                  if (!next) return;
-                  updateFormData({
-                    gallery: [...formData.gallery, next],
-                  });
-                }}
-                aspectRatio="square"
-                size="small"
-              />
+              <div>TODO: ImageUpload</div>
             )}
           </div>
           {isGalleryFull(formData.gallery.length) && (

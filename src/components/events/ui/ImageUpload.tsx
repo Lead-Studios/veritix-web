@@ -149,7 +149,7 @@ export default function ImageUpload({
             </svg>
             <p className="text-sm text-center px-4">Drag or drop an image, or browse</p>
             <p className="text-xs text-gray-600 mt-1">
-              JPEG, PNG, WebP, GIF · max {MAX_SIZE_MB} MB · min {MIN_WIDTH}×{MIN_HEIGHT} px
+              JPEG, PNG, WebP, GIF · max ${MAX_SIZE_MB} MB · min ${MIN_WIDTH}×${MIN_HEIGHT} px
             </p>
             {recommendedSize && (
               <p className="text-xs text-gray-600 mt-0.5">Recommended: {recommendedSize}</p>

@@ -27,7 +27,7 @@ export interface EventFormData {
   // Basic Information
   title: string;
   description: string;
-  coverImage: File | null;
+  coverImage: string;
   gallery: File[];
 
   // Date & Time
@@ -74,7 +74,7 @@ export interface EventFormData {
 const initialFormData: EventFormData = {
   title: "",
   description: "",
-  coverImage: null,
+  coverImage: "",
   gallery: [],
   startDate: "",
   endDate: "",
@@ -125,8 +125,7 @@ export default function CreateEventPage() {
       if (raw) {
         const saved = JSON.parse(raw) as Partial<EventFormData>;
         // coverImage and gallery are File objects — can't be serialised, skip them
-        const { coverImage: _ci, gallery: _g, ...rest } = saved as EventFormData;
-        void _ci;
+        const { gallery: _g, ...rest } = saved as EventFormData;
         void _g;
         setFormData((prev) => ({ ...prev, ...rest }));
       }
@@ -142,9 +141,8 @@ export default function CreateEventPage() {
       const next = { ...prev, ...updates };
       // Persist serialisable fields to localStorage
       try {
-        const { coverImage: _ci, gallery: _g, ...serialisable } = next;
-        void _ci;
-        void _g;
+        const { gallery: _g, ...serialisable } = next;
+      void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
         // quota exceeded or SSR — ignore
@@ -198,8 +196,7 @@ export default function CreateEventPage() {
 
   const handleSaveDraft = () => {
     try {
-      const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
-      void _ci;
+      const { gallery: _g, ...serialisable } = formData;
       void _g;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       setIsDirty(false);
