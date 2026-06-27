@@ -141,9 +141,8 @@ export default function CreateEventPage() {
       const next = { ...prev, ...updates };
       // Persist serialisable fields to localStorage
       try {
-        const { coverImage: _ci, gallery: _g, ...serialisable } = next;
-        void _ci;
-        void _g;
+        const { gallery: _g, ...serialisable } = next;
+      void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
         // quota exceeded or SSR — ignore
@@ -197,8 +196,7 @@ export default function CreateEventPage() {
 
   const handleSaveDraft = () => {
     try {
-      const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
-      void _ci;
+      const { gallery: _g, ...serialisable } = formData;
       void _g;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       setIsDirty(false);
