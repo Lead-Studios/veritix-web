@@ -44,7 +44,7 @@ describe("StellarPaymentInstructions", () => {
     );
 
     expect(screen.getByText("Complete your ticket payment")).toBeInTheDocument();
-    expect(screen.getByText("Required - your payment will fail without the memo")).toBeInTheDocument();
+    expect(screen.getByText("Required — your payment will fail without the memo")).toBeInTheDocument();
     expect(screen.getByText("25.5 XLM")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /copy destination address/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /copy memo/i })).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe("StellarPaymentInstructions", () => {
     );
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith("🎉 Tickets issued! Check your email.");
+      expect(toast.success).toHaveBeenCalledWith("\uD83C\uDF89 Tickets issued! Check your email.");
       expect(push).toHaveBeenCalledWith("/tickets");
     });
   });

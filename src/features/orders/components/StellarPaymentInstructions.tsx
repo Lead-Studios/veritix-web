@@ -25,6 +25,7 @@ type RetryPaymentResponse = {
 };
 
 const DEFAULT_EXPIRY_MINUTES = 15;
+const TICKETS_ISSUED_TOAST = "\uD83C\uDF89 Tickets issued! Check your email.";
 
 function normalizeAmount(amount: string | number) {
   return typeof amount === "number" ? amount.toFixed(7).replace(/\.?0+$/, "") : amount;
@@ -102,7 +103,7 @@ export function StellarPaymentInstructions({
 
   useEffect(() => {
     if (data?.status === "PAID") {
-      toast.success("🎉 Tickets issued! Check your email.");
+      toast.success(TICKETS_ISSUED_TOAST);
       router.push("/tickets");
     }
   }, [data?.status, router]);
@@ -261,7 +262,7 @@ function PaymentRow({ label, value, displayValue, copied, isCritical = false, on
           </p>
           {isCritical && (
             <p className="mt-2 text-sm font-semibold text-red-200">
-              Required - your payment will fail without the memo
+              Required — your payment will fail without the memo
             </p>
           )}
         </div>
