@@ -104,11 +104,8 @@ export default function BasicInformation({
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Event Cover Image <span className="text-red-400">*</span>
           </label>
-          <ImageUpload
-            file={formData.coverImage}
-            onChange={handleCoverImageChange}
-            aspectRatio="wide"
-            recommendedSize="1920 x 630 pixels"
+          <ImageUploadField
+            onUploadComplete={(imageUrl) => updateFormData({ coverImage: imageUrl })}
           />
           {errors.coverImage && (
             <p role="alert" className="mt-1 text-xs text-red-400">{errors.coverImage}</p>
