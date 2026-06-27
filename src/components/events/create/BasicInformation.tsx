@@ -2,7 +2,7 @@
 
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
-import ImageUpload from "../ui/ImageUpload";
+import ImageUpload, { ImageUploadField } from "../ui/ImageUpload";
 import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 import {
   MAX_GALLERY_IMAGES,
