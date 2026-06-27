@@ -142,7 +142,8 @@ export default function CreateEventPage() {
       const next = { ...prev, ...updates };
       // Persist serialisable fields to localStorage
       try {
-        const { gallery: _g, ...serialisable } = next;
+        const { coverImage: _ci, gallery: _g, ...serialisable } = next;
+      void _ci;
       void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
