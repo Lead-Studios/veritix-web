@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { WaitlistButton } from "@/features/events/components/WaitlistButton";
 import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
 import TabSelector from '@/components/TabSelector';
 import { Breadcrumb } from '@/components/ui';
