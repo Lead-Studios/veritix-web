@@ -26,6 +26,7 @@ type VerifyState =
   | 'success'
   | 'failure'
   | 'already-used'
+  | 'banned'
   | 'service-error'
   | 'network-error'
   | 'unknown-error';
