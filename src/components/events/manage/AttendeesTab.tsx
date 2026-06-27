@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Search } from "lucide-react";
+import { Download, MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   type Attendee,
@@ -91,39 +91,6 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
     }
   };
 
-  const handleOpenBanDialog = (attendee: Attendee) => {
-    setSelectedAttendee(attendee);
-    setShowBanDialog(true);
-  };
-
-  const handleCloseBanDialog = () => {
-    setSelectedAttendee(null);
-    setShowBanDialog(false);
-  };
-
-  const handleBan = async (reason: string) => {
-    if (!selectedAttendee) return;
-    setBanningId(selectedAttendee.id);
-    handleCloseBanDialog();
-    try {
-      const result = await banAttendee(eventId, selectedAttendee.id, reason);
-      if (!result.success) {
-        toast.error(result.message);
-        return;
-      }
-      setAttendees((prev) =>
-        prev.map((a) =>
-          a.id === selectedAttendee.id ? { ...a, banned: true, banReason: reason } : a,
-        ),
-      );
-      toast.success(`Banned ${selectedAttendee.name}.`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Banning failed.");
-    } finally {
-      setBanningId(null);
-    }
-  };
-
   const handleExport = () => {
     if (attendees.length === 0) {
       toast.info("No attendees to export.");
@@ -169,11 +136,21 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#4D21FF]/30 text-left text-xs uppercase tracking-wider text-[#21D4FF]">
-              <th scope="col" className="px-6 py-4">Name</th>
-              <th scope="col" className="px-6 py-4">Email</th>
-              <th scope="col" className="px-6 py-4">Ticket Type</th>
-              <th scope="col" className="px-6 py-4">Check-in</th>
-              <th scope="col" className="px-6 py-4">Action</th>
+              <th scope="col" className="px-6 py-4">
+                Name
+              </th>
+              <th scope="col" className="px-6 py-4">
+                Email
+              </th>
+              <th scope="col" className="px-6 py-4">
+                Ticket Type
+              </th>
+              <th scope="col" className="px-6 py-4">
+                Status
+              </th>
+              <th scope="col" className="relative px-6 py-4">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#4D21FF]/20">
@@ -204,7 +181,12 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
                   <td className="px-6 py-4 text-[#21D4FF]/80">{a.email}</td>
                   <td className="px-6 py-4 text-[#21D4FF]/80">{a.ticketType}</td>
                   <td className="px-6 py-4">
-                    {a.checkedIn ? (
+                    {a.banned ? (
+                      <span className="inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-950/30 px-3 py-1 text-xs text-red-300">
+                        <span className="h-2 w-2 rounded-full bg-red-400" />
+                        Banned
+                      </span>
+                    ) : a.checkedIn ? (
                       <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/30 px-3 py-1 text-xs text-emerald-300">
                         <span className="h-2 w-2 rounded-full bg-emerald-400" />
                         Checked in
@@ -216,19 +198,17 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => handleCheckIn(a)}
-                      disabled={a.checkedIn || checkingInId === a.id}
-                      className="rounded-md bg-[linear-gradient(135deg,#4D21FF_0%,#21D4FF_100%)] px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {a.checkedIn
-                        ? "Already in"
-                        : checkingInId === a.id
-                          ? "Checking…"
-                          : "Mark checked in"}
-                    </button>
+                  <td className="px-6 py-4 text-right">
+                    {banningId === a.id ? (
+                      <span className="text-xs text-red-400">Banning…</span>
+                    ) : (
+                      <KebabMenu
+                        attendee={a}
+                        onCheckIn={() => handleCheckIn(a)}
+                        onBan={() => handleOpenBanDialog(a)}
+                        isCheckingIn={checkingInId === a.id}
+                      />
+                    )}
                   </td>
                 </tr>
               ))
@@ -267,6 +247,76 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
           </div>
         </div>
       )}
+
+      <BanAttendeeDialog
+        open={showBanDialog}
+        onClose={handleCloseBanDialog}
+        onConfirm={handleBan}
+        attendeeName={selectedAttendee?.name ?? ""}
+      />
     </section>
+  );
+}
+
+function KebabMenu({
+  attendee,
+  onCheckIn,
+  onBan,
+  isCheckingIn,
+}: {
+  attendee: Attendee;
+  onCheckIn: () => void;
+  onBan: () => void;
+  isCheckingIn: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const disabled = attendee.banned || attendee.checkedIn || isCheckingIn;
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        disabled={disabled}
+        className="rounded-md p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-40"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
+        <MoreVertical size={18} />
+        <span className="sr-only">Actions for {attendee.name}</span>
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 z-10 mt-1 w-48 origin-top-right rounded-md bg-[#101428] py-1 shadow-lg ring-1 ring-black/5 focus:outline-none"
+          role="menu"
+          aria-orientation="vertical"
+          aria-labelledby="user-menu-button"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              onCheckIn();
+              setOpen(false);
+            }}
+            disabled={attendee.checkedIn}
+            className="block w-full px-4 py-2 text-left text-sm text-white/90 transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+            role="menuitem"
+          >
+            {isCheckingIn ? "Checking in..." : "Mark checked in"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              onBan();
+              setOpen(false);
+            }}
+            className="block w-full px-4 py-2 text-left text-sm text-red-400 transition-colors hover:bg-white/5"
+            role="menuitem"
+          >
+            Ban from event
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
