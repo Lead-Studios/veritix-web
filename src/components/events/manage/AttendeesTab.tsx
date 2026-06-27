@@ -25,6 +25,9 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
+  const [banningId, setBanningId] = useState<string | null>(null);
+  const [showBanDialog, setShowBanDialog] = useState(false);
+  const [selectedAttendee, setSelectedAttendee] = useState<Attendee | null>(null);
 
   // Initial fetch
   useEffect(() => {
