@@ -5,10 +5,12 @@ import { Download, Search } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   type Attendee,
+  banAttendee,
   checkInAttendee,
   exportAttendeesCSV,
   fetchEventAttendees,
 } from "@/lib/attendeeManagement";
+import BanAttendeeDialog from "./BanAttendeeDialog";
 
 interface AttendeesTabProps {
   eventId: string;
