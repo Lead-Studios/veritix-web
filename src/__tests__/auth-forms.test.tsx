@@ -21,10 +21,6 @@ vi.mock("next/navigation", () => ({
 vi.mock("react-toastify", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 vi.mock("framer-motion", () => {
-  const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
-  ["div", "form", "h2", "p"].forEach((tag) => {
-    motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);
-  });
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react") as typeof import("react");
   const tags = ["div", "form", "h2", "p"] as const;
@@ -39,11 +35,6 @@ vi.mock("@/lib/auth", () => ({
   forgotPassword: vi.fn().mockResolvedValue(undefined),
   logout: vi.fn(),
   getToken: vi.fn().mockReturnValue(null),
-}));
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
 }));
 
 import LoginForm from "../components/auth/login-form";
