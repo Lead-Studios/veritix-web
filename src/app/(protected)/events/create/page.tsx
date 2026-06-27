@@ -198,7 +198,8 @@ export default function CreateEventPage() {
 
   const handleSaveDraft = () => {
     try {
-      const { gallery: _g, ...serialisable } = formData;
+      const { coverImage: _ci, gallery: _g, ...serialisable } = formData;
+      void _ci;
       void _g;
       localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       setIsDirty(false);

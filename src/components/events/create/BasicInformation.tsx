@@ -2,7 +2,7 @@
 
 import React from "react";
 import { EventFormData } from "@/app/(protected)/events/create/page";
-import ImageUpload, { ImageUploadField } from "../ui/ImageUpload";
+import ImageUpload from "../ui/ImageUpload";
 import type { CreateEventFormErrors } from "@/lib/createEventValidation";
 import {
   MAX_GALLERY_IMAGES,
@@ -102,8 +102,11 @@ export default function BasicInformation({
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Event Cover Image <span className="text-red-400">*</span>
           </label>
-          <ImageUploadField
-            onUploadComplete={(imageUrl) => updateFormData({ coverImage: imageUrl })}
+          <ImageUpload
+            file={formData.coverImage}
+            onChange={handleCoverImageChange}
+            aspectRatio="wide"
+            recommendedSize="1920 x 630 pixels"
           />
           {errors.coverImage && (
             <p role="alert" className="mt-1 text-xs text-red-400">{errors.coverImage}</p>
