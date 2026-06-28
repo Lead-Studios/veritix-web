@@ -4,7 +4,7 @@ import { useState } from "react";
 interface Props { onDeleted?: () => void; }
 
 export default function DeleteAccount({ onDeleted }: Props) {
-  const [step, setStep] = useState<"idle" | "confirm" | "loading" | "done">("idle");
+  const [step, setStep] = useState<"idle"|"confirm"|"loading"|"done">("idle");
   const [password, setPassword] = useState("");
 
   const submit = async () => {
@@ -15,8 +15,7 @@ export default function DeleteAccount({ onDeleted }: Props) {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ password }),
     });
-    if (res.ok) { setStep("done"); onDeleted?.(); }
-    else setStep("confirm");
+    if (res.ok) { setStep("done"); onDeleted?.(); } else setStep("confirm");
   };
 
   if (step === "done") return <p className="text-green-600 text-sm">Account deleted.</p>;
@@ -29,9 +28,9 @@ export default function DeleteAccount({ onDeleted }: Props) {
       <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
         placeholder="Password" className="border rounded-lg px-3 py-2 text-sm" />
       <div className="flex gap-2">
-        <button onClick={submit} disabled={step === "loading" || !password}
+        <button onClick={submit} disabled={step==="loading"||!password}
           className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-60">
-          {step === "loading" ? "Deleting…" : "Confirm Delete"}
+          {step==="loading" ? "Deleting..." : "Confirm Delete"}
         </button>
         <button onClick={() => setStep("idle")} className="text-sm text-gray-500">Cancel</button>
       </div>
