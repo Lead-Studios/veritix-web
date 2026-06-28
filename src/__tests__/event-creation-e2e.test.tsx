@@ -70,6 +70,24 @@ vi.mock("@/components/events/ui/ImageUpload", () => ({
     ),
 }));
 
+vi.mock("@/components/events/ui/ImageUploadField", () => ({
+  ImageUploadField: ({
+    onUploadComplete,
+  }: {
+    onUploadComplete: (imageUrl: string) => void;
+  }) =>
+    React.createElement(
+      "button",
+      {
+        type: "button",
+        "data-testid": "mock-image-upload",
+        onClick: () =>
+          onUploadComplete("https://example.com/cover.png"),
+      },
+      "Upload",
+    ),
+}));
+
 // Avoid hitting the real Nominatim service when typing into the address combobox.
 vi.mock("@/lib/locationSearch", () => ({
   searchLocations: vi.fn().mockResolvedValue([]),
@@ -175,7 +193,7 @@ describe("Event Creation – end-to-end flow", () => {
     expect(body.get("description")).toBe(
       "An on-chain ticketing showcase for VeriTix builders.",
     );
-    expect(body.get("coverImage")).toBeInstanceOf(File);
+    expect(body.get("coverImage")).toBe("https://example.com/cover.png");
 
     // --- Date & Time ---
     expect(body.get("startDate")).toBe("2026-12-01");
