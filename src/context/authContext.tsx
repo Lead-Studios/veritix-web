@@ -1,78 +1,36 @@
 'use client';
-
-import React, { createContext, useState, useEffect } from 'react';
-
-export const AuthContext = createContext<{
-  user: { id: string; email: string; name?: string } | null;
-  loading: boolean;
-} | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface AuthUser {
-  id: string;
-  email: string;
-  name?: string;
-  role?: string;
-}
-
-interface AuthContextValue {
-  user: AuthUser | null;
-  loading: boolean;
-}
+interface AuthUser { id: string; email: string; name?: string; role?: string; }
+interface AuthContextValue { user: AuthUser | null; loading: boolean; login: (token: string, user: AuthUser) => void; logout: () => void; }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
-}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let active = true;
-
     const bootstrap = async () => {
-      const token =
-        localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
-
-      if (!active) return;
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
+      const token = localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+      if (!token) { setLoading(false); return; }
       try {
-        const res = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setUser(data);
-        const userData: AuthUser = await res.json();
-        setUser(userData);
-      } catch {
-        localStorage.removeItem('auth_token');
-        sessionStorage.removeItem('auth_token');
-      } finally {
-        if (active) setLoading(false);
-      }
+        const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) setUser(await res.json());
+      } catch { /* ignore */ }
+      setLoading(false);
     };
-
-    void bootstrap();
-    return () => {
-      active = false;
-    };
+    bootstrap();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const login = (token: string, userData: AuthUser) => { localStorage.setItem('auth_token', token); setUser(userData); };
+  const logout = () => { localStorage.removeItem('auth_token'); sessionStorage.removeItem('auth_token'); setUser(null); };
+
+  return <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
 };
