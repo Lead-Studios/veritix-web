@@ -1,72 +1,33 @@
 "use client";
+import { useState, useRef } from "react";
 
-import { getToken } from "@/lib/auth";
-import { useCallback, useEffect, useState } from "react";
+interface Props { currentUrl?: string; onUploaded?: (url: string) => void; }
 
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
-  walletAddress?: string;
-}
+export default function AvatarUpload({ currentUrl, onUploaded }: Props) {
+  const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
+  const [uploading, setUploading] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
 
-function authHeaders(): HeadersInit {
-  const token = getToken();
-  return token
-    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
-    : { "Content-Type": "application/json" };
-}
+  const handleFile = async (file: File) => {
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+    const form = new FormData();
+    form.append("avatar", file);
+    const token = localStorage.getItem("auth_token") ?? "";
+    const res = await fetch("/api/auth/avatar", { method: "POST", headers: { Authorization:  }, body: form });
+    if (res.ok) { const { url } = await res.json(); onUploaded?.(url); }
+    setUploading(false);
+  };
 
-export async function fetchProfile(): Promise<UserProfile> {
-  const res = await fetch("/api/auth/me", { headers: authHeaders() });
-  if (!res.ok) throw new Error("Failed to load profile");
-  return res.json();
-}
-
-export async function updateProfile(
-  patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>
-): Promise<UserProfile> {
-  const res = await fetch("/api/auth/me", {
-    method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify(patch),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? "Failed to save profile");
-  }
-  return res.json();
-}
-
-export function useProfile() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchProfile();
-      setProfile(data);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const save = useCallback(
-    async (patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>) => {
-      const updated = await updateProfile(patch);
-      setProfile(updated);
-      return updated;
-    },
-    []
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div onClick={() => ref.current?.click()}
+        className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 cursor-pointer border-2 border-primary">
+        {preview ? <img src={preview} alt="Avatar" className="w-full h-full object-cover" /> : <span className="flex items-center justify-center h-full text-gray-400 text-xs">Upload</span>}
+      </div>
+      <input ref={ref} type="file" accept="image/*" className="hidden"
+        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      {uploading && <p className="text-xs text-gray-500">Uploading...</p>}
+    </div>
   );
-
-  return { profile, loading, error, save, reload: load };
 }
