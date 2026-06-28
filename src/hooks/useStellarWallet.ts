@@ -37,11 +37,13 @@ export function useStellarWallet() {
   }, []);
 
   useEffect(() => {
-    const storedKey = localStorage.getItem('stellar_public_key');
-    if (storedKey) {
-      setPublicKey(storedKey);
-      setIsWalletConnected(true);
-    }
+    queueMicrotask(() => {
+      const storedKey = localStorage.getItem('stellar_public_key');
+      if (storedKey) {
+        setPublicKey(storedKey);
+        setIsWalletConnected(true);
+      }
+    });
   }, []);
 
   return {

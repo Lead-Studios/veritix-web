@@ -1,16 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
-import { Modal } from "@/components/ui";
-import { Breadcrumb } from "@/components/ui";
-import { performEventAction } from "@/lib/eventActions";
+import { Breadcrumb, Modal } from "@/components/ui";
 import TabSelector from "@/components/TabSelector";
 import AttendeesTab from "@/components/events/manage/AttendeesTab";
 import { TicketTypeRow } from "@/components/events/manage/TicketTypeRow";
 import { useEventInventory } from "@/hooks/useEventInventory";
+import { performEventAction } from "@/lib/eventActions";
 
 interface ManagedEvent {
   id: string;
@@ -25,10 +25,6 @@ export default function ManageEventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<ManagedEvent | null>(null);
   const [eventLoading, setEventLoading] = useState(true);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("Overview");
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
@@ -85,37 +81,18 @@ export default function ManageEventPage() {
   const isCancelled = event.status === "cancelled";
 
   return (
-    <main className="min-h-screen bg-[#101428] px-4 py-10 text-white">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-3xl font-bold">Manage: {event.name}</h1>
-        <p className="mt-2 text-[#21D4FF]/80">Status: {event.status}</p>
-        <Breadcrumb
-          className="mt-3 text-white/60"
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Events", href: "/events/manage" },
-            { label: event.name },
-          ]}
-        />
-  const isCancelled = event?.status === "cancelled";
-
-  return (
-    <div className="min-h-screen bg-[#101428] py-10 px-4">
+    <div className="min-h-screen bg-[#101428] px-4 py-10">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 text-sm">
           <Link href="/events/manage" className="text-[#21D4FF] hover:underline">
-            ← Back to events
+            Back to events
           </Link>
         </div>
 
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">
-              {eventLoading ? "Loading event…" : event?.name ?? "Event not found"}
-            </h1>
-            {event && !eventLoading && (
-              <p className="mt-1 text-sm text-[#21D4FF]/80">Status: {event.status}</p>
-            )}
+            <h1 className="text-3xl font-bold text-white">Manage: {event.name}</h1>
+            <p className="mt-1 text-sm text-[#21D4FF]/80">Status: {event.status}</p>
           </div>
           <button
             type="button"
@@ -127,15 +104,13 @@ export default function ManageEventPage() {
           </button>
         </div>
 
-        {event && (
-          <Breadcrumb
-            items={[
-              { label: "Dashboard", href: "/dashboard" },
-              { label: "Events", href: "/events/manage" },
-              { label: event.name },
-            ]}
-          />
-        )}
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Events", href: "/events/manage" },
+            { label: event.name },
+          ]}
+        />
 
         <TabSelector<Tab>
           tabs={TABS as unknown as Tab[]}
@@ -165,7 +140,7 @@ export default function ManageEventPage() {
                   </button>
                 </div>
               ) : inventoryLoading && ticketTypes.length === 0 ? (
-                <p className="text-sm text-[#21D4FF]/70">Loading ticket types…</p>
+                <p className="text-sm text-[#21D4FF]/70">Loading ticket types...</p>
               ) : ticketTypes.length === 0 ? (
                 <p className="text-sm text-[#21D4FF]/70">
                   No ticket types have been created for this event yet.
@@ -203,7 +178,7 @@ export default function ManageEventPage() {
 
         {activeTab === "Attendees" && (
           <div role="tabpanel" aria-label="Attendees" className="mt-6">
-            {event && <AttendeesTab eventId={event.id} />}
+            <AttendeesTab eventId={event.id} />
           </div>
         )}
       </div>
@@ -222,7 +197,7 @@ export default function ManageEventPage() {
             <AlertTriangle className="mt-0.5 shrink-0 text-red-400" size={20} aria-hidden="true" />
             <div className="text-sm text-red-100/90">
               <p className="font-semibold text-red-200">
-                Cancelling &ldquo;{event?.name}&rdquo; will:
+                Cancelling &ldquo;{event.name}&rdquo; will:
               </p>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-red-100/80">
                 <li>Trigger refunds for every ticket already sold.</li>
@@ -253,7 +228,7 @@ export default function ManageEventPage() {
                   aria-hidden="true"
                 />
               )}
-              {submitting ? "Cancelling…" : "Confirm Cancellation"}
+              {submitting ? "Cancelling..." : "Confirm Cancellation"}
             </button>
           </div>
         </div>

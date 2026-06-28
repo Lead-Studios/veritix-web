@@ -12,12 +12,24 @@ export interface Attendee {
   banReason?: string;
 }
 
+interface ApiAttendee {
+  id: string;
+  name: string;
+  email: string;
+  ticket_type: string;
+  order_id: string;
+  checked_in: boolean;
+  purchased_at: string;
+  banned?: boolean;
+  ban_reason?: string;
+}
+
 export async function fetchEventAttendees(eventId: string): Promise<Attendee[]> {
   const res = await fetch(`/api/admin/events/${eventId}/attendees`);
   if (!res.ok) throw new Error("Failed to fetch attendees");
   const data = await res.json();
   // FIXME: The API returns a mix of snake_case and camelCase, this should be fixed
-  return data.attendees.map((a: any) => ({
+  return (data.attendees as ApiAttendee[]).map((a) => ({
     id: a.id,
     name: a.name,
     email: a.email,

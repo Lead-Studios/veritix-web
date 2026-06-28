@@ -5,11 +5,14 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import EventsPage from "@/app/(public)/events/page";
 import { mockEvents } from "@/mocks/events";
 
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
-  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
-  usePathname: () => "/events",
-}));
+vi.mock("next/navigation", () => {
+  const searchParams = { get: vi.fn().mockReturnValue(null) };
+  return {
+    useRouter: () => ({ push: vi.fn() }),
+    useSearchParams: () => searchParams,
+    usePathname: () => "/events",
+  };
+});
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => {
     const { prefetch: _prefetch, ...props } = rest as Record<string, unknown>;
@@ -27,6 +30,31 @@ vi.mock("@/lib/eventsApi", () => ({
 vi.mock("framer-motion", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react") as typeof import("react");
+  const createMotionComponent = (tag: string) => {
+    const MotionComponent = ({
+      children,
+      ...rest
+    }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => {
+      const {
+        initial: _initial,
+        animate: _animate,
+        exit: _exit,
+        transition: _transition,
+        whileHover: _whileHover,
+        whileTap: _whileTap,
+        ...props
+      } = rest as React.HTMLAttributes<HTMLElement> & Record<string, unknown>;
+      void _initial;
+      void _animate;
+      void _exit;
+      void _transition;
+      void _whileHover;
+      void _whileTap;
+      return React.createElement(tag, props, children);
+    };
+    MotionComponent.displayName = `motion.${tag}`;
+    return MotionComponent;
+  };
   const proxy = new Proxy({}, {
     get: (_t, tag: string) => createMotionComponent(tag),
   });

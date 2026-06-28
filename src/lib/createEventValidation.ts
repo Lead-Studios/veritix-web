@@ -56,8 +56,13 @@ export const createEventSchema = z
     title: z.string().min(1, "Event title is required"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     coverImage: z
-      .custom<File | null>()
-      .refine((f) => f instanceof File, "Cover image is required"),
+      .custom<File | string | null>()
+      .refine(
+        (image) =>
+          (typeof File !== "undefined" && image instanceof File) ||
+          (typeof image === "string" && image.trim().length > 0),
+        "Cover image is required",
+      ),
     gallery: z.array(z.custom<File>()).optional(),
 
     // Date & Time

@@ -11,9 +11,9 @@ import {
   HiTicket,
   HiRefresh,
   HiSearch,
+  HiQrcode,
 } from 'react-icons/hi';
 import QRScanner from '@/components/verification/QRScanner';
-import { useVerifyStats } from '@/hooks/useVerifyStats';
 import {
   getVerificationErrorMessage,
   type VerificationErrorType,
@@ -273,6 +273,8 @@ export default function VerifyPage() {
   const [code, setCode] = useState('');
   const [verifyState, setVerifyState] = useState<VerifyState>('idle');
   const [ticketDetails, setTicketDetails] = useState<VerificationResult | null>(null);
+  const [mode, setMode] = useState<'camera' | 'manual'>('camera');
+  const [scannerError, setScannerError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
@@ -319,6 +321,11 @@ export default function VerifyPage() {
       // fetch() threw — network unreachable
       setVerifyState('network-error');
     }
+  };
+
+  const handleScan = (ticketCode: string) => {
+    setCode(ticketCode);
+    void runVerify(ticketCode);
   };
 
   const handleVerify = () => {

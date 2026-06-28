@@ -1,15 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useEffect } from 'react';
-
-export const AuthContext = createContext<{
-  user: { id: string; email: string; name?: string } | null;
-  loading: boolean;
-} | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ id: string; email: string; name?: string } | null>(null);
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthUser {
   id: string;
@@ -52,8 +43,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await fetch('/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        setUser(data);
         const userData: AuthUser = await res.json();
         setUser(userData);
       } catch {
