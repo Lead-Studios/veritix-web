@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, MoreVertical, Search } from "lucide-react";
+import { Download, Loader2, MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   type Attendee,
   banAttendee,
   checkInAttendee,
-  exportAttendeesCSV,
   fetchEventAttendees,
 } from "@/lib/attendeeManagement";
+import { exportAttendeesCsv, fetchAllTickets } from "@/lib/exportAttendeesCsv";
 import BanAttendeeDialog from "./BanAttendeeDialog";
 
 interface AttendeesTabProps {
@@ -26,6 +26,7 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
   const [page, setPage] = useState(1);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
   const [banningId, setBanningId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
   const [showBanDialog, setShowBanDialog] = useState(false);
   const [selectedAttendee, setSelectedAttendee] = useState<Attendee | null>(null);
 
@@ -91,13 +92,53 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
     }
   };
 
-  const handleExport = () => {
-    if (attendees.length === 0) {
-      toast.info("No attendees to export.");
-      return;
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const tickets = await fetchAllTickets(eventId);
+      if (tickets.length === 0) {
+        toast.info("No attendees to export.");
+        return;
+      }
+      exportAttendeesCsv(tickets, eventId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Export failed.");
+    } finally {
+      setExporting(false);
     }
-    // Export everything currently loaded for this event (not just the filtered/paged view).
-    exportAttendeesCSV(attendees, eventId);
+  };
+
+  const handleOpenBanDialog = (attendee: Attendee) => {
+    setSelectedAttendee(attendee);
+    setShowBanDialog(true);
+  };
+
+  const handleCloseBanDialog = () => {
+    setShowBanDialog(false);
+    setSelectedAttendee(null);
+  };
+
+  const handleBan = async (reason: string) => {
+    if (!selectedAttendee) return;
+    setBanningId(selectedAttendee.id);
+    handleCloseBanDialog();
+    try {
+      const result = await banAttendee(eventId, selectedAttendee.id, reason);
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+      setAttendees((prev) =>
+        prev.map((a) =>
+          a.id === selectedAttendee.id ? { ...a, banned: true, banReason: reason } : a,
+        ),
+      );
+      toast.success(`Banned ${selectedAttendee.name}.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Ban failed.");
+    } finally {
+      setBanningId(null);
+    }
   };
 
   return (
@@ -123,11 +164,15 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
         <button
           type="button"
           onClick={handleExport}
-          disabled={loading || attendees.length === 0}
+          disabled={loading || exporting}
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#4D21FF]/40 bg-[#000625] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4D21FF]/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Download size={16} aria-hidden="true" />
-          Export CSV
+          {exporting ? (
+            <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+          ) : (
+            <Download size={16} aria-hidden="true" />
+          )}
+          {exporting ? "Exporting…" : "Export CSV"}
         </button>
       </div>
 
