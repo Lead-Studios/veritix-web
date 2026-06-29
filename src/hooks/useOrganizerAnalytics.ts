@@ -1,31 +1,60 @@
 import { useState, useEffect } from "react";
 
-interface AnalyticsData { revenue: number; ticketsSold: number; events: number; }
+export interface DemographicItem {
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface Demographics {
+  region: DemographicItem[];
+  deviceType: DemographicItem[];
+  referralSource: DemographicItem[];
+}
+
+export interface OrganizerAnalytics {
+  revenue: { day: string; revenue: number }[];
+  performance: { day: string; value: number }[];
+  totalEarned: number;
+  payoutsQueued: number;
+  nextSettlementDays: number;
+  checkInsLive: boolean;
+  doorsOpenInMinutes: number;
+  totalEvents: number;
+  events?: { name: string; coverImage?: string }[];
+  ticketBreakdown?: { type: string; count: number; revenue: number }[];
+  demographics?: Demographics;
+}
 
 function getToken() {
+  if (typeof window === "undefined") return "";
   return localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token") ?? "";
 }
 
-export function useOrganizerAnalytics(organizerId: string) {
-  const [data, setData] = useState<AnalyticsData | null>(null);
+export function useOrganizerAnalytics(params?: { from?: string; to?: string }) {
+  const [data, setData] = useState<OrganizerAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!organizerId) return;
     setLoading(true);
+    setError(null);
     const token = getToken();
-    fetch(`/api/organizer/analytics?id=${organizerId}`, {
+    const query = new URLSearchParams();
+    if (params?.from) query.set("from", params.from);
+    if (params?.to) query.set("to", params.to);
+    const qs = query.toString() ? `?${query.toString()}` : "";
+    fetch(`/api/organizer/analytics${qs}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
-        if (!res.ok) throw new Error(`Analytics request failed: ${res.status}`);
+        if (!res.ok) throw new Error("Failed to fetch analytics");
         return res.json();
       })
       .then(setData)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [organizerId]);
+  }, [params?.from, params?.to]);
 
   return { data, loading, error };
 }

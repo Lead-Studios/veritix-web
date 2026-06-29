@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 import { HeroContent } from '@/components/dashboard/HeroContent'
 import { CTAButton } from '@/components/dashboard/CTAButton'
@@ -19,6 +19,8 @@ const TicketTypeChart = dynamic(
   { ssr: false, loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" /> }
 )
 import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
+import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
+import { PayoutHistory } from '@/components/dashboard/PayoutHistory'
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
 import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -42,8 +44,11 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
-  const { data, loading } = useOrganizerAnalytics()
   const router = useRouter()
+  const params = useSearchParams()
+  const from = params.get('from') ?? undefined
+  const to = params.get('to') ?? undefined
+  const { data, loading } = useOrganizerAnalytics({ from, to })
 
   const hasEvents = !loading && (data?.totalEvents ?? 0) > 0
   const hasData = !loading && data !== null
@@ -65,26 +70,14 @@ export default function DashboardPage() {
   })()
 
   const eventImages = data?.events?.slice(0, 4).map((e) => ({
-  const eventImgs = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
   })) ?? [];
 
-  const computeWeeklyTrend = () => {
-    if (!data?.revenue || data.revenue.length < 14) return null;
-    const lastWeek = data.revenue.slice(-14, -7);
-    const currentWeek = data.revenue.slice(-7);
-    const lastTotal = lastWeek.reduce((sum, item) => sum + item.revenue, 0);
-    const currentTotal = currentWeek.reduce((sum, item) => sum + item.revenue, 0);
-    if (lastTotal === 0) return null;
-    return ((currentTotal - lastTotal) / lastTotal) * 100;
-  };
-
-  const weeklyTrend = computeWeeklyTrend();
-  const trendText = weeklyTrend === null
+  const trendText = revenueTrend === null
     ? 'Insufficient data for trend'
-    : `Trending by ${Math.abs(weeklyTrend).toFixed(1)}% ${weeklyTrend >= 0 ? '↗️' : '↘️'} this week`;
-  const trendColor = weeklyTrend === null ? 'text-gray-500' : weeklyTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
+    : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`;
+  const trendColor = revenueTrend === null ? 'text-gray-500' : revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
@@ -113,6 +106,11 @@ export default function DashboardPage() {
           </div>
 
           <QuickActions />
+
+          {/* Date range picker for filtering charts */}
+          <div className="mb-6 flex justify-end">
+            <DateRangePicker />
+          </div>
 
           {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
@@ -150,13 +148,6 @@ export default function DashboardPage() {
                     <RevenueChart data={revenueData} />
                   </div>
                   <p className={`mt-4 text-xs ${trendColor}`}>{trendText}</p>
-                  {revenueTrend === null ? (
-                    <p className="mt-4 text-xs text-gray-500">Insufficient data for trend</p>
-                  ) : (
-                    <p className={`mt-4 text-xs ${revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      Trending by {Math.abs(revenueTrend).toFixed(1)}% {revenueTrend >= 0 ? '↗️' : '↘️'} this week
-                    </p>
-                  )}
                 </Card>
 
                 <Card>
@@ -245,6 +236,14 @@ export default function DashboardPage() {
           {!loading && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
+            </div>
+          )}
+
+          {/* Payout History */}
+          {!loading && hasEvents && (
+            <div className="mt-10">
+              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">Payout History</p>
+              <PayoutHistory />
             </div>
           )}
         </div>
