@@ -37,6 +37,7 @@ export default function LandingFooter() {
           <ul className="mt-4 space-y-3 text-sm text-white/70">
             <li><Link href="/events" className="transition hover:text-white">Attendees</Link></li>
             <li><Link href="/events/create" className="transition hover:text-white">Organiser</Link></li>
+            <li><Link href="/pricing" className="transition hover:text-white">Pricing</Link></li>
             <li><Link href="/events" className="transition hover:text-white">Promoters</Link></li>
             <li><Link href="#how-it-works" className="transition hover:text-white">How it Works</Link></li>
           </ul>

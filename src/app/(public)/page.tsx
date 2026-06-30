@@ -96,6 +96,9 @@ export default function Home() {
             <Link href="/events" className="transition hover:text-white">
               Explore
             </Link>
+            <Link href="/pricing" className="transition hover:text-white">
+              Pricing
+            </Link>
             <Link href="#trending" className="transition hover:text-white">
               Upcoming Events
             </Link>
