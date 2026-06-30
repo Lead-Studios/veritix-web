@@ -445,7 +445,7 @@ export default function Home() {
                 <div className="flex items-start">
                   <div>
                     <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                      Lock It In
+                      {howItWorksSteps[2].title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
                       {howItWorksSteps[2].description}
@@ -479,7 +479,7 @@ export default function Home() {
                 <div className="flex items-start">
                   <div>
                     <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                      Show Up, Stand Out
+                      {howItWorksSteps[3].title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
                       {howItWorksSteps[3].description}
@@ -529,7 +529,9 @@ export default function Home() {
                   3
                 </span>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">Lock It In</h3>
+                  <h3 className="text-2xl font-bold text-white">
+                    {howItWorksSteps[2].title}
+                  </h3>
                   <p className="mt-2 text-sm text-white/70">
                     {howItWorksSteps[2].description}
                   </p>
@@ -542,7 +544,7 @@ export default function Home() {
                 </span>
                 <div>
                   <h3 className="text-2xl font-bold text-white">
-                    Show Up, Stand Out
+                    {howItWorksSteps[3].title}
                   </h3>
                   <p className="mt-2 text-sm text-white/70">
                     {howItWorksSteps[3].description}

@@ -2,7 +2,8 @@ import { ToastContainer } from "react-toastify";
 import { Manrope, Playfair_Display } from "next/font/google";
 import "./global.css";
 import { AuthProvider } from "@/context/authContext";
-import { ThemeProvider } from "@/context/ThemeContext";
+import CookieBanner from "@/components/CookieBanner";
+import OfflineBanner from "@/components/OfflineBanner";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ const displayFont = Playfair_Display({
 export const metadata = {
   title: "VeriTix",
   description: "Blockchain-powered ticketing on Stellar",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -27,13 +29,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] dark:bg-[#0b1025] text-white antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+    <html lang="en">
+      <head>
+        <meta name="theme-color" content="#4d21ff" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
+      <body className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] text-white antialiased`}>
+        <OfflineBanner />
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+        <CookieBanner />
         <ToastContainer />
       </body>
     </html>
