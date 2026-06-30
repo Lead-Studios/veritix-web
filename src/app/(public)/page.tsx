@@ -16,7 +16,10 @@ import {
   ChevronDown,
   Search,
 } from "lucide-react";
-import { howItWorksSteps, trendingEvents } from "@/mocks/landing";
+import { howItWorksSteps } from "@/mocks/landing";
+import useSWR from "swr";
+import { fetchEvents } from "@/lib/eventsApi";
+import type { Event } from "@/types/event";
 
 import { WalletButton } from "@/components/navbar/WalletButton";
  const LandingTestimonials = dynamic(
@@ -43,6 +46,20 @@ export default function Home() {
   const [searchQ, setSearchQ] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchDate, setSearchDate] = useState("");
+
+  const { data: allEvents, isLoading: eventsLoading } = useSWR<Event[]>(
+    "events",
+    fetchEvents,
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+  );
+
+  const trendingEvents = (() => {
+    if (!allEvents) return [];
+    const featured = allEvents.filter((e) => e.featured);
+    if (featured.length >= 3) return featured.slice(0, 3);
+    const recent = allEvents.filter((e) => !e.featured).slice(0, 3 - featured.length);
+    return [...featured, ...recent].slice(0, 3);
+  })();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,7 +282,15 @@ export default function Home() {
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {trendingEvents.map((event) => (
+            {eventsLoading
+              ? [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-80 animate-pulse rounded-3xl border border-white/10 bg-white/5"
+                    aria-hidden="true"
+                  />
+                ))
+              : trendingEvents.map((event) => (
               <motion.article
                 key={event.id}
                 className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(10,16,40,0.5)] backdrop-blur"
@@ -284,8 +309,8 @@ export default function Home() {
 
                 <div className="mt-4 overflow-hidden rounded-2xl bg-[#141b3b]">
                   <Image
-                    src={event.image}
-                    alt={event.title}
+                    src={event.imageUrl ?? "/djparty.png"}
+                    alt={event.name}
                     width={420}
                     height={260}
                     className="h-44 w-full object-cover"
@@ -296,21 +321,21 @@ export default function Home() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
-                      <span>{event.date}</span>
+                      <span>{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock size={16} />
-                      <span>{event.time}</span>
+                      <span>{new Date(event.eventDate).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
                   </div>
 
                   <div>
                     <h3 className="font-display text-lg text-white">
-                      {event.title}
+                      {event.name}
                     </h3>
                     <div className="mt-1 flex items-center gap-2 text-xs text-white/70">
                       <MapPin size={14} />
-                      <span>{event.location}</span>
+                      <span>{event.city ?? event.location}</span>
                     </div>
                   </div>
 
@@ -320,7 +345,7 @@ export default function Home() {
                       <span>{event.price}</span>
                     </div>
                     <MotionLink
-                      href="/events"
+                      href={`/events/${event.id}`}
                       className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-4 py-2 text-xs font-semibold text-white"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
