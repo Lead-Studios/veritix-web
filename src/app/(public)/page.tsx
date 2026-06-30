@@ -99,6 +99,9 @@ export default function Home() {
             <Link href="/pricing" className="transition hover:text-white">
               Pricing
             </Link>
+            <Link href="/blog" className="transition hover:text-white">
+              Blog
+            </Link>
             <Link href="#trending" className="transition hover:text-white">
               Upcoming Events
             </Link>
