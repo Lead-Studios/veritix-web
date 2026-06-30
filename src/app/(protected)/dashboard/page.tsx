@@ -13,15 +13,21 @@ import { RevenueChart } from '@/components/dashboard/charts/RevenueChart'
 import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart'
 import { EmptyState } from '@/components/EmptyState'
 import dynamic from 'next/dynamic'
-// Code-split Recharts-based chart away from the initial dashboard bundle
+import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
+import { LiveCheckInCard } from '@/components/dashboard/LiveCheckInCard'
+import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
+import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
+import { Skeleton } from '@/components/ui/Skeleton'
+
 const TicketTypeChart = dynamic(
   () => import('@/components/dashboard/charts/TicketTypeChart').then((m) => m.TicketTypeChart),
   { ssr: false, loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" /> }
 )
-import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
-import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
-import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
-import { Skeleton } from '@/components/ui/Skeleton'
+
+const RevenueByTicketTypeChart = dynamic(
+  () => import('@/components/dashboard/charts/RevenueByTicketTypeChart').then((m) => m.RevenueByTicketTypeChart),
+  { ssr: false, loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" /> }
+)
 
 function formatCurrency(n: number) {
   return `₦ ${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
@@ -54,7 +60,6 @@ export default function DashboardPage() {
   const payoutsQueued = data?.payoutsQueued ?? 0
   const nextSettlementDays = data?.nextSettlementDays ?? 0
 
-  // Compute week-over-week revenue trend from data.revenue
   const revenueTrend = (() => {
     const rev = data?.revenue ?? []
     if (rev.length < 14) return null
@@ -64,27 +69,17 @@ export default function DashboardPage() {
     return ((currentWeek - lastWeek) / lastWeek) * 100
   })()
 
-  const eventImages = data?.events?.slice(0, 4).map((e) => ({
+  const trendText = revenueTrend === null
+    ? 'Insufficient data for trend'
+    : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`
+  const trendColor = revenueTrend === null ? 'text-gray-500' : revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400'
+
   const eventImgs = data?.events?.slice(0, 4).map((e) => ({
     src: e.coverImage ?? null,
     alt: e.name,
-  })) ?? [];
+  })) ?? []
 
-  const computeWeeklyTrend = () => {
-    if (!data?.revenue || data.revenue.length < 14) return null;
-    const lastWeek = data.revenue.slice(-14, -7);
-    const currentWeek = data.revenue.slice(-7);
-    const lastTotal = lastWeek.reduce((sum, item) => sum + item.revenue, 0);
-    const currentTotal = currentWeek.reduce((sum, item) => sum + item.revenue, 0);
-    if (lastTotal === 0) return null;
-    return ((currentTotal - lastTotal) / lastTotal) * 100;
-  };
-
-  const weeklyTrend = computeWeeklyTrend();
-  const trendText = weeklyTrend === null
-    ? 'Insufficient data for trend'
-    : `Trending by ${Math.abs(weeklyTrend).toFixed(1)}% ${weeklyTrend >= 0 ? '↗️' : '↘️'} this week`;
-  const trendColor = weeklyTrend === null ? 'text-gray-500' : weeklyTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
+  const liveEvent = data?.events?.find(() => data.checkInsLive)
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
@@ -114,10 +109,8 @@ export default function DashboardPage() {
 
           <QuickActions />
 
-          {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
 
-          {/* Empty state — no events yet */}
           {!loading && !hasEvents && (
             <EmptyState
               title="No events yet"
@@ -129,7 +122,6 @@ export default function DashboardPage() {
             />
           )}
 
-          {/* Dashboard grid — only shown when events exist */}
           {!loading && hasEvents && (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:h-[500px]">
               {/* Left Column - Revenue */}
@@ -150,13 +142,6 @@ export default function DashboardPage() {
                     <RevenueChart data={revenueData} />
                   </div>
                   <p className={`mt-4 text-xs ${trendColor}`}>{trendText}</p>
-                  {revenueTrend === null ? (
-                    <p className="mt-4 text-xs text-gray-500">Insufficient data for trend</p>
-                  ) : (
-                    <p className={`mt-4 text-xs ${revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      Trending by {Math.abs(revenueTrend).toFixed(1)}% {revenueTrend >= 0 ? '↗️' : '↘️'} this week
-                    </p>
-                  )}
                 </Card>
 
                 <Card>
@@ -168,18 +153,15 @@ export default function DashboardPage() {
                 </Card>
               </ScrollColumn>
 
-              {/* Middle Column - Attendees */}
+              {/* Middle Column - Attendees / Check-ins */}
               <ScrollColumn animationClass="animate-scroll-down-once" className="gap-0">
                 <Card>
-                  <p className="text-xs uppercase text-[#21D4FF]">Latest check-ins</p>
-                  <p className="text-sm text-[#21D4FF]">
-                    {data?.checkInsLive
-                      ? `Doors open in ${data.doorsOpenInMinutes}m`
-                      : 'No active events'}
-                  </p>
-                  <div className="mt-3 text-xs text-[#4D21FF]">
-                    {data?.checkInsLive ? 'Live updates enabled' : 'Updates paused'}
-                  </div>
+                  <p className="text-xs uppercase text-[#21D4FF] mb-2">Latest check-ins</p>
+                  <LiveCheckInCard
+                    eventId={liveEvent?.id ?? ''}
+                    eventName={liveEvent?.name ?? ''}
+                    isLive={data?.checkInsLive ?? false}
+                  />
                 </Card>
 
                 <Card>
@@ -188,7 +170,7 @@ export default function DashboardPage() {
                     <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {eventImages.map((image, index) => (
+                    {eventImgs.map((image, index) => (
                       <EventImage key={index} src={image.src} alt={image.alt} />
                     ))}
                   </div>
@@ -217,7 +199,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
                     <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                    <p className="text-xl font-bold text-[#4D21D4FF]">{formatCurrency(totalEarned)}</p>
+                    <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
                     <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
                   </div>
                 </Card>
@@ -236,6 +218,18 @@ export default function DashboardPage() {
                 <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
                 <div className="mt-4">
                   <TicketTypeChart data={data.ticketBreakdown} />
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Revenue by Ticket Type */}
+          {!loading && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+            <div className="mt-10">
+              <Card>
+                <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
+                <div className="mt-4">
+                  <RevenueByTicketTypeChart data={data.ticketBreakdown} />
                 </div>
               </Card>
             </div>
