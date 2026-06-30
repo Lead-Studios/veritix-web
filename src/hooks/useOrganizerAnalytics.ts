@@ -10,6 +10,16 @@ export interface Demographics {
   region: DemographicItem[];
   deviceType: DemographicItem[];
   referralSource: DemographicItem[];
+export interface TicketTypeBreakdown {
+  type: string;
+  count: number;
+  revenue: number;
+}
+
+export interface Demographics {
+  region: { label: string; count: number; percentage: number }[];
+  deviceType: { label: string; count: number; percentage: number }[];
+  referralSource: { label: string; count: number; percentage: number }[];
 }
 
 export interface OrganizerAnalytics {

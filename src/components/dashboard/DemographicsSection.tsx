@@ -7,6 +7,9 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+"use client";
+
+import dynamic from "next/dynamic";
 import type { Demographics } from "@/hooks/useOrganizerAnalytics";
 
 interface Props {
@@ -20,6 +23,13 @@ function DemoGroup({
   title: string;
   items: { label: string; count: number; percentage: number }[];
 }) {
+// Lazy-load the map so it never SSR-crashes
+const GeoHeatmap = dynamic(() => import("./GeoHeatmap"), {
+  ssr: false,
+  loading: () => <div className="h-[300px] animate-pulse rounded-xl bg-white/5" />,
+});
+
+function DemoGroup({ title, items }: { title: string; items: { label: string; count: number; percentage: number }[] }) {
   return (
     <div className="rounded-lg bg-white/5 p-4">
       <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">{title}</p>
@@ -94,6 +104,14 @@ export function DemographicsSection({ demographics }: Props) {
   return (
     <section aria-label="Demographic breakdown">
       <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">Audience Demographics</p>
+
+      {/* Geographic heatmap — shown when region data exists */}
+      {demographics.region.length > 0 ? (
+        <div className="mb-6">
+          <GeoHeatmap regions={demographics.region} />
+        </div>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {demographics.region.length > 0 && (
           <DemoGroup title="Region" items={demographics.region} />

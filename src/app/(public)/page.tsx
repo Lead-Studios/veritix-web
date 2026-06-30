@@ -16,8 +16,8 @@ import {
   ChevronDown,
   Search,
 } from "lucide-react";
-import useSWR from "swr";
 import { howItWorksSteps } from "@/mocks/landing";
+import useSWR from "swr";
 import { fetchEvents } from "@/lib/eventsApi";
 import type { Event } from "@/types/event";
 
@@ -154,6 +154,9 @@ export default function Home() {
     const featured = allEvents.filter((e) => e.featured);
     const display = featured.length >= 3 ? featured : [...featured, ...allEvents.filter((e) => !e.featured)];
     return display.slice(0, 3);
+    if (featured.length >= 3) return featured.slice(0, 3);
+    const recent = allEvents.filter((e) => !e.featured).slice(0, 3 - featured.length);
+    return [...featured, ...recent].slice(0, 3);
   })();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -190,6 +193,9 @@ export default function Home() {
             </Link>
             <Link href="/events" className="transition hover:text-white">
               Explore
+            </Link>
+            <Link href="/pricing" className="transition hover:text-white">
+              Pricing
             </Link>
             <Link href="#trending" className="transition hover:text-white">
               Upcoming Events
@@ -382,6 +388,82 @@ export default function Home() {
               : trendingEvents.map((event) => (
                   <TrendingEventCard key={event.id} event={event} />
                 ))}
+              ? [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-80 animate-pulse rounded-3xl border border-white/10 bg-white/5"
+                    aria-hidden="true"
+                  />
+                ))
+              : trendingEvents.map((event) => (
+              <motion.article
+                key={event.id}
+                className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(10,16,40,0.5)] backdrop-blur"
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center justify-between text-xs text-white/70">
+                  <span className="rounded-lg bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-3 py-1 text-white">
+                    {event.category}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <Share2 size={16} />
+                    <Heart size={16} />
+                  </div>
+                </div>
+
+                <div className="mt-4 overflow-hidden rounded-2xl bg-[#141b3b]">
+                  <Image
+                    src={event.imageUrl ?? "/djparty.png"}
+                    alt={event.name}
+                    width={420}
+                    height={260}
+                    className="h-44 w-full object-cover"
+                  />
+                </div>
+
+                <div className="mt-5 space-y-3 text-sm text-white/80">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} />
+                      <span>{new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock size={16} />
+                      <span>{new Date(event.eventDate).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-display text-lg text-white">
+                      {event.name}
+                    </h3>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-white/70">
+                      <MapPin size={14} />
+                      <span>{event.city ?? event.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                      <Ticket size={16} />
+                      <span>{event.price}</span>
+                    </div>
+                    <MotionLink
+                      href={`/events/${event.id}`}
+                      className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-4 py-2 text-xs font-semibold text-white"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      More Info
+                      <span className="rounded-full bg-white/20 px-2 py-1 text-[10px]">
+                        →
+                      </span>
+                    </MotionLink>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
           </div>
         </motion.div>
       </section>
