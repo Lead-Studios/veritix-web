@@ -1,3 +1,12 @@
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 "use client";
 
 import dynamic from "next/dynamic";
@@ -7,6 +16,13 @@ interface Props {
   demographics: Demographics;
 }
 
+function DemoGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; count: number; percentage: number }[];
+}) {
 // Lazy-load the map so it never SSR-crashes
 const GeoHeatmap = dynamic(() => import("./GeoHeatmap"), {
   ssr: false,
@@ -27,6 +43,52 @@ function DemoGroup({ title, items }: { title: string; items: { label: string; co
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+const BAR_COLORS = ["#4D21FF", "#21D4FF", "#7c85ff", "#39c6ff", "#6f7bff", "#21d4aa"];
+
+function ReferralSourceChart({
+  items,
+}: {
+  items: { label: string; count: number; percentage: number }[];
+}) {
+  const data = items.map((item) => ({ name: item.label, count: item.count, pct: item.percentage }));
+
+  return (
+    <div className="rounded-lg bg-white/5 p-4">
+      <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">How did they find you?</p>
+      <ResponsiveContainer width="100%" height={items.length * 36 + 16}>
+        <BarChart
+          layout="vertical"
+          data={data}
+          margin={{ top: 0, right: 48, left: 8, bottom: 0 }}
+        >
+          <XAxis type="number" hide />
+          <YAxis
+            type="category"
+            dataKey="name"
+            width={90}
+            tick={{ fill: "#21D4FF", fontSize: 11 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Tooltip
+            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            contentStyle={{ background: "#101428", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }}
+            formatter={(value: number, _name: string, props: { payload?: { pct?: number } }) =>
+              [`${value.toLocaleString()} (${props.payload?.pct ?? 0}%)`, "Attendees"]
+            }
+            labelStyle={{ color: "#21D4FF", fontSize: 11 }}
+          />
+          <Bar dataKey="count" radius={[0, 4, 4, 0]} label={{ position: "right", fill: "#4D21FF", fontSize: 11, formatter: (v: number) => v.toLocaleString() }}>
+            {data.map((_entry, index) => (
+              <Cell key={index} fill={BAR_COLORS[index % BAR_COLORS.length]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }
@@ -58,7 +120,9 @@ export function DemographicsSection({ demographics }: Props) {
           <DemoGroup title="Device Type" items={demographics.deviceType} />
         )}
         {demographics.referralSource.length > 0 && (
-          <DemoGroup title="Referral Source" items={demographics.referralSource} />
+          <div className="sm:col-span-2 lg:col-span-1">
+            <ReferralSourceChart items={demographics.referralSource} />
+          </div>
         )}
       </div>
     </section>

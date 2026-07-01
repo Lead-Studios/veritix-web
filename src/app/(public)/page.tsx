@@ -41,21 +41,119 @@ const fadeUp = {
   viewport: { once: true, amount: 0.2 },
 };
 
+function TrendingEventCard({ event }: { event: Event }) {
+  const formattedDate = event.eventDate
+    ? new Date(event.eventDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "";
+  return (
+    <motion.article
+      className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(10,16,40,0.5)] backdrop-blur"
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center justify-between text-xs text-white/70">
+        <span className="rounded-lg bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-3 py-1 text-white">
+          {event.category}
+        </span>
+        <div className="flex items-center gap-3">
+          <Share2 size={16} />
+          <Heart size={16} />
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl bg-[#141b3b]">
+        <Image
+          src={event.imageUrl ?? "/djparty.png"}
+          alt={event.name}
+          width={420}
+          height={260}
+          className="h-44 w-full object-cover"
+        />
+      </div>
+
+      <div className="mt-5 space-y-3 text-sm text-white/80">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} />
+            <span>{formattedDate}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock size={16} />
+            <span>{event.venue}</span>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-display text-lg text-white">{event.name}</h3>
+          <div className="mt-1 flex items-center gap-2 text-xs text-white/70">
+            <MapPin size={14} />
+            <span>{event.location}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-2 text-sm font-semibold text-white">
+            <Ticket size={16} />
+            <span>{event.price}</span>
+          </div>
+          <MotionLink
+            href={`/events/${event.id}`}
+            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-4 py-2 text-xs font-semibold text-white"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            More Info
+            <span className="rounded-full bg-white/20 px-2 py-1 text-[10px]">→</span>
+          </MotionLink>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function EventCardSkeleton() {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-5 animate-pulse">
+      <div className="flex items-center justify-between">
+        <div className="h-6 w-16 rounded-lg bg-white/10" />
+        <div className="flex gap-3">
+          <div className="h-4 w-4 rounded bg-white/10" />
+          <div className="h-4 w-4 rounded bg-white/10" />
+        </div>
+      </div>
+      <div className="mt-4 h-44 rounded-2xl bg-white/10" />
+      <div className="mt-5 space-y-3">
+        <div className="flex justify-between">
+          <div className="h-4 w-24 rounded bg-white/10" />
+          <div className="h-4 w-16 rounded bg-white/10" />
+        </div>
+        <div className="h-5 w-3/4 rounded bg-white/10" />
+        <div className="h-4 w-1/2 rounded bg-white/10" />
+        <div className="flex justify-between pt-2">
+          <div className="h-6 w-16 rounded bg-white/10" />
+          <div className="h-8 w-24 rounded-full bg-white/10" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [searchQ, setSearchQ] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchDate, setSearchDate] = useState("");
 
-  const { data: allEvents, isLoading: eventsLoading } = useSWR<Event[]>(
-    "events",
-    fetchEvents,
-    { revalidateOnFocus: false, dedupingInterval: 60_000 },
-  );
+  const { data: allEvents, isLoading: eventsLoading } = useSWR<Event[]>("events", fetchEvents, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60_000,
+  });
 
   const trendingEvents = (() => {
     if (!allEvents) return [];
     const featured = allEvents.filter((e) => e.featured);
+    const display = featured.length >= 3 ? featured : [...featured, ...allEvents.filter((e) => !e.featured)];
+    return display.slice(0, 3);
     if (featured.length >= 3) return featured.slice(0, 3);
     const recent = allEvents.filter((e) => !e.featured).slice(0, 3 - featured.length);
     return [...featured, ...recent].slice(0, 3);
@@ -98,6 +196,9 @@ export default function Home() {
             </Link>
             <Link href="/pricing" className="transition hover:text-white">
               Pricing
+            </Link>
+            <Link href="/blog" className="transition hover:text-white">
+              Blog
             </Link>
             <Link href="#trending" className="transition hover:text-white">
               Upcoming Events
@@ -286,6 +387,10 @@ export default function Home() {
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {eventsLoading
+              ? [0, 1, 2].map((i) => <EventCardSkeleton key={i} />)
+              : trendingEvents.map((event) => (
+                  <TrendingEventCard key={event.id} event={event} />
+                ))}
               ? [0, 1, 2].map((i) => (
                   <div
                     key={i}

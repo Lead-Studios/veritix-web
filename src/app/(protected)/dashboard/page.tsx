@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { StatusBadge } from '@/components/dashboard/StatusBadge'
 import { HeroContent } from '@/components/dashboard/HeroContent'
 import { CTAButton } from '@/components/dashboard/CTAButton'
@@ -14,6 +14,8 @@ import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart
 import { EmptyState } from '@/components/EmptyState'
 import dynamic from 'next/dynamic'
 import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
+import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
+import { PayoutHistory } from '@/components/dashboard/PayoutHistory'
 import { LiveCheckInCard } from '@/components/dashboard/LiveCheckInCard'
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
 import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
@@ -48,8 +50,11 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
-  const { data, loading } = useOrganizerAnalytics()
   const router = useRouter()
+  const params = useSearchParams()
+  const from = params.get('from') ?? undefined
+  const to = params.get('to') ?? undefined
+  const { data, loading } = useOrganizerAnalytics({ from, to })
 
   const hasEvents = !loading && (data?.totalEvents ?? 0) > 0
   const hasData = !loading && data !== null
@@ -69,6 +74,15 @@ export default function DashboardPage() {
     return ((currentWeek - lastWeek) / lastWeek) * 100
   })()
 
+  const eventImages = data?.events?.slice(0, 4).map((e) => ({
+    src: e.coverImage ?? null,
+    alt: e.name,
+  })) ?? [];
+
+  const trendText = revenueTrend === null
+    ? 'Insufficient data for trend'
+    : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`;
+  const trendColor = revenueTrend === null ? 'text-gray-500' : revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
   const trendText = revenueTrend === null
     ? 'Insufficient data for trend'
     : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`
@@ -109,6 +123,12 @@ export default function DashboardPage() {
 
           <QuickActions />
 
+          {/* Date range picker for filtering charts */}
+          <div className="mb-6 flex justify-end">
+            <DateRangePicker />
+          </div>
+
+          {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
 
           {!loading && !hasEvents && (
@@ -239,6 +259,14 @@ export default function DashboardPage() {
           {!loading && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
+            </div>
+          )}
+
+          {/* Payout History */}
+          {!loading && hasEvents && (
+            <div className="mt-10">
+              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">Payout History</p>
+              <PayoutHistory />
             </div>
           )}
         </div>
