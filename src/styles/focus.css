@@ -1,0 +1,42 @@
+/**
+ * Global focus-visible styles for keyboard navigation accessibility.
+ * Uses :focus-visible so mouse users don't see focus rings,
+ * but keyboard and assistive technology users always get clear indicators.
+ */
+
+/* Remove default browser outlines — replaced below */
+*:focus {
+  outline: none;
+}
+
+/* Accessible focus ring for all interactive elements */
+*:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Higher-contrast ring for elements on dark backgrounds */
+.dark *:focus-visible,
+[data-theme="dark"] *:focus-visible {
+  outline-color: #a78bfa;
+}
+
+/* Skip-to-content link — hidden until focused */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0 0 4px 4px;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  left: 50%;
+  transform: translateX(-50%);
+  outline: none;
+}
