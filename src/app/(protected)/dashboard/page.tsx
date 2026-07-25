@@ -17,6 +17,7 @@ import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
 import { DateRangePicker } from '@/components/dashboard/DateRangePicker'
 import { PayoutHistory } from '@/components/dashboard/PayoutHistory'
 import { LiveCheckInCard } from '@/components/dashboard/LiveCheckInCard'
+import { ProjectedRevenueCard } from '@/components/dashboard/ProjectedRevenueCard'
 import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
 import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -74,15 +75,6 @@ export default function DashboardPage() {
     return ((currentWeek - lastWeek) / lastWeek) * 100
   })()
 
-  const eventImages = data?.events?.slice(0, 4).map((e) => ({
-    src: e.coverImage ?? null,
-    alt: e.name,
-  })) ?? [];
-
-  const trendText = revenueTrend === null
-    ? 'Insufficient data for trend'
-    : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`;
-  const trendColor = revenueTrend === null ? 'text-gray-500' : revenueTrend >= 0 ? 'text-emerald-400' : 'text-red-400';
   const trendText = revenueTrend === null
     ? 'Insufficient data for trend'
     : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? '↗️' : '↘️'} this week`
@@ -93,7 +85,32 @@ export default function DashboardPage() {
     alt: e.name,
   })) ?? []
 
+  // Event names for the command palette
+  const eventNames = data?.events?.map((e) => e.name) ?? []
+
   const liveEvent = data?.events?.find(() => data.checkInsLive)
+
+  // ── Projected revenue: aggregate across all events ─────────────────────────
+  const projectedRevenueInput = (() => {
+    const events = data?.events ?? []
+    if (events.length === 0) return null
+
+    const totalRemaining = events.reduce((sum, e) => sum + (e.remainingTickets ?? 0), 0)
+    const totalCapacity = events.reduce((sum, e) => sum + (e.totalTickets ?? 0), 0)
+    if (totalRemaining === 0 || totalCapacity === 0) return null
+
+    const avgPrice =
+      events.reduce((sum, e) => sum + (e.averageTicketPrice ?? 0), 0) / events.length
+    const soldSoFar = totalCapacity - totalRemaining
+    const sellThroughRate = soldSoFar / totalCapacity
+
+    return {
+      remainingTickets: totalRemaining,
+      averageTicketPrice: avgPrice,
+      sellThroughRate,
+      totalTickets: totalCapacity,
+    }
+  })()
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
@@ -121,7 +138,8 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <QuickActions />
+          {/* QuickActions — receives event names for command palette fuzzy search */}
+          <QuickActions eventNames={eventNames} />
 
           {/* Date range picker for filtering charts */}
           <div className="mb-6 flex justify-end">
@@ -171,6 +189,11 @@ export default function DashboardPage() {
                     detail={`Next settlement: ${nextSettlementDays} days`}
                   />
                 </Card>
+
+                {/* Projected Revenue card — hidden automatically if insufficient data */}
+                {projectedRevenueInput && (
+                  <ProjectedRevenueCard input={projectedRevenueInput} />
+                )}
               </ScrollColumn>
 
               {/* Middle Column - Attendees / Check-ins */}
@@ -215,6 +238,7 @@ export default function DashboardPage() {
                     <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
+                    {/* PerformanceChart now supports click-to-drill-down */}
                     <PerformanceChart data={barData} />
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
@@ -255,7 +279,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Demographics */}
+          {/* Demographics — GeoHeatmap is lazy-loaded inside DemographicsSection */}
           {!loading && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
