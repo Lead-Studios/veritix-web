@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isValidRedirect } from "@/lib/utils";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -39,12 +40,17 @@ export default function LoginForm() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      await loginUser({ email: data.email, password: data.password, rememberMe: data.rememberMe });
+      await loginUser({
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe,
+      });
       toast.success("Login successful!");
       const next = searchParams.get("next");
-      router.push(next && next.startsWith("/") ? next : "/dashboard");
+      router.push(isValidRedirect(next) ? next : "/dashboard");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Login failed. Please try again.";
+      const message =
+        err instanceof Error ? err.message : "Login failed. Please try again.";
       setError("root", { message });
     }
   };
@@ -59,7 +65,10 @@ export default function LoginForm() {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.12 } },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.5, staggerChildren: 0.12 },
+    },
   };
 
   const itemVariants = {
@@ -109,22 +118,35 @@ export default function LoginForm() {
             />
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex items-center gap-2">
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-2"
+          >
             <input
               id="rememberMe"
               type="checkbox"
               {...register("rememberMe")}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <label htmlFor="rememberMe" className="text-sm text-gray-700 select-none cursor-pointer">
+            <label
+              htmlFor="rememberMe"
+              className="text-sm text-gray-700 select-none cursor-pointer"
+            >
               Remember me
             </label>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+            >
               {errors.root && (
-                <p role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+                <p
+                  role="alert"
+                  className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600"
+                >
                   {errors.root.message}
                 </p>
               )}
@@ -136,14 +158,21 @@ export default function LoginForm() {
         </motion.form>
       </div>
 
-      <motion.div className="flex items-center gap-4 my-4" variants={itemVariants}>
+      <motion.div
+        className="flex items-center gap-4 my-4"
+        variants={itemVariants}
+      >
         <div className="flex-1 h-px bg-primary-black" />
         <span className="text-sm lg:text-xl">or continue with</span>
         <div className="flex-1 h-px bg-primary-black" />
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+        >
           <Button
             onClick={handleGoogleLogin}
             variant="outline"
@@ -177,7 +206,9 @@ export default function LoginForm() {
             type="button"
             variant="outline"
             className="w-full py-3 flex items-center justify-center gap-2"
-            onClick={() => { window.location.href = "/api/auth/google"; }}
+            onClick={() => {
+              window.location.href = "/api/auth/google";
+            }}
           >
             <FcGoogle size={20} />
             <span className="text-sm font-medium">Continue with Google</span>
