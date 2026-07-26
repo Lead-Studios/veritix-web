@@ -20,10 +20,20 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Login failed. Please check your credentials.");
+    throw new Error(
+      err?.message ?? "Login failed. Please check your credentials.",
+    );
   }
 
-  return res.json() as Promise<AuthResponse>;
+  const authResponse = (await res.json()) as AuthResponse;
+  if (typeof window !== "undefined") {
+    if (payload.rememberMe) {
+      localStorage.setItem("auth_token", authResponse.token);
+    } else {
+      sessionStorage.setItem("auth_token", authResponse.token);
+    }
+  }
+  return authResponse;
 }
 
 export async function forgotPassword(email: string): Promise<void> {
@@ -35,7 +45,9 @@ export async function forgotPassword(email: string): Promise<void> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to send reset link. Please try again.");
+    throw new Error(
+      err?.message ?? "Failed to send reset link. Please try again.",
+    );
   }
 }
 
@@ -48,5 +60,7 @@ export function logout(): void {
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
+  return (
+    localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token")
+  );
 }
