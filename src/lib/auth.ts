@@ -11,6 +11,10 @@ export interface AuthResponse {
   user: { id: string; email: string; name?: string };
 }
 
+interface ErrorResponse {
+  message?: string;
+}
+
 export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
@@ -19,7 +23,7 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+    const err: ErrorResponse = await res.json().catch(() => ({}));
     throw new Error(
       err?.message ?? "Login failed. Please check your credentials.",
     );
@@ -44,7 +48,7 @@ export async function forgotPassword(email: string): Promise<void> {
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+    const err: ErrorResponse = await res.json().catch(() => ({}));
     throw new Error(
       err?.message ?? "Failed to send reset link. Please try again.",
     );
@@ -63,10 +67,4 @@ export function getToken(): string | null {
   return (
     localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token")
   );
-}
-  }
-}
-
-export async function logout(): Promise<void> {
-  await fetch(`${API_BASE}/api/auth/logout`, { method: "POST" });
 }

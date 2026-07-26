@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
   isConnected,
   getPublicKey,
   requestAccess,
-} from '@stellar/freighter-api';
+} from "@stellar/freighter-api";
 
 export function useStellarWallet() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
@@ -18,26 +18,26 @@ export function useStellarWallet() {
         const key = await getPublicKey();
         setPublicKey(key);
         setIsWalletConnected(true);
-        localStorage.setItem('stellar_public_key', key);
+        localStorage.setItem("stellar_public_key", key);
         return;
       }
       const key = await requestAccess();
       setPublicKey(key);
       setIsWalletConnected(true);
-      localStorage.setItem('stellar_public_key', key);
-    } catch (error) {
-      console.error('Error connecting to Freighter:', error);
+      localStorage.setItem("stellar_public_key", key);
+    } catch (e: unknown) {
+      console.error("Error connecting to Freighter:", e);
     }
   }, []);
 
   const disconnect = useCallback(() => {
     setPublicKey(null);
     setIsWalletConnected(false);
-    localStorage.removeItem('stellar_public_key');
+    localStorage.removeItem("stellar_public_key");
   }, []);
 
   useEffect(() => {
-    const storedKey = localStorage.getItem('stellar_public_key');
+    const storedKey = localStorage.getItem("stellar_public_key");
     if (storedKey) {
       setPublicKey(storedKey);
       setIsWalletConnected(true);

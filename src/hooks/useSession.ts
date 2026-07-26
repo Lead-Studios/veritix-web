@@ -5,15 +5,21 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { getToken, logout } from "@/lib/auth";
 
+interface JwtPayload {
+  exp?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Checks whether the stored JWT is expired.
  * Returns true if the token is missing or its `exp` claim is in the past.
  */
 export function isTokenExpired(token: string): boolean {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload: JwtPayload = JSON.parse(atob(token.split(".")[1]));
     return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
-  } catch {
+  } catch (e: unknown) {
+    console.error("Failed to parse JWT", e);
     return true;
   }
 }
@@ -23,9 +29,10 @@ export function isTokenExpired(token: string): boolean {
  */
 export function getTokenExpiry(token: string): number | null {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload: JwtPayload = JSON.parse(atob(token.split(".")[1]));
     return typeof payload.exp === "number" ? payload.exp * 1000 : null;
-  } catch {
+  } catch (e: unknown) {
+    console.error("Failed to parse JWT", e);
     return null;
   }
 }
@@ -68,7 +75,8 @@ export function useSession() {
           toastId: "session-expiring-soon",
         });
       }
-    } catch {
+    } catch (e: unknown) {
+      console.error("Session check failed", e);
       // Never crash the page due to session check failure
       router.replace("/login");
     }

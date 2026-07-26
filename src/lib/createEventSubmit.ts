@@ -6,6 +6,10 @@ export interface CreateEventResponse {
   slug: string;
 }
 
+interface ErrorResponse {
+  message?: string;
+}
+
 export async function submitCreateEvent(
   data: EventFormData,
 ): Promise<CreateEventResponse> {
@@ -36,7 +40,7 @@ export async function submitCreateEvent(
 
   const res = await authedFetch("/api/events", { method: "POST", body });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+    const err: ErrorResponse = await res.json().catch(() => ({}));
     throw new Error(err.message ?? "Failed to create event. Please try again.");
   }
   return res.json();

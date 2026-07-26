@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+interface DuplicateEventResponse {
+  id: string;
+}
+
 export function useDuplicateEvent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,10 +18,14 @@ export function useDuplicateEvent() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`Failed to duplicate event: ${res.status}`);
-      const { id } = await res.json();
-      return id as string;
-    } catch (e) {
-      setError((e as Error).message);
+      const { id }: DuplicateEventResponse = await res.json();
+      return id;
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("An unknown error occurred");
+      }
       return null;
     } finally {
       setLoading(false);

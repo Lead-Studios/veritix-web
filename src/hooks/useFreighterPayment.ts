@@ -12,6 +12,7 @@ import {
   Operation,
   Asset,
   BASE_FEE,
+  Memo,
 } from "@stellar/stellar-sdk";
 
 export type PaymentStatus = "idle" | "signing" | "submitting" | "confirmed" | "failed";
@@ -39,10 +40,23 @@ const HORIZON_URL: Record<string, string> = {
   mainnet: "https://horizon.stellar.org",
 };
 
+interface HorizonAccountResponse {
+  sequence: string;
+}
+
+interface HorizonTransactionResponse {
+  hash: string;
+  extras?: {
+    result_codes?: {
+      transaction?: string;
+    };
+  };
+}
+
 async function getAccountSequence(publicKey: string, horizon: string): Promise<string> {
   const res = await fetch(`${horizon}/accounts/${publicKey}`);
   if (!res.ok) throw new Error("Failed to fetch account details");
-  const data = await res.json();
+  const data: HorizonAccountResponse = await res.json();
   return data.sequence;
 }
 
@@ -55,7 +69,7 @@ async function submitTransaction(
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ tx: signedXdr }),
   });
-  const data = await res.json();
+  const data: HorizonTransactionResponse = await res.json();
   if (!res.ok) {
     throw new Error(data.extras?.result_codes?.transaction ?? "Transaction submission failed");
   }
@@ -101,10 +115,7 @@ export function useFreighterPayment() {
           );
 
         if (memo) {
-          transaction.addMemo(
-            // @ts-expect-error - Memo.text is a valid Stellar SDK memo type
-            { type: "MEMO_TEXT", value: memo }
-          );
+          transaction.addMemo(Memo.text(memo));
         }
 
         transaction.setTimeout(30);
@@ -115,14 +126,14 @@ export function useFreighterPayment() {
           networkPassphrase: passphrase,
         });
 
-        setStatus("submitting");
+        setStatus("submitting
         const hash = await submitTransaction(signedXdr, horizon);
 
         setStatus("confirmed");
         setTxHash(hash);
 
         return { status: "confirmed", txHash: hash };
-      } catch (err) {
+      } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Payment failed";
         setStatus("failed");
         setError(msg);

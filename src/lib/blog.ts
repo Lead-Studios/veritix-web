@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export interface BlogPost {
   slug: string;
@@ -12,7 +12,15 @@ export interface BlogPost {
   content: string;
 }
 
-const CONTENT_DIR = path.join(process.cwd(), 'src', 'content', 'blog');
+interface Frontmatter {
+  title: string;
+  author: string;
+  date: string;
+  coverImage: string;
+  tags: string[];
+}
+
+const CONTENT_DIR = path.join(process.cwd(), "src", "content", "blog");
 
 export function getAllPosts(): BlogPost[] {
   if (!fs.existsSync(CONTENT_DIR)) {
@@ -21,14 +29,14 @@ export function getAllPosts(): BlogPost[] {
 
   const files = fs.readdirSync(CONTENT_DIR);
   const posts = files
-    .filter((file) => file.endsWith('.md'))
+    .filter((file) => file.endsWith(".md"))
     .map((file) => {
       const filePath = path.join(CONTENT_DIR, file);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const fileContent = fs.readFileSync(filePath, "utf-8");
       const { frontmatter, content } = parseFrontmatter(fileContent);
-      
+
       return {
-        slug: file.replace('.md', ''),
+        slug: file.replace(".md", ""),
         ...frontmatter,
         content,
         readingTime: calculateReadingTime(content),
@@ -41,14 +49,14 @@ export function getAllPosts(): BlogPost[] {
 
 export function getPostBySlug(slug: string): BlogPost | null {
   const filePath = path.join(CONTENT_DIR, `${slug}.md`);
-  
+
   if (!fs.existsSync(filePath)) {
     return null;
   }
 
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const fileContent = fs.readFileSync(filePath, "utf-8");
   const { frontmatter, content } = parseFrontmatter(fileContent);
-  
+
   return {
     slug,
     ...frontmatter,
@@ -57,17 +65,20 @@ export function getPostBySlug(slug: string): BlogPost | null {
   };
 }
 
-function parseFrontmatter(content: string): { frontmatter: Omit<BlogPost, 'slug' | 'content' | 'readingTime'>; content: string } {
+function parseFrontmatter(content: string): {
+  frontmatter: Frontmatter;
+  content: string;
+} {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
   const match = content.match(frontmatterRegex);
-  
+
   if (!match) {
     return {
       frontmatter: {
-        title: '',
-        author: '',
-        date: '',
-        coverImage: '',
+        title: "",
+        author: "",
+        date: "",
+        coverImage: "",
         tags: [],
       },
       content,
@@ -76,30 +87,30 @@ function parseFrontmatter(content: string): { frontmatter: Omit<BlogPost, 'slug'
 
   const frontmatterStr = match[1];
   const body = match[2];
-  
-  const frontmatter: any = {};
-  frontmatterStr.split('\n').forEach((line) => {
-    const [key, ...valueParts] = line.split(':');
+
+  const frontmatter: Partial<Frontmatter> = {};
+  frontmatterStr.split("\n").forEach((line) => {
+    const [key, ...valueParts] = line.split(":");
     if (key && valueParts.length > 0) {
-      const value = valueParts.join(':').trim().replace(/^"|"$/g, '');
-      
-      if (key === 'tags') {
-        frontmatter[key] = value
-          .replace(/^\[|\]$/g, '')
-          .split(',')
-          .map((tag: string) => tag.trim().replace(/^"|"$/g, ''));
+      const value = valueParts.join(":").trim().replace(/^"|"$/g, "");
+
+      if (key === "tags") {
+        (frontmatter as any)[key] = value
+          .replace(/^\[|\]$/g, "")
+          .split(",")
+          .map((tag: string) => tag.trim().replace(/^"|"$/g, ""));
       } else {
-        frontmatter[key] = value;
+        (frontmatter as any)[key] = value;
       }
     }
   });
 
   return {
     frontmatter: {
-      title: frontmatter.title || '',
-      author: frontmatter.author || '',
-      date: frontmatter.date || '',
-      coverImage: frontmatter.coverImage || '',
+      title: frontmatter.title || "",
+      author: frontmatter.author || "",
+      date: frontmatter.date || "",
+      coverImage: frontmatter.coverImage || "",
       tags: frontmatter.tags || [],
     },
     content: body,

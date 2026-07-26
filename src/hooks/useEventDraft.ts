@@ -2,12 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 
 const KEY = "veritix_event_draft";
 
-export function useEventDraft<T>(initial: T) {
+export function useEventDraft<T>(
+  initial: T,
+  isDraft: (val: unknown) => val is T,
+) {
   const [draft, setDraft] = useState<T>(() => {
     try {
       const saved = localStorage.getItem(KEY);
-      return saved ? (JSON.parse(saved) as T) : initial;
-    } catch { return initial; }
+      if (!saved) return initial;
+
+      const parsed = JSON.parse(saved);
+      return isDraft(parsed) ? parsed : initial;
+    } catch (e: unknown) {
+      console.error("Failed to load or parse event draft:", e);
+      return initial;
+    }
   });
 
   useEffect(() => {

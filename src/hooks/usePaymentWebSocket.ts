@@ -2,12 +2,25 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type WebSocketStatus = "connecting" | "connected" | "disconnected" | "error";
+export type WebSocketStatus =
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
 
 export interface PaymentEvent {
   txHash: string;
   status: "pending" | "confirmed" | "failed";
   message?: string;
+}
+
+function isPaymentEvent(value: unknown): value is PaymentEvent {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "txHash" in value &&
+    "status" in value
+  );
 }
 
 interface UsePaymentWebSocketOptions {
@@ -39,10 +52,12 @@ export function usePaymentWebSocket({
 
       ws.onmessage = (event) => {
         try {
-          const data: PaymentEvent = JSON.parse(event.data);
-          onPaymentUpdate?.(data);
-        } catch {
-          // ignore malformed messages
+          const data = JSON.parse(event.data);
+          if (isPaymentEvent(data)) {
+            onPaymentUpdate?.(data);
+          }
+        } catch (e: unknown) {
+          console.error("Failed to parse WebSocket message", e);
         }
       };
 
@@ -58,7 +73,8 @@ export function usePaymentWebSocket({
       };
 
       wsRef.current = ws;
-    } catch {
+    } catch (e: unknown) {
+      console.error("Failed to create WebSocket", e);
       setWsStatus("error");
       reconnectTimerRef.current = setTimeout(connect, reconnectInterval);
     }
