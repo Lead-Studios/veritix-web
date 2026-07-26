@@ -9,7 +9,11 @@ import { Button } from "../button";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { containerVariants, itemVariants } from "@/lib/animations/motionVariants";
+import { sanitiseErrorMessage } from "@/utils";
+import {
+  containerVariants,
+  itemVariants,
+} from "@/lib/animations/motionVariants";
 import { FcGoogle } from "react-icons/fc";
 import { IoWallet } from "react-icons/io5";
 import PasswordStrengthGuide from "./PasswordStrengthGuide";
@@ -36,50 +40,60 @@ export default function SignUpForm() {
     handleSubmit,
     formState: { isSubmitting },
     control,
-    setError
+    setError,
   } = useForm<FormValues>({
     resolver: zodResolver(signUpSchema),
   });
 
-  const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
+  const passwordValue = useWatch({
+    control,
+    name: "password",
+    defaultValue: "",
+  });
 
   const onSubmit = async (data: FormValues) => {
-  try {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    const result = await res.json();
+      const result = await res.json();
 
-    if (!res.ok) {
-      if (result?.errors && typeof result.errors === "object") {
-        Object.entries(result.errors).forEach(([field, message]) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setError(field as keyof FormValues, {
-            type: "server",
-            message: String(message),
+      if (!res.ok) {
+        if (result?.errors && typeof result.errors === "object") {
+          Object.entries(result.errors).forEach(([field, message]) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setError(field as keyof FormValues, {
+              type: "server",
+              message: String(message),
+            });
           });
-        });
+        }
+
+        throw new Error(result?.message || "Registration failed");
       }
 
-      throw new Error(result?.message || "Registration failed");
+      toast.success("Account created successfully");
+
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+      // Show email verification prompt
+      toast.info(
+        "Please check your email to verify your account before signing in.",
+        { autoClose: 8000 },
+      );
+      // router.push("/login");
+    } catch (err: unknown) {
+      toast.error(
+        sanitiseErrorMessage(
+          err instanceof Error ? err.message : "Something went wrong",
+        ),
+      );
     }
-
-    toast.success("Account created successfully");
-
-    router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
-    // Show email verification prompt
-    toast.info("Please check your email to verify your account before signing in.", { autoClose: 8000 });
-    // router.push("/login");
-
-  } catch (err: unknown) {
-    toast.error(err instanceof Error ? err.message : "Something went wrong");
-  }
-};
+  };
 
   const walletEnabled = process.env.NEXT_PUBLIC_WALLET_AUTH_ENABLED === "true";
 
@@ -87,7 +101,9 @@ export default function SignUpForm() {
     try {
       window.location.href = "/api/auth/google";
     } catch {
-      toast.error("Google sign-up failed. Please try again or use email registration.");
+      toast.error(
+        "Google sign-up failed. Please try again or use email registration.",
+      );
     }
   };
 
@@ -95,11 +111,11 @@ export default function SignUpForm() {
     try {
       window.location.href = "/api/auth/wallet";
     } catch {
-      toast.error("Wallet sign-up failed. Please ensure your wallet is connected and try again.");
+      toast.error(
+        "Wallet sign-up failed. Please ensure your wallet is connected and try again.",
+      );
     }
   };
-
-
 
   return (
     <motion.div
@@ -210,22 +226,22 @@ export default function SignUpForm() {
             variants={itemVariants}
           >
             <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button
+                onClick={handleGoogleSignUp}
+                variant="outline"
+                disabled={isSubmitting}
+                className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
               >
-                <Button
-                  onClick={handleGoogleSignUp}
-                  variant="outline"
-                  disabled={isSubmitting}
-                  className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <FcGoogle />
-                    <p className="text-sm font-medium">Google</p>
-                  </div>
-                </Button>
-              </motion.div>
+                <div className="flex items-center gap-2">
+                  <FcGoogle />
+                  <p className="text-sm font-medium">Google</p>
+                </div>
+              </Button>
+            </motion.div>
 
             {walletEnabled && (
               <motion.div
