@@ -30,18 +30,6 @@ export function getTokenExpiry(token: string): number | null {
   }
 }
 
-/**
- * Returns milliseconds until the token expires, or 0 if already expired.
- */
-export function getTokenExpiry(token: string): number | null {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
-  } catch {
-    return null;
-  }
-}
-
 function msUntilExpiry(token: string): number {
   const expiry = getTokenExpiry(token);
   if (expiry === null) return 0;
