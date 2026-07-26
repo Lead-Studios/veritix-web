@@ -11,7 +11,31 @@ import { Breadcrumb } from '@/components/ui';
 import { AppImage } from '@/components/shared/AppImage';
 import { useEvent } from '@/hooks/useEvents';
 import { useFavorite } from '@/hooks/useFavorite';
+import DOMPurify from 'dompurify';
+
 type TabType = 'about' | 'schedule' | 'performers';
+
+// Function to sanitize HTML
+const sanitizeAndProcessHtml = (html: string) => {
+  // Ensure DOMPurify runs only on the client-side
+  if (typeof window === 'undefined') {
+    return { __html: '' };
+  }
+
+  // Whitelist of allowed tags
+  const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'a'];
+
+  // Sanitize the HTML
+  const sanitizedHtml = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS,
+    ADD_ATTR: ['target', 'rel'], // Allow target and rel attributes
+  });
+
+  // Post-sanitization: Enforce target and rel on <a> tags
+  const cleanHtml = sanitizedHtml.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ');
+
+  return { __html: cleanHtml };
+};
 
 export default function EventDetailClient() {
   const params = useParams();
@@ -241,7 +265,10 @@ export default function EventDetailClient() {
               >
                 {event.description && (
                   <div className="space-y-4 p-4">
-                    <p className="text-gray-300 leading-relaxed">{event.description}</p>
+                    <div
+                      className="text-gray-300 leading-relaxed"
+                      dangerouslySetInnerHTML={sanitizeAndProcessHtml(event.description)}
+                    />
                   </div>
                 )}
 
@@ -337,7 +364,7 @@ export default function EventDetailClient() {
                           <p className="text-white font-semibold text-sm">{performer.name}</p>
                           <p className="text-gray-400 text-xs">{performer.role}</p>
                         </div>
-                      ))}
+                      ))}\
                     </div>
                   </>
                 ) : (
@@ -346,109 +373,109 @@ export default function EventDetailClient() {
                     <h3 className="text-2xl font-bold text-white mb-2">Performers Coming Soon</h3>
                     <p className="text-gray-400">Lineup will be announced soon</p>
                   </div>
-                )}
-              </motion.div>
-            )}
-          </div>
-
-          {/* Ticket Options - Full Width Below */}
-          <div className="w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl bg-[#00062580]/50 border border-[#E0E0E033]/20 overflow-hidden"
-            >
-              <div className="bg-[#4D21FF] p-5">
-                <h2 className="text-xl font-bold text-white">Ticket Options</h2>
-              </div>
-
-              <div className="p-6">
-                {event.ticketOptions && event.ticketOptions.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
-                    {event.ticketOptions.map((ticket, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        onClick={() => { setSelectedTicketIndex(index); setQuantity(1); }}
-                        className={`p-5 rounded-xl bg-[#00062580]/50 border hover:border-white/10 transition-all duration-300 cursor-pointer ${selectedTicketIndex === index ? 'border-[#4D21FF]' : 'border-[#E0E0E033]/20'}`}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <h3 className="text-base font-bold text-white">{ticket.name}</h3>
-                          {ticket.popular && (
-                            <span className="px-8 py-3 rounded-full text-xs font-bold  text-[#4D21FF] border border-[#4D21FF]">
-                              Popular
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="text-xs text-gray-400 mb-3">{ticket.description}</p>
-
-                        {ticket.benefits.length > 0 && (
-                          <ul className="space-y-1.5 mb-4">
-                            {ticket.benefits.map((benefit, i) => (
-                              <li key={i} className="text-xs text-gray-400">
-                                {benefit}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-
-                        <div className="flex items-end justify-between p-3 ">
-                          <div>
-                            <div className="text-xl font-bold text-[#4D21FF]">
-                              {ticket.price} ETH
-                            </div>
-                          </div>
-                          {ticket.remaining === 0 ? (
-                            <span className="text-xs font-semibold text-red-400">Sold out</span>
-                          ) : (
-                            <p className="text-xs text-gray-300">{ticket.remaining} remaining</p>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">🎫</div>
-                    <p className="text-gray-400 text-sm">Ticket info coming soon</p>
-                  </div>
-                )}
-
-                {event.ticketOptions && event.ticketOptions.length > 0 && (() => {
-                  const selected = event.ticketOptions![selectedTicketIndex];
-                  const isSoldOut = selected.remaining === 0;
-                  const maxQty = Math.min(selected.remaining, 10);
-                  const totalPrice = (selected.price * quantity).toFixed(4);
-                  return (
-                    <div className="border border-[#E0E0E033]/20 rounded-xl p-4 mb-4 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-300">Quantity</span>
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            aria-label="Decrease quantity"
-                            disabled={quantity <= 1 || isSoldOut}
-                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition"
-                          >
-                            −
-                          </button>
-                          <span className="text-white font-semibold w-6 text-center">{quantity}</span>
-                          <button
-                            type="button"
-                            aria-label="Increase quantity"
-                            disabled={quantity >= maxQty || isSoldOut}
-                            onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
-                            className="w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
+                )}\
+              </motion.div>\
+            )}\
+          </div>\
+\
+          {/* Ticket Options - Full Width Below */}\
+          <div className=\"w-full\">\
+            <motion.div\
+              initial={{ opacity: 0, y: 20 }}\
+              animate={{ opacity: 1, y: 0 }}\
+              className=\"rounded-2xl bg-[#00062580]/50 border border-[#E0E0E033]/20 overflow-hidden\"\
+            >\
+              <div className=\"bg-[#4D21FF] p-5\">\
+                <h2 className=\"text-xl font-bold text-white\">Ticket Options</h2>\
+              </div>\
+\
+              <div className=\"p-6\">\
+                {event.ticketOptions && event.ticketOptions.length > 0 ? (\
+                  <div className=\"grid grid-cols-1 md:grid-cols-1 gap-4 mb-6\">\
+                    {event.ticketOptions.map((ticket, index) => (\
+                      <motion.div\
+                        key={index}\
+                        initial={{ opacity: 0, y: 10 }}\
+                        animate={{ opacity: 1, y: 0 }}\
+                        transition={{ delay: index * 0.1 }}\
+                        onClick={() => { setSelectedTicketIndex(index); setQuantity(1); }}\
+                        className={`p-5 rounded-xl bg-[#00062580]/50 border hover:border-white/10 transition-all duration-300 cursor-pointer ${selectedTicketIndex === index ? 'border-[#4D21FF]' : 'border-[#E0E0E033]/20'}`}\
+                      >\
+                        <div className=\"flex items-start justify-between mb-3\">\
+                          <h3 className=\"text-base font-bold text-white\">{ticket.name}</h3>\
+                          {ticket.popular && (\
+                            <span className=\"px-8 py-3 rounded-full text-xs font-bold  text-[#4D21FF] border border-[#4D21FF]\">\
+                              Popular\
+                            </span>\
+                          )}\
+                        </div>\
+\
+                        <p className=\"text-xs text-gray-400 mb-3\">{ticket.description}</p>\
+\
+                        {ticket.benefits.length > 0 && (\
+                          <ul className=\"space-y-1.5 mb-4\">\
+                            {ticket.benefits.map((benefit, i) => (\
+                              <li key={i} className=\"text-xs text-gray-400\">\
+                                {benefit}\
+                              </li>\
+                            ))}\
+                          </ul>\
+                        )}\
+\
+                        <div className=\"flex items-end justify-between p-3 \">\
+                          <div>\
+                            <div className=\"text-xl font-bold text-[#4D21FF]\">\
+                              {ticket.price} ETH\
+                            </div>\
+                          </div>\
+                          {ticket.remaining === 0 ? (\
+                            <span className=\"text-xs font-semibold text-red-400\">Sold out</span>\
+                          ) : (\
+                            <p className=\"text-xs text-gray-300\">{ticket.remaining} remaining</p>\
+                          )}\
+                        </div>\
+                      </motion.div>\
+                    ))}\
+                  </div>\
+                ) : (\
+                  <div className=\"text-center py-8\">\
+                    <div className=\"text-4xl mb-2\">🎫</div>\
+                    <p className=\"text-gray-400 text-sm\">Ticket info coming soon</p>\
+                  </div>\
+                )}\
+\
+                {event.ticketOptions && event.ticketOptions.length > 0 && (() => {\
+                  const selected = event.ticketOptions![selectedTicketIndex];\
+                  const isSoldOut = selected.remaining === 0;\
+                  const maxQty = Math.min(selected.remaining, 10);\
+                  const totalPrice = (selected.price * quantity).toFixed(4);\
+                  return (\
+                    <div className=\"border border-[#E0E0E033]/20 rounded-xl p-4 mb-4 space-y-4\">\
+                      <div className=\"flex items-center justify-between\">\
+                        <span className=\"text-sm text-gray-300\">Quantity</span>\
+                        <div className=\"flex items-center gap-3\">\
+                          <button\
+                            type=\"button\"\
+                            aria-label=\"Decrease quantity\"\
+                            disabled={quantity <= 1 || isSoldOut}\
+                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}\
+                            className=\"w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition\"\
+                          >\
+                            −\
+                          </button>\
+                          <span className=\"text-white font-semibold w-6 text-center\">{quantity}</span>\
+                          <button\
+                            type=\"button\"\
+                            aria-label=\"Increase quantity\"\
+                            disabled={quantity >= maxQty || isSoldOut}\
+                            onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}\
+                            className=\"w-8 h-8 rounded-full bg-white/10 text-white font-bold flex items-center justify-center hover:bg-white/20 disabled:opacity-40 transition\"\
+                          >\
+                            +\
+                          </button>\
+                        </div>\
+                      </div>\
+                      <div className=\"flex items-center justify-between text-sm\">\
                         <span className="text-gray-400">{selected.name} × {quantity}</span>
                         <span className="text-white font-bold">{totalPrice} ETH</span>
                       </div>
