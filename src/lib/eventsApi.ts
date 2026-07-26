@@ -48,14 +48,11 @@ export async function fetchOrganizerById(id: string): Promise<Organizer | null> 
 }
 
 export async function fetchEventsByOrganizer(organizerId: string): Promise<Event[]> {
-  const events = await fetchEvents();
-  return events.filter(e => e.organizer?.name && getOrganizerIdFromName(e.organizer.name) === organizerId);
-}
-
-function getOrganizerIdFromName(name: string): string {
-  const nameToId: Record<string, string> = {
-    "Rhythm Nation Collective": "rhythm-nation-collective",
-    "Beat Collective": "beat-collective",
-  };
-  return nameToId[name] ?? name.toLowerCase().replace(/\s+/g, '-');
+  if (!API_BASE) {
+    const events = await fetchEvents();
+    return events.filter(e => e.organizer?.id === organizerId);
+  }
+  const res = await fetch(`${API_BASE}/events?organizerId=${encodeURIComponent(organizerId)}`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error("Failed to fetch organizer events");
+  return res.json() as Promise<Event[]>;
 }
