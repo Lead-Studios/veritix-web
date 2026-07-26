@@ -99,3 +99,20 @@ export function useOrganizerAnalytics(options: Options = {}) {
 
   return { data, loading, error };
 }
+
+// ─── Selectors ────────────────────────────────────────────────────────────────
+
+export function selectRevenue(data: OrganizerAnalytics | null) {
+  return data?.revenue ?? [];
+}
+
+export function selectTicketBreakdown(data: OrganizerAnalytics | null) {
+  return data?.ticketBreakdown ?? [];
+}
+
+export function selectLiveCheckIns(data: OrganizerAnalytics | null) {
+  return {
+    checkInsLive: data?.checkInsLive ?? false,
+    doorsOpenInMinutes: data?.doorsOpenInMinutes,
+  };
+}

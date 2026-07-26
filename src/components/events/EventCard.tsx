@@ -5,7 +5,25 @@ import Link from 'next/link';
 import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { HiCalendar, HiClock, HiLocationMarker } from 'react-icons/hi';
+import { HiCalendar, HiClock, HiLocationMarker, HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import { useFavorite } from '@/hooks/useFavorite';
+
+function FavoriteToggle({ eventId }: { eventId: string }) {
+  const { isLiked, toggle } = useFavorite(eventId);
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }}
+      className="p-1.5 rounded-full hover:bg-white/10 text-rose-500 transition-colors"
+      aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
+    >
+      {isLiked ? <HiHeart className="w-5 h-5 fill-current" /> : <HiOutlineHeart className="w-5 h-5" />}
+    </button>
+  );
+}
 
 interface EventCardProps {
   event: Event;
@@ -59,8 +77,11 @@ function EventCard({ event, index = 0 }: EventCardProps) {
                 >
                   {event.name}
                 </Link>
-                <div className="text-xl font-bold text-[#6B8CFF] whitespace-nowrap">
-                  {event.price}
+                <div className="flex items-center gap-2">
+                  <FavoriteToggle eventId={event.id} />
+                  <div className="text-xl font-bold text-[#6B8CFF] whitespace-nowrap">
+                    {event.price}
+                  </div>
                 </div>
               </div>
 
