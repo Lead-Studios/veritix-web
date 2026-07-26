@@ -172,7 +172,7 @@ export default function DashboardPage() {
               title={
                 !hasData ? "No analytics data available to export" : undefined
               }
-              className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-[#21D4FF] transition hover:bg-[#4D21FF]/20 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Export CSV
             </button>
@@ -384,4 +384,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
+} 
