@@ -28,14 +28,14 @@ export async function fetchOrganizerById(
 ): Promise<Organizer | null> {
   if (!API_BASE) {
     const organizerMap: Record<string, Organizer> = {
-      "Rhythm Nation Collective": {
+      "rhythm-nation-collective": {
         id: "rhythm-nation-collective",
         name: "Rhythm Nation Collective",
         avatar: "/images/organizers/rhythm-nation.png",
         description: "Bringing immersive music experiences to life",
         verified: true,
       },
-      "Beat Collective": {
+      "beat-collective": {
         id: "beat-collective",
         name: "Beat Collective",
         avatar: "/images/organizers/beat-collective.png",
@@ -57,17 +57,9 @@ export async function fetchEventsByOrganizer(
   organizerId: string,
 ): Promise<Event[]> {
   const events = await fetchEvents();
-  return events.filter(
-    (e) =>
-      e.organizer?.name &&
-      getOrganizerIdFromName(e.organizer.name) === organizerId,
-  );
+  return events.filter((e) => e.organizer?.id === organizerId);
 }
 
 function getOrganizerIdFromName(name: string): string {
-  const nameToId: Record<string, string> = {
-    "Rhythm Nation Collective": "rhythm-nation-collective",
-    "Beat Collective": "beat-collective",
-  };
-  return nameToId[name] ?? name.toLowerCase().replace(/\s+/g, "-");
+  return name.toLowerCase().replace(/\s+/g, "-");
 }

@@ -25,6 +25,17 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
     );
   }
 
+  const authResponse = (await res.json()) as AuthResponse;
+  if (typeof window !== "undefined") {
+    if (payload.rememberMe) {
+      localStorage.setItem("auth_token", authResponse.token);
+    } else {
+      sessionStorage.setItem("auth_token", authResponse.token);
+    }
+  }
+  return authResponse;
+}
+
 export async function forgotPassword(email: string): Promise<void> {
   const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
     method: "POST",
@@ -37,6 +48,22 @@ export async function forgotPassword(email: string): Promise<void> {
     throw new Error(
       err?.message ?? "Failed to send reset link. Please try again.",
     );
+  }
+}
+
+export function logout(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("auth_token");
+    sessionStorage.removeItem("auth_token");
+  }
+}
+
+export function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return (
+    localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token")
+  );
+}
   }
 }
 
