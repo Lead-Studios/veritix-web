@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { FocusTrap } from "./FocusTrap";
 
 interface ModalProps {
   open: boolean;
@@ -58,38 +59,40 @@ export function Modal({
 
           {/* Panel */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              className={`relative w-full ${sizeClasses[size]} rounded-3xl border border-white/10 bg-[#0b1025] p-6 shadow-[0_40px_80px_rgba(10,16,40,0.7)]`}
-              initial={{ opacity: 0, scale: 0.92, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 16 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-            >
-              {/* Gradient top border accent */}
-              <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-[#4d21ff] to-[#21d4ff]" />
-
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 rounded-full bg-white/10 p-1.5 text-white/60 transition hover:bg-white/20 hover:text-white"
-                aria-label="Close modal"
+            <FocusTrap active={open}>
+              <motion.div
+                className={`relative w-full ${sizeClasses[size]} rounded-3xl border border-white/10 bg-[#0b1025] p-6 shadow-[0_40px_80px_rgba(10,16,40,0.7)]`}
+                initial={{ opacity: 0, scale: 0.92, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 16 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
               >
-                <X size={16} />
-              </button>
+                {/* Gradient top border accent */}
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-[#4d21ff] to-[#21d4ff]" />
 
-              {(title || description) && (
-                <div className="mb-5 pr-6">
-                  {title && (
-                    <h2 className="text-xl font-semibold text-white">{title}</h2>
-                  )}
-                  {description && (
-                    <p className="mt-1 text-sm text-white/60">{description}</p>
-                  )}
-                </div>
-              )}
+                {/* Close button */}
+                <button
+                  onClick={onClose}
+                  className="absolute right-4 top-4 rounded-full bg-white/10 p-1.5 text-white/60 transition hover:bg-white/20 hover:text-white"
+                  aria-label="Close modal"
+                >
+                  <X size={16} />
+                </button>
 
-              {children}
-            </motion.div>
+                {(title || description) && (
+                  <div className="mb-5 pr-6">
+                    {title && (
+                      <h2 className="text-xl font-semibold text-white">{title}</h2>
+                    )}
+                    {description && (
+                      <p className="mt-1 text-sm text-white/60">{description}</p>
+                    )}
+                  </div>
+                )}
+
+                {children}
+              </motion.div>
+            </FocusTrap>
           </div>
         </>
       )}
