@@ -121,13 +121,23 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
         <div className="bg-[#1a1f3a] p-3 rounded-xl">
           <QRCode ref={qrRef} value={ticket.ticketCode} />
         </div>
-        <button
-          onClick={handleDownloadQR}
-          className="text-xs text-[#6B8CFF] hover:text-[#4D21FF] underline transition-colors"
-          aria-label="Download QR code"
-        >
-          Download QR
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadQR}
+            className="text-xs text-[#6B8CFF] hover:text-[#4D21FF] underline transition-colors"
+            aria-label="Download QR code"
+          >
+            Download QR
+          </button>
+          <span className="text-gray-600 text-xs">|</span>
+          <button
+            onClick={() => window.print()}
+            className="text-xs text-[#6B8CFF] hover:text-[#4D21FF] underline transition-colors print:hidden"
+            aria-label="Print Ticket"
+          >
+            Print Ticket
+          </button>
+        </div>
       </div>
 
       {/* Ticket code */}
