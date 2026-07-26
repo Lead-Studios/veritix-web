@@ -88,7 +88,7 @@ export const createEventSchema = z
     tickets: z.array(ticketSchema).min(1, "At least one ticket type is required"),
 
     // Blockchain
-    blockchainNetwork: z.enum(["ethereum", "polygon", "solana"]),
+    blockchainNetwork: z.enum(["stellar"]),
     treasuryAddress: z.string().min(1, "Treasury address is required"),
     creatorRoyalty: z.number().min(0).max(10),
 
@@ -124,20 +124,12 @@ export const createEventSchema = z
     // Treasury address format validation per network
     if (data.treasuryAddress) {
       const addr = data.treasuryAddress.trim();
-      const evmRe = /^0x[0-9a-fA-F]{40}$/;
-      const solanaRe = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-      const examples: Record<string, string> = {
-        ethereum: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
-        polygon: '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed',
-        solana: 'So11111111111111111111111111111111111111112',
-      };
-      const valid =
-        (data.blockchainNetwork === 'solana' && solanaRe.test(addr)) ||
-        (['ethereum', 'polygon'].includes(data.blockchainNetwork) && evmRe.test(addr));
+      const stellarRe = /^G[A-Z2-7]{55}$/;
+      const valid = data.blockchainNetwork === 'stellar' && stellarRe.test(addr);
       if (!valid) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Invalid ${data.blockchainNetwork} address. Example: ${examples[data.blockchainNetwork]}`,
+          message: `Invalid ${data.blockchainNetwork} address. Example: GASW2... (56-character base32 G-address)`,
           path: ['treasuryAddress'],
         });
       }
