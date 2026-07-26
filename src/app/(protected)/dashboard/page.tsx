@@ -82,25 +82,29 @@ export default function DashboardPage() {
   const payoutsQueued = data?.payoutsQueued ?? 0;
   const nextSettlementDays = data?.nextSettlementDays ?? 0;
 
-  const revenueTrend = (() => {
+  const { revenueTrend, trendText, trendColor } = useMemo(() => {
     const rev = data?.revenue ?? [];
-    if (rev.length < 14) return null;
+    if (rev.length < 14) {
+      return {
+        revenueTrend: null,
+        trendText: "Insufficient data for trend",
+        trendColor: "text-gray-500",
+      };
+    }
     const currentWeek = rev.slice(-7).reduce((sum, d) => sum + d.revenue, 0);
     const lastWeek = rev.slice(-14, -7).reduce((sum, d) => sum + d.revenue, 0);
-    if (lastWeek === 0) return null;
-    return ((currentWeek - lastWeek) / lastWeek) * 100;
-  })();
-
-  const trendText =
-    revenueTrend === null
-      ? "Insufficient data for trend"
-      : `Trending by ${Math.abs(revenueTrend).toFixed(1)}% ${revenueTrend >= 0 ? "↗️" : "↘️"} this week`;
-  const trendColor =
-    revenueTrend === null
-      ? "text-gray-500"
-      : revenueTrend >= 0
-        ? "text-emerald-400"
-        : "text-red-400";
+    if (lastWeek === 0) {
+      return {
+        revenueTrend: null,
+        trendText: "Insufficient data for trend",
+        trendColor: "text-gray-500",
+      };
+    }
+    const trend = ((currentWeek - lastWeek) / lastWeek) * 100;
+    const text = `Trending by ${Math.abs(trend).toFixed(1)}% ${trend >= 0 ? "↗️" : "↘️"} this week`;
+    const color = trend >= 0 ? "text-emerald-400" : "text-red-400";
+    return { revenueTrend: trend, trendText: text, trendColor: color };
+  }, [data?.revenue]);
 
   const eventImgs =
     data?.events?.slice(0, 4).map((e) => ({
