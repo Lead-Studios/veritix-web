@@ -20,11 +20,10 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Login failed. Please check your credentials.");
+    throw new Error(
+      err?.message ?? "Login failed. Please check your credentials.",
+    );
   }
-
-  return res.json() as Promise<AuthResponse>;
-}
 
 export async function forgotPassword(email: string): Promise<void> {
   const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
@@ -35,18 +34,12 @@ export async function forgotPassword(email: string): Promise<void> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to send reset link. Please try again.");
+    throw new Error(
+      err?.message ?? "Failed to send reset link. Please try again.",
+    );
   }
 }
 
-export function logout(): void {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("auth_token");
-    sessionStorage.removeItem("auth_token");
-  }
-}
-
-export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
+export async function logout(): Promise<void> {
+  await fetch(`${API_BASE}/api/auth/logout`, { method: "POST" });
 }
