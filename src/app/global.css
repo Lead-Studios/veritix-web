@@ -264,3 +264,13 @@ body {
     border-color: rgba(255, 255, 255, 0.3) !important;
   }
 }
+
+@media print {
+  nav, header, sidebar, footer, .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
