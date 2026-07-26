@@ -51,6 +51,7 @@ export interface OrganizerAnalytics {
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 interface Options {
+  organizerId?: string;
   from?: string;
   to?: string;
 }
@@ -60,7 +61,7 @@ export function useOrganizerAnalytics(options: Options = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { from, to } = options;
+  const { organizerId, from, to } = options;
 
   useEffect(() => {
     let cancelled = false;
@@ -68,6 +69,7 @@ export function useOrganizerAnalytics(options: Options = {}) {
     setError(null);
 
     const params = new URLSearchParams();
+    if (organizerId) params.set("organizerId", organizerId);
     if (from) params.set("from", from);
     if (to) params.set("to", to);
     const qs = params.toString() ? `?${params.toString()}` : "";
@@ -93,7 +95,7 @@ export function useOrganizerAnalytics(options: Options = {}) {
     return () => {
       cancelled = true;
     };
-  }, [from, to]);
+  }, [organizerId, from, to]);
 
   return { data, loading, error };
 }
