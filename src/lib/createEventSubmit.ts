@@ -1,4 +1,5 @@
 import { EventFormData } from "@/app/(protected)/events/create/page";
+import { authedFetch } from "./authedFetch";
 
 export interface CreateEventResponse {
   id: string;
@@ -33,7 +34,7 @@ export async function submitCreateEvent(
     }
   });
 
-  const res = await fetch("/api/events", { method: "POST", body });
+  const res = await authedFetch("/api/events", { method: "POST", body });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message ?? "Failed to create event. Please try again.");
