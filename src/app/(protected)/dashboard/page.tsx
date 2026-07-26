@@ -210,7 +210,11 @@ export default function DashboardPage() {
                 <Card>
                   <div className="mb-4">
                     <p className="text-2xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                    <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
+                    {revenueTrend !== null ? (
+                      <p className={`text-xs ${trendColor}`}>{trendText}</p>
+                    ) : (
+                      <p className="text-xs text-gray-500">Insufficient data</p>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {eventImgs.map((image, index) => (
