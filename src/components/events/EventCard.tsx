@@ -50,6 +50,14 @@ function EventCard({ event, index = 0 }: EventCardProps) {
           {/* Event Details - Bottom on mobile, Right on larger */}
           <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
             <div className="space-y-3">
+              {event.category && (
+                <Link
+                  href={`/events?category=${encodeURIComponent(event.category)}`}
+                  className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors"
+                >
+                  {event.category}
+                </Link>
+              )}
               {/* Event Name and Price - Same Line */}
               <div className="flex items-start justify-between gap-3">
                 <Link 
