@@ -1,17 +1,13 @@
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import { authedFetch } from "./authedFetch";
+import { CreateEventFormData } from "./createEventValidation";
+import { apiClient } from "./apiClient";
 
 export interface CreateEventResponse {
   id: string;
   slug: string;
 }
 
-interface ErrorResponse {
-  message?: string;
-}
-
 export async function submitCreateEvent(
-  data: EventFormData,
+  data: CreateEventFormData,
 ): Promise<CreateEventResponse> {
   const body = new FormData();
   Object.entries(data).forEach(([key, value]) => {
@@ -28,8 +24,6 @@ export async function submitCreateEvent(
         }
       });
     } else if (value !== null && value !== undefined) {
-      // Plain objects (e.g. recurrence config) need to be serialised so the
-      // backend can parse them — String(obj) would otherwise produce "[object Object]".
       if (typeof value === "object") {
         body.append(key, JSON.stringify(value));
       } else {
@@ -38,10 +32,5 @@ export async function submitCreateEvent(
     }
   });
 
-  const res = await authedFetch("/api/events", { method: "POST", body });
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json().catch(() => ({}));
-    throw new Error(err.message ?? "Failed to create event. Please try again.");
-  }
-  return res.json();
+  return apiClient.post<CreateEventResponse>("/api/events", body);
 }

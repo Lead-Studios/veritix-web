@@ -1,26 +1,27 @@
 import type { Event } from "@/types/event";
 import type { Organizer } from "@/types/organizer";
 import { mockEvents } from "@/mocks/events";
+import { apiClient } from "./apiClient";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 export async function fetchEvents(): Promise<Event[]> {
   if (!API_BASE) return mockEvents;
-  const res = await fetch(`${API_BASE}/events`, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error("Failed to fetch events");
-  return res.json() as Promise<Event[]>;
+  return apiClient.get<Event[]>("/events");
 }
 
 export async function fetchEventById(id: string): Promise<Event | null> {
   if (!API_BASE) {
     return mockEvents.find((e) => e.id === id) ?? null;
   }
-  const res = await fetch(`${API_BASE}/events/${id}`, {
-    next: { revalidate: 60 },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to fetch event");
-  return res.json() as Promise<Event>;
+  try {
+    return await apiClient.get<Event>(`/events/${id}`);
+  } catch (error) {
+    if (error instanceof Error && (error as any).status === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function fetchOrganizerById(
@@ -45,12 +46,14 @@ export async function fetchOrganizerById(
     };
     return organizerMap[id] ?? null;
   }
-  const res = await fetch(`${API_BASE}/organizers/${id}`, {
-    next: { revalidate: 60 },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to fetch organizer");
-  return res.json() as Promise<Organizer>;
+  try {
+    return await apiClient.get<Organizer>(`/organizers/${id}`);
+  } catch (error) {
+    if (error instanceof Error && (error as any).status === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function fetchEventsByOrganizer(
@@ -58,8 +61,4 @@ export async function fetchEventsByOrganizer(
 ): Promise<Event[]> {
   const events = await fetchEvents();
   return events.filter((e) => e.organizer?.id === organizerId);
-}
-
-function getOrganizerIdFromName(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, "-");
 }

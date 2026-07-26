@@ -1,6 +1,5 @@
 import { EventFormData } from "./createEventSubmit";
-
-// FE-065: Draft persistence helpers for create-event flow
+import { apiClient } from "./apiClient";
 
 const DRAFT_STORAGE_KEY = "veritix_event_draft";
 const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -35,14 +34,6 @@ function readLocalDraft(): EventDraft | null {
   }
 }
 
-function clearLocalDraft(): void {
-  try {
-    localStorage.removeItem(DRAFT_STORAGE_KEY);
-  } catch (e: unknown) {
-    console.error("Failed to clear draft from local storage", e);
-  }
-}
-
 export async function saveDraft(
   formData: Partial<EventFormData>,
 ): Promise<EventDraft> {
@@ -53,16 +44,11 @@ export async function saveDraft(
   writeLocalDraft(localDraft);
 
   try {
-    const res = await fetch("/api/events/drafts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ formData }),
+    const serverDraft = await apiClient.post<EventDraft>("/api/events/drafts", {
+      formData,
     });
-    if (res.ok) {
-      const serverDraft = (await res.json()) as EventDraft;
-      writeLocalDraft(serverDraft);
-      return serverDraft;
-    }
+    writeLocalDraft(serverDraft);
+    return serverDraft;
   } catch (e: unknown) {
     console.error("Failed to save draft to server", e);
   }
@@ -75,12 +61,11 @@ export async function loadDraft(draftId: string): Promise<EventDraft | null> {
   if (local && local.id === draftId) return local;
 
   try {
-    const res = await fetch(`/api/events/drafts/${draftId}`);
-    if (res.ok) {
-      const serverDraft = (await res.json()) as EventDraft;
-      writeLocalDraft(serverDraft);
-      return serverDraft;
-    }
+    const serverDraft = await apiClient.get<EventDraft>(
+      `/api/events/drafts/${draftId}`,
+    );
+    writeLocalDraft(serverDraft);
+    return serverDraft;
   } catch (e: unknown) {
     console.error("Failed to load draft from server", e);
   }
