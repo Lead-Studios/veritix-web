@@ -3,6 +3,7 @@ import { Manrope, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
 import "./global.css";
 import { AuthProvider } from "@/context/authContext";
+import { KeyboardShortcutHelp } from "@/components/KeyboardShortcutHelp";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <AuthProvider>
+          <KeyboardShortcutHelp />
           <main id="main-content" tabIndex={-1}>
             {children}
           </main>
