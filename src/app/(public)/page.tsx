@@ -57,8 +57,12 @@ function TrendingEventCard({ event }: { event: Event }) {
           {event.category}
         </span>
         <div className="flex items-center gap-3">
-          <Share2 size={16} />
-          <Heart size={16} />
+          <button type="button" aria-label="Share event" className="p-0 bg-transparent border-0 cursor-pointer">
+            <Share2 size={16} />
+          </button>
+          <button type="button" aria-label="Add to favourites" className="p-0 bg-transparent border-0 cursor-pointer">
+            <Heart size={16} />
+          </button>
         </div>
       </div>
 
@@ -293,7 +297,7 @@ export default function Home() {
                   placeholder="Search events, artists..."
                   value={searchQ}
                   onChange={(e) => setSearchQ(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event name or keyword"
                 />
               </div>
@@ -304,7 +308,7 @@ export default function Home() {
                   placeholder="Location..."
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event location"
                 />
               </div>
@@ -315,7 +319,7 @@ export default function Home() {
                   placeholder="Date..."
                   value={searchDate}
                   onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event date"
                 />
               </div>
@@ -419,8 +423,12 @@ export default function Home() {
                     {event.category}
                   </span>
                   <div className="flex items-center gap-3">
-                    <Share2 size={16} />
-                    <Heart size={16} />
+                    <button type="button" aria-label="Share event" className="p-0 bg-transparent border-0 cursor-pointer">
+                      <Share2 size={16} />
+                    </button>
+                    <button type="button" aria-label="Add to favourites" className="p-0 bg-transparent border-0 cursor-pointer">
+                      <Heart size={16} />
+                    </button>
                   </div>
                 </div>
 
