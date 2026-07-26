@@ -1,3 +1,5 @@
+import { apiClient } from "./apiClient";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export interface LoginPayload {
@@ -11,25 +13,11 @@ export interface AuthResponse {
   user: { id: string; email: string; name?: string };
 }
 
-interface ErrorResponse {
-  message?: string;
-}
-
 export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json().catch(() => ({}));
-    throw new Error(
-      err?.message ?? "Login failed. Please check your credentials.",
-    );
-  }
-
-  const authResponse = (await res.json()) as AuthResponse;
+  const authResponse = await apiClient.post<AuthResponse>(
+    "/api/auth/login",
+    payload,
+  );
   if (typeof window !== "undefined") {
     if (payload.rememberMe) {
       localStorage.setItem("auth_token", authResponse.token);
@@ -41,18 +29,7 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function forgotPassword(email: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json().catch(() => ({}));
-    throw new Error(
-      err?.message ?? "Failed to send reset link. Please try again.",
-    );
-  }
+  await apiClient.post("/api/auth/forgot-password", { email });
 }
 
 export function logout(): void {
