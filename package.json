@@ -13,8 +13,10 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-slot": "^1.2.4",
+    "@types/dompurify": "^3.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dompurify": "^3.4.12",
     "framer-motion": "^12.28.1",
     "lucide-react": "^0.562.0",
     "next": "16.1.4",

@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { sanitiseErrorMessage } from "@/utils";
 import { loginUser } from "@/lib/auth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isValidRedirect } from "@/lib/utils";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -47,11 +48,10 @@ export default function LoginForm() {
       });
       toast.success("Login successful!");
       const next = searchParams.get("next");
-      router.push(next && next.startsWith("/") ? next : "/dashboard");
+      router.push(isValidRedirect(next) ? next : "/dashboard");
     } catch (err) {
-      const message = sanitiseErrorMessage(
-        err instanceof Error ? err.message : "Login failed. Please try again.",
-      );
+      const message =
+        err instanceof Error ? err.message : "Login failed. Please try again.";
       setError("root", { message });
     }
   };
