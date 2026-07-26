@@ -8,9 +8,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── mocks ──────────────────────────────────────────────────────────────────
 vi.mock("next/link", () => ({
-  default: ({ href, children }: { href: string; children: React.ReactNode }) => (
-    <a href={href}>{children}</a>
-  ),
+  default: ({
+    href,
+    children,
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => <a href={href}>{children}</a>,
 }));
 
 vi.mock("next/navigation", () => ({
@@ -18,27 +22,42 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({ get: vi.fn().mockReturnValue(null) }),
 }));
 
-vi.mock("react-toastify", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
+vi.mock("react-toastify", () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
 
 vi.mock("framer-motion", () => {
-  const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
+  const motion: Record<
+    string,
+    React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>
+  > = {};
   ["div", "form", "h2", "p"].forEach((tag) => {
-    motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);
+    motion[tag] = ({ children, ...rest }) =>
+      React.createElement(tag, rest, children);
   });
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react") as typeof import("react");
   const tags = ["div", "form", "h2", "p"] as const;
   const motion = Object.fromEntries(
-    tags.map((tag) => [tag, ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => React.createElement(tag, rest, children)])
+    tags.map((tag) => [
+      tag,
+      ({
+        children,
+        ...rest
+      }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
+        React.createElement(tag, rest, children),
+    ]),
   );
-  return { motion, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
+  return {
+    motion,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
 });
 
 vi.mock("@/lib/auth", () => ({
-  loginUser: vi.fn().mockResolvedValue({ token: "tok", user: { id: "1", email: "u@e.com" } }),
+  loginUser: vi.fn().mockResolvedValue(undefined),
   forgotPassword: vi.fn().mockResolvedValue(undefined),
   logout: vi.fn(),
-  getToken: vi.fn().mockReturnValue(null),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -67,7 +86,9 @@ describe("LoginForm", () => {
   it("renders email and password fields and a submit button", () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(document.getElementById("password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /sign in/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows validation errors when submitted empty", async () => {
@@ -78,7 +99,9 @@ describe("LoginForm", () => {
   });
 
   it("shows an error for an invalid email format", async () => {
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "not-an-email" } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "not-an-email" },
+    });
     submitForm(container);
     await waitFor(() => {
       expect(screen.getByText(/valid email/i)).toBeInTheDocument();
@@ -86,8 +109,12 @@ describe("LoginForm", () => {
   });
 
   it("shows an error when password is too short", async () => {
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "user@example.com" } });
-    fireEvent.change(document.getElementById("password")!, { target: { value: "abc" } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(document.getElementById("password")!, {
+      target: { value: "abc" },
+    });
     submitForm(container);
     await waitFor(() => {
       expect(screen.getByText(/at least 6 characters/i)).toBeInTheDocument();
@@ -95,8 +122,12 @@ describe("LoginForm", () => {
   });
 
   it("disables the submit button while the form is submitting", async () => {
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "user@example.com" } });
-    fireEvent.change(document.getElementById("password")!, { target: { value: "password123" } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(document.getElementById("password")!, {
+      target: { value: "password123" },
+    });
     const btn = screen.getByRole("button", { name: /sign in/i });
     submitForm(container);
     await waitFor(() => expect(btn).toBeDisabled());
@@ -128,7 +159,9 @@ describe("SignUpForm", () => {
   });
 
   it("enforces password complexity rules", async () => {
-    fireEvent.change(document.getElementById("password")!, { target: { value: "simple" } });
+    fireEvent.change(document.getElementById("password")!, {
+      target: { value: "simple" },
+    });
     submitForm(container);
     await waitFor(() => {
       // PasswordStrengthGuide shows "uppercase" text; the error message also contains it
@@ -138,7 +171,9 @@ describe("SignUpForm", () => {
   });
 
   it("enforces minimum username length", async () => {
-    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: "ab" } });
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: "ab" },
+    });
     submitForm(container);
     await waitFor(() => {
       expect(screen.getByText(/at least 3 characters/i)).toBeInTheDocument();
@@ -156,11 +191,15 @@ describe("ForgotPasswordForm", () => {
 
   it("renders an email field and submit button", () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send magic link/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /send magic link/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows a validation error for an invalid email", async () => {
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "bad" } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "bad" },
+    });
     submitForm(container);
     await waitFor(() => {
       expect(screen.getByText(/valid email/i)).toBeInTheDocument();
@@ -173,7 +212,9 @@ describe("ForgotPasswordForm", () => {
     (forgotPassword as ReturnType<typeof vi.fn>).mockImplementationOnce(
       () => new Promise(() => {}),
     );
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "user@example.com" } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" },
+    });
     const btn = screen.getByRole("button", { name: /send magic link/i });
     submitForm(container);
     await waitFor(() => expect(btn).toBeDisabled());

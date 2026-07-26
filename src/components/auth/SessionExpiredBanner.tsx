@@ -3,8 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { getToken, logout } from "@/lib/auth";
-import { getTokenExpiry } from "@/hooks/useSession";
+import { logout } from "@/lib/auth";
 
 const WARN_BEFORE_MS = 5 * 60 * 1000; // 5 minutes
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
@@ -23,16 +22,11 @@ export default function SessionExpiredBanner() {
   const handleExtend = useCallback(async () => {
     setExtending(true);
     try {
-      const token = getToken();
       const res = await fetch(`${API_BASE}/api/auth/refresh`, {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Refresh failed");
-      const data = await res.json();
-      if (data?.token) {
-        localStorage.setItem("auth_token", data.token);
-      }
       setShowWarning(false);
       toast.success("Session extended successfully.");
     } catch {
