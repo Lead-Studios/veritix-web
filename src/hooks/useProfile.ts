@@ -11,13 +11,6 @@ export interface UserProfile {
   walletAddress?: string;
 }
 
-function authHeaders(): HeadersInit {
-  const token = getToken();
-  return token
-    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
-    : { "Content-Type": "application/json" };
-}
-
 export async function fetchProfile(): Promise<UserProfile> {
   const res = await fetch("/api/auth/me", { headers: authHeaders() });
   if (!res.ok) throw new Error("Failed to load profile");
@@ -29,12 +22,15 @@ export async function updateProfile(
 ): Promise<UserProfile> {
   const res = await fetch("/api/auth/me", {
     method: "PATCH",
-    headers: authHeaders(),
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(patch),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { message?: string }).message ?? "Failed to save profile");
+    throw new Error(
+      (err as { message?: string }).message ?? "Failed to save profile",
+    );
   }
   return res.json();
 }
@@ -57,15 +53,19 @@ export function useProfile() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const save = useCallback(
-    async (patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>) => {
+    async (
+      patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>,
+    ) => {
       const updated = await updateProfile(patch);
       setProfile(updated);
       return updated;
     },
-    []
+    [],
   );
 
   return { profile, loading, error, save, reload: load };
