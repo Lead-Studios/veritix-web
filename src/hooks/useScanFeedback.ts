@@ -8,8 +8,11 @@ export function useScanFeedback() {
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const getAudioContext = useCallback(() => {
+    if (typeof window === "undefined") return null;
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      audioContextRef.current = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
     }
     return audioContextRef.current;
   }, []);
@@ -18,21 +21,25 @@ export function useScanFeedback() {
     (frequency: number, duration: number, type: OscillatorType = "sine") => {
       try {
         const ctx = getAudioContext();
+        if (!ctx) return;
         const oscillator = ctx.createOscillator();
         const gain = ctx.createGain();
         oscillator.type = type;
         oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
         gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          ctx.currentTime + duration,
+        );
         oscillator.connect(gain);
         gain.connect(ctx.destination);
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + duration);
-      } catch {
-        // audio not supported
+      } catch (e: unknown) {
+        console.error("Audio playback failed", e);
       }
     },
-    [getAudioContext]
+    [getAudioContext],
   );
 
   const playValidSound = useCallback(() => {
@@ -46,11 +53,11 @@ export function useScanFeedback() {
 
   const triggerHaptic = useCallback((type: "valid" | "invalid") => {
     try {
-      if (navigator.vibrate) {
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
         navigator.vibrate(type === "valid" ? [50, 30, 50] : [100, 50, 100]);
       }
-    } catch {
-      // vibration not supported
+    } catch (e: unknown) {
+      console.error("Haptic feedback failed", e);
     }
   }, []);
 
@@ -63,7 +70,7 @@ export function useScanFeedback() {
       }
       triggerHaptic(result);
     },
-    [playValidSound, playInvalidSound, triggerHaptic]
+    [playValidSound, playInvalidSound, triggerHaptic],
   );
 
   return { playFeedback, playValidSound, playInvalidSound, triggerHaptic };

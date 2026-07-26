@@ -16,9 +16,12 @@ export const socialLinks = {
     "https://linkedin.com/company/veritix",
   twitter:
     process.env.NEXT_PUBLIC_SOCIAL_TWITTER ?? "https://twitter.com/veritix",
-  github:
-    process.env.NEXT_PUBLIC_SOCIAL_GITHUB ?? "https://github.com/veritix",
+  github: process.env.NEXT_PUBLIC_SOCIAL_GITHUB ?? "https://github.com/veritix",
 };
+
+interface ErrorResponse {
+  message?: string;
+}
 
 /**
  * Submit the contact form data to the backend API.
@@ -40,8 +43,10 @@ export async function submitContactForm(data: {
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to send your message. Please try again.");
+    const err: ErrorResponse = await res.json().catch(() => ({}));
+    throw new Error(
+      err?.message || "Failed to send your message. Please try again.",
+    );
   }
 
   return res.json();

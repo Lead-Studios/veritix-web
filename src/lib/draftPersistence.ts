@@ -1,3 +1,5 @@
+import { EventFormData } from "./createEventSubmit";
+
 // FE-065: Draft persistence helpers for create-event flow
 
 const DRAFT_STORAGE_KEY = "veritix_event_draft";
@@ -5,15 +7,15 @@ const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface EventDraft {
   id?: string;
-  formData: Record<string, unknown>;
+  formData: Partial<EventFormData>;
   savedAt: string;
 }
 
 function writeLocalDraft(draft: EventDraft): void {
   try {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  } catch {
-    // localStorage may be full or unavailable
+  } catch (e: unknown) {
+    console.error("Failed to write draft to local storage", e);
   }
 }
 
@@ -27,7 +29,8 @@ function readLocalDraft(): EventDraft | null {
       return null;
     }
     return draft;
-  } catch {
+  } catch (e: unknown) {
+    console.error("Failed to read draft from local storage", e);
     return null;
   }
 }
@@ -35,12 +38,14 @@ function readLocalDraft(): EventDraft | null {
 function clearLocalDraft(): void {
   try {
     localStorage.removeItem(DRAFT_STORAGE_KEY);
-  } catch {
-    // ignore
+  } catch (e: unknown) {
+    console.error("Failed to clear draft from local storage", e);
   }
 }
 
-export async function saveDraft(formData: Record<string, unknown>): Promise<EventDraft> {
+export async function saveDraft(
+  formData: Partial<EventFormData>,
+): Promise<EventDraft> {
   const localDraft: EventDraft = {
     formData,
     savedAt: new Date().toISOString(),
@@ -58,8 +63,8 @@ export async function saveDraft(formData: Record<string, unknown>): Promise<Even
       writeLocalDraft(serverDraft);
       return serverDraft;
     }
-  } catch {
-    // API failure is non-fatal; local draft is already saved
+  } catch (e: unknown) {
+    console.error("Failed to save draft to server", e);
   }
 
   return localDraft;
@@ -76,8 +81,8 @@ export async function loadDraft(draftId: string): Promise<EventDraft | null> {
       writeLocalDraft(serverDraft);
       return serverDraft;
     }
-  } catch {
-    // Fall back to local if API is unavailable
+  } catch (e: unknown) {
+    console.error("Failed to load draft from server", e);
   }
 
   return local;

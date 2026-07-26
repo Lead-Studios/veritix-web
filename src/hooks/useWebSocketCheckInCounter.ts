@@ -9,9 +9,25 @@ export interface WebSocketCheckInState {
   connected: boolean;
 }
 
+interface CheckinUpdateMessage {
+  type: "checkin_update";
+  checkInCount: number;
+  totalCapacity: number;
+}
+
+function isCheckinUpdateMessage(value: unknown): value is CheckinUpdateMessage {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as CheckinUpdateMessage).type === "checkin_update" &&
+    typeof (value as CheckinUpdateMessage).checkInCount === "number" &&
+    typeof (value as CheckinUpdateMessage).totalCapacity === "number"
+  );
+}
+
 export function useWebSocketCheckInCounter(
   eventId: string | null,
-  wsUrl: string
+  wsUrl: string,
 ) {
   const [state, setState] = useState<WebSocketCheckInState>({
     checkInCount: 0,
@@ -34,7 +50,7 @@ export function useWebSocketCheckInCounter(
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data.type === "checkin_update") {
+          if (isCheckinUpdateMessage(data)) {
             setState({
               checkInCount: data.checkInCount,
               totalCapacity: data.totalCapacity,
@@ -42,8 +58,8 @@ export function useWebSocketCheckInCounter(
               connected: true,
             });
           }
-        } catch {
-          // ignore malformed
+        } catch (e: unknown) {
+          console.error("Failed to parse WebSocket message", e);
         }
       };
 
@@ -57,8 +73,8 @@ export function useWebSocketCheckInCounter(
       };
 
       wsRef.current = ws;
-    } catch {
-      // connection failed
+    } catch (e: unknown) {
+      console.error("WebSocket connection failed", e);
     }
   }, [eventId, wsUrl]);
 

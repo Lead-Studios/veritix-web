@@ -3,6 +3,7 @@ import { Manrope, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
 import "./global.css";
 import { AuthProvider } from "@/context/authContext";
+import { validateEnvironment } from "@/lib/envValidation";
 import { KeyboardShortcutHelp } from "@/components/KeyboardShortcutHelp";
 
 const bodyFont = Manrope({
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   },
   description: "Blockchain-powered ticketing on Stellar",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://veritix.io"
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://veritix.io",
   ),
 };
 
@@ -33,6 +34,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  validateEnvironment();
   return (
     <html lang="en" dir="ltr">
       <body

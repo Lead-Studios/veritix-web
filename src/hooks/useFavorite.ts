@@ -6,8 +6,17 @@ function getStoredFavorites(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set();
-  } catch {
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (
+      Array.isArray(parsed) &&
+      parsed.every((item) => typeof item === "string")
+    ) {
+      return new Set<string>(parsed);
+    }
+    return new Set();
+  } catch (e: unknown) {
+    console.error("Failed to parse favorites from localStorage", e);
     return new Set();
   }
 }
@@ -20,7 +29,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 async function syncFavoriteToApi(
   eventId: string,
-  liked: boolean
+  liked: boolean,
 ): Promise<void> {
   if (!API_BASE) return;
   await fetch(`${API_BASE}/events/${eventId}/favorite`, {
@@ -54,7 +63,7 @@ export function useFavorite(eventId: string) {
     setIsPending(true);
     try {
       await syncFavoriteToApi(eventId, next);
-    } catch {
+    } catch (e: unknown) {
       // Rollback on API failure
       setIsLiked(!next);
       const rollback = getStoredFavorites();

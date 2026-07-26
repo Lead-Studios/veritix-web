@@ -6,14 +6,30 @@ type StellarNetwork = (typeof VALID_STELLAR_NETWORKS)[number];
 const REQUIRED_ENV_VARS = [
   "NEXT_PUBLIC_API_BASE_URL",
   "NEXT_PUBLIC_STELLAR_NETWORK",
+  "AUTH_SECRET",
+] as const;
+
+const OPTIONAL_ENV_VARS = [
+  // e.g. "NEXT_PUBLIC_FEATURE_FLAG_X"
 ] as const;
 
 export function validateEnvironment(): void {
-  const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
-  if (missing.length > 0) {
+  if (process.env.NODE_ENV === "test") {
+    return;
+  }
+
+  const missingRequired = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
+  if (missingRequired.length > 0) {
     throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}\n` +
-        "Check .env.example for the full list of required variables."
+      `Missing required environment variables: ${missingRequired.join(", ")}\n` +
+        "Check .env.example for the full list of required variables.",
+    );
+  }
+
+  const missingOptional = OPTIONAL_ENV_VARS.filter((key) => !process.env[key]);
+  if (missingOptional.length > 0) {
+    console.warn(
+      `Missing optional environment variables: ${missingOptional.join(", ")}`,
     );
   }
 
@@ -21,7 +37,7 @@ export function validateEnvironment(): void {
   if (!VALID_STELLAR_NETWORKS.includes(network as StellarNetwork)) {
     throw new Error(
       `Invalid NEXT_PUBLIC_STELLAR_NETWORK value: "${network}". ` +
-        `Must be one of: ${VALID_STELLAR_NETWORKS.join(", ")}.`
+        `Must be one of: ${VALID_STELLAR_NETWORKS.join(", ")}.`,
     );
   }
 }

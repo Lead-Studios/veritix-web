@@ -8,6 +8,20 @@ interface CachedTicket {
   cachedAt: number;
 }
 
+function isCachedTicketArray(value: unknown): value is CachedTicket[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (item) =>
+        typeof item === "object" &&
+        item !== null &&
+        "ticketCode" in item &&
+        "status" in item &&
+        "cachedAt" in item,
+    )
+  );
+}
+
 const CACHE_KEY = "veritix_offline_cache";
 const CACHE_TTL_MS = 30 * 60 * 1000;
 
@@ -27,14 +41,16 @@ export function useOfflineVerification() {
     try {
       const stored = localStorage.getItem(CACHE_KEY);
       if (stored) {
-        const parsed: CachedTicket[] = JSON.parse(stored);
-        const validEntries = parsed.filter(
-          (t) => Date.now() - t.cachedAt < CACHE_TTL_MS
-        );
-        setCache(new Map(validEntries.map((t) => [t.ticketCode, t])));
+        const parsed = JSON.parse(stored);
+        if (isCachedTicketArray(parsed)) {
+          const validEntries = parsed.filter(
+            (t) => Date.now() - t.cachedAt < CACHE_TTL_MS,
+          );
+          setCache(new Map(validEntries.map((t) => [t.ticketCode, t])));
+        }
       }
-    } catch {
-      // corrupted cache
+    } catch (e: unknown) {
+      console.error("Failed to load or parse offline cache", e);
     }
 
     return () => {
@@ -51,7 +67,7 @@ export function useOfflineVerification() {
       }
       return null;
     },
-    [cache]
+    [cache],
   );
 
   const cacheResult = useCallback(
@@ -67,22 +83,22 @@ export function useOfflineVerification() {
       try {
         localStorage.setItem(
           CACHE_KEY,
-          JSON.stringify(Array.from(next.values()))
+          JSON.stringify(Array.from(next.values())),
         );
-      } catch {
-        // storage full
+      } catch (e: unknown) {
+        console.error("Failed to save to offline cache", e);
       }
 
       setCache(next);
     },
-    [cache]
+    [cache],
   );
 
   const clearCache = useCallback(() => {
     try {
       localStorage.removeItem(CACHE_KEY);
-    } catch {
-      // ignore
+    } catch (e: unknown) {
+      console.error("Failed to clear offline cache", e);
     }
     setCache(new Map());
   }, []);

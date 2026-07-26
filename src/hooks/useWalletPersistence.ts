@@ -1,11 +1,21 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export interface PersistedWallet {
   address: string;
   network: string;
   walletType: string;
+}
+
+function isPersistedWallet(value: unknown): value is PersistedWallet {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "address" in value &&
+    "network" in value &&
+    "walletType" in value
+  );
 }
 
 const STORAGE_KEY = "veritix_wallet";
@@ -14,18 +24,29 @@ function readWallet(): PersistedWallet | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as PersistedWallet) : null;
-  } catch {
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (isPersistedWallet(parsed)) {
+        return parsed;
+      }
+    }
+    return null;
+  } catch (e: unknown) {
+    console.error("Failed to read wallet from session storage", e);
     return null;
   }
 }
 
 function writeWallet(wallet: PersistedWallet | null): void {
   if (typeof window === "undefined") return;
-  if (wallet) {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
-  } else {
-    sessionStorage.removeItem(STORAGE_KEY);
+  try {
+    if (wallet) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  } catch (e: unknown) {
+    console.error("Failed to write wallet to session storage", e);
   }
 }
 
