@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -20,6 +20,7 @@ import { howItWorksSteps } from "@/mocks/landing";
 import useSWR from "swr";
 import { fetchEvents } from "@/lib/eventsApi";
 import type { Event } from "@/types/event";
+import { useMotionPreferences } from "@/hooks/useMotionPreferences";
 
 import { WalletButton } from "@/components/navbar/WalletButton";
  const LandingTestimonials = dynamic(
@@ -140,9 +141,17 @@ function EventCardSkeleton() {
 
 export default function Home() {
   const router = useRouter();
+  const { prefersReducedMotion } = useMotionPreferences();
   const [searchQ, setSearchQ] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchDate, setSearchDate] = useState("");
+
+  const fadeUp = useMemo(() => ({
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
+    whileInView: { opacity: 1, y: 0 },
+    transition: { duration: prefersReducedMotion ? 0 : 0.7 },
+    viewport: { once: true, amount: 0.2 },
+  }), [prefersReducedMotion]);
 
   const { data: allEvents, isLoading: eventsLoading } = useSWR<Event[]>("events", fetchEvents, {
     revalidateOnFocus: false,
