@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -20,6 +20,7 @@ import { howItWorksSteps } from "@/mocks/landing";
 import useSWR from "swr";
 import { fetchEvents } from "@/lib/eventsApi";
 import type { Event } from "@/types/event";
+import { useMotionPreferences } from "@/hooks/useMotionPreferences";
 
 import { WalletButton } from "@/components/navbar/WalletButton";
  const LandingTestimonials = dynamic(
@@ -56,8 +57,12 @@ function TrendingEventCard({ event }: { event: Event }) {
           {event.category}
         </span>
         <div className="flex items-center gap-3">
-          <Share2 size={16} />
-          <Heart size={16} />
+          <button type="button" aria-label="Share event" className="p-0 bg-transparent border-0 cursor-pointer">
+            <Share2 size={16} />
+          </button>
+          <button type="button" aria-label="Add to favourites" className="p-0 bg-transparent border-0 cursor-pointer">
+            <Heart size={16} />
+          </button>
         </div>
       </div>
 
@@ -140,9 +145,17 @@ function EventCardSkeleton() {
 
 export default function Home() {
   const router = useRouter();
+  const { prefersReducedMotion } = useMotionPreferences();
   const [searchQ, setSearchQ] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchDate, setSearchDate] = useState("");
+
+  const fadeUp = useMemo(() => ({
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
+    whileInView: { opacity: 1, y: 0 },
+    transition: { duration: prefersReducedMotion ? 0 : 0.7 },
+    viewport: { once: true, amount: 0.2 },
+  }), [prefersReducedMotion]);
 
   const { data: allEvents, isLoading: eventsLoading } = useSWR<Event[]>("events", fetchEvents, {
     revalidateOnFocus: false,
@@ -284,7 +297,7 @@ export default function Home() {
                   placeholder="Search events, artists..."
                   value={searchQ}
                   onChange={(e) => setSearchQ(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event name or keyword"
                 />
               </div>
@@ -295,7 +308,7 @@ export default function Home() {
                   placeholder="Location..."
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event location"
                 />
               </div>
@@ -306,7 +319,7 @@ export default function Home() {
                   placeholder="Date..."
                   value={searchDate}
                   onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/40"
+                  className="w-full bg-transparent text-sm focus:outline-none text-white placeholder:text-white/60"
                   aria-label="Event date"
                 />
               </div>
@@ -410,8 +423,12 @@ export default function Home() {
                     {event.category}
                   </span>
                   <div className="flex items-center gap-3">
-                    <Share2 size={16} />
-                    <Heart size={16} />
+                    <button type="button" aria-label="Share event" className="p-0 bg-transparent border-0 cursor-pointer">
+                      <Share2 size={16} />
+                    </button>
+                    <button type="button" aria-label="Add to favourites" className="p-0 bg-transparent border-0 cursor-pointer">
+                      <Heart size={16} />
+                    </button>
                   </div>
                 </div>
 

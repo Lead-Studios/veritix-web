@@ -236,3 +236,31 @@ body {
     rgba(33, 212, 255, 1) 100%
   );
 }
+
+/* High contrast mode for WCAG AA compliance */
+@media (prefers-contrast: more) {
+  .text-white\/40 {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+  .text-white\/50 {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .text-white\/60 {
+    color: rgba(255, 255, 255, 0.92) !important;
+  }
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+  .text-gray-400 {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .text-gray-500 {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+  .bg-white\/5 {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+  }
+  .border-white\/10 {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+}

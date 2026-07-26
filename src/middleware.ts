@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { canAccessVerificationTools } from "@/lib/verificationAccess";
+import type { UserRole } from "@/lib/verificationAccess";
+
+function decodeUserRole(token: string): UserRole | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return (payload.role ?? null) as UserRole | null;
+  } catch {
+    return null;
+  }
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,9 +33,9 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/verify")) {
-    const roleCookie = request.cookies.get("user_role")?.value as
-      | "attendee" | "organizer" | "staff" | "admin" | null;
-    if (!canAccessVerificationTools(roleCookie ?? null)) {
+    const roleFromCookie = request.cookies.get("user_role")?.value as UserRole | null;
+    const role = roleFromCookie ?? decodeUserRole(token);
+    if (!canAccessVerificationTools(role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

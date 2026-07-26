@@ -64,3 +64,9 @@ export function getToken(): string | null {
     localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token")
   );
 }
+  }
+}
+
+export async function logout(): Promise<void> {
+  await fetch(`${API_BASE}/api/auth/logout`, { method: "POST" });
+}
