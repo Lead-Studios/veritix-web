@@ -1,18 +1,19 @@
 import { loginUser, logout } from "../lib/auth";
+mport { vi } from "vitest";
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe("auth", () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
-    (global.fetch as jest.Mock).mockClear();
+    (global.fetch as ReturnType<typeof vi.fn>).mockClear();
   });
 
   describe("loginUser", () => {
     it("should store the token in localStorage when rememberMe is true", async () => {
       const mockToken = "test_token";
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: async () => ({ token: mockToken, user: {} }),
       });
@@ -29,7 +30,7 @@ describe("auth", () => {
 
     it("should store the token in sessionStorage when rememberMe is false", async () => {
       const mockToken = "test_token";
-      (global.fetch as jest.Mock).mockResolvedValue({
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
         ok: true,
         json: async () => ({ token: mockToken, user: {} }),
       });

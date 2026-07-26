@@ -6,14 +6,22 @@ export interface CreateEventResponse {
 }
 
 export async function submitCreateEvent(
-  data: EventFormData
+  data: EventFormData,
 ): Promise<CreateEventResponse> {
   const body = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (value instanceof File) {
       body.append(key, value);
     } else if (Array.isArray(value)) {
-      value.forEach((v) => body.append(key, v instanceof File ? v : String(v)));
+      value.forEach((v) => {
+        if (v instanceof File) {
+          body.append(key, v);
+        } else if (typeof v === "object" && v !== null) {
+          body.append(key, JSON.stringify(v));
+        } else {
+          body.append(key, String(v));
+        }
+      });
     } else if (value !== null && value !== undefined) {
       // Plain objects (e.g. recurrence config) need to be serialised so the
       // backend can parse them — String(obj) would otherwise produce "[object Object]".
