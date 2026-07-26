@@ -5,9 +5,16 @@ import { apiClient } from "./apiClient";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
-export async function fetchEvents(): Promise<Event[]> {
-  if (!API_BASE) return mockEvents;
-  return apiClient.get<Event[]>("/events");
+export async function fetchEvents(params?: { page?: number; limit?: number }): Promise<Event[]> {
+  if (!API_BASE) {
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 20;
+    const start = (page - 1) * limit;
+    return mockEvents.slice(start, start + limit);
+  }
+  const page = params?.page ?? 1;
+  const limit = params?.limit ?? 20;
+  return apiClient.get<Event[]>(`/events?page=${page}&limit=${limit}`);
 }
 
 export async function fetchEventById(id: string): Promise<Event | null> {
