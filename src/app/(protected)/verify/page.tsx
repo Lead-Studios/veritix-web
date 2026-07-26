@@ -19,6 +19,7 @@ import {
   type VerificationErrorType,
 } from '@/lib/verificationErrors';
 import { verifyTicket, type VerificationResult } from '@/features/verification/api';
+import { useMotionPreferences } from '@/hooks/useMotionPreferences';
 
 type VerifyState =
   | 'idle'
@@ -40,7 +41,7 @@ const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> =
 };
 
 // ─── Scan Frame Animation ─────────────────────────────────────────────────────
-function ScanFrame() {
+function ScanFrame({ skipAnimation }: { skipAnimation?: boolean }) {
   return (
     <div className="relative w-56 h-56 mx-auto">
       {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => {
@@ -67,11 +68,13 @@ function ScanFrame() {
         );
       })}
 
-      <motion.div
-        className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#21D4FF] to-transparent"
-        animate={{ top: ['10%', '90%', '10%'] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      {!skipAnimation && (
+        <motion.div
+          className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#21D4FF] to-transparent"
+          animate={{ top: ['10%', '90%', '10%'] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
 
       <div className="absolute inset-4 opacity-10">
         <div
@@ -95,12 +98,14 @@ function ResultCard({
   ticketDetails,
   onReset,
   onRetry,
+  skipAnimation,
 }: {
   state: VerifyState;
   ticketCode: string;
   ticketDetails: VerificationResult | null;
   onReset: () => void;
   onRetry?: () => void;
+  skipAnimation?: boolean;
 }) {
   const isSuccess = state === 'success';
   const isAlreadyUsed = state === 'already-used';
@@ -173,10 +178,10 @@ function ResultCard({
     <AnimatePresence mode="wait">
       <motion.div
         key={state}
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        initial={skipAnimation ? false : { opacity: 0, scale: 0.92, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.92, y: -20 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
+        exit={skipAnimation ? undefined : { opacity: 0, scale: 0.92, y: -20 }}
+        transition={{ duration: skipAnimation ? 0 : 0.35, ease: 'easeOut' }}
         role="status"
         aria-live="polite"
         data-state={state}
@@ -270,6 +275,7 @@ export default function VerifyPage() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get('eventId');
   const { stats, loading: statsLoading } = useVerifyStats(eventId);
+  const { prefersReducedMotion } = useMotionPreferences();
   const [code, setCode] = useState('');
   const [verifyState, setVerifyState] = useState<VerifyState>('idle');
   const [ticketDetails, setTicketDetails] = useState<VerificationResult | null>(null);
@@ -483,6 +489,7 @@ export default function VerifyPage() {
               ticketDetails={ticketDetails}
               onReset={handleReset}
               onRetry={handleRetry}
+              skipAnimation={prefersReducedMotion}
             />
           )}
 

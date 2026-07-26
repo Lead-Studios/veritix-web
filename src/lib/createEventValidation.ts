@@ -4,9 +4,8 @@ const ticketSchema = z.object({
   name: z.string().min(1, "Ticket name is required"),
   quantity: z.number({ error: "Quantity must be a number" }).int().min(1, "Quantity must be at least 1"),
   price: z
-    .string()
-    .min(1, "Price is required")
-    .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, "Price must be a valid non-negative number"),
+    .number({ error: "Price must be a number" })
+    .nonnegative("Price must be a non-negative number"),
   description: z.string().optional(),
   transferable: z.boolean(),
   resellable: z.boolean(),
