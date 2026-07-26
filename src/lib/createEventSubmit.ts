@@ -1,4 +1,4 @@
-import { EventFormData } from "@/app/(protected)/events/create/page";
+import { CreateEventFormData } from "./createEventValidation";
 import { apiClient } from "./apiClient";
 
 export interface CreateEventResponse {
@@ -7,7 +7,7 @@ export interface CreateEventResponse {
 }
 
 export async function submitCreateEvent(
-  data: EventFormData,
+  data: CreateEventFormData,
 ): Promise<CreateEventResponse> {
   const body = new FormData();
   Object.entries(data).forEach(([key, value]) => {

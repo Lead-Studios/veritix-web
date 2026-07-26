@@ -2,7 +2,10 @@ import { z } from "zod";
 
 const ticketSchema = z.object({
   name: z.string().min(1, "Ticket name is required"),
-  quantity: z.number({ error: "Quantity must be a number" }).int().min(1, "Quantity must be at least 1"),
+  quantity: z
+    .number({ error: "Quantity must be a number" })
+    .int()
+    .min(1, "Quantity must be at least 1"),
   price: z
     .number({ error: "Price must be a number" })
     .nonnegative("Price must be a non-negative number"),
@@ -11,6 +14,8 @@ const ticketSchema = z.object({
   resellable: z.boolean(),
   resellPriceLimit: z.string().optional(),
 });
+
+export type TicketFormData = z.infer<typeof ticketSchema>;
 
 const recurrenceSchema = z.object({
   frequency: z.enum(["none", "daily", "weekly", "monthly", "custom"]),
@@ -32,7 +37,7 @@ export const DUPLICATE_TICKET_NAME_MESSAGE =
  * Empty / whitespace-only names are ignored.
  */
 export function findDuplicateTicketIndices(
-  tickets: Array<{ name: string }>
+  tickets: Array<{ name: string }>,
 ): Set<number> {
   const firstSeen = new Map<string, number>();
   const duplicates = new Set<number>();
@@ -53,7 +58,9 @@ export const createEventSchema = z
   .object({
     // Basic Information
     title: z.string().min(1, "Event title is required"),
-    description: z.string().min(10, "Description must be at least 10 characters"),
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters"),
     coverImage: z
       .custom<File | null>()
       .refine((f) => f instanceof File, "Cover image is required"),
@@ -67,7 +74,16 @@ export const createEventSchema = z
 
     // Location
     eventType: z.enum(["physical", "online", "hybrid"]),
-    category: z.enum(["music", "festival", "sports", "art", "theater", "comedy", "conference", "workshop"]),
+    category: z.enum([
+      "music",
+      "festival",
+      "sports",
+      "art",
+      "theater",
+      "comedy",
+      "conference",
+      "workshop",
+    ]),
     venueName: z.string().optional(),
     address: z.string().optional(),
     city: z.string().optional(),
@@ -79,12 +95,17 @@ export const createEventSchema = z
     zipCode: z.string().optional(),
     latitude: z.number().nullable().optional(),
     longitude: z.number().nullable().optional(),
-    capacity: z.number({ error: "Capacity must be a number" }).int().min(1, "Capacity must be at least 1"),
+    capacity: z
+      .number({ error: "Capacity must be a number" })
+      .int()
+      .min(1, "Capacity must be at least 1"),
     eventClosingDate: z.string().optional(),
     streamingUrl: z.string().optional(),
 
     // Tickets
-    tickets: z.array(ticketSchema).min(1, "At least one ticket type is required"),
+    tickets: z
+      .array(ticketSchema)
+      .min(1, "At least one ticket type is required"),
 
     // Blockchain
     blockchainNetwork: z.enum(["stellar"]),
@@ -109,9 +130,16 @@ export const createEventSchema = z
     }
 
     if (data.eventClosingDate) {
-      const start = data.startDate ? new Date(`${data.startDate}T${data.startTime || "00:00"}`) : null;
+      const start = data.startDate
+        ? new Date(`${data.startDate}T${data.startTime || "00:00"}`)
+        : null;
       const closing = new Date(`${data.eventClosingDate}T00:00`);
-      if (start && !isNaN(start.getTime()) && !isNaN(closing.getTime()) && closing <= start) {
+      if (
+        start &&
+        !isNaN(start.getTime()) &&
+        !isNaN(closing.getTime()) &&
+        closing <= start
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Closing date must be after the event start date",
@@ -124,12 +152,13 @@ export const createEventSchema = z
     if (data.treasuryAddress) {
       const addr = data.treasuryAddress.trim();
       const stellarRe = /^G[A-Z2-7]{55}$/;
-      const valid = data.blockchainNetwork === 'stellar' && stellarRe.test(addr);
+      const valid =
+        data.blockchainNetwork === "stellar" && stellarRe.test(addr);
       if (!valid) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Invalid ${data.blockchainNetwork} address. Example: GASW2... (56-character base32 G-address)`,
-          path: ['treasuryAddress'],
+          path: ["treasuryAddress"],
         });
       }
     }
@@ -201,7 +230,8 @@ export const createEventSchema = z
         if (!parsed.success) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Streaming URL must be a valid URL (e.g. https://example.com)",
+            message:
+              "Streaming URL must be a valid URL (e.g. https://example.com)",
             path: ["streamingUrl"],
           });
         }
@@ -209,12 +239,13 @@ export const createEventSchema = z
     }
   });
 
+export type CreateEventFormData = z.infer<typeof createEventSchema>;
 
 export type CreateEventFormErrors = Partial<Record<string, string>>;
 
 /** Maps Zod issues to a flat { fieldPath: message } record */
 export function parseCreateEventErrors(
-  issues: z.ZodIssue[]
+  issues: z.ZodIssue[],
 ): CreateEventFormErrors {
   const errors: CreateEventFormErrors = {};
   for (const issue of issues) {
@@ -226,22 +257,72 @@ export function parseCreateEventErrors(
 
 /** Returns a human-readable section label for a field path */
 export function sectionForField(field: string): string {
-  if (["title", "description", "coverImage", "category"].includes(field)) return "Basic Information";
+  if (["title", "description", "coverImage", "category"].includes(field))
+    return "Basic Information";
   if (field.startsWith("recurrence")) return "Recurrence";
-  if (["startDate", "startTime", "endDate", "endTime", "eventClosingDate"].includes(field)) return "Date & Time";
-  if (["venueName", "address", "city", "countryCode", "state", "zipCode", "capacity", "streamingUrl"].includes(field)) return "Location";
+  if (
+    [
+      "startDate",
+      "startTime",
+      "endDate",
+      "endTime",
+      "eventClosingDate",
+    ].includes(field)
+  )
+    return "Date & Time";
+  if (
+    [
+      "venueName",
+      "address",
+      "city",
+      "countryCode",
+      "state",
+      "zipCode",
+      "capacity",
+      "streamingUrl",
+    ].includes(field)
+  )
+    return "Location";
   if (field.startsWith("tickets")) return "Ticket Information";
-  if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "Blockchain Setting";
+  if (
+    ["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)
+  )
+    return "Blockchain Setting";
   return "General";
 }
 
 /** Returns the section id (data-section attribute) for a field */
 export function sectionIdForField(field: string): string {
-  if (["title", "description", "coverImage", "category"].includes(field)) return "section-basic";
+  if (["title", "description", "coverImage", "category"].includes(field))
+    return "section-basic";
   if (field.startsWith("recurrence")) return "section-recurrence";
-  if (["startDate", "startTime", "endDate", "endTime", "eventClosingDate"].includes(field)) return "section-datetime";
-  if (["venueName", "address", "city", "countryCode", "state", "zipCode", "capacity", "streamingUrl"].includes(field)) return "section-location";
+  if (
+    [
+      "startDate",
+      "startTime",
+      "endDate",
+      "endTime",
+      "eventClosingDate",
+    ].includes(field)
+  )
+    return "section-datetime";
+  if (
+    [
+      "venueName",
+      "address",
+      "city",
+      "countryCode",
+      "state",
+      "zipCode",
+      "capacity",
+      "streamingUrl",
+    ].includes(field)
+  )
+    return "section-location";
   if (field.startsWith("tickets")) return "section-tickets";
-  if (["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)) return "section-blockchain";
+  if (
+    ["blockchainNetwork", "treasuryAddress", "creatorRoyalty"].includes(field)
+  )
+    return "section-blockchain";
   return "";
 }
