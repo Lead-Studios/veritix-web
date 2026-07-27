@@ -4,8 +4,8 @@ import {
   FieldValues,
   FieldPath,
 } from "react-hook-form";
-import { cn } from "../../lib/cn";
-import usePasswordToggle from "../../hooks/usePasswordToggle";
+import { cn } from "@/lib/cn";
+import usePasswordToggle from "@/hooks/usePasswordToggle";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import Link from "next/link";
 

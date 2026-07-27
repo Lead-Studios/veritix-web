@@ -37,7 +37,7 @@ export function getTokenExpiry(token: string): number | null {
   }
 }
 
-function msUntilExpiry(token: string): number {
+export function msUntilExpiry(token: string): number {
   const expiry = getTokenExpiry(token);
   if (expiry === null) return 0;
   return Math.max(0, expiry - Date.now());

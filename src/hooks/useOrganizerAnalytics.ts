@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,47 +57,31 @@ interface Options {
 }
 
 export function useOrganizerAnalytics(options: Options = {}) {
-  const [data, setData] = useState<OrganizerAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const { organizerId, from, to } = options;
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
+  const params = new URLSearchParams();
+  if (organizerId) params.set("organizerId", organizerId);
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
+  const qs = params.toString() ? `?${params.toString()}` : "";
 
-    const params = new URLSearchParams();
-    if (organizerId) params.set("organizerId", organizerId);
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
-    const qs = params.toString() ? `?${params.toString()}` : "";
+  const key = organizerId || from || to ? `/api/organizer/analytics${qs}` : null;
 
-    fetch(`/api/organizer/analytics${qs}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch analytics");
-        return res.json() as Promise<OrganizerAnalytics>;
-      })
-      .then((json) => {
-        if (!cancelled) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-          setLoading(false);
-        }
-      });
+  const { data, error, isLoading } = useSWR<OrganizerAnalytics | null>(
+    key,
+    async () => {
+      const res = await fetch(`/api/organizer/analytics${qs}`);
+      if (!res.ok) throw new Error("Failed to fetch analytics");
+      return (await res.json()) as OrganizerAnalytics;
+    },
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+  );
 
-    return () => {
-      cancelled = true;
-    };
-  }, [organizerId, from, to]);
-
-  return { data, loading, error };
+  return {
+    data: data ?? null,
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+  };
 }
 
 // ─── Selectors ────────────────────────────────────────────────────────────────
