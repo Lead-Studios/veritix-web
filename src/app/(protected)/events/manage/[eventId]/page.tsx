@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Breadcrumb } from "@/components/ui";
+import { CapacityWarningBanner } from "@/components/events/CapacityWarningBanner";
 import EventManagementTabs, { type ManagedEvent } from "@/features/events/components/EventManagementTabs";
 
 export default function ManageEventPage() {
@@ -64,6 +65,12 @@ export default function ManageEventPage() {
           </div>
         </div>
 
+        <CapacityWarningBanner
+          sold={event.soldTickets ?? 0}
+          capacity={event.capacity ?? 0}
+          eventTitle={event.name}
+          eventId={event.id}
+        />
         <EventManagementTabs
           event={event}
           onEventUpdate={(updates) => setEvent((prev) => prev ? { ...prev, ...updates } : prev)}
