@@ -1,4 +1,6 @@
 import useSWR from "swr";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,11 +38,8 @@ export interface OrganizerAnalytics {
     id: string;
     name: string;
     coverImage?: string;
-    /** Remaining tickets available for sale */
     remainingTickets?: number;
-    /** Average price per ticket */
     averageTicketPrice?: number;
-    /** Total ticket capacity */
     totalTickets?: number;
   }[];
 
@@ -58,29 +57,55 @@ interface Options {
 
 export function useOrganizerAnalytics(options: Options = {}) {
   const { organizerId, from, to } = options;
+  const router = useRouter();
 
   const params = new URLSearchParams();
+
   if (organizerId) params.set("organizerId", organizerId);
   if (from) params.set("from", from);
   if (to) params.set("to", to);
+
   const qs = params.toString() ? `?${params.toString()}` : "";
+  const key = `/api/organizer/analytics${qs}`;
 
-  const key = organizerId || from || to ? `/api/organizer/analytics${qs}` : null;
-
-  const { data, error, isLoading } = useSWR<OrganizerAnalytics | null>(
+  const { data, error, isLoading, mutate } = useSWR<OrganizerAnalytics>(
     key,
-    async () => {
-      const res = await fetch(`/api/organizer/analytics${qs}`);
-      if (!res.ok) throw new Error("Failed to fetch analytics");
+    async (url: string) => {
+      const res = await fetch(url);
+
+      if (res.status === 401) {
+        try {
+          localStorage.removeItem("session");
+          sessionStorage.clear();
+        } catch {
+          // Storage may not be available
+        }
+
+        router.replace("/login?next=/dashboard");
+        throw new Error("Your session has expired. Redirecting to login...");
+      }
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch analytics (${res.status})`);
+      }
+
       return (await res.json()) as OrganizerAnalytics;
     },
-    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60_000,
+    },
   );
+
+  const refresh = useCallback(() => {
+    void mutate();
+  }, [mutate]);
 
   return {
     data: data ?? null,
     loading: isLoading,
     error: error instanceof Error ? error.message : null,
+    mutate: refresh,
   };
 }
 
