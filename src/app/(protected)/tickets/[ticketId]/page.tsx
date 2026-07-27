@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
 import { Loader } from "@/components/ui/Loader";
 import { Breadcrumb } from "@/components/ui";
+import { PostEventReviewModal } from "@/features/tickets/components/PostEventReviewModal";
+import { Star } from "lucide-react";
 
 // Fetch ticket from API; falls back to a demo stub when the endpoint is unavailable.
 async function fetchTicket(ticketId: string): Promise<AttendeeTicket> {
@@ -28,16 +30,48 @@ async function fetchTicket(ticketId: string): Promise<AttendeeTicket> {
   };
 }
 
+function getStoredRating(eventId: string): number | null {
+  try {
+    const val = localStorage.getItem(`reviewed_event_${eventId}`);
+    return val ? Number(val) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function TicketPassPage() {
   const { ticketId } = useParams<{ ticketId: string }>();
   const [ticket, setTicket] = useState<AttendeeTicket | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewedRating, setReviewedRating] = useState<number | null>(null);
 
   useEffect(() => {
     fetchTicket(ticketId)
-      .then(setTicket)
+      .then((t) => {
+        setTicket(t);
+        // Check if already reviewed (persisted in localStorage)
+        const stored = getStoredRating(t.id);
+        if (stored) setReviewedRating(stored);
+      })
       .catch(() => setError("Could not load ticket."));
   }, [ticketId]);
+
+  // Determine if the "Leave a Review" button should be shown:
+  // event date has passed AND ticket was issued AND not yet reviewed
+  const canReview = (() => {
+    if (!ticket || reviewedRating) return false;
+    if ((ticket as AttendeeTicket & { status?: string }).status !== undefined &&
+        (ticket as AttendeeTicket & { status?: string }).status !== "ISSUED") return false;
+    if (!ticket.eventDate || ticket.eventDate === "TBD") return false;
+    const eventDate = new Date(ticket.eventDate);
+    return !isNaN(eventDate.getTime()) && eventDate < new Date();
+  })();
+
+  const handleReviewSuccess = (rating: number) => {
+    setReviewedRating(rating);
+    setShowReviewModal(false);
+  };
 
   if (error) {
     return (
@@ -74,7 +108,35 @@ export default function TicketPassPage() {
               : undefined
           }
         />
+
+        {/* Post-event review section */}
+        <div className="mt-6">
+          {reviewedRating ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-sm text-amber-300">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span>You reviewed this event ★{reviewedRating}</span>
+            </div>
+          ) : canReview ? (
+            <button
+              type="button"
+              onClick={() => setShowReviewModal(true)}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+            >
+              <Star className="w-4 h-4" />
+              Leave a Review
+            </button>
+          ) : null}
+        </div>
       </div>
+
+      {showReviewModal && (
+        <PostEventReviewModal
+          eventId={ticket.id}
+          eventName={ticket.eventName}
+          onClose={() => setShowReviewModal(false)}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
     </main>
   );
 }

@@ -11,9 +11,9 @@ import {
   HiTicket,
   HiRefresh,
   HiSearch,
+  HiQrcode,
 } from "react-icons/hi";
 import QRScanner from "@/components/verification/QRScanner";
-import { useVerifyStats } from "@/hooks/useVerifyStats";
 import {
   getVerificationErrorMessage,
   type VerificationErrorType,
@@ -305,6 +305,8 @@ export default function VerifyPage() {
   const { stats, loading: statsLoading } = useVerifyStats(eventId);
   const { prefersReducedMotion } = useMotionPreferences();
   const [code, setCode] = useState("");
+  const [mode, setMode] = useState<"camera" | "manual">("camera");
+  const [scannerError, setScannerError] = useState<string | null>(null);
   const [verifyState, setVerifyState] = useState<VerifyState>("idle");
   const [ticketDetails, setTicketDetails] = useState<VerificationResult | null>(
     null,
@@ -336,6 +338,10 @@ export default function VerifyPage() {
   }, [lockoutTimer]);
 
   const runVerify = async (ticketCode: string) => {
+    // Guard: do not fire API call with empty code
+    const target = ticketCode.trim();
+    if (!target) return;
+
     const now = Date.now();
 
     // Rate limiting: max 3 requests per second
@@ -356,7 +362,7 @@ export default function VerifyPage() {
     setTicketDetails(null);
 
     try {
-      const { ok, status, data } = await verifyTicket(ticketCode);
+      const { ok, status, data } = await verifyTicket(target);
 
       const isSuccess = ok && data && data.status === "VALID";
 
@@ -382,7 +388,7 @@ export default function VerifyPage() {
         now - newFirstFailTimestamp < FAIL_WINDOW_SECONDS * 1000
       ) {
         setLockoutTimer(LOCKOUT_DURATION_SECONDS);
-        setVerifyState("failure"); // Or a new 'locked-out' state
+        setVerifyState("failure");
         return;
       }
 
@@ -413,15 +419,27 @@ export default function VerifyPage() {
     }
   };
 
-  const handleVerify = () => {
-    if (!code.trim()) return;
-    runVerify(code);
+  // handleVerify is called from the manual-entry form submit.
+  // It reads the current `code` state and guards against empty input.
+  const handleVerify = (codeOverride?: string) => {
+    const target = (codeOverride ?? code).trim();
+    if (!target) return; // guard: skip API call when code is empty
+    runVerify(target);
+  };
+
+  // handleScan is called by the QR scanner with the decoded string.
+  const handleScan = (scannedCode: string) => {
+    const target = scannedCode.trim();
+    if (!target) return;
+    setCode(target);
+    runVerify(target);
   };
 
   const handleReset = () => {
     setCode("");
     setVerifyState("idle");
     setTicketDetails(null);
+    setScannerError(null);
     inputRef.current?.focus();
   };
 
@@ -514,10 +532,10 @@ export default function VerifyPage() {
                   )}
                   {lockoutTimer > 0 && (
                     <div className="rounded-2xl border border-yellow-500/30 bg-yellow-950/60 px-4 py-3 text-sm text-yellow-300 text-center">
-                      Too many failed attempts. Please wait {lockoutTimer} seconds.
+                      Too many failed attempts. Please wait {lockoutTimer}{" "}
+                      seconds.
                     </div>
                   )}
-                </div>
                 </div>
               </motion.div>
             )}
@@ -540,10 +558,10 @@ export default function VerifyPage() {
 
               <div className="p-6 space-y-4">
                 {lockoutTimer > 0 && (
-                    <div className="rounded-2xl border border-yellow-500/30 bg-yellow-950/60 px-4 py-3 text-sm text-yellow-300 text-center">
-                      Too many failed attempts. Please wait {lockoutTimer} seconds.
-                    </div>
-                  )}
+                  <div className="rounded-2xl border border-yellow-500/30 bg-yellow-950/60 px-4 py-3 text-sm text-yellow-300 text-center">
+                    Too many failed attempts. Please wait {lockoutTimer} seconds.
+                  </div>
+                )}
                 <div className="relative">
                   <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
@@ -562,7 +580,7 @@ export default function VerifyPage() {
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  onClick={handleVerify}
+                  onClick={() => handleVerify()}
                   disabled={!code.trim() || isChecking || lockoutTimer > 0}
                   className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold hover:opacity-90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
