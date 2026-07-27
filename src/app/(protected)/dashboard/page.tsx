@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { HeroContent } from "@/components/dashboard/HeroContent";
@@ -21,6 +22,7 @@ import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCar
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 const TicketTypeChart = dynamic(
   () =>
@@ -64,15 +66,41 @@ function DashboardSkeleton() {
   );
 }
 
+function ErrorCard({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-red-500/30 bg-red-950/20 p-8 text-center space-y-4">
+      <AlertTriangle className="w-10 h-10 text-red-400 mx-auto" />
+      <div>
+        <p className="text-white font-semibold text-lg">Failed to load analytics</p>
+        <p className="text-red-300/80 text-sm mt-1">{message}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all"
+      >
+        <RefreshCw className="w-4 h-4" />
+        Retry
+      </button>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const params = useSearchParams();
   const from = params.get("from") ?? undefined;
   const to = params.get("to") ?? undefined;
-  const { data, loading } = useOrganizerAnalytics({ from, to });
+  const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
 
-  const hasEvents = !loading && (data?.totalEvents ?? 0) > 0;
-  const hasData = !loading && data !== null;
+  const hasEvents = !loading && !error && (data?.totalEvents ?? 0) > 0;
+  const hasData = !loading && !error && data !== null;
 
   const revenueData =
     data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
@@ -112,16 +140,12 @@ export default function DashboardPage() {
       alt: e.name,
     })) ?? [];
 
-  // Event names for the command palette
   const eventNames = data?.events?.map((e) => e.name) ?? [];
-
   const liveEvent = data?.events?.find(() => data.checkInsLive);
 
-  // ── Projected revenue: aggregate across all events ─────────────────────────
   const projectedRevenueInput = (() => {
     const events = data?.events ?? [];
     if (events.length === 0) return null;
-
     const totalRemaining = events.reduce(
       (sum, e) => sum + (e.remainingTickets ?? 0),
       0,
@@ -131,13 +155,11 @@ export default function DashboardPage() {
       0,
     );
     if (totalRemaining === 0 || totalCapacity === 0) return null;
-
     const avgPrice =
       events.reduce((sum, e) => sum + (e.averageTicketPrice ?? 0), 0) /
       events.length;
     const soldSoFar = totalCapacity - totalRemaining;
     const sellThroughRate = soldSoFar / totalCapacity;
-
     return {
       remainingTickets: totalRemaining,
       averageTicketPrice: avgPrice,
@@ -160,32 +182,20 @@ export default function DashboardPage() {
           />
 
           <div className="mb-8 flex flex-col sm:flex-row justify-center gap-4">
-            <CTAButton
-              href="/events/create"
-              text="Get Started"
-              variant="primary"
-            />
-            <CTAButton
-              href="/events"
-              text="Discover events"
-              variant="secondary"
-            />
+            <CTAButton href="/events/create" text="Get Started" variant="primary" />
+            <CTAButton href="/events" text="Discover events" variant="secondary" />
             <button
               onClick={() => data && exportAnalyticsCsv(data)}
               disabled={!hasData}
-              title={
-                !hasData ? "No analytics data available to export" : undefined
-              }
+              title={!hasData ? "No analytics data available to export" : undefined}
               className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Export CSV
             </button>
           </div>
 
-          {/* QuickActions — receives event names for command palette fuzzy search */}
           <QuickActions eventNames={eventNames} />
 
-          {/* Date range picker for filtering charts */}
           <div className="mb-6 flex justify-end">
             <DateRangePicker />
           </div>
@@ -193,7 +203,12 @@ export default function DashboardPage() {
           {/* Loading skeleton */}
           {loading && <DashboardSkeleton />}
 
-          {!loading && !hasEvents && (
+          {/* Error state */}
+          {!loading && error && (
+            <ErrorCard message={error} onRetry={mutate} />
+          )}
+
+          {!loading && !error && !hasEvents && (
             <EmptyState
               title="No events yet"
               description="Create your first event to start seeing analytics, revenue, and performance data here."
@@ -204,7 +219,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!loading && hasEvents && (
+          {!loading && !error && hasEvents && (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:h-[500px]">
               {/* Left Column - Revenue */}
               <ScrollColumn animationClass="animate-scroll-up-once">
@@ -218,10 +233,7 @@ export default function DashboardPage() {
 
                 <Card>
                   <div className="mb-4">
-                    <CardHeader
-                      title="Revenue"
-                      subtitle="Revenue for the past week"
-                    />
+                    <CardHeader title="Revenue" subtitle="Revenue for the past week" />
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
                     <RevenueChart data={revenueData} />
@@ -237,21 +249,15 @@ export default function DashboardPage() {
                   />
                 </Card>
 
-                {/* Projected Revenue card — hidden automatically if insufficient data */}
                 {projectedRevenueInput && (
                   <ProjectedRevenueCard input={projectedRevenueInput} />
                 )}
               </ScrollColumn>
 
               {/* Middle Column - Attendees / Check-ins */}
-              <ScrollColumn
-                animationClass="animate-scroll-down-once"
-                className="gap-0"
-              >
+              <ScrollColumn animationClass="animate-scroll-down-once" className="gap-0">
                 <Card>
-                  <p className="text-xs uppercase text-[#21D4FF] mb-2">
-                    Latest check-ins
-                  </p>
+                  <p className="text-xs uppercase text-[#21D4FF] mb-2">Latest check-ins</p>
                   <LiveCheckInCard
                     eventId={liveEvent?.id ?? ""}
                     eventName={liveEvent?.name ?? ""}
@@ -279,51 +285,29 @@ export default function DashboardPage() {
               </ScrollColumn>
 
               {/* Right Column - Performance */}
-              <ScrollColumn
-                animationClass="animate-scroll-up-once"
-                className="gap-6"
-              >
+              <ScrollColumn animationClass="animate-scroll-up-once" className="gap-6">
                 <Card className="rounded-lg">
-                  <p className="text-xs uppercase text-[#21D4FF]">
-                    Performance
-                  </p>
-                  <p className="text-sm text-[#21D4FF]">
-                    Top-selling tickets this week
-                  </p>
-                  <div className="mt-3 text-xs text-[#4D21FF]">
-                    Updated 2 mins ago
-                  </div>
+                  <p className="text-xs uppercase text-[#21D4FF]">Performance</p>
+                  <p className="text-sm text-[#21D4FF]">Top-selling tickets this week</p>
+                  <div className="mt-3 text-xs text-[#4D21FF]">Updated 2 mins ago</div>
                 </Card>
 
                 <Card className="rounded-lg">
                   <div className="mb-4 flex justify-between items-start">
                     <div>
-                      <p className="text-xs uppercase text-[#21D4FF]">
-                        Trending
-                      </p>
-                      <p className={`text-sm font-semibold ${trendColor}`}>
-                        {trendText}
-                      </p>
+                      <p className="text-xs uppercase text-[#21D4FF]">Trending</p>
+                      <p className={`text-sm font-semibold ${trendColor}`}>{trendText}</p>
                       <p className="text-xs text-[#21D4FF]">Past 7 days</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#4D21FF]">
-                      7d
-                    </span>
+                    <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
-                    {/* PerformanceChart now supports click-to-drill-down */}
                     <PerformanceChart data={barData} />
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">
-                      Total Earned
-                    </p>
-                    <p className="text-xl font-bold text-[#4D21FF]">
-                      {formatCurrency(totalEarned)}
-                    </p>
-                    <p className="text-xs text-[#21D4FF]">
-                      Total amount sent to your bank account
-                    </p>
+                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
+                    <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
+                    <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
                   </div>
                 </Card>
               </ScrollColumn>
@@ -334,53 +318,37 @@ export default function DashboardPage() {
             <RecentActivity />
           </div>
 
-          {/* Ticket Type Breakdown */}
-          {!loading &&
-            data?.ticketBreakdown &&
-            data.ticketBreakdown.length > 0 && (
-              <div className="mt-10">
-                <Card>
-                  <CardHeader
-                    title="Ticket Type Breakdown"
-                    subtitle="Revenue and volume by ticket category"
-                  />
-                  <div className="mt-4">
-                    <TicketTypeChart data={data.ticketBreakdown} />
-                  </div>
-                </Card>
-              </div>
-            )}
+          {!loading && !error && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+            <div className="mt-10">
+              <Card>
+                <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
+                <div className="mt-4">
+                  <TicketTypeChart data={data.ticketBreakdown} />
+                </div>
+              </Card>
+            </div>
+          )}
 
-          {/* Revenue by Ticket Type */}
-          {!loading &&
-            data?.ticketBreakdown &&
-            data.ticketBreakdown.length > 0 && (
-              <div className="mt-10">
-                <Card>
-                  <CardHeader
-                    title="Revenue by Ticket Type"
-                    subtitle="Which ticket categories drive the most revenue"
-                  />
-                  <div className="mt-4">
-                    <RevenueByTicketTypeChart data={data.ticketBreakdown} />
-                  </div>
-                </Card>
-              </div>
-            )}
+          {!loading && !error && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+            <div className="mt-10">
+              <Card>
+                <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
+                <div className="mt-4">
+                  <RevenueByTicketTypeChart data={data.ticketBreakdown} />
+                </div>
+              </Card>
+            </div>
+          )}
 
-          {/* Demographics — GeoHeatmap is lazy-loaded inside DemographicsSection */}
-          {!loading && data?.demographics && (
+          {!loading && !error && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
             </div>
           )}
 
-          {/* Payout History */}
-          {!loading && hasEvents && (
+          {!loading && !error && hasEvents && (
             <div className="mt-10">
-              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">
-                Payout History
-              </p>
+              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">Payout History</p>
               <PayoutHistory />
             </div>
           )}
@@ -388,4 +356,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-} 
+}
