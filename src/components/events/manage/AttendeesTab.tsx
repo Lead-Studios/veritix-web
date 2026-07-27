@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Loader2, MoreVertical, Search } from "lucide-react";
+import { Download, FileDown, Loader2, MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   type Attendee,
@@ -10,15 +10,24 @@ import {
   fetchEventAttendees,
 } from "@/lib/attendeeManagement";
 import { exportAttendeesCsv, fetchAllTickets } from "@/lib/exportAttendeesCsv";
+import { generateCheckInPDF } from "@/lib/generateCheckInPDF";
 import BanAttendeeDialog from "./BanAttendeeDialog";
 
 interface AttendeesTabProps {
   eventId: string;
+  eventName?: string;
+  eventDate?: string;
+  eventVenue?: string;
 }
 
 const PAGE_SIZE = 10;
 
-export default function AttendeesTab({ eventId }: AttendeesTabProps) {
+export default function AttendeesTab({
+  eventId,
+  eventName = "Event",
+  eventDate = "",
+  eventVenue = "",
+}: AttendeesTabProps) {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +36,7 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
   const [banningId, setBanningId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
   const [showBanDialog, setShowBanDialog] = useState(false);
   const [selectedAttendee, setSelectedAttendee] = useState<Attendee | null>(null);
 
@@ -108,6 +118,36 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
     }
   };
 
+  const handleGeneratePDF = async () => {
+    if (attendees.length === 0) {
+      toast.info("No attendees to include in the PDF.");
+      return;
+    }
+    setGeneratingPDF(true);
+    try {
+      const allTickets = await fetchAllTickets(eventId);
+      await generateCheckInPDF(
+        {
+          name: eventName,
+          date: eventDate,
+          venue: eventVenue,
+          totalAttendees: allTickets.length,
+        },
+        allTickets.map((t) => ({
+          name: t.holderName ?? t.name ?? "Unknown",
+          email: t.email ?? "",
+          ticketType: t.ticketType ?? "General",
+          ticketCode: t.ticketCode ?? t.id ?? "",
+        })),
+      );
+      toast.success("Check-in sheet downloaded.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "PDF generation failed.");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
   const handleOpenBanDialog = (attendee: Attendee) => {
     setSelectedAttendee(attendee);
     setShowBanDialog(true);
@@ -161,19 +201,38 @@ export default function AttendeesTab({ eventId }: AttendeesTabProps) {
           />
         </label>
 
-        <button
-          type="button"
-          onClick={handleExport}
-          disabled={loading || exporting}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#4D21FF]/40 bg-[#000625] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4D21FF]/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {exporting ? (
-            <Loader2 size={16} aria-hidden="true" className="animate-spin" />
-          ) : (
-            <Download size={16} aria-hidden="true" />
-          )}
-          {exporting ? "Exporting…" : "Export CSV"}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Generate Check-in Sheet PDF */}
+          <button
+            type="button"
+            onClick={handleGeneratePDF}
+            disabled={loading || generatingPDF || attendees.length === 0}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#4D21FF]/40 bg-[#000625] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4D21FF]/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-50"
+            title="Download printable PDF check-in sheet"
+          >
+            {generatingPDF ? (
+              <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+            ) : (
+              <FileDown size={16} aria-hidden="true" />
+            )}
+            {generatingPDF ? "Generating…" : "Check-in Sheet"}
+          </button>
+
+          {/* Export CSV */}
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={loading || exporting}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#4D21FF]/40 bg-[#000625] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4D21FF]/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {exporting ? (
+              <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+            ) : (
+              <Download size={16} aria-hidden="true" />
+            )}
+            {exporting ? "Exporting…" : "Export CSV"}
+          </button>
+        </div>
       </div>
 
       {/* Table */}

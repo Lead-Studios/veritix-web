@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,11 +37,8 @@ export interface OrganizerAnalytics {
     id: string;
     name: string;
     coverImage?: string;
-    /** Remaining tickets available for sale */
     remainingTickets?: number;
-    /** Average price per ticket */
     averageTicketPrice?: number;
-    /** Total ticket capacity */
     totalTickets?: number;
   }[];
 
@@ -57,11 +55,16 @@ interface Options {
 }
 
 export function useOrganizerAnalytics(options: Options = {}) {
+  const router = useRouter();
   const [data, setData] = useState<OrganizerAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fetchKey, setFetchKey] = useState(0);
 
   const { organizerId, from, to } = options;
+
+  /** Call this to re-fetch analytics data (e.g. from an error-state Retry button). */
+  const mutate = useCallback(() => setFetchKey((k) => k + 1), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,11 +78,28 @@ export function useOrganizerAnalytics(options: Options = {}) {
     const qs = params.toString() ? `?${params.toString()}` : "";
 
     fetch(`/api/organizer/analytics${qs}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch analytics");
-        return res.json() as Promise<OrganizerAnalytics>;
-      })
-      .then((json) => {
+      .then(async (res) => {
+        // 401 → clear stored tokens and redirect to login
+        if (res.status === 401) {
+          try {
+            localStorage.removeItem("session");
+            sessionStorage.clear();
+          } catch {
+            // storage may not be available
+          }
+          router.replace("/login?next=/dashboard");
+          if (!cancelled) {
+            setError("Your session has expired. Redirecting to login…");
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch analytics (${res.status})`);
+        }
+
+        const json = (await res.json()) as OrganizerAnalytics;
         if (!cancelled) {
           setData(json);
           setLoading(false);
@@ -95,9 +115,9 @@ export function useOrganizerAnalytics(options: Options = {}) {
     return () => {
       cancelled = true;
     };
-  }, [organizerId, from, to]);
+  }, [organizerId, from, to, fetchKey, router]);
 
-  return { data, loading, error };
+  return { data, loading, error, mutate };
 }
 
 // ─── Selectors ────────────────────────────────────────────────────────────────
