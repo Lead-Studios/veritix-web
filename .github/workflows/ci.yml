@@ -31,6 +31,8 @@ jobs:
         run: npm run type-check
 
       - name: Build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: npm run build
 
       - name: Test

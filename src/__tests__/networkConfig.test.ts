@@ -40,6 +40,7 @@ describe("validateEnvironment", () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:4000/api";
     process.env.NEXT_PUBLIC_STELLAR_NETWORK = "testnet";
+    process.env.AUTH_SECRET = "test-secret";
   });
 
   afterEach(() => {
@@ -58,6 +59,11 @@ describe("validateEnvironment", () => {
   it("throws when NEXT_PUBLIC_STELLAR_NETWORK is missing", () => {
     delete process.env.NEXT_PUBLIC_STELLAR_NETWORK;
     expect(() => validateEnvironment()).toThrow(/NEXT_PUBLIC_STELLAR_NETWORK/);
+  });
+
+  it("throws when NEXT_PUBLIC_API_BASE_URL is malformed", () => {
+    process.env.NEXT_PUBLIC_API_BASE_URL = "not-a-url";
+    expect(() => validateEnvironment()).toThrow(/NEXT_PUBLIC_API_BASE_URL/);
   });
 
   it("throws when NEXT_PUBLIC_STELLAR_NETWORK has an invalid value", () => {

@@ -3,7 +3,7 @@ import { Manrope, Playfair_Display } from "next/font/google";
 import type { Metadata } from "next";
 import "./global.css";
 import { AuthProvider } from "@/context/authContext";
-import { validateEnvironment } from "@/lib/envValidation";
+import { validateEnvironment } from "@/lib/validateEnv";
 import { KeyboardShortcutHelp } from "@/components/KeyboardShortcutHelp";
 
 const bodyFont = Manrope({
