@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import useSWR from "swr";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -55,69 +56,57 @@ interface Options {
 }
 
 export function useOrganizerAnalytics(options: Options = {}) {
-  const router = useRouter();
-  const [data, setData] = useState<OrganizerAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [fetchKey, setFetchKey] = useState(0);
-
   const { organizerId, from, to } = options;
+  const router = useRouter();
 
-  /** Call this to re-fetch analytics data (e.g. from an error-state Retry button). */
-  const mutate = useCallback(() => setFetchKey((k) => k + 1), []);
+  const params = new URLSearchParams();
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
+  if (organizerId) params.set("organizerId", organizerId);
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
 
-    const params = new URLSearchParams();
-    if (organizerId) params.set("organizerId", organizerId);
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
-    const qs = params.toString() ? `?${params.toString()}` : "";
+  const qs = params.toString() ? `?${params.toString()}` : "";
+  const key = `/api/organizer/analytics${qs}`;
 
-    fetch(`/api/organizer/analytics${qs}`)
-      .then(async (res) => {
-        // 401 → clear stored tokens and redirect to login
-        if (res.status === 401) {
-          try {
-            localStorage.removeItem("session");
-            sessionStorage.clear();
-          } catch {
-            // storage may not be available
-          }
-          router.replace("/login?next=/dashboard");
-          if (!cancelled) {
-            setError("Your session has expired. Redirecting to login…");
-            setLoading(false);
-          }
-          return;
+  const { data, error, isLoading, mutate } = useSWR<OrganizerAnalytics>(
+    key,
+    async (url: string) => {
+      const res = await fetch(url);
+
+      if (res.status === 401) {
+        try {
+          localStorage.removeItem("session");
+          sessionStorage.clear();
+        } catch {
+          // Storage may not be available
         }
 
-        if (!res.ok) {
-          throw new Error(`Failed to fetch analytics (${res.status})`);
-        }
+        router.replace("/login?next=/dashboard");
+        throw new Error("Your session has expired. Redirecting to login...");
+      }
 
-        const json = (await res.json()) as OrganizerAnalytics;
-        if (!cancelled) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-          setLoading(false);
-        }
-      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch analytics (${res.status})`);
+      }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [organizerId, from, to, fetchKey, router]);
+      return (await res.json()) as OrganizerAnalytics;
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60_000,
+    },
+  );
 
-  return { data, loading, error, mutate };
+  const refresh = useCallback(() => {
+    void mutate();
+  }, [mutate]);
+
+  return {
+    data: data ?? null,
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    mutate: refresh,
+  };
 }
 
 // ─── Selectors ────────────────────────────────────────────────────────────────
