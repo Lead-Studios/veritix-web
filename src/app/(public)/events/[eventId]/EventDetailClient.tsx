@@ -12,6 +12,7 @@ import { AppImage } from '@/components/shared/AppImage';
 import { useEvent } from '@/hooks/useEvents';
 import { useFavorite } from '@/hooks/useFavorite';
 import DOMPurify from 'dompurify';
+import { EventReviews } from '@/features/events/components/EventReviews';
 
 type TabType = 'about' | 'schedule' | 'performers';
 
