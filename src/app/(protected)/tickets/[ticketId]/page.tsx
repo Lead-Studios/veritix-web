@@ -5,9 +5,16 @@ import { useState, useEffect } from "react";
 import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
 import { Loader } from "@/components/ui/Loader";
 import { Breadcrumb } from "@/components/ui";
+import { StellarExplorerLink } from "@/components/stellar/StellarExplorerLink";
+
+// Extended ticket type that includes optional Stellar tx hash
+type AttendeeTicketExtended = AttendeeTicket & {
+  stellarTxHash?: string;
+  stellarNetwork?: "testnet" | "mainnet";
+};
 
 // Fetch ticket from API; falls back to a demo stub when the endpoint is unavailable.
-async function fetchTicket(ticketId: string): Promise<AttendeeTicket> {
+async function fetchTicket(ticketId: string): Promise<AttendeeTicketExtended> {
   try {
     const res = await fetch(`/api/tickets/${ticketId}`);
     if (res.ok) return res.json();
@@ -30,7 +37,7 @@ async function fetchTicket(ticketId: string): Promise<AttendeeTicket> {
 
 export default function TicketPassPage() {
   const { ticketId } = useParams<{ ticketId: string }>();
-  const [ticket, setTicket] = useState<AttendeeTicket | null>(null);
+  const [ticket, setTicket] = useState<AttendeeTicketExtended | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,6 +62,10 @@ export default function TicketPassPage() {
     );
   }
 
+  const network =
+    ticket.stellarNetwork ??
+    (process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet" ? "mainnet" : "testnet");
+
   return (
     <main className="min-h-screen bg-[#101428] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
@@ -74,6 +85,16 @@ export default function TicketPassPage() {
               : undefined
           }
         />
+
+        {/* On-chain proof: show Stellar explorer link if the ticket has a tx hash */}
+        {ticket.stellarTxHash && (
+          <div className="mt-4 rounded-xl border border-[#4D21FF]/30 bg-[#000625]/60 px-4 py-3 space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#21D4FF]">
+              On-chain issuance
+            </p>
+            <StellarExplorerLink txHash={ticket.stellarTxHash} network={network} />
+          </div>
+        )}
       </div>
     </main>
   );
