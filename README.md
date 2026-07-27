@@ -2,119 +2,155 @@
 
 **VeriTix Web** is the **frontend application** for **VeriTix**, a blockchain-powered ticketing platform built on the **Stellar ecosystem**.
 
-This repository contains the **user-facing web application** used by:
-- Event attendees (ticket purchase, ownership, verification)
-- Event organizers (event setup, ticket rules, analytics)
-- Gate operators (ticket validation at entry)
-
-> ⚠️ **Important:**  
-> This repo is **frontend-only**. Blockchain logic, smart contracts, and backend services live in separate repositories.
+[![CI](https://github.com/Lead-Studios/veritix-web/actions/workflows/ci.yml/badge.svg)](https://github.com/Lead-Studios/veritix-web/actions/workflows/ci.yml)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FLead-Studios%2Fveritix-web)
 
 ---
 
-## 🔍 What Is VeriTix?
+## What Is VeriTix?
 
-VeriTix is a **decentralized ticketing system** designed to eliminate fraud, prevent scalping, and give organizers full control over how tickets are issued, transferred, and verified.
-
-Unlike traditional ticketing platforms, VeriTix anchors ticket ownership and verification data on the **Stellar blockchain**, ensuring transparency and tamper resistance while keeping fees low.
+VeriTix is a **decentralized ticketing system** that eliminates fraud, prevents scalping, and gives organizers full control over ticket issuance, transfer, and verification. Ticket ownership and verification data are anchored on the **Stellar blockchain** for transparency and tamper-resistance.
 
 ---
 
-## 🧭 What This Repo Contains (Scope)
+## Prerequisites
 
-### ✅ Frontend Responsibilities
-- Event discovery & ticket purchase UI
-- Wallet connection and user authentication flows
-- Ticket display (QR / on-chain reference)
-- Ticket verification interface (for event entry)
-- Organizer dashboards (events, tickets, rules)
-- Communication with the backend APIs
-- UX states for blockchain-related actions (pending, confirmed, failed)
+| Tool | Version |
+|------|---------|
+| Node.js | 20+ |
+| npm | 10+ |
+| Git | any recent |
 
-### ❌ What This Repo Does NOT Contain
-- Stellar smart contracts
-- Backend APIs or database logic
-- Indexers or off-chain workers
-- Payment rails or custodial logic
-
-These live in **separate backend / protocol repositories**.
+You will also need a running instance of the **VeriTix backend API** (NestJS). Set `NEXT_PUBLIC_API_BASE_URL` to point at it.
 
 ---
 
-## 🏗️ Architecture Overview
+## Local Development Setup
 
-```text
-User Browser
-     ↓
-VeriTix Web (Next.js / TypeScript)
-     ↓
-Backend API (Auth, Tickets, Events)
-     ↓
-Stellar Network (Anchoring & Verification)
+### 1. Clone the repository
 
+```bash
+git clone https://github.com/Lead-Studios/veritix-web.git
+cd veritix-web
+```
 
----
-
-## 🚀 Local Development Setup
-
-### 1. Install dependencies
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Configure environment variables
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env.local
 ```
 
-Open `.env.local` and fill in the values. The table below describes each variable:
+Open `.env.local` and fill in the values. See the [Environment Variables](#environment-variables) table below.
 
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_API_BASE_URL` | Yes | Base URL of the VeriTix backend API (e.g. `http://localhost:4000/api`) |
-| `NEXT_PUBLIC_STELLAR_NETWORK` | Yes | Stellar network: `testnet` or `mainnet` |
-| `NEXT_PUBLIC_HORIZON_URL` | No | Custom Horizon server URL; leave blank to use the SDK default |
-| `AUTH_SECRET` | Yes | Long random string used to sign server-side session tokens |
-| `NEXT_PUBLIC_ENABLE_WALLET_CONNECT` | No | Set to `true` to enable the wallet-connect UI flow |
-
-> **Next.js convention:** variables prefixed with `NEXT_PUBLIC_` are embedded in the browser bundle and visible to end users. Variables without that prefix are server-side only and never sent to the client.
-
-### 3. Run the dev server
+### 4. Run the development server
 
 ```bash
 npm run dev
 ```
 
-### 4. Run tests
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_BASE_URL` | **Yes** | Base URL of the VeriTix backend REST API (e.g. `http://localhost:4000/api`) |
+| `NEXT_PUBLIC_WS_URL` | No | WebSocket server URL for real-time features (e.g. `ws://localhost:4000`) |
+| `NEXT_PUBLIC_STELLAR_NETWORK` | **Yes** | Stellar network to use: `testnet` or `mainnet` |
+| `NEXT_PUBLIC_HORIZON_URL` | No | Custom Horizon server URL; leave blank to use the SDK default |
+| `STELLAR_PLATFORM_PUBLIC_KEY` | No | Platform escrow account public key (server-only) |
+| `STELLAR_PLATFORM_SECRET_KEY` | No | Platform escrow account secret key — **never** prefix with `NEXT_PUBLIC_` |
+| `AUTH_SECRET` | **Yes** | Long random string used to sign server-side session tokens |
+| `NEXTAUTH_URL` | **Yes** | Canonical URL of this app (e.g. `http://localhost:3000`) |
+| `NEXTAUTH_SECRET` | **Yes** | Long random string for NextAuth (can equal `AUTH_SECRET`) |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `NEXT_PUBLIC_ENABLE_WALLET_CONNECT` | No | Set `true` to enable the wallet-connect UI flow |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | No | Set `true` to show Google sign-in button |
+| `NEXT_PUBLIC_WALLET_AUTH_ENABLED` | No | Set `true` to show wallet sign-in button |
+| `NEXT_PUBLIC_ANALYTICS_TOKEN` | No | Vercel Analytics / PostHog / Mixpanel token |
+| `ANALYZE` | No | Set `true` and run `npm run build` to open the bundle analyser |
+
+> **Next.js convention:** variables prefixed `NEXT_PUBLIC_` are embedded in the browser bundle. Variables without that prefix are server-only and never sent to the client.
+
+---
+
+## Running Tests
+
+### Unit & integration tests (Vitest + React Testing Library)
 
 ```bash
 npm test
 ```
 
----
+Tests live in `src/__tests__/` and follow the `*.test.tsx` / `*.test.ts` naming convention.
 
-## 🧪 Testing
-
-Integration and E2E tests live in `src/__tests__/` and cover:
-
-- **Event discovery** — search, category filters, tab switching
-- **Event creation** — organizer multi-step form submission
-- **Ticket verification** — valid, invalid, and already-used ticket flows
-
-Run tests with:
-Tests live in `src/__tests__/` and follow the `*.test.tsx` naming convention. The project uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
-
-Place new test files alongside the code they test or inside `src/__tests__/`. Run the full suite with:
+### End-to-end tests (Playwright)
 
 ```bash
-npm test
+npm run test:e2e
+```
+
+E2E specs live in `e2e/`.
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/             # Next.js App Router pages and layouts
+│   ├── (public)/    # Unauthenticated routes (events, login, register…)
+│   └── (protected)/ # Authenticated routes (dashboard, tickets, verify…)
+├── components/      # Shared UI components
+├── features/        # Feature-scoped components (events, tickets, orders…)
+├── hooks/           # Custom React hooks
+├── lib/             # Utility functions and API helpers
+└── __tests__/       # Test files
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Contributing
+
+### Branch naming
+
+```
+feat/FE-<issue>-short-description   # new feature
+fix/FE-<issue>-short-description    # bug fix
+chore/FE-<issue>-short-description  # maintenance / tooling
+```
+
+### Pull request checklist
+
+- [ ] Branch is up-to-date with `main`
+- [ ] `npm run lint` passes with no warnings
+- [ ] `npm run type-check` passes
+- [ ] `npm run build` succeeds
+- [ ] `npm test` passes
+- [ ] PR description references the issue (`Closes #<issue>`)
+
+### Label meanings
+
+| Label | Meaning |
+|---|---|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `chore` | Tooling, docs, refactor |
+| `wip` | Work in progress — do not merge |
+| `needs-review` | Ready for review |
+
+---
+
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -126,3 +162,5 @@ npm test
 | Notifications | react-toastify |
 | Charts | Recharts |
 | Icons | lucide-react, react-icons |
+| Tests (unit) | Vitest + React Testing Library |
+| Tests (e2e) | Playwright |
