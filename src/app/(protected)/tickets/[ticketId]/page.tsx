@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
+import { TransferHistory } from "@/components/tickets/TransferHistory";
 import { Loader } from "@/components/ui/Loader";
 import { Breadcrumb } from "@/components/ui";
 
@@ -74,6 +75,9 @@ export default function TicketPassPage() {
               : undefined
           }
         />
+        <div className="mt-4">
+          <TransferHistory ticketId={ticketId} />
+        </div>
       </div>
     </main>
   );
