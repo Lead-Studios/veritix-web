@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
+import { TransferHistory } from "@/components/tickets/TransferHistory";
 import { Loader } from "@/components/ui/Loader";
 import { Breadcrumb } from "@/components/ui";
 import { PostEventReviewModal } from "@/features/tickets/components/PostEventReviewModal";
@@ -112,33 +113,8 @@ export default function TicketPassPage() {
               : undefined
           }
         />
-
-        {/* On-chain proof: show Stellar explorer link if the ticket has a tx hash */}
-        {ticket.stellarTxHash && (
-          <div className="mt-4 rounded-xl border border-[#4D21FF]/30 bg-[#000625]/60 px-4 py-3 space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#21D4FF]">
-              On-chain issuance
-            </p>
-            <StellarExplorerLink txHash={ticket.stellarTxHash} network={network} />
-          </div>
-        )}
-        {/* Post-event review section */}
-        <div className="mt-6">
-          {reviewedRating ? (
-            <div className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-sm text-amber-300">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>You reviewed this event ★{reviewedRating}</span>
-            </div>
-          ) : canReview ? (
-            <button
-              type="button"
-              onClick={() => setShowReviewModal(true)}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-2"
-            >
-              <Star className="w-4 h-4" />
-              Leave a Review
-            </button>
-          ) : null}
+        <div className="mt-4">
+          <TransferHistory ticketId={ticketId} />
         </div>
       </div>
 
