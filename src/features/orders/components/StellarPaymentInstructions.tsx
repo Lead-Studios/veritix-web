@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { toast } from "react-toastify";
 import { Check, Clock, Copy, RefreshCw, TicketCheck } from "lucide-react";
 import { useOrderStatus } from "@/hooks/useOrderStatus";
+import { StellarExplorerLink } from "@/components/stellar/StellarExplorerLink";
 
 type StellarPaymentInstructionsProps = {
   orderId: string;
@@ -15,6 +16,8 @@ type StellarPaymentInstructionsProps = {
   expiresAt?: string | Date;
   expiresInMinutes?: number;
   className?: string;
+  /** Stellar network for the explorer link */
+  network?: "testnet" | "mainnet";
 };
 
 type RetryPaymentResponse = {
@@ -56,6 +59,7 @@ export function StellarPaymentInstructions({
   expiresAt,
   expiresInMinutes = DEFAULT_EXPIRY_MINUTES,
   className = "",
+  network = "testnet",
 }: StellarPaymentInstructionsProps) {
   const router = useRouter();
   const [payment, setPayment] = useState({
@@ -76,6 +80,9 @@ export function StellarPaymentInstructions({
   const remainingMs = payment.expiresAt - now;
   const isExpired = remainingMs <= 0;
 
+  // The confirmation tx hash returned after payment is confirmed
+  const confirmationTxHash = (data as { confirmationTxHash?: string } | undefined)?.confirmationTxHash ?? "";
+
   const stellarPayUri = useMemo(() => {
     const params = new URLSearchParams({
       destination: payment.destinationAddress,
@@ -86,8 +93,6 @@ export function StellarPaymentInstructions({
   }, [amount, payment.destinationAddress, payment.memo]);
 
   useEffect(() => {
-    // This syncs the local payment window when the backend returns a fresh order payload.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPayment({
       destinationAddress,
       memo,
@@ -201,6 +206,14 @@ export function StellarPaymentInstructions({
             copied={copiedField === "amount"}
             onCopy={() => copyValue("amount", String(amount))}
           />
+
+          {/* Show Stellar explorer link once payment is confirmed */}
+          {data?.status === "PAID" && confirmationTxHash && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 space-y-2">
+              <p className="text-sm font-semibold text-emerald-300">Payment confirmed ✓</p>
+              <StellarExplorerLink txHash={confirmationTxHash} network={network} />
+            </div>
+          )}
 
           {isExpired ? (
             <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-4">

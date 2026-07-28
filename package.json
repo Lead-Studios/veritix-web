@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

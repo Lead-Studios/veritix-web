@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,11 +38,8 @@ export interface OrganizerAnalytics {
     id: string;
     name: string;
     coverImage?: string;
-    /** Remaining tickets available for sale */
     remainingTickets?: number;
-    /** Average price per ticket */
     averageTicketPrice?: number;
-    /** Total ticket capacity */
     totalTickets?: number;
   }[];
 
@@ -57,47 +56,57 @@ interface Options {
 }
 
 export function useOrganizerAnalytics(options: Options = {}) {
-  const [data, setData] = useState<OrganizerAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const { organizerId, from, to } = options;
+  const router = useRouter();
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
+  const params = new URLSearchParams();
 
-    const params = new URLSearchParams();
-    if (organizerId) params.set("organizerId", organizerId);
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
-    const qs = params.toString() ? `?${params.toString()}` : "";
+  if (organizerId) params.set("organizerId", organizerId);
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
 
-    fetch(`/api/organizer/analytics${qs}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch analytics");
-        return res.json() as Promise<OrganizerAnalytics>;
-      })
-      .then((json) => {
-        if (!cancelled) {
-          setData(json);
-          setLoading(false);
+  const qs = params.toString() ? `?${params.toString()}` : "";
+  const key = `/api/organizer/analytics${qs}`;
+
+  const { data, error, isLoading, mutate } = useSWR<OrganizerAnalytics>(
+    key,
+    async (url: string) => {
+      const res = await fetch(url);
+
+      if (res.status === 401) {
+        try {
+          localStorage.removeItem("session");
+          sessionStorage.clear();
+        } catch {
+          // Storage may not be available
         }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Unknown error");
-          setLoading(false);
-        }
-      });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [organizerId, from, to]);
+        router.replace("/login?next=/dashboard");
+        throw new Error("Your session has expired. Redirecting to login...");
+      }
 
-  return { data, loading, error };
+      if (!res.ok) {
+        throw new Error(`Failed to fetch analytics (${res.status})`);
+      }
+
+      return (await res.json()) as OrganizerAnalytics;
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60_000,
+    },
+  );
+
+  const refresh = useCallback(() => {
+    void mutate();
+  }, [mutate]);
+
+  return {
+    data: data ?? null,
+    loading: isLoading,
+    error: error instanceof Error ? error.message : null,
+    mutate: refresh,
+  };
 }
 
 // ─── Selectors ────────────────────────────────────────────────────────────────
