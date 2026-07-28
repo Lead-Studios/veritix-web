@@ -12,11 +12,14 @@ class ApiError extends Error {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-async function getHeaders() {
+async function getHeaders(body?: unknown) {
   const session = await getSession();
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
+  const headers: HeadersInit = {};
+
+  if (!(body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
   if (session?.accessToken) {
     headers["Authorization"] = `Bearer ${session.accessToken}`;
   }
@@ -41,13 +44,13 @@ async function request<T>(
   path: string,
   body?: any,
 ): Promise<T> {
-  const headers = await getHeaders();
+  const headers = await getHeaders(body);
   const config: RequestInit = {
     method,
     headers,
   };
-  if (body) {
-    config.body = JSON.stringify(body);
+  if (body !== undefined) {
+    config.body = body instanceof FormData ? body : JSON.stringify(body);
   }
 
   const response = await fetch(`${API_BASE}${path}`, config);

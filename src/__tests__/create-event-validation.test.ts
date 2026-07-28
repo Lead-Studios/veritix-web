@@ -336,14 +336,84 @@ describe("submitCreateEvent", () => {
     );
   });
 
-  it("appends File values directly to FormData", async () => {
+  it("appends File values directly to FormData as binary data", async () => {
     let capturedBody: FormData | undefined;
+    const coverImage = new File(["img"], "cover.jpg", { type: "image/jpeg" });
+
     vi.mocked(fetch).mockImplementationOnce(async (_url, init) => {
       capturedBody = init?.body as FormData;
       return new Response(JSON.stringify({ id: "1", slug: "s" }), { status: 200 });
     });
 
-    await submitCreateEvent(validPhysicalData as never);
-    expect(capturedBody?.get("coverImage")).toBeInstanceOf(File);
+    await submitCreateEvent({ ...validPhysicalData, coverImage } as never);
+
+    expect(capturedBody?.get("coverImage")).toBe(coverImage);
+    expect(capturedBody?.get("coverImage")).not.toEqual("[object File]");
+  });
+
+  it("JSON-stringifies each item in an array of plain objects", async () => {
+    let capturedBody: FormData | undefined;
+    const tags = [{ name: "vip" }, { name: "early" }];
+
+    vi.mocked(fetch).mockImplementationOnce(async (_url, init) => {
+      capturedBody = init?.body as FormData;
+      return new Response(JSON.stringify({ id: "1", slug: "s" }), { status: 200 });
+    });
+
+    await submitCreateEvent({ ...validPhysicalData, tags } as never);
+
+    const serializedValues = capturedBody?.getAll("tags") ?? [];
+    expect(serializedValues).toHaveLength(2);
+    expect(serializedValues.map((value) => String(value))).toEqual([
+      JSON.stringify(tags[0]),
+      JSON.stringify(tags[1]),
+    ]);
+  });
+
+  it("appends each File in an array as binary data", async () => {
+    let capturedBody: FormData | undefined;
+    const gallery = [
+      new File(["one"], "one.jpg", { type: "image/jpeg" }),
+      new File(["two"], "two.jpg", { type: "image/jpeg" }),
+    ];
+
+    vi.mocked(fetch).mockImplementationOnce(async (_url, init) => {
+      capturedBody = init?.body as FormData;
+      return new Response(JSON.stringify({ id: "1", slug: "s" }), { status: 200 });
+    });
+
+    await submitCreateEvent({ ...validPhysicalData, gallery } as never);
+
+    const appendedFiles = capturedBody?.getAll("gallery") ?? [];
+    expect(appendedFiles).toHaveLength(2);
+    expect(appendedFiles[0]).toBe(gallery[0]);
+    expect(appendedFiles[1]).toBe(gallery[1]);
+  });
+
+  it("JSON-stringifies nested recurrence objects", async () => {
+    let capturedBody: FormData | undefined;
+    const recurrence = {
+      frequency: "weekly",
+      interval: 2,
+      daysOfWeek: ["monday"],
+    };
+
+    vi.mocked(fetch).mockImplementationOnce(async (_url, init) => {
+      capturedBody = init?.body as FormData;
+      return new Response(JSON.stringify({ id: "1", slug: "s" }), { status: 200 });
+    });
+
+    await submitCreateEvent({ ...validPhysicalData, recurrence } as never);
+
+    expect(capturedBody?.get("recurrence")).toBe(JSON.stringify(recurrence));
+  });
+
+  it("throws an Error with the server message when the response is not ok", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify({ message: "Validation failed" }), { status: 422 })
+    );
+
+    await expect(submitCreateEvent(validPhysicalData as never)).rejects.toThrow("Validation failed");
+    await expect(submitCreateEvent(validPhysicalData as never)).rejects.toBeInstanceOf(Error);
   });
 });
