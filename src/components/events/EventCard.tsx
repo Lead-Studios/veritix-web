@@ -31,6 +31,15 @@ interface EventCardProps {
 }
 
 function EventCard({ event, index = 0 }: EventCardProps) {
+  const imageSrc = ((event as Event & { image?: string }).image ?? event.imageUrl ?? "/images/events/event.png") as string;
+  const eventDate = event.eventDate
+    ? new Date(event.eventDate).toLocaleDateString("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Date TBD";
+  const eventTime = (event as Event & { time?: string }).time ?? "Time TBD";
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -52,7 +61,7 @@ function EventCard({ event, index = 0 }: EventCardProps) {
               aria-label={`View details for ${event.name}`}
             />
             <Image
-              src={event.image}
+              src={imageSrc}
               alt={event.name}
               fill
               className="object-cover"
@@ -97,12 +106,12 @@ function EventCard({ event, index = 0 }: EventCardProps) {
               <div className="space-y-2">
                 <div className="flex items-center gap-6 text-gray-400 text-sm">
                   <HiCalendar className="w-4 h-4 shrink-0" />
-                  <span>{event.date}</span>
+                  <span>{eventDate}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-400 text-sm">
                   <HiClock className="w-4 h-4 shrink-0" />
-                  <span>{event.time}</span>
+                  <span>{eventTime}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-400 text-sm">
