@@ -19,6 +19,7 @@ export const mockEvents: Event[] = [
     category: "festival",
     featured: true,
     attendees: 1200,
+    capacity: 1600,
     description:
       "Get ready to move at the ultimate Summer Dance Festival of 2024 — a high-energy celebration of music, culture, and community under the open sky. This unforgettable two-day experience brings together DJs, dance crews, and music lovers from around the world for a weekend packed with rhythm, beats, and unforgettable vibes.",
     organizer: {
@@ -72,6 +73,7 @@ export const mockEvents: Event[] = [
     category: "music",
     featured: false,
     attendees: 800,
+    capacity: 1000,
     description:
       "Experience the best electronic music under the stars. World-class DJs and incredible light shows await.",
     organizer: {
@@ -85,6 +87,7 @@ export const mockEvents: Event[] = [
     name: "Summer Dance Festival",
     image: "/images/events/detail.png",
     date: "June 15-17, 2024",
+    dateEnd: "June 17, 2024",
     time: "6:00 PM - 2:00 AM",
     location: "Central Park, New York",
     venue: "Central Park",
@@ -93,6 +96,7 @@ export const mockEvents: Event[] = [
     category: "festival",
     featured: false,
     attendees: 1200,
+    capacity: 1600,
   },
   {
     id: "electronic-music-night-2",
@@ -107,6 +111,7 @@ export const mockEvents: Event[] = [
     category: "music",
     featured: false,
     attendees: 800,
+    capacity: 1000,
   },
 ];
 
