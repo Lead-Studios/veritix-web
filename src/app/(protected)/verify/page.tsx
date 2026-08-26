@@ -23,6 +23,8 @@ import {
   type VerificationResult,
 } from "@/features/verification/api";
 import { useMotionPreferences } from "@/hooks/useMotionPreferences";
+import { useCommandPalette } from "@/hooks/useCommandPalette";
+import OfflineBanner from "@/components/OfflineBanner";
 
 type VerifyState =
   | "idle"
@@ -313,6 +315,18 @@ export default function VerifyPage() {
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const [recentAttempts, setRecentAttempts] = useState<number[]>([]);
+  const { toggle } = useCommandPalette();
+
+  useEffect(() => {
+    const handleFocusShortcut = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleFocusShortcut);
+    return () => document.removeEventListener("keydown", handleFocusShortcut);
+  }, []);
   const [consecutiveFails, setConsecutiveFails] = useState(0);
   const [firstFailTimestamp, setFirstFailTimestamp] = useState<number | null>(
     null,
@@ -458,6 +472,7 @@ export default function VerifyPage() {
 
   return (
     <div className="min-h-screen bg-primary-dark-blue">
+      <OfflineBanner />
       {/* Hero Header */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -573,8 +588,11 @@ export default function VerifyPage() {
                     placeholder="e.g. TKT-2024-ALPHA-001"
                     disabled={isChecking || lockoutTimer > 0}
                     autoFocus
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 font-mono text-sm focus:outline-none focus:border-[#4D21FF] transition-colors disabled:opacity-50"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 font-mono text-sm focus:outline-none focus:border-[#4D21FF] focus:ring-2 focus:ring-[#4D21FF]/50 transition-colors disabled:opacity-50"
                   />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 bg-white/5 rounded px-1.5 py-0.5 border border-white/10">
+                    ⌘K
+                  </span>
                 </div>
 
                 <motion.button

@@ -46,8 +46,15 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     fill: stage.fill ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length],
   }));
 
+  const summary = stages.length > 0
+    ? `Funnel showing ${stages.length} stages from ${stages[0].name} (${stages[0].value.toLocaleString()}) to ${stages[stages.length - 1].name} (${stages[stages.length - 1].value.toLocaleString()})`
+    : "Empty funnel chart";
+
   return (
     <div className={className} style={{ width: "100%", height }}>
+      <div className="sr-only" role="img" aria-label={summary}>
+        {summary}
+      </div>
       <ResponsiveContainer width="100%" height="100%">
         <RechartsFunnelChart>
           <Tooltip
@@ -58,7 +65,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               fontSize: 13,
             }}
           />
-          <Funnel dataKey="value" data={data} isAnimationActive>
+          <Funnel dataKey="value" data={data} isAnimationActive aria-label={summary}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.fill} />
             ))}
