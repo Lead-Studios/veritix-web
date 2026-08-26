@@ -21,10 +21,11 @@ import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
 import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
 import { useOrganizerAnalytics, selectRevenue, selectTicketBreakdown, selectLiveCheckIns } from "@/hooks/useOrganizerAnalytics";
 import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
-import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import UnverifiedBanner from "@/components/dashboard/UnverifiedBanner";
+import { useProfile } from "@/hooks/useProfile";
 
 const TicketTypeChart = dynamic(
   () =>
@@ -107,8 +108,9 @@ export default function DashboardPage() {
   const router = useRouter();
   const params = useSearchParams();
   const from = params.get("from") ?? undefined;
-  const to = params.get("to") ?? undefined;
   const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
+  const { profile } = useProfile();
+  const isVerified = profile?.isVerified ?? profile?.emailVerified ?? false;
 
   const revenue = useMemo(() => selectRevenue(data), [data]);
   const ticketBreakdown = useMemo(() => selectTicketBreakdown(data), [data]);
@@ -206,6 +208,8 @@ export default function DashboardPage() {
       </div>
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
         <div className="mx-auto max-w-7xl">
+          <UnverifiedBanner isVerified={isVerified} email={profile?.email} className="mb-6" />
+
           <div className="mb-6 flex justify-center">
             <StatusBadge text="Tailored to all your event needs" />
           </div>

@@ -116,6 +116,41 @@ describe("EventCard", () => {
     expect(screen.getByText("100% sold")).toBeInTheDocument();
     expect(screen.getByText("Sold out")).toBeInTheDocument();
   });
+
+  it("renders coloured category badge linking to /events?category=...", async () => {
+    const { default: EventCard } = await import("@/components/events/EventCard");
+    render(
+      <EventCard
+        event={{
+          ...mockEvent,
+          category: "music",
+        } as any}
+      />
+    );
+
+    const categoryBadge = screen.getByRole("link", { name: /Category: music/i });
+    expect(categoryBadge).toBeInTheDocument();
+    expect(categoryBadge).toHaveAttribute("href", "/events?category=music");
+    expect(categoryBadge).toHaveTextContent("music");
+    expect(categoryBadge.className).toContain("text-purple-300");
+  });
+
+  it("renders distinct category styling for festival category", async () => {
+    const { default: EventCard } = await import("@/components/events/EventCard");
+    render(
+      <EventCard
+        event={{
+          ...mockEvent,
+          category: "festival",
+        } as any}
+      />
+    );
+
+    const categoryBadge = screen.getByRole("link", { name: /Category: festival/i });
+    expect(categoryBadge).toBeInTheDocument();
+    expect(categoryBadge).toHaveAttribute("href", "/events?category=festival");
+    expect(categoryBadge.className).toContain("text-pink-300");
+  });
 });
 
 // ── ResultCard Tests (verify page) ───────────────────────────────────────────

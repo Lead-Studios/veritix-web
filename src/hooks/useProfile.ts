@@ -9,6 +9,8 @@ export interface UserProfile {
   email: string;
   avatarUrl?: string;
   walletAddress?: string;
+  isVerified?: boolean;
+  emailVerified?: boolean;
 }
 
 export async function fetchProfile(): Promise<UserProfile> {
