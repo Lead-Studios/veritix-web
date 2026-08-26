@@ -19,6 +19,7 @@ import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
 import { PayoutHistory } from "@/components/dashboard/PayoutHistory";
 import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
 import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
+import { useOrganizerAnalytics, selectRevenue, selectTicketBreakdown, selectLiveCheckIns } from "@/hooks/useOrganizerAnalytics";
 import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
@@ -109,6 +110,10 @@ export default function DashboardPage() {
   const to = params.get("to") ?? undefined;
   const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
 
+  const revenue = useMemo(() => selectRevenue(data), [data]);
+  const ticketBreakdown = useMemo(() => selectTicketBreakdown(data), [data]);
+  const liveCheckIns = useMemo(() => selectLiveCheckIns(data), [data]);
+
   const hasEvents = !loading && !error && (data?.totalEvents ?? 0) > 0;
   const hasData = !loading && !error && data !== null;
 
@@ -125,7 +130,7 @@ export default function DashboardPage() {
   }, [loading, error, hasData]);
 
   const revenueData =
-    data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
+    revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
   const barData =
     data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? [];
   const totalEarned = data?.totalEarned ?? 0;
@@ -133,7 +138,7 @@ export default function DashboardPage() {
   const nextSettlementDays = data?.nextSettlementDays ?? 0;
 
   const { revenueTrend, trendText, trendColor } = useMemo(() => {
-    const rev = data?.revenue ?? [];
+    const rev = revenue ?? [];
     if (rev.length < 14) {
       return {
         revenueTrend: null,
@@ -154,7 +159,7 @@ export default function DashboardPage() {
     const text = `Trending by ${Math.abs(trend).toFixed(1)}% ${trend >= 0 ? "↗️" : "↘️"} this week`;
     const color = trend >= 0 ? "text-emerald-400" : "text-red-400";
     return { revenueTrend: trend, trendText: text, trendColor: color };
-  }, [data?.revenue]);
+  }, [revenue]);
 
   const eventImgs =
     data?.events?.slice(0, 4).map((e) => ({
@@ -163,7 +168,7 @@ export default function DashboardPage() {
     })) ?? [];
 
   const eventNames = data?.events?.map((e) => e.name) ?? [];
-  const liveEvent = data?.events?.find(() => data.checkInsLive);
+  const liveEvent = data?.events?.find(() => liveCheckIns.checkInsLive);
 
   const projectedRevenueInput = (() => {
     const events = data?.events ?? [];
@@ -292,7 +297,7 @@ export default function DashboardPage() {
                   <LiveCheckInCard
                     eventId={liveEvent?.id ?? ""}
                     eventName={liveEvent?.name ?? ""}
-                    isLive={data?.checkInsLive ?? false}
+                    isLive={liveCheckIns.checkInsLive}
                   />
                 </Card>
 
@@ -351,11 +356,12 @@ export default function DashboardPage() {
             <RecentActivity />
           </div>
 
-          {!loading && !error && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+          {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
                 <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
                 <div className="mt-4">
+                  <TicketTypeChart data={ticketBreakdown} />
                   <ChartErrorBoundary chartName="Ticket Type Breakdown">
                     <TicketTypeChart data={data.ticketBreakdown} />
                   </ChartErrorBoundary>
@@ -364,11 +370,12 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {!loading && !error && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
+          {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
                 <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
                 <div className="mt-4">
+                  <RevenueByTicketTypeChart data={ticketBreakdown} />
                   <ChartErrorBoundary chartName="Revenue by Ticket Type">
                     <RevenueByTicketTypeChart data={data.ticketBreakdown} />
                   </ChartErrorBoundary>
