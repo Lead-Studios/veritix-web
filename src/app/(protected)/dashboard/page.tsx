@@ -19,6 +19,7 @@ import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
 import { PayoutHistory } from "@/components/dashboard/PayoutHistory";
 import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
 import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
+import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -236,7 +237,9 @@ export default function DashboardPage() {
                     <CardHeader title="Revenue" subtitle="Revenue for the past week" />
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
-                    <RevenueChart data={revenueData} />
+                    <ChartErrorBoundary chartName="Revenue">
+                      <RevenueChart data={revenueData} />
+                    </ChartErrorBoundary>
                   </div>
                   <p className={`mt-4 text-xs ${trendColor}`}>{trendText}</p>
                 </Card>
@@ -302,7 +305,9 @@ export default function DashboardPage() {
                     <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
-                    <PerformanceChart data={barData} />
+                    <ChartErrorBoundary chartName="Performance">
+                      <PerformanceChart data={barData} />
+                    </ChartErrorBoundary>
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
                     <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
@@ -323,7 +328,9 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
                 <div className="mt-4">
-                  <TicketTypeChart data={data.ticketBreakdown} />
+                  <ChartErrorBoundary chartName="Ticket Type Breakdown">
+                    <TicketTypeChart data={data.ticketBreakdown} />
+                  </ChartErrorBoundary>
                 </div>
               </Card>
             </div>
@@ -334,7 +341,9 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
                 <div className="mt-4">
-                  <RevenueByTicketTypeChart data={data.ticketBreakdown} />
+                  <ChartErrorBoundary chartName="Revenue by Ticket Type">
+                    <RevenueByTicketTypeChart data={data.ticketBreakdown} />
+                  </ChartErrorBoundary>
                 </div>
               </Card>
             </div>
