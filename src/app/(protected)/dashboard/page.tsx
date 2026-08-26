@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { HeroContent } from "@/components/dashboard/HeroContent";
@@ -55,15 +55,24 @@ import { formatCurrency } from "@/lib/currencyFormat";
 
 function DashboardSkeleton() {
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex flex-col gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-48" />
-          <Skeleton className="h-20" />
-        </div>
-      ))}
-    </div>
+    <>
+      <div
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      >
+        Loading dashboard data
+      </div>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-4">
+            <Skeleton className="h-24" />
+            <Skeleton className="h-48" />
+            <Skeleton className="h-20" />
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -102,6 +111,18 @@ export default function DashboardPage() {
 
   const hasEvents = !loading && !error && (data?.totalEvents ?? 0) > 0;
   const hasData = !loading && !error && data !== null;
+
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      setAnnouncement("Loading dashboard data");
+    } else if (error) {
+      setAnnouncement("Failed to load dashboard data. Please refresh.");
+    } else if (hasData) {
+      setAnnouncement("Dashboard data loaded");
+    }
+  }, [loading, error, hasData]);
 
   const revenueData =
     data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
@@ -171,6 +192,13 @@ export default function DashboardPage() {
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
+      <div
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      >
+        {announcement}
+      </div>
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex justify-center">
