@@ -4,9 +4,13 @@ interface RevenueChartProps {
 
 export const RevenueChart = ({ data }: RevenueChartProps) => {
   const maxValue = Math.max(...data.map((item) => item.revenue), 1);
+  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+  const summary = `Revenue chart showing ${data.length} periods with total revenue of $${totalRevenue.toLocaleString()}`;
 
   return (
-    <div className="space-y-3">
+    <div role="img" aria-label={summary}>
+      <div className="sr-only">{summary}</div>
+      <div className="space-y-3">
       {data.map((item) => (
         <div key={item.month} className="flex items-center gap-3 text-xs">
           <span className="w-8 text-[#21D4FF]">{item.month}</span>
@@ -18,6 +22,7 @@ export const RevenueChart = ({ data }: RevenueChartProps) => {
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 };
