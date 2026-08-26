@@ -54,6 +54,8 @@ const RevenueByTicketTypeChart = dynamic(
 
 import { formatCurrency } from '@/lib/currencyFormat';
 
+import { getUser } from '@/lib/auth';
+
 function DashboardSkeleton() {
   return (
     <>
@@ -98,26 +100,57 @@ export default function DashboardPage() {
   const params = useSearchParams();
   const from = params.get('from') ?? undefined;
   const to = params.get('to') ?? undefined;
-  const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
+  const user = getUser();
+  const { data, isLoading, error, mutate } = useOrganizerAnalytics({
+    organizerId: user?.id,
+    from,
+    to,
+  });
 
   const revenue = useMemo(() => selectRevenue(data), [data]);
   const ticketBreakdown = useMemo(() => selectTicketBreakdown(data), [data]);
   const liveCheckIns = useMemo(() => selectLiveCheckIns(data), [data]);
 
-  const hasEvents = !loading && !error && (data?.totalEvents ?? 0) > 0;
-  const hasData = !loading && !error && data !== null;
+  const hasEvents = !isLoading && !error && (data?.totalEvents ?? 0) > 0;
+  const hasData = !isLoading && !error && data !== null;
 
   const [announcement, setAnnouncement] = useState<string | null>(null);
 
   useEffect(() => {
-    if (loading) {
+    if (isLoading) {
       setAnnouncement('Loading dashboard data');
     } else if (error) {
       setAnnouncement('Failed to load dashboard data. Please refresh.');
     } else if (hasData) {
       setAnnouncement('Dashboard data loaded');
     }
-  }, [loading, error, hasData]);
+  }, [isLoading, error, hasData]);
+
+  const { revenueTrend, trendText, trendColor } = useMemo(() => {
+    const rev = revenue ?? [];
+    if (rev.length < 14) {
+      return {
+        revenueTrend: null,
+        trendText: 'Insufficient data for trend',
+        trendColor: 'text-gray-500',
+      };
+    }
+    const currentWeek = rev.slice(-7).reduce((sum, d) => sum + d.revenue, 0);
+    const lastWeek = rev.slice(-14, -7).reduce((sum, d) => sum + d.revenue, 0);
+    if (lastWeek === 0) {
+      return {
+        revenueTrend: null,
+        trendText: 'Insufficient data for trend',
+        trendColor: 'text-gray-500',
+      };
+    }
+    const trend = ((currentWeek - lastWeek) / lastWeek) * 100;
+    const text = `Trending by ${Math.abs(trend).toFixed(1)}% ${
+      trend >= 0 ? '↗️' : '↘️'
+    } this week`;
+    const color = trend >= 0 ? 'text-emerald-400' : 'text-red-400';
+    return { revenueTrend: trend, trendText: text, trendColor: color };
+  }, [revenue]);
 
   const revenueData = revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
   const barData = data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? [];
@@ -188,12 +221,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Loading skeleton */}
-          {loading && <DashboardSkeleton />}
+          {isLoading && <DashboardSkeleton />}
 
           {/* Error state */}
-          {!loading && error && <ErrorCard message={error} onRetry={mutate} />}
+          {!isLoading && error && <ErrorCard message={error} onRetry={mutate} />}
 
-          {!loading && !error && !hasEvents && (
+          {!isLoading && !error && !hasEvents && (
             <EmptyState
               title="No events yet"
               description="Create your first event to start seeing analytics, revenue, and performance data here."
@@ -204,7 +237,7 @@ export default function DashboardPage() {
             />
           )}
 
-          {!loading && !error && hasEvents && (
+          {!isLoading && !error && hasEvents && (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:h-[500px]">
               {/* Left Column - Revenue */}
               <ScrollColumn animationClass="animate-scroll-up-once">
@@ -315,7 +348,7 @@ export default function DashboardPage() {
             <RecentActivity />
           </div>
 
-          {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
+          {!isLoading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
                 <CardHeader
@@ -332,7 +365,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
+          {!isLoading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
                 <CardHeader
@@ -349,13 +382,13 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {!loading && !error && data?.demographics && (
+          {!isLoading && !error && data?.demographics && (
             <div className="mt-10">
               <DemographicsSection demographics={data.demographics} />
             </div>
           )}
 
-          {!loading && !error && hasEvents && (
+          {!isLoading && !error && hasEvents && (
             <div className="mt-10">
               <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">
                 Payout History
