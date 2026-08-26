@@ -160,6 +160,8 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
     }
   }
 
+  const summary = `Performance chart showing ${data.length} periods with total sales of ${data.reduce((s, d) => s + d.value, 0).toLocaleString()}`;
+
   return (
     <>
       <div className="sr-only" role="img" aria-label={summary}>

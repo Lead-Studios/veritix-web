@@ -11,8 +11,17 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
       production-dependencies:
         dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        update-types:
+          - "patch"
     labels:
       - "dependencies"
       - "automated"
@@ -27,3 +36,16 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+
+  # Security updates checked daily
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "security"
+      - "dependencies"
+      - "automated"

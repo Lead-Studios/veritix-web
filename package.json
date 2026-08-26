@@ -11,7 +11,9 @@
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "storybook:build": "storybook build",
+    "analyze": "ANALYZE=true npm run build",
+    "check-env": "node scripts/check-env.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -65,5 +67,11 @@
     "@storybook/addon-docs": "^10.5.5",
     "@storybook/addon-onboarding": "^10.5.5",
     "eslint-plugin-storybook": "^10.5.5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "tsc --noEmit --pretty"
+    ]
   }
 }

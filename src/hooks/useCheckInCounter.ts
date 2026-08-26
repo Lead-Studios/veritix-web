@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 15_000;
 
 export interface CheckInCounterState {
   checkInCount: number | null;
@@ -29,7 +29,7 @@ export function useCheckInCounter(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Keep a ref so the interval callback always has the latest `isLive` value
+  // Keep refs so interval callbacks always have the latest values
   const isLiveRef = useRef(isLive);
   isLiveRef.current = isLive;
 
@@ -37,6 +37,7 @@ export function useCheckInCounter(
 
   const fetchData = useCallback(async () => {
     if (!isLiveRef.current) return;
+    if (typeof document !== "undefined" && document.hidden) return;
     setLoading(true);
     setError(null);
     try {
@@ -72,6 +73,26 @@ export function useCheckInCounter(
     }
     return stopPolling; // cleanup on unmount or dependency change
   }, [isLive, startPolling, stopPolling]);
+
+  // Pause polling when tab is hidden, resume when visible
+  useEffect(() => {
+    if (!isLive) return;
+
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        // Tab became visible — fetch immediately and restart polling
+        fetchData();
+        startPolling();
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isLive, fetchData, startPolling, stopPolling]);
 
   return {
     checkInCount,

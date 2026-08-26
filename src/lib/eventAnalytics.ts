@@ -1,5 +1,7 @@
 // FE-098: Manage-event analytics types and fetch helper
 
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 export interface EventAnalytics {
   totalSold: number;
   totalCapacity: number;
@@ -10,7 +12,7 @@ export interface EventAnalytics {
 }
 
 export async function fetchEventAnalytics(eventId: string): Promise<EventAnalytics> {
-  const res = await fetch(`/api/events/${eventId}/analytics`);
+  const res = await fetch(buildUrl(API_ROUTES.events.analytics(eventId)));
   if (!res.ok) throw new Error("Failed to fetch event analytics");
   return res.json();
 }

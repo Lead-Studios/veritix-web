@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { X } from "lucide-react";
 
 type Preset = "7d" | "30d" | "90d" | "custom";
 
@@ -17,6 +18,7 @@ export function DateRangePicker() {
   const preset = (params.get("range") as Preset) ?? "30d";
   const from = params.get("from") ?? "";
   const to = params.get("to") ?? "";
+  const hasActiveFilter = params.has("from") || params.has("to") || params.has("range");
 
   function setPreset(value: Preset) {
     const sp = new URLSearchParams(params.toString());
@@ -33,6 +35,15 @@ export function DateRangePicker() {
     sp.set(key, value);
     sp.set("range", "custom");
     router.replace(`?${sp.toString()}`);
+  }
+
+  function clearFilter() {
+    const sp = new URLSearchParams(params.toString());
+    sp.delete("range");
+    sp.delete("from");
+    sp.delete("to");
+    const qs = sp.toString();
+    router.replace(qs ? `?${qs}` : window.location.pathname);
   }
 
   return (
@@ -72,6 +83,18 @@ export function DateRangePicker() {
             aria-label="To date"
           />
         </div>
+      )}
+
+      {hasActiveFilter && (
+        <button
+          type="button"
+          onClick={clearFilter}
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-gray-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+          aria-label="Clear date filter and show all-time data"
+        >
+          <X size={12} aria-hidden="true" />
+          All time
+        </button>
       )}
     </div>
   );

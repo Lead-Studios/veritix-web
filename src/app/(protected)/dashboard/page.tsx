@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { HeroContent } from "@/components/dashboard/HeroContent";
@@ -19,6 +19,7 @@ import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
 import { PayoutHistory } from "@/components/dashboard/PayoutHistory";
 import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
 import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
+import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -54,15 +55,24 @@ import { formatCurrency } from "@/lib/currencyFormat";
 
 function DashboardSkeleton() {
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex flex-col gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-48" />
-          <Skeleton className="h-20" />
-        </div>
-      ))}
-    </div>
+    <>
+      <div
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      >
+        Loading dashboard data
+      </div>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-4">
+            <Skeleton className="h-24" />
+            <Skeleton className="h-48" />
+            <Skeleton className="h-20" />
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -101,6 +111,18 @@ export default function DashboardPage() {
 
   const hasEvents = !loading && !error && (data?.totalEvents ?? 0) > 0;
   const hasData = !loading && !error && data !== null;
+
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (loading) {
+      setAnnouncement("Loading dashboard data");
+    } else if (error) {
+      setAnnouncement("Failed to load dashboard data. Please refresh.");
+    } else if (hasData) {
+      setAnnouncement("Dashboard data loaded");
+    }
+  }, [loading, error, hasData]);
 
   const revenueData =
     data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
@@ -170,6 +192,13 @@ export default function DashboardPage() {
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
+      <div
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      >
+        {announcement}
+      </div>
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex justify-center">
@@ -236,7 +265,9 @@ export default function DashboardPage() {
                     <CardHeader title="Revenue" subtitle="Revenue for the past week" />
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
-                    <RevenueChart data={revenueData} />
+                    <ChartErrorBoundary chartName="Revenue">
+                      <RevenueChart data={revenueData} />
+                    </ChartErrorBoundary>
                   </div>
                   <p className={`mt-4 text-xs ${trendColor}`}>{trendText}</p>
                 </Card>
@@ -302,7 +333,9 @@ export default function DashboardPage() {
                     <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
-                    <PerformanceChart data={barData} />
+                    <ChartErrorBoundary chartName="Performance">
+                      <PerformanceChart data={barData} />
+                    </ChartErrorBoundary>
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
                     <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
@@ -323,7 +356,9 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
                 <div className="mt-4">
-                  <TicketTypeChart data={data.ticketBreakdown} />
+                  <ChartErrorBoundary chartName="Ticket Type Breakdown">
+                    <TicketTypeChart data={data.ticketBreakdown} />
+                  </ChartErrorBoundary>
                 </div>
               </Card>
             </div>
@@ -334,7 +369,9 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
                 <div className="mt-4">
-                  <RevenueByTicketTypeChart data={data.ticketBreakdown} />
+                  <ChartErrorBoundary chartName="Revenue by Ticket Type">
+                    <RevenueByTicketTypeChart data={data.ticketBreakdown} />
+                  </ChartErrorBoundary>
                 </div>
               </Card>
             </div>
