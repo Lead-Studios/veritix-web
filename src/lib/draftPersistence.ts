@@ -1,5 +1,6 @@
 import { EventFormData } from "./createEventSubmit";
 import { apiClient } from "./apiClient";
+import { buildUrl, API_ROUTES } from "./api-routes";
 
 const DRAFT_STORAGE_KEY = "veritix_event_draft";
 const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -44,7 +45,7 @@ export async function saveDraft(
   writeLocalDraft(localDraft);
 
   try {
-    const serverDraft = await apiClient.post<EventDraft>("/api/events/drafts", {
+    const serverDraft = await apiClient.post<EventDraft>(API_ROUTES.events.drafts, {
       formData,
     });
     writeLocalDraft(serverDraft);
@@ -62,7 +63,7 @@ export async function loadDraft(draftId: string): Promise<EventDraft | null> {
 
   try {
     const serverDraft = await apiClient.get<EventDraft>(
-      `/api/events/drafts/${draftId}`,
+      API_ROUTES.events.draftDetail(draftId),
     );
     writeLocalDraft(serverDraft);
     return serverDraft;

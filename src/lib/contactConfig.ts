@@ -1,3 +1,5 @@
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 /**
  * Centralised contact details and social links for the contact page.
  * Update this file to change support information without touching component markup.
@@ -35,8 +37,7 @@ export async function submitContactForm(data: {
   subject: string;
   message: string;
 }) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
-  const res = await fetch(`${API_BASE}/api/contact`, {
+  const res = await fetch(buildUrl(API_ROUTES.contact), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),

@@ -6,6 +6,11 @@ on:
       - main
       - dev
 
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
 jobs:
   lighthouse:
     name: Run Lighthouse CI
@@ -29,11 +34,91 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000' }}
 
       - name: Run Lighthouse CI
+        id: lighthouse
         uses: treosh/lighthouse-ci-action@v11
         with:
           configPath: ".lighthouserc.json"
           uploadArtifacts: true
           temporaryPublicStorage: true
+        continue-on-error: true
+
+      - name: Comment scores on PR
+        if: always() && steps.lighthouse.outcome != 'skipped'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const resultsDir = '.lighthouseci';
+            let body = '## 🔍 Lighthouse CI Results\n\n';
+
+            try {
+              const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
+              if (files.length === 0) {
+                body += 'No Lighthouse results found.\n';
+              } else {
+                const summary = { performance: [], accessibility: [], 'best-practices': [], seo: [] };
+                for (const file of files) {
+                  const json = JSON.parse(fs.readFileSync(path.join(resultsDir, file), 'utf8'));
+                  if (json.categories) {
+                    for (const [key, cat] of Object.entries(json.categories)) {
+                      if (summary[key] !== undefined) {
+                        summary[key].push(cat.score);
+                      }
+                    }
+                  }
+                }
+
+                const fmt = (key) => {
+                  const scores = summary[key];
+                  if (!scores.length) return 'N/A';
+                  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                  const pct = Math.round(avg * 100);
+                  const emoji = pct >= 90 ? '🟢' : pct >= 50 ? '🟡' : '🔴';
+                  return `${emoji} ${pct}/100`;
+                };
+
+                body += `| Category | Score |\n|---|---|\n`;
+                body += `| Performance | ${fmt('performance')} |\n`;
+                body += `| Accessibility | ${fmt('accessibility')} |\n`;
+                body += `| Best Practices | ${fmt('best-practices')} |\n`;
+                body += `| SEO | ${fmt('seo')} |\n`;
+              }
+            } catch (err) {
+              body += `Error parsing results: ${err.message}\n`;
+            }
+
+            if (steps.lighthouse.outcome === 'failure') {
+              body += '\n> ⚠️ **Lighthouse checks failed.** Please fix the issues before merging.\n';
+            } else {
+              body += '\n> ✅ All Lighthouse checks passed.\n';
+            }
+
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Lighthouse CI Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
 
       - name: Upload Lighthouse results
         uses: actions/upload-artifact@v4
@@ -42,3 +127,7 @@ jobs:
           name: lighthouse-results
           path: .lighthouseci/
           retention-days: 30
+
+      - name: Fail if Lighthouse assertions failed
+        if: steps.lighthouse.outcome == 'failure'
+        run: exit 1

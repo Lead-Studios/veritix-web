@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { buildUrl, API_ROUTES } from "./api-routes";
 
 function authHeaders(): HeadersInit {
   const token =
@@ -17,7 +17,7 @@ export async function changePassword(payload: {
   currentPassword: string;
   newPassword: string;
 }): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/auth/change-password`, {
+  const res = await fetch(buildUrl(API_ROUTES.auth.changePassword), {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -37,7 +37,7 @@ export interface NotificationPreferences {
 }
 
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
-  const res = await fetch(`${API_BASE}/api/profile/notification-preferences`, {
+  const res = await fetch(buildUrl(API_ROUTES.profile.notificationPreferences), {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error("Failed to load notification preferences.");
@@ -48,7 +48,7 @@ export async function patchNotificationPreference(
   key: keyof NotificationPreferences,
   value: boolean,
 ): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/profile/notification-preferences`, {
+  const res = await fetch(buildUrl(API_ROUTES.profile.notificationPreferences), {
     method: "PATCH",
     headers: authHeaders(),
     body: JSON.stringify({ [key]: value }),
@@ -62,7 +62,7 @@ export async function patchNotificationPreference(
 // ── Account deletion ─────────────────────────────────────────────────────────
 
 export async function deleteAccount(email: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/profile/account`, {
+  const res = await fetch(buildUrl(API_ROUTES.profile.account), {
     method: "DELETE",
     headers: authHeaders(),
     body: JSON.stringify({ email }),
@@ -81,13 +81,13 @@ export interface ProfileData {
 }
 
 export async function getProfile(): Promise<ProfileData> {
-  const res = await fetch(`${API_BASE}/api/profile`, { headers: authHeaders() });
+  const res = await fetch(buildUrl(API_ROUTES.profile.base), { headers: authHeaders() });
   if (!res.ok) throw new Error("Failed to load profile.");
   return res.json() as Promise<ProfileData>;
 }
 
 export async function updateProfile(payload: ProfileData): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/profile`, {
+  const res = await fetch(buildUrl(API_ROUTES.profile.base), {
     method: "PATCH",
     headers: authHeaders(),
     body: JSON.stringify(payload),

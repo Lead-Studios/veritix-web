@@ -1,3 +1,5 @@
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 export interface CheckInRecord {
   ticketCode: string;
   checkedInAt: string;
@@ -10,7 +12,7 @@ export interface CheckInRecord {
  * and is shared across concurrent scanner devices.
  */
 export async function markTicketUsed(ticketCode: string): Promise<void> {
-  const res = await fetch("/api/tickets/check-in", {
+  const res = await fetch(buildUrl(API_ROUTES.tickets.checkIn), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ticketCode }),
@@ -22,7 +24,7 @@ export async function markTicketUsed(ticketCode: string): Promise<void> {
  * Checks whether a ticket has already been used via the backend.
  */
 export async function isTicketUsed(ticketCode: string): Promise<boolean> {
-  const res = await fetch(`/api/tickets/${encodeURIComponent(ticketCode)}/status`);
+  const res = await fetch(buildUrl(API_ROUTES.tickets.status(ticketCode)));
   if (!res.ok) return false;
   const data = await res.json();
   return data.checkedIn === true;

@@ -1,28 +1,17 @@
 import type { Event } from "@/types/event";
 import type { Organizer } from "@/types/organizer";
-import { mockEvents } from "@/mocks/events";
 import { apiClient } from "./apiClient";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+import { API_ROUTES } from "./api-routes";
 
 export async function fetchEvents(params?: { page?: number; limit?: number }): Promise<Event[]> {
-  if (!API_BASE) {
-    const page = params?.page ?? 1;
-    const limit = params?.limit ?? 20;
-    const start = (page - 1) * limit;
-    return mockEvents.slice(start, start + limit);
-  }
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
-  return apiClient.get<Event[]>(`/events?page=${page}&limit=${limit}`);
+  return apiClient.get<Event[]>(`${API_ROUTES.events.list}?page=${page}&limit=${limit}`);
 }
 
 export async function fetchEventById(id: string): Promise<Event | null> {
-  if (!API_BASE) {
-    return mockEvents.find((e) => e.id === id) ?? null;
-  }
   try {
-    return await apiClient.get<Event>(`/events/${id}`);
+    return await apiClient.get<Event>(API_ROUTES.events.detail(id));
   } catch (error) {
     if (error instanceof Error && (error as any).status === 404) {
       return null;
@@ -34,25 +23,6 @@ export async function fetchEventById(id: string): Promise<Event | null> {
 export async function fetchOrganizerById(
   id: string,
 ): Promise<Organizer | null> {
-  if (!API_BASE) {
-    const organizerMap: Record<string, Organizer> = {
-      "rhythm-nation-collective": {
-        id: "rhythm-nation-collective",
-        name: "Rhythm Nation Collective",
-        avatar: "/images/organizers/rhythm-nation.png",
-        description: "Bringing immersive music experiences to life",
-        verified: true,
-      },
-      "beat-collective": {
-        id: "beat-collective",
-        name: "Beat Collective",
-        avatar: "/images/organizers/beat-collective.png",
-        description: "Electronic music events since 2015",
-        verified: true,
-      },
-    };
-    return organizerMap[id] ?? null;
-  }
   try {
     return await apiClient.get<Organizer>(`/organizers/${id}`);
   } catch (error) {
