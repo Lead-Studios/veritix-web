@@ -335,9 +335,11 @@ export default function DashboardPage() {
                     <p className="text-xl font-bold text-[#4D21FF]">
                       {formatCurrency(totalEarned)}
                     </p>
-                    <p className="text-xs text-[#21D4FF]">
-                      Total amount sent to your bank account
-                    </p>
+                    {revenueTrend !== null ? (
+                      <p className={`text-xs ${trendColor}`}>{trendText}</p>
+                    ) : (
+                      <p className="text-xs text-gray-500">Insufficient data</p>
+                    )}
                   </div>
                 </Card>
               </ScrollColumn>
