@@ -1,7 +1,10 @@
 import type { Event } from "@/types/event";
 import type { Organizer } from "@/types/organizer";
 import { apiClient } from "./apiClient";
+import { authedFetch } from "./authedFetch";
 import { API_ROUTES } from "./api-routes";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 export async function fetchEvents(params?: { page?: number; limit?: number }): Promise<Event[]> {
   const page = params?.page ?? 1;
@@ -24,7 +27,12 @@ export async function fetchOrganizerById(
   id: string,
 ): Promise<Organizer | null> {
   try {
-    return await apiClient.get<Organizer>(`/organizers/${id}`);
+    const res = await authedFetch(`${API_BASE}/organizers/${id}`);
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error(`Failed to fetch organizer: ${res.status}`);
+    }
+    return res.json();
   } catch (error) {
     if (error instanceof Error && (error as any).status === 404) {
       return null;
