@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
-import { toast } from "react-toastify";
-import { Check, Clock, Copy, RefreshCw, TicketCheck } from "lucide-react";
-import { useOrderStatus } from "@/hooks/useOrderStatus";
-import { StellarExplorerLink } from "@/components/stellar/StellarExplorerLink";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
+import { toast } from 'react-toastify';
+import { Check, Clock, Copy, RefreshCw, TicketCheck } from 'lucide-react';
+import { useOrderStatus } from '@/hooks/useOrderStatus';
+import { sanitiseErrorMessage } from 'utils';
+import { StellarExplorerLink } from '@/components/stellar/StellarExplorerLink';
 
 type StellarPaymentInstructionsProps = {
   orderId: string;
@@ -17,7 +18,7 @@ type StellarPaymentInstructionsProps = {
   expiresInMinutes?: number;
   className?: string;
   /** Stellar network for the explorer link */
-  network?: "testnet" | "mainnet";
+  network?: 'testnet' | 'mainnet';
 };
 
 type RetryPaymentResponse = {
@@ -28,10 +29,10 @@ type RetryPaymentResponse = {
 };
 
 const DEFAULT_EXPIRY_MINUTES = 15;
-const TICKETS_ISSUED_TOAST = "\uD83C\uDF89 Tickets issued! Check your email.";
+const TICKETS_ISSUED_TOAST = '\uD83C\uDF89 Tickets issued! Check your email.';
 
 function normalizeAmount(amount: string | number) {
-  return typeof amount === "number" ? amount.toFixed(7).replace(/\.?0+$/, "") : amount;
+  return typeof amount === 'number' ? amount.toFixed(7).replace(/\.?0+$/, '') : amount;
 }
 
 function truncateAddress(address: string) {
@@ -39,7 +40,10 @@ function truncateAddress(address: string) {
   return `${address.slice(0, 8)}...${address.slice(-8)}`;
 }
 
-function getInitialExpiry(expiresAt?: string | Date, expiresInMinutes = DEFAULT_EXPIRY_MINUTES) {
+function getInitialExpiry(
+  expiresAt?: string | Date,
+  expiresInMinutes = DEFAULT_EXPIRY_MINUTES,
+) {
   if (expiresAt) return new Date(expiresAt).getTime();
   return Date.now() + expiresInMinutes * 60_000;
 }
@@ -48,7 +52,7 @@ function formatRemaining(milliseconds: number) {
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 export function StellarPaymentInstructions({
@@ -58,8 +62,8 @@ export function StellarPaymentInstructions({
   amountXLM,
   expiresAt,
   expiresInMinutes = DEFAULT_EXPIRY_MINUTES,
-  className = "",
-  network = "testnet",
+  className = '',
+  network = 'testnet',
 }: StellarPaymentInstructionsProps) {
   const router = useRouter();
   const [payment, setPayment] = useState({
@@ -69,7 +73,9 @@ export function StellarPaymentInstructions({
     expiresAt: getInitialExpiry(expiresAt, expiresInMinutes),
   });
   const [now, setNow] = useState(() => Date.now());
-  const [copiedField, setCopiedField] = useState<"destination" | "memo" | "amount" | null>(null);
+  const [copiedField, setCopiedField] = useState<
+    'destination' | 'memo' | 'amount' | null
+  >(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const { data, error, isLoading, refetch } = useOrderStatus(orderId, {
     enabled: Boolean(orderId),
@@ -81,7 +87,8 @@ export function StellarPaymentInstructions({
   const isExpired = remainingMs <= 0;
 
   // The confirmation tx hash returned after payment is confirmed
-  const confirmationTxHash = (data as { confirmationTxHash?: string } | undefined)?.confirmationTxHash ?? "";
+  const confirmationTxHash =
+    (data as { confirmationTxHash?: string } | undefined)?.confirmationTxHash ?? '';
 
   const stellarPayUri = useMemo(() => {
     const params = new URLSearchParams({
@@ -107,13 +114,13 @@ export function StellarPaymentInstructions({
   }, []);
 
   useEffect(() => {
-    if (data?.status === "PAID") {
+    if (data?.status === 'PAID') {
       toast.success(TICKETS_ISSUED_TOAST);
-      router.push("/tickets");
+      router.push('/tickets');
     }
   }, [data?.status, router]);
 
-  async function copyValue(field: "destination" | "memo" | "amount", value: string) {
+  async function copyValue(field: 'destination' | 'memo' | 'amount', value: string) {
     await navigator.clipboard.writeText(value);
     setCopiedField(field);
     window.setTimeout(() => setCopiedField(null), 1800);
@@ -122,9 +129,12 @@ export function StellarPaymentInstructions({
   async function retryPayment() {
     setIsRetrying(true);
     try {
-      const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}/retry-payment`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/orders/${encodeURIComponent(orderId)}/retry-payment`,
+        {
+          method: 'POST',
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`Retry payment request failed with ${response.status}`);
@@ -138,10 +148,10 @@ export function StellarPaymentInstructions({
         expiresAt: getInitialExpiry(retryData.expiresAt, expiresInMinutes),
       }));
       setNow(Date.now());
-      toast.success("Payment window refreshed.");
+      toast.success('Payment window refreshed.');
       await refetch();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not retry payment.");
+      toast.error(sanitiseErrorMessage(err.message));
     } finally {
       setIsRetrying(false);
     }
@@ -161,8 +171,8 @@ export function StellarPaymentInstructions({
             Complete your ticket payment
           </h2>
           <p className="max-w-2xl text-sm leading-6 text-gray-300">
-            Send the exact XLM amount to the destination below and include the memo. The order
-            will auto-confirm once the payment is detected.
+            Send the exact XLM amount to the destination below and include the memo. The
+            order will auto-confirm once the payment is detected.
           </p>
         </div>
 
@@ -188,36 +198,40 @@ export function StellarPaymentInstructions({
             label="Destination address"
             value={payment.destinationAddress}
             displayValue={truncateAddress(payment.destinationAddress)}
-            copied={copiedField === "destination"}
-            onCopy={() => copyValue("destination", payment.destinationAddress)}
+            copied={copiedField === 'destination'}
+            onCopy={() => copyValue('destination', payment.destinationAddress)}
           />
           <PaymentRow
             label="Memo"
             value={payment.memo}
             displayValue={payment.memo}
-            copied={copiedField === "memo"}
+            copied={copiedField === 'memo'}
             isCritical
-            onCopy={() => copyValue("memo", payment.memo)}
+            onCopy={() => copyValue('memo', payment.memo)}
           />
           <PaymentRow
             label="Amount"
             value={`${amount} XLM`}
             displayValue={`${amount} XLM`}
-            copied={copiedField === "amount"}
-            onCopy={() => copyValue("amount", String(amount))}
+            copied={copiedField === 'amount'}
+            onCopy={() => copyValue('amount', String(amount))}
           />
 
           {/* Show Stellar explorer link once payment is confirmed */}
-          {data?.status === "PAID" && confirmationTxHash && (
+          {data?.status === 'PAID' && confirmationTxHash && (
             <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 space-y-2">
-              <p className="text-sm font-semibold text-emerald-300">Payment confirmed ✓</p>
+              <p className="text-sm font-semibold text-emerald-300">
+                Payment confirmed ✓
+              </p>
               <StellarExplorerLink txHash={confirmationTxHash} network={network} />
             </div>
           )}
 
           {isExpired ? (
             <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-4">
-              <p className="text-sm font-semibold text-red-200">This payment window expired.</p>
+              <p className="text-sm font-semibold text-red-200">
+                This payment window expired.
+              </p>
               <p className="mt-1 text-sm text-red-100/80">
                 Retry payment to request a fresh memo and expiry window for this order.
               </p>
@@ -227,14 +241,19 @@ export function StellarPaymentInstructions({
                 disabled={isRetrying}
                 className="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <RefreshCw className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`} aria-hidden="true" />
+                <RefreshCw
+                  className={`h-4 w-4 ${isRetrying ? 'animate-spin' : ''}`}
+                  aria-hidden="true"
+                />
                 Retry Payment
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">
               <TicketCheck className="h-4 w-4 text-emerald-300" aria-hidden="true" />
-              {isLoading ? "Checking payment status..." : "Waiting for payment confirmation."}
+              {isLoading
+                ? 'Checking payment status...'
+                : 'Waiting for payment confirmation.'}
             </div>
           )}
 
@@ -258,16 +277,25 @@ type PaymentRowProps = {
   onCopy: () => void;
 };
 
-function PaymentRow({ label, value, displayValue, copied, isCritical = false, onCopy }: PaymentRowProps) {
+function PaymentRow({
+  label,
+  value,
+  displayValue,
+  copied,
+  isCritical = false,
+  onCopy,
+}: PaymentRowProps) {
   return (
     <div
       className={`rounded-xl border p-4 ${
-        isCritical ? "border-red-500/40 bg-red-950/30" : "border-white/10 bg-white/5"
+        isCritical ? 'border-red-500/40 bg-red-950/30' : 'border-white/10 bg-white/5'
       }`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className={`text-xs font-semibold uppercase tracking-wide ${isCritical ? "text-red-300" : "text-gray-400"}`}>
+          <p
+            className={`text-xs font-semibold uppercase tracking-wide ${isCritical ? 'text-red-300' : 'text-gray-400'}`}
+          >
             {label}
           </p>
           <p title={value} className="mt-1 break-all font-mono text-sm text-white">
@@ -285,8 +313,12 @@ function PaymentRow({ label, value, displayValue, copied, isCritical = false, on
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
           aria-label={`Copy ${label.toLowerCase()}`}
         >
-          {copied ? <Check className="h-4 w-4 text-emerald-300" /> : <Copy className="h-4 w-4" />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? (
+            <Check className="h-4 w-4 text-emerald-300" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+          {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
     </div>
