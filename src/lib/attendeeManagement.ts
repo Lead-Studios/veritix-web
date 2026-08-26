@@ -1,5 +1,7 @@
 // FE-097: Attendee and order management utilities for manage-event screen
 
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 export interface Attendee {
   id: string;
   name: string;
@@ -31,10 +33,9 @@ interface FetchAttendeesResponse {
 export async function fetchEventAttendees(
   eventId: string,
 ): Promise<Attendee[]> {
-  const res = await fetch(`/api/admin/events/${eventId}/attendees`);
+  const res = await fetch(buildUrl(API_ROUTES.admin.attendees(eventId)));
   if (!res.ok) throw new Error("Failed to fetch attendees");
   const data: FetchAttendeesResponse = await res.json();
-  // FIXME: The API returns a mix of snake_case and camelCase, this should be fixed
   return data.attendees.map((a) => ({
     id: a.id,
     name: a.name,
@@ -53,7 +54,7 @@ export async function checkInAttendee(
   attendeeId: string,
 ): Promise<{ success: boolean; message: string }> {
   const res = await fetch(
-    `/api/events/${eventId}/attendees/${attendeeId}/check-in`,
+    buildUrl(API_ROUTES.events.attendeeCheckIn(eventId, attendeeId)),
     {
       method: "POST",
     },
@@ -68,7 +69,7 @@ export async function banAttendee(
   attendeeId: string,
   reason: string,
 ): Promise<{ success: boolean; message: string }> {
-  const res = await fetch(`/api/admin/events/${eventId}/ban`, {
+  const res = await fetch(buildUrl(API_ROUTES.admin.ban(eventId)), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ attendeeId, reason }),

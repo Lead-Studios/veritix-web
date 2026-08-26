@@ -1,6 +1,8 @@
 // FE-096: Organizer event lifecycle actions
 // Adds edit, publish, unpublish, and cancel/archive actions to the manage-event screen.
 
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 export type EventAction = "publish" | "unpublish" | "cancel" | "archive";
 
 export interface ActionResult {
@@ -12,7 +14,7 @@ export async function performEventAction(
   eventId: string,
   action: EventAction
 ): Promise<ActionResult> {
-  const res = await fetch(`/api/events/${eventId}/actions`, {
+  const res = await fetch(buildUrl(API_ROUTES.events.actions(eventId)), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action }),

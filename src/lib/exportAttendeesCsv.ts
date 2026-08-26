@@ -1,3 +1,5 @@
+import { buildUrl, API_ROUTES } from "./api-routes";
+
 export interface TicketRecord {
   attendeeName: string;
   attendeeEmail: string;
@@ -10,7 +12,7 @@ export interface TicketRecord {
 /** Fetch all tickets for an event, paginating if total > 1000. */
 export async function fetchAllTickets(eventId: string): Promise<TicketRecord[]> {
   const PAGE = 1000;
-  const first = await fetch(`/api/events/${eventId}/tickets?limit=${PAGE}&offset=0`);
+  const first = await fetch(buildUrl(`${API_ROUTES.events.tickets(eventId)}?limit=${PAGE}&offset=0`));
   if (!first.ok) throw new Error("Failed to fetch tickets");
   const firstData = await first.json();
   const total: number = firstData.total ?? firstData.tickets?.length ?? 0;
@@ -19,7 +21,7 @@ export async function fetchAllTickets(eventId: string): Promise<TicketRecord[]> 
   if (total > PAGE) {
     const pages = Math.ceil(total / PAGE);
     const requests = Array.from({ length: pages - 1 }, (_, i) =>
-      fetch(`/api/events/${eventId}/tickets?limit=${PAGE}&offset=${(i + 1) * PAGE}`)
+      fetch(buildUrl(`${API_ROUTES.events.tickets(eventId)}?limit=${PAGE}&offset=${(i + 1) * PAGE}`))
         .then((r) => r.json())
         .then((d) => mapTickets(d.tickets ?? d)),
     );

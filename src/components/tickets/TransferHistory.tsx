@@ -13,6 +13,18 @@ interface TransferHistoryProps {
   ticketId: string;
 }
 
+function truncateAddress(addr: string): string {
+  if (addr.length <= 10) return addr;
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
+function stellarExplorerLink(hash: string, network: "testnet" | "mainnet" = "testnet"): string {
+  const base = network === "mainnet"
+    ? "https://stellar.expert/explorer/public"
+    : "https://stellar.expert/explorer/testnet";
+  return `${base}/tx/${hash}`;
+}
+
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -46,8 +58,8 @@ export function TransferHistory({ ticketId }: TransferHistoryProps) {
 
   const steps = transfers
     ? [
-        { label: "Issued to", name: transfers[0]?.from ?? "Original owner", date: null, reason: null },
-        ...transfers.map((t) => ({ label: "Transferred to", name: t.to, date: t.date, reason: t.reason })),
+        { label: "Issued to", name: transfers[0]?.from ?? "Original owner", date: null, reason: null, txHash: null },
+        ...transfers.map((t) => ({ label: "Transferred to", name: t.to, date: t.date, reason: t.reason, txHash: (t as Transfer & { txHash?: string }).txHash ?? null })),
       ]
     : [];
 
@@ -92,13 +104,25 @@ export function TransferHistory({ ticketId }: TransferHistoryProps) {
                   <div className="pt-1 pb-4">
                     <p className="text-sm text-white">
                       {step.label}{" "}
-                      <span className="font-semibold">{step.name}</span>
+                      <span className="font-semibold" title={step.name}>
+                        {truncateAddress(step.name)}
+                      </span>
                       {step.reason && (
                         <span className="ml-1 text-xs text-gray-400">({step.reason})</span>
                       )}
                     </p>
                     {step.date && (
                       <p className="text-xs text-gray-500 mt-0.5">{relativeDate(step.date)}</p>
+                    )}
+                    {step.txHash && (
+                      <a
+                        href={stellarExplorerLink(step.txHash)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-[#4D21FF] hover:text-[#21D4FF] mt-0.5 inline-block underline underline-offset-2"
+                      >
+                        View on Stellar Explorer ↗
+                      </a>
                     )}
                   </div>
                 </div>

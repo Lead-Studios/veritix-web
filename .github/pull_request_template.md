@@ -21,10 +21,20 @@ Closes #
 - [ ] I have tested my changes in at least one browser
 - [ ] I have considered accessibility (keyboard navigation, screen reader, colour contrast)
 - [ ] I have updated `CHANGELOG.md` under `[Unreleased]`
+- [ ] No hardcoded strings — all user-facing text uses constants or translations
+- [ ] Changes are responsive and look correct on mobile viewports
 
 ## Screenshots / Recordings
 
-<!-- Add before/after screenshots or a screen recording for UI changes -->
+<!-- Required for any UI changes. Include before/after screenshots or a screen recording. -->
+
+| Before | After |
+| ------ | ----- |
+|        |       |
+
+## Related Issues
+
+<!-- List any related issues: Closes #N, Fixes #N, Related to #N -->
 
 ## Additional Notes
 
