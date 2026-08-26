@@ -1,67 +1,63 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { HeroContent } from "@/components/dashboard/HeroContent";
-import { CTAButton } from "@/components/dashboard/CTAButton";
-import { QuickActions } from "@/components/dashboard/QuickActions";
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { ScrollColumn } from "@/components/dashboard/ScrollColumn";
-import { Card, CardHeader, StatDisplay } from "@/components/dashboard/Card";
-import { EventImage } from "@/components/dashboard/EventImage";
-import { RevenueChart } from "@/components/dashboard/charts/RevenueChart";
-import { PerformanceChart } from "@/components/dashboard/charts/PerformanceChart";
-import { EmptyState } from "@/components/EmptyState";
-import dynamic from "next/dynamic";
-import { DemographicsSection } from "@/components/dashboard/DemographicsSection";
-import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
-import { PayoutHistory } from "@/components/dashboard/PayoutHistory";
-import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
-import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
-import { useOrganizerAnalytics, selectRevenue, selectTicketBreakdown, selectLiveCheckIns } from "@/hooks/useOrganizerAnalytics";
-import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
-import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
-import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { StatusBadge } from '@/components/dashboard/StatusBadge';
+import { HeroContent } from '@/components/dashboard/HeroContent';
+import { CTAButton } from '@/components/dashboard/CTAButton';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { ScrollColumn } from '@/components/dashboard/ScrollColumn';
+import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card';
+import { EventImage } from '@/components/dashboard/EventImage';
+import { RevenueChart } from '@/components/dashboard/charts/RevenueChart';
+import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart';
+import { EmptyState } from '@/components/EmptyState';
+import dynamic from 'next/dynamic';
+import { DemographicsSection } from '@/components/dashboard/DemographicsSection';
+import { DateRangePicker } from '@/components/dashboard/DateRangePicker';
+import { PayoutHistory } from '@/components/dashboard/PayoutHistory';
+import { LiveCheckInCard } from '@/components/dashboard/LiveCheckInCard';
+import { ProjectedRevenueCard } from '@/components/dashboard/ProjectedRevenueCard';
+import {
+  useOrganizerAnalytics,
+  selectRevenue,
+  selectTicketBreakdown,
+  selectLiveCheckIns,
+} from '@/hooks/useOrganizerAnalytics';
+import { ChartErrorBoundary } from '@/components/dashboard/ChartErrorBoundary';
+import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 const TicketTypeChart = dynamic(
   () =>
-    import("@/components/dashboard/charts/TicketTypeChart").then(
+    import('@/components/dashboard/charts/TicketTypeChart').then(
       (m) => m.TicketTypeChart,
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className="h-[220px] animate-pulse rounded-xl bg-white/5" />
-    ),
+    loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" />,
   },
 );
 
 const RevenueByTicketTypeChart = dynamic(
   () =>
-    import("@/components/dashboard/charts/RevenueByTicketTypeChart").then(
+    import('@/components/dashboard/charts/RevenueByTicketTypeChart').then(
       (m) => m.RevenueByTicketTypeChart,
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className="h-[220px] animate-pulse rounded-xl bg-white/5" />
-    ),
+    loading: () => <div className="h-[220px] animate-pulse rounded-xl bg-white/5" />,
   },
 );
 
-import { formatCurrency } from "@/lib/currencyFormat";
+import { formatCurrency } from '@/lib/currencyFormat';
 
 function DashboardSkeleton() {
   return (
     <>
-      <div
-        role="status"
-        aria-live="polite"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" className="sr-only">
         Loading dashboard data
       </div>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -77,13 +73,7 @@ function DashboardSkeleton() {
   );
 }
 
-function ErrorCard({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
+function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="rounded-2xl border border-red-500/30 bg-red-950/20 p-8 text-center space-y-4">
       <AlertTriangle className="w-10 h-10 text-red-400 mx-auto" />
@@ -106,8 +96,8 @@ function ErrorCard({
 export default function DashboardPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const from = params.get("from") ?? undefined;
-  const to = params.get("to") ?? undefined;
+  const from = params.get('from') ?? undefined;
+  const to = params.get('to') ?? undefined;
   const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
 
   const revenue = useMemo(() => selectRevenue(data), [data]);
@@ -121,45 +111,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (loading) {
-      setAnnouncement("Loading dashboard data");
+      setAnnouncement('Loading dashboard data');
     } else if (error) {
-      setAnnouncement("Failed to load dashboard data. Please refresh.");
+      setAnnouncement('Failed to load dashboard data. Please refresh.');
     } else if (hasData) {
-      setAnnouncement("Dashboard data loaded");
+      setAnnouncement('Dashboard data loaded');
     }
   }, [loading, error, hasData]);
 
-  const revenueData =
-    revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
-  const barData =
-    data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? [];
+  const revenueData = revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [];
+  const barData = data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? [];
   const totalEarned = data?.totalEarned ?? 0;
   const payoutsQueued = data?.payoutsQueued ?? 0;
   const nextSettlementDays = data?.nextSettlementDays ?? 0;
-
-  const { revenueTrend, trendText, trendColor } = useMemo(() => {
-    const rev = revenue ?? [];
-    if (rev.length < 14) {
-      return {
-        revenueTrend: null,
-        trendText: "Insufficient data for trend",
-        trendColor: "text-gray-500",
-      };
-    }
-    const currentWeek = rev.slice(-7).reduce((sum, d) => sum + d.revenue, 0);
-    const lastWeek = rev.slice(-14, -7).reduce((sum, d) => sum + d.revenue, 0);
-    if (lastWeek === 0) {
-      return {
-        revenueTrend: null,
-        trendText: "Insufficient data for trend",
-        trendColor: "text-gray-500",
-      };
-    }
-    const trend = ((currentWeek - lastWeek) / lastWeek) * 100;
-    const text = `Trending by ${Math.abs(trend).toFixed(1)}% ${trend >= 0 ? "↗️" : "↘️"} this week`;
-    const color = trend >= 0 ? "text-emerald-400" : "text-red-400";
-    return { revenueTrend: trend, trendText: text, trendColor: color };
-  }, [revenue]);
 
   const eventImgs =
     data?.events?.slice(0, 4).map((e) => ({
@@ -173,18 +137,11 @@ export default function DashboardPage() {
   const projectedRevenueInput = (() => {
     const events = data?.events ?? [];
     if (events.length === 0) return null;
-    const totalRemaining = events.reduce(
-      (sum, e) => sum + (e.remainingTickets ?? 0),
-      0,
-    );
-    const totalCapacity = events.reduce(
-      (sum, e) => sum + (e.totalTickets ?? 0),
-      0,
-    );
+    const totalRemaining = events.reduce((sum, e) => sum + (e.remainingTickets ?? 0), 0);
+    const totalCapacity = events.reduce((sum, e) => sum + (e.totalTickets ?? 0), 0);
     if (totalRemaining === 0 || totalCapacity === 0) return null;
     const avgPrice =
-      events.reduce((sum, e) => sum + (e.averageTicketPrice ?? 0), 0) /
-      events.length;
+      events.reduce((sum, e) => sum + (e.averageTicketPrice ?? 0), 0) / events.length;
     const soldSoFar = totalCapacity - totalRemaining;
     const sellThroughRate = soldSoFar / totalCapacity;
     return {
@@ -197,11 +154,7 @@ export default function DashboardPage() {
 
   return (
     <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
-      <div
-        role="status"
-        aria-live="polite"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" className="sr-only">
         {announcement}
       </div>
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
@@ -221,7 +174,7 @@ export default function DashboardPage() {
             <button
               onClick={() => data && exportAnalyticsCsv(data)}
               disabled={!hasData}
-              title={!hasData ? "No analytics data available to export" : undefined}
+              title={!hasData ? 'No analytics data available to export' : undefined}
               className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Export CSV
@@ -238,17 +191,15 @@ export default function DashboardPage() {
           {loading && <DashboardSkeleton />}
 
           {/* Error state */}
-          {!loading && error && (
-            <ErrorCard message={error} onRetry={mutate} />
-          )}
+          {!loading && error && <ErrorCard message={error} onRetry={mutate} />}
 
           {!loading && !error && !hasEvents && (
             <EmptyState
               title="No events yet"
               description="Create your first event to start seeing analytics, revenue, and performance data here."
               action={{
-                label: "Create your first event",
-                onClick: () => router.push("/events/create"),
+                label: 'Create your first event',
+                onClick: () => router.push('/events/create'),
               }}
             />
           )}
@@ -293,10 +244,12 @@ export default function DashboardPage() {
               {/* Middle Column - Attendees / Check-ins */}
               <ScrollColumn animationClass="animate-scroll-down-once" className="gap-0">
                 <Card>
-                  <p className="text-xs uppercase text-[#21D4FF] mb-2">Latest check-ins</p>
+                  <p className="text-xs uppercase text-[#21D4FF] mb-2">
+                    Latest check-ins
+                  </p>
                   <LiveCheckInCard
-                    eventId={liveEvent?.id ?? ""}
-                    eventName={liveEvent?.name ?? ""}
+                    eventId={liveEvent?.id ?? ''}
+                    eventName={liveEvent?.name ?? ''}
                     isLive={liveCheckIns.checkInsLive}
                   />
                 </Card>
@@ -343,9 +296,15 @@ export default function DashboardPage() {
                     </ChartErrorBoundary>
                   </div>
                   <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                    <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                    <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
+                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">
+                      Total Earned
+                    </p>
+                    <p className="text-xl font-bold text-[#4D21FF]">
+                      {formatCurrency(totalEarned)}
+                    </p>
+                    <p className="text-xs text-[#21D4FF]">
+                      Total amount sent to your bank account
+                    </p>
                   </div>
                 </Card>
               </ScrollColumn>
@@ -359,7 +318,10 @@ export default function DashboardPage() {
           {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
-                <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
+                <CardHeader
+                  title="Ticket Type Breakdown"
+                  subtitle="Revenue and volume by ticket category"
+                />
                 <div className="mt-4">
                   <TicketTypeChart data={ticketBreakdown} />
                   <ChartErrorBoundary chartName="Ticket Type Breakdown">
@@ -373,7 +335,10 @@ export default function DashboardPage() {
           {!loading && !error && ticketBreakdown && ticketBreakdown.length > 0 && (
             <div className="mt-10">
               <Card>
-                <CardHeader title="Revenue by Ticket Type" subtitle="Which ticket categories drive the most revenue" />
+                <CardHeader
+                  title="Revenue by Ticket Type"
+                  subtitle="Which ticket categories drive the most revenue"
+                />
                 <div className="mt-4">
                   <RevenueByTicketTypeChart data={ticketBreakdown} />
                   <ChartErrorBoundary chartName="Revenue by Ticket Type">
@@ -392,7 +357,9 @@ export default function DashboardPage() {
 
           {!loading && !error && hasEvents && (
             <div className="mt-10">
-              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">Payout History</p>
+              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">
+                Payout History
+              </p>
               <PayoutHistory />
             </div>
           )}
