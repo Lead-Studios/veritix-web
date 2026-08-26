@@ -1,11 +1,10 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
+import { getToken } from './auth';
 
 export class AuthError extends Error {
-  constructor(
-    message = "Authentication required. Please log in to verify tickets.",
-  ) {
+  constructor(message = 'Authentication required. Please log in to verify tickets.') {
     super(message);
-    this.name = "AuthError";
+    this.name = 'AuthError';
   }
 }
 
@@ -18,21 +17,25 @@ export interface TicketVerificationResult {
   errorMessage?: string;
 }
 
-export async function verifyTicket(
-  code: string,
-): Promise<TicketVerificationResult> {
+export async function verifyTicket(code: string): Promise<TicketVerificationResult> {
+  const token = getToken();
+  if (!token) {
+    throw new AuthError();
+  }
+
   try {
     return await apiClient.post<TicketVerificationResult>(
-      "/api/tickets/verify",
+      '/api/tickets/verify',
       { code },
+      { headers: { Authorization: `Bearer ${token}` } },
     );
   } catch (error) {
     if (error instanceof Error && (error as any).status === 401) {
-      throw new AuthError("Session expired. Please log in again.");
+      throw new AuthError('Session expired. Please log in again.');
     }
     return {
       valid: false,
-      errorMessage: "Verification service unavailable. Please try again.",
+      errorMessage: 'Verification service unavailable. Please try again.',
     };
   }
 }
@@ -40,15 +43,21 @@ export async function verifyTicket(
 export async function checkInTicket(
   code: string,
 ): Promise<{ success: boolean; message: string }> {
+  const token = getToken();
+  if (!token) {
+    throw new AuthError();
+  }
+
   try {
     return await apiClient.post<{ success: boolean; message: string }>(
-      "/api/tickets/check-in",
+      '/api/tickets/check-in',
       { code },
+      { headers: { Authorization: `Bearer ${token}` } },
     );
   } catch (error) {
     if (error instanceof Error && (error as any).status === 401) {
-      throw new AuthError("Session expired. Please log in again.");
+      throw new AuthError('Session expired. Please log in again.');
     }
-    return { success: false, message: "Check-in failed. Please try again." };
+    return { success: false, message: 'Check-in failed. Please try again.' };
   }
 }
