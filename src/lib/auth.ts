@@ -34,6 +34,8 @@ export async function forgotPassword(email: string): Promise<void> {
   await apiClient.post('/api/auth/forgot-password', { email });
 }
 
+export async function logout(): Promise<void> {
+  await apiClient.post('/api/auth/logout', {});
 export function logout(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_token');
