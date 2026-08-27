@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "@/hooks/useSession";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/hooks/useSession';
+import { sanitiseErrorMessage } from 'utils';
+import { toast } from 'sonner';
 
 export const useWaitlist = (eventId: string, initialPosition: number | null) => {
   const [position, setPosition] = useState(initialPosition);
@@ -10,7 +11,7 @@ export const useWaitlist = (eventId: string, initialPosition: number | null) => 
   const router = useRouter();
 
   const joinWaitlist = async () => {
-    if (status === "unauthenticated") {
+    if (status === 'unauthenticated') {
       router.push(`/login?next=/events/${eventId}`);
       return;
     }
@@ -18,14 +19,16 @@ export const useWaitlist = (eventId: string, initialPosition: number | null) => 
     setIsLoading(true);
     try {
       const res = await fetch(`/api/events/${eventId}/waitlist`, {
-        method: "POST",
+        method: 'POST',
       });
-      if (!res.ok) throw new Error("Failed to join waitlist");
+      if (!res.ok) throw new Error('Failed to join waitlist');
       const { position } = await res.json();
       setPosition(position);
-      toast.success("You are on the waitlist! We will notify you if tickets become available.");
+      toast.success(
+        'You are on the waitlist! We will notify you if tickets become available.',
+      );
     } catch (error) {
-      toast.error("There was an issue joining the waitlist. Please try again.");
+      toast.error(sanitiseErrorMessage(error.message));
     } finally {
       setIsLoading(false);
     }
@@ -35,12 +38,12 @@ export const useWaitlist = (eventId: string, initialPosition: number | null) => 
     setIsLoading(true);
     try {
       const res = await fetch(`/api/events/${eventId}/waitlist`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
-      if (!res.ok) throw new Error("Failed to leave waitlist");
+      if (!res.ok) throw new Error('Failed to leave waitlist');
       setPosition(null);
     } catch (error) {
-      toast.error("There was an issue leaving the waitlist. Please try again.");
+      toast.error(sanitiseErrorMessage(error.message));
     } finally {
       setIsLoading(false);
     }
