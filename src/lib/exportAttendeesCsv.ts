@@ -9,21 +9,46 @@ export interface TicketRecord {
   purchasedAt: string;
 }
 
+interface RawTicketRecord {
+  attendeeName?: string;
+  attendee_name?: string;
+  attendeeEmail?: string;
+  attendee_email?: string;
+  ticketType?: string;
+  ticket_type?: string;
+  ticketCode?: string;
+  ticket_code?: string;
+  status?: string;
+  purchasedAt?: string;
+  purchased_at?: string;
+}
+
+interface TicketPage {
+  total?: number;
+  tickets?: RawTicketRecord[];
+}
+
 /** Fetch all tickets for an event, paginating if total > 1000. */
 export async function fetchAllTickets(eventId: string): Promise<TicketRecord[]> {
   const PAGE = 1000;
   const first = await fetch(buildUrl(`${API_ROUTES.events.tickets(eventId)}?limit=${PAGE}&offset=0`));
   if (!first.ok) throw new Error("Failed to fetch tickets");
-  const firstData = await first.json();
-  const total: number = firstData.total ?? firstData.tickets?.length ?? 0;
-  const tickets: TicketRecord[] = mapTickets(firstData.tickets ?? firstData);
+  const firstData = (await first.json()) as TicketPage | RawTicketRecord[];
+  const firstPage = Array.isArray(firstData) ? undefined : firstData;
+  const total = firstPage?.total ?? firstPage?.tickets?.length ?? 0;
+  const tickets = mapTickets(
+    firstPage?.tickets ?? (Array.isArray(firstData) ? firstData : []),
+  );
 
   if (total > PAGE) {
     const pages = Math.ceil(total / PAGE);
     const requests = Array.from({ length: pages - 1 }, (_, i) =>
       fetch(buildUrl(`${API_ROUTES.events.tickets(eventId)}?limit=${PAGE}&offset=${(i + 1) * PAGE}`))
-        .then((r) => r.json())
-        .then((d) => mapTickets(d.tickets ?? d)),
+        .then((r) => r.json() as Promise<TicketPage | RawTicketRecord[]>)
+        .then((data) => {
+          const page = Array.isArray(data) ? undefined : data;
+          return mapTickets(page?.tickets ?? (Array.isArray(data) ? data : []));
+        }),
     );
     const rest = await Promise.all(requests);
     rest.forEach((batch) => tickets.push(...batch));
@@ -32,7 +57,7 @@ export async function fetchAllTickets(eventId: string): Promise<TicketRecord[]> 
   return tickets;
 }
 
-function mapTickets(raw: any[]): TicketRecord[] {
+function mapTickets(raw: RawTicketRecord[]): TicketRecord[] {
   return raw.map((t) => ({
     attendeeName: t.attendeeName ?? t.attendee_name ?? "",
     attendeeEmail: t.attendeeEmail ?? t.attendee_email ?? "",

@@ -1,4 +1,4 @@
-import { apiClient } from "./apiClient";
+import { ApiError, apiClient } from "./apiClient";
 
 export class AuthError extends Error {
   constructor(
@@ -27,7 +27,7 @@ export async function verifyTicket(
       { code },
     );
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 401) {
+    if (error instanceof ApiError && error.status === 401) {
       throw new AuthError("Session expired. Please log in again.");
     }
     return {
@@ -46,7 +46,7 @@ export async function checkInTicket(
       { code },
     );
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 401) {
+    if (error instanceof ApiError && error.status === 401) {
       throw new AuthError("Session expired. Please log in again.");
     }
     return { success: false, message: "Check-in failed. Please try again." };

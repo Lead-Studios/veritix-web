@@ -1,6 +1,6 @@
 import type { Event } from "@/types/event";
 import type { Organizer } from "@/types/organizer";
-import { apiClient } from "./apiClient";
+import { ApiError, apiClient } from "./apiClient";
 import { API_ROUTES } from "./api-routes";
 
 export async function fetchEvents(params?: { page?: number; limit?: number }): Promise<Event[]> {
@@ -13,7 +13,7 @@ export async function fetchEventById(id: string): Promise<Event | null> {
   try {
     return await apiClient.get<Event>(API_ROUTES.events.detail(id));
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 404) {
+    if (error instanceof ApiError && error.status === 404) {
       return null;
     }
     throw error;
@@ -26,7 +26,7 @@ export async function fetchOrganizerById(
   try {
     return await apiClient.get<Organizer>(`/organizers/${id}`);
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 404) {
+    if (error instanceof ApiError && error.status === 404) {
       return null;
     }
     throw error;
