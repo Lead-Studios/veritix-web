@@ -1,13 +1,16 @@
 import { EventFormData } from './createEventSubmit';
 import { apiClient } from './apiClient';
 import { buildUrl, API_ROUTES } from './api-routes';
+import type { CreateEventFormData } from "./createEventValidation";
+import { apiClient } from "./apiClient";
+import { buildUrl, API_ROUTES } from "./api-routes";
 
 const DRAFT_STORAGE_KEY = 'veritix_event_draft';
 const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface EventDraft {
   id?: string;
-  formData: Partial<EventFormData>;
+  formData: Partial<CreateEventFormData>;
   savedAt: string;
 }
 
@@ -36,6 +39,9 @@ function readLocalDraft(): EventDraft | null {
 }
 
 export async function saveDraft(formData: Partial<EventFormData>): Promise<EventDraft> {
+export async function saveDraft(
+  formData: Partial<CreateEventFormData>,
+): Promise<EventDraft> {
   const localDraft: EventDraft = {
     formData,
     savedAt: new Date().toISOString(),

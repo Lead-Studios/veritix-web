@@ -23,6 +23,9 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
       sessionStorage.setItem('auth_token', authResponse.token);
     }
     redirect('/dashboard');
+    const storage = payload.rememberMe ? localStorage : sessionStorage;
+    storage.setItem('auth_token', authResponse.token);
+    storage.setItem('user', JSON.stringify(authResponse.user));
   }
   return authResponse;
 }
@@ -41,4 +44,11 @@ export function logout(): void {
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+}
+
+export function getUser(): AuthResponse['user'] | null {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('user') ?? sessionStorage.getItem('user');
+  if (!user) return null;
+  return JSON.parse(user);
 }
