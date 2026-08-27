@@ -1,4 +1,4 @@
-import { formatCurrency } from "../src/lib/currencyFormat";
+import { formatCurrency } from "@/lib/currencyFormat";
 
 describe("formatCurrency", () => {
   it("should format an integer value correctly", () => {
