@@ -1,34 +1,60 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
+import { mockEvents } from "../mocks/events";
+import { ApiError, apiClient } from "../lib/apiClient";
 import {
-  fetchEvents,
   fetchEventById,
-  fetchOrganizerById,
+  fetchEvents,
   fetchEventsByOrganizer,
-} from '../lib/eventsApi';
+  fetchOrganizerById,
+} from "../lib/eventsApi";
 
-vi.mock('../lib/eventsApi');
+vi.mock("../lib/apiClient", async () => {
+  const actual = await vi.importActual<typeof import("../lib/apiClient")>("../lib/apiClient");
+  return { ...actual, apiClient: { get: vi.fn() } };
+});
 
-describe('eventsApi mock and real-API branches', () => {
-  it('fetchEvents returns events in mock mode', async () => {
-    const events = await fetchEvents();
-    expect(Array.isArray(events)).toBe(true);
+const getMock = vi.mocked(apiClient.get);
+
+describe("eventsApi mock branches", () => {
+  it("fetchEvents returns mockEvents", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "");
+    await expect(fetchEvents()).resolves.toBe(mockEvents);
   });
 
-  it('fetchEventById finds event by id or returns null when missing', async () => {
-    const event = await fetchEventById('event-1');
-    expect(event === null || typeof event === 'object').toBe(true);
-
-    const nonExistent = await fetchEventById('non-existent-999');
-    expect(nonExistent).toBeNull();
+  it("fetchEventById finds a mock event by id", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "");
+    await expect(fetchEventById(mockEvents[0].id)).resolves.toBe(mockEvents[0]);
   });
 
-  it('fetchOrganizerById finds organizer by id', async () => {
-    const org = await fetchOrganizerById('org-1');
-    expect(org === null || typeof org === 'object').toBe(true);
+  it("fetchOrganizerById finds the organizer by its id key", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "");
+    await expect(fetchOrganizerById("org-1")).resolves.toMatchObject({ id: "org-1" });
+  });
+});
+
+describe("eventsApi real API branches", () => {
+  it("fetchEvents returns the parsed API response", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    const events = [{ id: "event-1" }];
+    getMock.mockResolvedValueOnce(events as never);
+
+    await expect(fetchEvents({ page: 2, limit: 10 })).resolves.toBe(events);
+    expect(getMock).toHaveBeenCalledWith("/events?page=2&limit=10");
   });
 
-  it('fetchEventsByOrganizer filters events by organizer id', async () => {
-    const events = await fetchEventsByOrganizer('org-1');
-    expect(Array.isArray(events)).toBe(true);
+  it("fetchEventById returns null for an API 404", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    getMock.mockRejectedValueOnce(new ApiError("Not found", 404));
+
+    await expect(fetchEventById("missing")).resolves.toBeNull();
+  });
+
+  it("fetchEventsByOrganizer sends the filtered API request", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.example.com");
+    const events = [{ id: "event-1" }];
+    getMock.mockResolvedValueOnce(events as never);
+
+    await expect(fetchEventsByOrganizer("org-1")).resolves.toBe(events);
+    expect(getMock).toHaveBeenCalledWith("/events?organizerId=org-1");
   });
 });
