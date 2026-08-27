@@ -13,7 +13,8 @@ export default function EventAnalyticsTab({ eventId }: EventAnalyticsTabProps) {
   const { data, error, isLoading } = useSWR(
     eventId ? `analytics-${eventId}` : null,
     () => fetchEventAnalytics(eventId),
-    { revalidateOnFocus: false },
+    // revalidateOnFocus/dedupingInterval come from the SWRConfig provider in
+    // src/app/(protected)/layout.tsx — this component only renders under that layout.
   );
 
   if (isLoading) {
