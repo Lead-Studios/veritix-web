@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import Toggle from "../ui/Toggle";
+import React from 'react';
+import { EventFormData } from '@/app/(protected)/events/create/page';
+import Toggle from '../ui/Toggle';
 import {
   DUPLICATE_TICKET_NAME_MESSAGE,
   findDuplicateTicketIndices,
   type CreateEventFormErrors,
-} from "@/lib/createEventValidation";
+} from '@/lib/createEventValidation';
 
 interface TicketInformationProps {
   formData: EventFormData;
@@ -25,7 +25,7 @@ export default function TicketInformation({
   // duplicates also flow through the `errors` prop, so we merge both views.
   const duplicateIndices = React.useMemo(
     () => findDuplicateTicketIndices(formData.tickets),
-    [formData.tickets]
+    [formData.tickets],
   );
 
   const nameErrorFor = (index: number): string | undefined => {
@@ -37,19 +37,19 @@ export default function TicketInformation({
       tickets: [
         ...formData.tickets,
         {
-          name: "",
+          name: '',
           quantity: 0,
-          price: "",
-          description: "",
+          price: '',
+          description: '',
           transferable: true,
           resellable: false,
-          resellPriceLimit: "",
+          resellPriceLimit: '',
         },
       ],
     });
   };
 
-  const updateTicket = (index: number, updates: Partial<EventFormData["tickets"][0]>) => {
+  const updateTicket = (index: number, updates: Partial<EventFormData['tickets'][0]>) => {
     const newTickets = [...formData.tickets];
     newTickets[index] = { ...newTickets[index], ...updates };
     updateFormData({ tickets: newTickets });
@@ -73,10 +73,7 @@ export default function TicketInformation({
 
       <div className="space-y-8">
         {formData.tickets.map((ticket, index) => (
-          <div
-            key={index}
-            className="bg-gray-800 rounded-lg p-6 border border-gray-700"
-          >
+          <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <svg
@@ -121,7 +118,7 @@ export default function TicketInformation({
                   aria-describedby={
                     nameErrorFor(index) ? `error-ticket-${index}-name` : undefined
                   }
-                  className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${nameErrorFor(index) ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${nameErrorFor(index) ? 'border-red-500' : 'border-gray-600'}`}
                 />
                 {nameErrorFor(index) && (
                   <p
@@ -150,10 +147,12 @@ export default function TicketInformation({
                     }
                     min="0"
                     aria-invalid={!!errors[`tickets.${index}.quantity`]}
-                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.quantity`] ? "border-red-500" : "border-gray-600"}`}
+                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.quantity`] ? 'border-red-500' : 'border-gray-600'}`}
                   />
                   {errors[`tickets.${index}.quantity`] && (
-                    <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.quantity`]}</p>
+                    <p role="alert" className="mt-1 text-xs text-red-400">
+                      {errors[`tickets.${index}.quantity`]}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -161,15 +160,19 @@ export default function TicketInformation({
                     Price (ETH) <span className="text-red-400">*</span>
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     value={ticket.price}
-                    onChange={(e) => updateTicket(index, { price: e.target.value })}
+                    onChange={(e) =>
+                      updateTicket(index, { price: e.target.valueAsNumber })
+                    }
                     placeholder="e.g. 0.05"
                     aria-invalid={!!errors[`tickets.${index}.price`]}
-                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.price`] ? "border-red-500" : "border-gray-600"}`}
+                    className={`w-full bg-gray-700 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors[`tickets.${index}.price`] ? 'border-red-500' : 'border-gray-600'}`}
                   />
                   {errors[`tickets.${index}.price`] && (
-                    <p role="alert" className="mt-1 text-xs text-red-400">{errors[`tickets.${index}.price`]}</p>
+                    <p role="alert" className="mt-1 text-xs text-red-400">
+                      {errors[`tickets.${index}.price`]}
+                    </p>
                   )}
                 </div>
               </div>
@@ -182,9 +185,7 @@ export default function TicketInformation({
                 <input
                   type="text"
                   value={ticket.description}
-                  onChange={(e) =>
-                    updateTicket(index, { description: e.target.value })
-                  }
+                  onChange={(e) => updateTicket(index, { description: e.target.value })}
                   placeholder="Enter benefits, restriction etc."
                   className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                 />
@@ -203,9 +204,7 @@ export default function TicketInformation({
                   </label>
                   <Toggle
                     checked={ticket.transferable}
-                    onChange={(checked) =>
-                      updateTicket(index, { transferable: checked })
-                    }
+                    onChange={(checked) => updateTicket(index, { transferable: checked })}
                   />
                 </div>
 
@@ -216,9 +215,7 @@ export default function TicketInformation({
                   </label>
                   <Toggle
                     checked={ticket.resellable}
-                    onChange={(checked) =>
-                      updateTicket(index, { resellable: checked })
-                    }
+                    onChange={(checked) => updateTicket(index, { resellable: checked })}
                   />
                 </div>
 
@@ -245,7 +242,8 @@ export default function TicketInformation({
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                      Maximum resale price as a percentage of the original ticket price (e.g. 150 = up to 1.5× original)
+                      Maximum resale price as a percentage of the original ticket price
+                      (e.g. 150 = up to 1.5× original)
                     </p>
                   </div>
                 )}
@@ -259,12 +257,7 @@ export default function TicketInformation({
           onClick={addTicketType}
           className="w-full border-2 border-dashed border-gray-700 hover:border-blue-600 rounded-lg py-4 flex items-center justify-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
         >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
