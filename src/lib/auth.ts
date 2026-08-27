@@ -1,4 +1,5 @@
 import { apiClient } from './apiClient';
+import { redirect } from 'next/navigation';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
@@ -16,6 +17,12 @@ export interface AuthResponse {
 export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
   const authResponse = await apiClient.post<AuthResponse>('/api/auth/login', payload);
   if (typeof window !== 'undefined') {
+    if (payload.rememberMe) {
+      localStorage.setItem('auth_token', authResponse.token);
+    } else {
+      sessionStorage.setItem('auth_token', authResponse.token);
+    }
+    redirect('/dashboard');
     const storage = payload.rememberMe ? localStorage : sessionStorage;
     storage.setItem('auth_token', authResponse.token);
     storage.setItem('user', JSON.stringify(authResponse.user));
