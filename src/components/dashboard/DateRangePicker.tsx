@@ -56,7 +56,7 @@ export function DateRangePicker() {
             onClick={() => setPreset(value)}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               preset === value
-                ? "bg-[#4D21FF] text-white"
+                ? "bg-brand-primary text-white"
                 : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
             }`}
           >
@@ -71,7 +71,7 @@ export function DateRangePicker() {
             type="date"
             value={from}
             onChange={(e) => setCustom("from", e.target.value)}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#4D21FF] focus:outline-none [color-scheme:dark]"
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-brand-primary focus:outline-none [color-scheme:dark]"
             aria-label="From date"
           />
           <span>–</span>
@@ -79,7 +79,7 @@ export function DateRangePicker() {
             type="date"
             value={to}
             onChange={(e) => setCustom("to", e.target.value)}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-[#4D21FF] focus:outline-none [color-scheme:dark]"
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-brand-primary focus:outline-none [color-scheme:dark]"
             aria-label="To date"
           />
         </div>
@@ -89,7 +89,7 @@ export function DateRangePicker() {
         <button
           type="button"
           onClick={clearFilter}
-          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-gray-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-gray-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
           aria-label="Clear date filter and show all-time data"
         >
           <X size={12} aria-hidden="true" />

@@ -1,6 +1,6 @@
 export default function DashboardLoading() {
   return (
-    <div className="dark min-h-screen bg-[#101428]">
+    <div className="dark min-h-screen bg-surface-dark">
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-6">
           {/* Header skeleton */}

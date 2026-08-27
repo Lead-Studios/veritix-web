@@ -6,7 +6,7 @@ interface EventImageProps {
   borderColor?: string
 }
 
-export const EventImage = ({ src, alt, borderColor = 'border-[#4D21FF]' }: EventImageProps) => (
+export const EventImage = ({ src, alt, borderColor = 'border-brand-primary' }: EventImageProps) => (
   <div className={`relative h-22 w-full rounded-lg overflow-hidden border ${borderColor} bg-[#1a1f3a]`}>
     <AppImage
       src={src || '/placeholder-event.svg'}
