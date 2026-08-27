@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-function createCspResponse(request: NextRequest): NextResponse {
+export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const cspHeader = `
     default-src 'self' https://veritix.io *.veritix.io;
@@ -30,7 +30,6 @@ function createCspResponse(request: NextRequest): NextResponse {
     'Content-Security-Policy',
     cspHeader.replace(/\s{2,}/g, ' ').trim(),
   );
-  return response;
 }
 import { jwtVerify } from 'jose';
 import { canAccessVerificationTools, UserRole } from './lib/verificationAccess';
@@ -57,22 +56,17 @@ function isProtectedPath(pathname: string): boolean {
 
 function getSessionToken(req: NextRequest): string | undefined {
   return (
-    req.cookies.get('auth_token')?.value ??
     req.cookies.get('session')?.value ??
     req.cookies.get('next-auth.session-token')?.value ??
     req.cookies.get('__Secure-next-auth.session-token')?.value
   );
 }
 
-async function hasSufficientRole(
-  token: string,
-  cookieRole: string | undefined,
-  secret: Uint8Array,
-): Promise<boolean> {
+async function hasSufficientRole(token: string, secret: Uint8Array): Promise<boolean> {
   try {
     const { payload } = await jwtVerify(token, secret);
     const role = (payload.role as UserRole) ?? null;
-    return role === cookieRole && canAccessVerificationTools(role);
+    return canAccessVerificationTools(role);
   } catch (err) {
     console.error('JWT verification failed:', err);
     return false;
@@ -106,13 +100,13 @@ export async function middleware(req: NextRequest) {
     // Role-based access for verification tools
     if (pathname.startsWith('/verify')) {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-      if (!(await hasSufficientRole(token, req.cookies.get('user_role')?.value, secret))) {
+      if (!(await hasSufficientRole(token, secret))) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
       }
     }
   }
 
-  return createCspResponse(req);
+  return response;
 }
 
 export const config = {
