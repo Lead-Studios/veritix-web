@@ -1,4 +1,4 @@
-import { EventFormData } from "./createEventSubmit";
+import type { CreateEventFormData } from "./createEventValidation";
 import { apiClient } from "./apiClient";
 import { buildUrl, API_ROUTES } from "./api-routes";
 
@@ -7,7 +7,7 @@ const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface EventDraft {
   id?: string;
-  formData: Partial<EventFormData>;
+  formData: Partial<CreateEventFormData>;
   savedAt: string;
 }
 
@@ -36,7 +36,7 @@ function readLocalDraft(): EventDraft | null {
 }
 
 export async function saveDraft(
-  formData: Partial<EventFormData>,
+  formData: Partial<CreateEventFormData>,
 ): Promise<EventDraft> {
   const localDraft: EventDraft = {
     formData,
