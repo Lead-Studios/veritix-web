@@ -1,6 +1,7 @@
-import { apiClient } from "./apiClient";
+import { apiClient } from './apiClient';
+import { redirect } from 'next/navigation';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export interface LoginPayload {
   email: string;
@@ -14,34 +15,40 @@ export interface AuthResponse {
 }
 
 export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
-  const authResponse = await apiClient.post<AuthResponse>(
-    "/api/auth/login",
-    payload,
-  );
-  if (typeof window !== "undefined") {
+  const authResponse = await apiClient.post<AuthResponse>('/api/auth/login', payload);
+  if (typeof window !== 'undefined') {
     if (payload.rememberMe) {
-      localStorage.setItem("auth_token", authResponse.token);
+      localStorage.setItem('auth_token', authResponse.token);
     } else {
-      sessionStorage.setItem("auth_token", authResponse.token);
+      sessionStorage.setItem('auth_token', authResponse.token);
     }
+    redirect('/dashboard');
+    const storage = payload.rememberMe ? localStorage : sessionStorage;
+    storage.setItem('auth_token', authResponse.token);
+    storage.setItem('user', JSON.stringify(authResponse.user));
   }
   return authResponse;
 }
 
 export async function forgotPassword(email: string): Promise<void> {
-  await apiClient.post("/api/auth/forgot-password", { email });
+  await apiClient.post('/api/auth/forgot-password', { email });
 }
 
 export function logout(): void {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("auth_token");
-    sessionStorage.removeItem("auth_token");
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
   }
 }
 
 export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return (
-    localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token")
-  );
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
+}
+
+export function getUser(): AuthResponse['user'] | null {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('user') ?? sessionStorage.getItem('user');
+  if (!user) return null;
+  return JSON.parse(user);
 }

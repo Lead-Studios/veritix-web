@@ -1,6 +1,6 @@
 import { getSession } from "next-auth/react";
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
@@ -28,11 +28,18 @@ async function getHeaders(body?: unknown) {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response
+    const errorData: unknown = await response
       .json()
       .catch(() => ({ message: "Unknown error" }));
+    const message =
+      typeof errorData === "object" &&
+      errorData !== null &&
+      "message" in errorData &&
+      typeof errorData.message === "string"
+        ? errorData.message
+        : "API request failed";
     throw new ApiError(
-      errorData.message || "API request failed",
+      message,
       response.status,
     );
   }
@@ -42,7 +49,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 async function request<T>(
   method: string,
   path: string,
-  body?: any,
+  body?: unknown,
 ): Promise<T> {
   const headers = await getHeaders(body);
   const config: RequestInit = {
@@ -59,8 +66,8 @@ async function request<T>(
 
 export const apiClient = {
   get: <T>(path: string) => request<T>("GET", path),
-  post: <T>(path: string, body: any) => request<T>("POST", path, body),
-  put: <T>(path: string, body: any) => request<T>("PUT", path, body),
-  patch: <T>(path: string, body: any) => request<T>("PATCH", path, body),
+  post: <T>(path: string, body: unknown) => request<T>("POST", path, body),
+  put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
+  patch: <T>(path: string, body: unknown) => request<T>("PATCH", path, body),
   del: <T>(path: string) => request<T>("DELETE", path),
 };

@@ -1,13 +1,16 @@
-import { EventFormData } from "./createEventSubmit";
+import { EventFormData } from './createEventSubmit';
+import { apiClient } from './apiClient';
+import { buildUrl, API_ROUTES } from './api-routes';
+import type { CreateEventFormData } from "./createEventValidation";
 import { apiClient } from "./apiClient";
 import { buildUrl, API_ROUTES } from "./api-routes";
 
-const DRAFT_STORAGE_KEY = "veritix_event_draft";
+const DRAFT_STORAGE_KEY = 'veritix_event_draft';
 const STALE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface EventDraft {
   id?: string;
-  formData: Partial<EventFormData>;
+  formData: Partial<CreateEventFormData>;
   savedAt: string;
 }
 
@@ -15,7 +18,7 @@ function writeLocalDraft(draft: EventDraft): void {
   try {
     localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
   } catch (e: unknown) {
-    console.error("Failed to write draft to local storage", e);
+    console.error('Failed to write draft to local storage', e);
   }
 }
 
@@ -30,13 +33,14 @@ function readLocalDraft(): EventDraft | null {
     }
     return draft;
   } catch (e: unknown) {
-    console.error("Failed to read draft from local storage", e);
+    console.error('Failed to read draft from local storage', e);
     return null;
   }
 }
 
+export async function saveDraft(formData: Partial<EventFormData>): Promise<EventDraft> {
 export async function saveDraft(
-  formData: Partial<EventFormData>,
+  formData: Partial<CreateEventFormData>,
 ): Promise<EventDraft> {
   const localDraft: EventDraft = {
     formData,
@@ -51,25 +55,29 @@ export async function saveDraft(
     writeLocalDraft(serverDraft);
     return serverDraft;
   } catch (e: unknown) {
-    console.error("Failed to save draft to server", e);
+    console.error('Failed to save draft to server', e);
   }
 
   return localDraft;
 }
 
-export async function loadDraft(draftId: string): Promise<EventDraft | null> {
+export async function loadDraft(draftId?: string): Promise<EventDraft | null> {
   const local = readLocalDraft();
-  if (local && local.id === draftId) return local;
-
-  try {
-    const serverDraft = await apiClient.get<EventDraft>(
-      API_ROUTES.events.draftDetail(draftId),
-    );
-    writeLocalDraft(serverDraft);
-    return serverDraft;
-  } catch (e: unknown) {
-    console.error("Failed to load draft from server", e);
+  if (local) {
+    return local;
   }
 
-  return local;
+  if (draftId) {
+    try {
+      const serverDraft = await apiClient.get<EventDraft>(
+        API_ROUTES.events.draftDetail(draftId),
+      );
+      writeLocalDraft(serverDraft);
+      return serverDraft;
+    } catch (e: unknown) {
+      console.error('Failed to load draft from server', e);
+    }
+  }
+
+  return null;
 }
