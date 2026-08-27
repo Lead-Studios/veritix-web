@@ -8,7 +8,7 @@
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join, ext } from "node:path";
+import { join } from "node:path";
 
 const SRC_DIR = join(import.meta.dirname, "..", "src");
 const ENV_EXAMPLE = join(import.meta.dirname, "..", ".env.example");

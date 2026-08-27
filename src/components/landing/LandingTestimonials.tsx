@@ -148,7 +148,7 @@ export default function LandingTestimonials() {
       } else {
         alert('There was an error submitting your testimonial. Please try again.');
       }
-    } catch (error) {
+    } catch {
       alert('There was an error submitting your testimonial. Please try again.');
     }
   };

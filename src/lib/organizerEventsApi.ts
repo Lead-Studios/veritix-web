@@ -1,15 +1,5 @@
 import { Event } from "@/types/event";
 
-function getToken() {
-  return (
-    (typeof localStorage !== "undefined" &&
-      localStorage.getItem("auth_token")) ||
-    (typeof sessionStorage !== "undefined" &&
-      sessionStorage.getItem("auth_token")) ||
-    ""
-  );
-}
-
 export async function fetchEventsByOrganizer(
   organizerId: string,
 ): Promise<Event[]> {
