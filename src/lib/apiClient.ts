@@ -1,53 +1,60 @@
-import { getSession } from "next-auth/react";
+import { getSession } from 'next-auth/react';
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
   ) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
   }
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 async function getHeaders(body?: unknown) {
-  const session = await getSession();
   const headers: HeadersInit = {};
 
   if (!(body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
+    headers['Content-Type'] = 'application/json';
   }
 
-  if (session?.accessToken) {
-    headers["Authorization"] = `Bearer ${session.accessToken}`;
-  }
   return headers;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response
+    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+    throw new ApiError(errorData.message || 'API request failed', response.status);
+    const errorData: unknown = await response
       .json()
       .catch(() => ({ message: "Unknown error" }));
+    const message =
+      typeof errorData === "object" &&
+      errorData !== null &&
+      "message" in errorData &&
+      typeof errorData.message === "string"
+        ? errorData.message
+        : "API request failed";
     throw new ApiError(
-      errorData.message || "API request failed",
+      message,
       response.status,
     );
   }
   return response.json();
 }
 
+async function request<T>(method: string, path: string, body?: any): Promise<T> {
 async function request<T>(
   method: string,
   path: string,
-  body?: any,
+  body?: unknown,
 ): Promise<T> {
   const headers = await getHeaders(body);
   const config: RequestInit = {
     method,
     headers,
+    credentials: 'include',
   };
   if (body !== undefined) {
     config.body = body instanceof FormData ? body : JSON.stringify(body);
@@ -58,9 +65,14 @@ async function request<T>(
 }
 
 export const apiClient = {
+  get: <T>(path: string) => request<T>('GET', path),
+  post: <T>(path: string, body: any) => request<T>('POST', path, body),
+  put: <T>(path: string, body: any) => request<T>('PUT', path, body),
+  patch: <T>(path: string, body: any) => request<T>('PATCH', path, body),
+  del: <T>(path: string) => request<T>('DELETE', path),
   get: <T>(path: string) => request<T>("GET", path),
-  post: <T>(path: string, body: any) => request<T>("POST", path, body),
-  put: <T>(path: string, body: any) => request<T>("PUT", path, body),
-  patch: <T>(path: string, body: any) => request<T>("PATCH", path, body),
+  post: <T>(path: string, body: unknown) => request<T>("POST", path, body),
+  put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
+  patch: <T>(path: string, body: unknown) => request<T>("PATCH", path, body),
   del: <T>(path: string) => request<T>("DELETE", path),
 };

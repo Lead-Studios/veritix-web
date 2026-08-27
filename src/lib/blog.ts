@@ -95,12 +95,12 @@ function parseFrontmatter(content: string): {
       const value = valueParts.join(":").trim().replace(/^"|"$/g, "");
 
       if (key === "tags") {
-        (frontmatter as any)[key] = value
+        frontmatter.tags = value
           .replace(/^\[|\]$/g, "")
           .split(",")
           .map((tag: string) => tag.trim().replace(/^"|"$/g, ""));
-      } else {
-        (frontmatter as any)[key] = value;
+      } else if (key === "title" || key === "author" || key === "date" || key === "coverImage") {
+        frontmatter[key] = value;
       }
     }
   });
