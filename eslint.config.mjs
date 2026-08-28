@@ -15,9 +15,17 @@ const eslintConfig = defineConfig([
         {
           patterns: [
             {
-              group: ["../", "../../", "../../../", "../../../../"],
+              // A single "../" (one directory up, e.g. "../Button") is fine.
+              // Anything crossing two or more directory levels must use the
+              // "@/" alias instead (e.g. "@/lib/auth" not "../../lib/auth").
+              group: [
+                "../../*",
+                "../../../*",
+                "../../../../*",
+                "../../../../../*",
+              ],
               message:
-                "Use the @/ alias for imports that cross directory boundaries.",
+                "Use the @/ alias for imports that cross two or more directory levels (e.g. `@/lib/auth` instead of `../../lib/auth`).",
             },
           ],
         },
