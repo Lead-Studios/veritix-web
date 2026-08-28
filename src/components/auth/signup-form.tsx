@@ -1,35 +1,32 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
-import z from "zod";
-import { Input } from "../ui/input";
-import { TbUserPlus } from "react-icons/tb";
-import { Button } from "../button";
-import Link from "next/link";
-import { toast } from "react-toastify";
-import { motion } from "framer-motion";
-import { sanitiseErrorMessage } from "@/utils";
-import {
-  containerVariants,
-  itemVariants,
-} from "@/lib/animations/motionVariants";
-import { FcGoogle } from "react-icons/fc";
-import { IoWallet } from "react-icons/io5";
-import PasswordStrengthGuide from "./PasswordStrengthGuide";
-import { useRouter } from "next/navigation";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import z from 'zod';
+import { Input } from '../ui/input';
+import { TbUserPlus } from 'react-icons/tb';
+import { Button } from '../button';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
+import { sanitiseErrorMessage } from '@/utils';
+import { containerVariants, itemVariants } from '@/lib/animations/motionVariants';
+import { FcGoogle } from 'react-icons/fc';
+import { IoWallet } from 'react-icons/io5';
+import PasswordStrengthGuide from './PasswordStrengthGuide';
+import { useRouter } from 'next/navigation';
 
 const signUpSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.email("Please enter a valid email address"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  email: z.email('Please enter a valid email address'),
   password: z
-    .string("Password is required")
-    .min(6, "Password must be at least 6 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .string('Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
 type FormValues = z.infer<typeof signUpSchema>;
@@ -47,16 +44,16 @@ export default function SignUpForm() {
 
   const passwordValue = useWatch({
     control,
-    name: "password",
-    defaultValue: "",
+    name: 'password',
+    defaultValue: '',
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
@@ -64,55 +61,50 @@ export default function SignUpForm() {
       const result = await res.json();
 
       if (!res.ok) {
-        if (result?.errors && typeof result.errors === "object") {
+        if (result?.errors && typeof result.errors === 'object') {
           Object.entries(result.errors).forEach(([field, message]) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             setError(field as keyof FormValues, {
-              type: "server",
+              type: 'server',
               message: String(message),
             });
           });
         }
 
-        throw new Error(result?.message || "Registration failed");
+        throw new Error(result?.message || 'Registration failed');
       }
 
-      toast.success("Account created successfully");
+      toast.success('Account created successfully');
 
       router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
       // Show email verification prompt
-      toast.info(
-        "Please check your email to verify your account before signing in.",
-        { autoClose: 8000 },
-      );
+      toast.info('Please check your email to verify your account before signing in.', {
+        autoClose: 8000,
+      });
       // router.push("/login");
     } catch (err: unknown) {
       toast.error(
-        sanitiseErrorMessage(
-          err instanceof Error ? err.message : "Something went wrong",
-        ),
+        sanitiseErrorMessage(err instanceof Error ? err.message : 'Something went wrong'),
       );
     }
   };
 
-  const walletEnabled = process.env.NEXT_PUBLIC_WALLET_AUTH_ENABLED === "true";
+  const walletEnabled = process.env.NEXT_PUBLIC_WALLET_AUTH_ENABLED === 'true';
 
   const handleGoogleSignUp = async () => {
     try {
-      window.location.href = "/api/auth/google";
+      window.location.href = '/api/auth/google';
     } catch {
-      toast.error(
-        "Google sign-up failed. Please try again or use email registration.",
-      );
+      toast.error('Google sign-up failed. Please try again or use email registration.');
     }
   };
 
   const handleWalletSignUp = async () => {
     try {
-      window.location.href = "/api/auth/wallet";
+      window.location.href = '/api/auth/wallet';
     } catch {
       toast.error(
-        "Wallet sign-up failed. Please ensure your wallet is connected and try again.",
+        'Wallet sign-up failed. Please ensure your wallet is connected and try again.',
       );
     }
   };
@@ -203,7 +195,7 @@ export default function SignUpForm() {
                 disabled={isSubmitting}
                 className="w-full py-3 md:py-4 text-base md:text-lg mt-2"
               >
-                {isSubmitting ? "Creating Account..." : "Sign Up"}
+                {isSubmitting ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </motion.div>
           </motion.div>
@@ -212,10 +204,7 @@ export default function SignUpForm() {
 
       {(true || walletEnabled) && (
         <>
-          <motion.div
-            className="flex items-center gap-4 my-4"
-            variants={itemVariants}
-          >
+          <motion.div className="flex items-center gap-4 my-4" variants={itemVariants}>
             <div className="flex-1 h-px bg-primary-black"></div>
             <span className="text-sm lg:text-xl">or register with</span>
             <div className="flex-1 h-px bg-primary-black"></div>
@@ -267,7 +256,7 @@ export default function SignUpForm() {
       )}
 
       <motion.p className="text-center lg:text-xl mt-6" variants={itemVariants}>
-        Already have an account?{" "}
+        Already have an account?{' '}
         <Link href="/login" className="font-bold">
           Sign in
         </Link>

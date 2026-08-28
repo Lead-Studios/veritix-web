@@ -1,20 +1,22 @@
-"use client";
+'use client';
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef } from 'react';
 
-type ScanResult = "valid" | "invalid";
+type ScanResult = 'valid' | 'invalid';
 
 export function useScanFeedback() {
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const getAudioContext = useCallback(() => {
-    if (typeof window === "undefined") return null;
+    if (typeof window === 'undefined') return null;
     if (!audioContextRef.current) {
       const AudioContextConstructor =
         window.AudioContext ??
-        (window as Window & {
-          webkitAudioContext?: typeof AudioContext;
-        }).webkitAudioContext;
+        (
+          window as Window & {
+            webkitAudioContext?: typeof AudioContext;
+          }
+        ).webkitAudioContext;
       if (!AudioContextConstructor) return null;
       audioContextRef.current = new AudioContextConstructor();
     }
@@ -22,7 +24,7 @@ export function useScanFeedback() {
   }, []);
 
   const playBeep = useCallback(
-    (frequency: number, duration: number, type: OscillatorType = "sine") => {
+    (frequency: number, duration: number, type: OscillatorType = 'sine') => {
       try {
         const ctx = getAudioContext();
         if (!ctx) return;
@@ -31,43 +33,40 @@ export function useScanFeedback() {
         oscillator.type = type;
         oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
         gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(
-          0.001,
-          ctx.currentTime + duration,
-        );
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
         oscillator.connect(gain);
         gain.connect(ctx.destination);
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + duration);
       } catch (e: unknown) {
-        console.error("Audio playback failed", e);
+        console.error('Audio playback failed', e);
       }
     },
     [getAudioContext],
   );
 
   const playValidSound = useCallback(() => {
-    playBeep(880, 0.15, "sine");
-    setTimeout(() => playBeep(1320, 0.2, "sine"), 120);
+    playBeep(880, 0.15, 'sine');
+    setTimeout(() => playBeep(1320, 0.2, 'sine'), 120);
   }, [playBeep]);
 
   const playInvalidSound = useCallback(() => {
-    playBeep(220, 0.3, "square");
+    playBeep(220, 0.3, 'square');
   }, [playBeep]);
 
-  const triggerHaptic = useCallback((type: "valid" | "invalid") => {
+  const triggerHaptic = useCallback((type: 'valid' | 'invalid') => {
     try {
-      if (typeof navigator !== "undefined" && navigator.vibrate) {
-        navigator.vibrate(type === "valid" ? [50, 30, 50] : [100, 50, 100]);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(type === 'valid' ? [50, 30, 50] : [100, 50, 100]);
       }
     } catch (e: unknown) {
-      console.error("Haptic feedback failed", e);
+      console.error('Haptic feedback failed', e);
     }
   }, []);
 
   const playFeedback = useCallback(
     (result: ScanResult) => {
-      if (result === "valid") {
+      if (result === 'valid') {
         playValidSound();
       } else {
         playInvalidSound();

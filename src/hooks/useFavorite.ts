@@ -1,22 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = "veritix_favorites";
+const STORAGE_KEY = 'veritix_favorites';
 
 function getStoredFavorites(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+  if (typeof window === 'undefined') return new Set();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
-    if (
-      Array.isArray(parsed) &&
-      parsed.every((item) => typeof item === "string")
-    ) {
+    if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
       return new Set<string>(parsed);
     }
     return new Set();
   } catch (e: unknown) {
-    console.error("Failed to parse favorites from localStorage", e);
+    console.error('Failed to parse favorites from localStorage', e);
     return new Set();
   }
 }
@@ -25,15 +22,12 @@ function storeFavorites(favorites: Set<string>): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...favorites]));
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 
-async function syncFavoriteToApi(
-  eventId: string,
-  liked: boolean,
-): Promise<void> {
+async function syncFavoriteToApi(eventId: string, liked: boolean): Promise<void> {
   if (!API_BASE) return;
   await fetch(`${API_BASE}/events/${eventId}/favorite`, {
-    method: liked ? "POST" : "DELETE",
+    method: liked ? 'POST' : 'DELETE',
   });
 }
 
@@ -73,7 +67,7 @@ export function useFavorite(eventId: string) {
         rollback.delete(eventId);
       }
       storeFavorites(rollback);
-      setError("Failed to update favorite. Please try again.");
+      setError('Failed to update favorite. Please try again.');
     } finally {
       setIsPending(false);
     }

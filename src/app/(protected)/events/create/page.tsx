@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useRef, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import BasicInformation from "@/components/events/create/BasicInformation";
-import Recurrence from "@/components/events/create/Recurrence";
-import DateAndTime from "@/components/events/create/DateAndTime";
-import Location from "@/components/events/create/Location";
-import TicketInformation from "@/components/events/create/TicketInformation";
-import BlockchainSetting from "@/components/events/create/BlockchainSetting";
-import EventSummary from "@/components/events/create/EventSummary";
-import { DEFAULT_RECURRENCE, type RecurrenceConfig } from "@/lib/recurrence";
+import React, { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import BasicInformation from '@/components/events/create/BasicInformation';
+import Recurrence from '@/components/events/create/Recurrence';
+import DateAndTime from '@/components/events/create/DateAndTime';
+import Location from '@/components/events/create/Location';
+import TicketInformation from '@/components/events/create/TicketInformation';
+import BlockchainSetting from '@/components/events/create/BlockchainSetting';
+import EventSummary from '@/components/events/create/EventSummary';
+import { DEFAULT_RECURRENCE, type RecurrenceConfig } from '@/lib/recurrence';
 import {
   createEventSchema,
   findDuplicateTicketIndices,
@@ -17,11 +17,11 @@ import {
   sectionForField,
   sectionIdForField,
   type CreateEventFormErrors,
-} from "@/lib/createEventValidation";
-import { submitCreateEvent } from "@/lib/createEventSubmit";
-import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
+} from '@/lib/createEventValidation';
+import { submitCreateEvent } from '@/lib/createEventSubmit';
+import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 
-const DRAFT_KEY = "veritix_event_draft";
+const DRAFT_KEY = 'veritix_event_draft';
 
 export interface EventFormData {
   // Basic Information
@@ -37,8 +37,16 @@ export interface EventFormData {
   endTime: string;
 
   // Location
-  eventType: "physical" | "online" | "hybrid";
-  category: "music" | "festival" | "sports" | "art" | "theater" | "comedy" | "conference" | "workshop";
+  eventType: 'physical' | 'online' | 'hybrid';
+  category:
+    | 'music'
+    | 'festival'
+    | 'sports'
+    | 'art'
+    | 'theater'
+    | 'comedy'
+    | 'conference'
+    | 'workshop';
   venueName: string;
   address: string;
   city: string;
@@ -63,7 +71,7 @@ export interface EventFormData {
   }>;
 
   // Blockchain Setting
-  blockchainNetwork: "ethereum" | "polygon" | "solana";
+  blockchainNetwork: 'ethereum' | 'polygon' | 'solana';
   treasuryAddress: string;
   creatorRoyalty: number;
 
@@ -72,40 +80,40 @@ export interface EventFormData {
 }
 
 const initialFormData: EventFormData = {
-  title: "",
-  description: "",
-  coverImage: "",
+  title: '',
+  description: '',
+  coverImage: '',
   gallery: [],
-  startDate: "",
-  endDate: "",
-  startTime: "",
-  endTime: "",
-  eventType: "physical",
-  category: "conference",
-  venueName: "",
-  address: "",
-  city: "",
-  countryCode: "NG",
-  state: "",
-  zipCode: "",
+  startDate: '',
+  endDate: '',
+  startTime: '',
+  endTime: '',
+  eventType: 'physical',
+  category: 'conference',
+  venueName: '',
+  address: '',
+  city: '',
+  countryCode: 'NG',
+  state: '',
+  zipCode: '',
   latitude: null,
   longitude: null,
   capacity: 100,
-  eventClosingDate: "",
-  streamingUrl: "",
+  eventClosingDate: '',
+  streamingUrl: '',
   tickets: [
     {
-      name: "",
+      name: '',
       quantity: 0,
-      price: "",
-      description: "",
+      price: '',
+      description: '',
       transferable: true,
       resellable: false,
-      resellPriceLimit: "",
+      resellPriceLimit: '',
     },
   ],
-  blockchainNetwork: "ethereum",
-  treasuryAddress: "",
+  blockchainNetwork: 'ethereum',
+  treasuryAddress: '',
   creatorRoyalty: 3,
   recurrence: { ...DEFAULT_RECURRENCE },
 };
@@ -142,7 +150,7 @@ export default function CreateEventPage() {
       // Persist serialisable fields to localStorage
       try {
         const { gallery: _g, ...serialisable } = next;
-      void _g;
+        void _g;
         localStorage.setItem(DRAFT_KEY, JSON.stringify(serialisable));
       } catch {
         // quota exceeded or SSR — ignore
@@ -165,7 +173,7 @@ export default function CreateEventPage() {
     const target = sectionId
       ? document.getElementById(sectionId)
       : errorSummaryRef.current;
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleCreateEvent = async () => {
@@ -173,7 +181,7 @@ export default function CreateEventPage() {
     if (errs) {
       setErrors(errs);
       // Scroll to error summary first, then to first broken section
-      errorSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      errorSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setTimeout(() => scrollToFirstError(errs), 400);
       return;
     }
@@ -184,11 +192,11 @@ export default function CreateEventPage() {
       await submitCreateEvent(formData);
       setIsDirty(false);
       localStorage.removeItem(DRAFT_KEY);
-      router.push("/events/manage");
+      router.push('/events/manage');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to create event.";
+      const msg = err instanceof Error ? err.message : 'Failed to create event.';
       setErrors({ _form: msg });
-      errorSummaryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      errorSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } finally {
       setIsSubmitting(false);
     }
@@ -205,13 +213,12 @@ export default function CreateEventPage() {
     }
   };
 
-  const errorEntries = Object.entries(errors).filter(([k]) => k !== "_form");
+  const errorEntries = Object.entries(errors).filter(([k]) => k !== '_form');
   const hasErrors = errorEntries.length > 0 || !!errors._form;
 
   // Block submission while there are duplicate ticket-type names. Computed
   // live from formData so the button updates as the organiser types.
-  const hasDuplicateTicketNames =
-    findDuplicateTicketIndices(formData.tickets).size > 0;
+  const hasDuplicateTicketNames = findDuplicateTicketIndices(formData.tickets).size > 0;
 
   return (
     <div className="min-h-screen bg-[#0a0e21] text-white">
@@ -264,9 +271,7 @@ export default function CreateEventPage() {
               <p className="text-red-300 font-semibold text-sm">
                 Please fix the following errors before submitting:
               </p>
-              {errors._form && (
-                <p className="text-red-400 text-sm">{errors._form}</p>
-              )}
+              {errors._form && <p className="text-red-400 text-sm">{errors._form}</p>}
               {errorEntries.length > 0 && (
                 <ul className="space-y-1 list-disc list-inside">
                   {errorEntries.map(([field, msg]) => {
@@ -277,14 +282,16 @@ export default function CreateEventPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const el = sectionId ? document.getElementById(sectionId) : null;
-                            el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            const el = sectionId
+                              ? document.getElementById(sectionId)
+                              : null;
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                           }}
                           className="underline hover:text-red-300 text-left"
                         >
                           {section}
                         </button>
-                        {": "}
+                        {': '}
                         {msg}
                       </li>
                     );
@@ -350,7 +357,7 @@ export default function CreateEventPage() {
               aria-disabled={isSubmitting || hasDuplicateTicketNames}
               title={
                 hasDuplicateTicketNames
-                  ? "Resolve duplicate ticket-type names before creating the event"
+                  ? 'Resolve duplicate ticket-type names before creating the event'
                   : undefined
               }
               className="w-full bg-gradient-to-r from-blue-700 to-blue-200 hover:from-blue-800 hover:to-blue-300 text-white font-semibold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"

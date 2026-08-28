@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
 interface LoadingSpinnerProps {
   /** Accessible label for screen readers */
   label?: string;
   /** Visual size of the spinner */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   /** Optionally render as inline (span) instead of block (div) */
   inline?: boolean;
   /** Extra class names */
@@ -12,9 +12,9 @@ interface LoadingSpinnerProps {
 }
 
 const sizeClasses = {
-  sm: "h-4 w-4 border-2",
-  md: "h-8 w-8 border-2",
-  lg: "h-12 w-12 border-4",
+  sm: 'h-4 w-4 border-2',
+  md: 'h-8 w-8 border-2',
+  lg: 'h-12 w-12 border-4',
 };
 
 /**
@@ -23,12 +23,12 @@ const sizeClasses = {
  * without requiring sighted-only animation cues.
  */
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  label = "Loading…",
-  size = "md",
+  label = 'Loading…',
+  size = 'md',
   inline = false,
-  className = "",
+  className = '',
 }) => {
-  const Tag = inline ? "span" : "div";
+  const Tag = inline ? 'span' : 'div';
 
   return (
     <Tag

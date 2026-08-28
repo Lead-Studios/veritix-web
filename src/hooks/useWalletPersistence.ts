@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from 'react';
 
 export interface PersistedWallet {
   address: string;
@@ -10,18 +10,18 @@ export interface PersistedWallet {
 
 function isPersistedWallet(value: unknown): value is PersistedWallet {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
-    "address" in value &&
-    "network" in value &&
-    "walletType" in value
+    'address' in value &&
+    'network' in value &&
+    'walletType' in value
   );
 }
 
-const STORAGE_KEY = "veritix_wallet";
+const STORAGE_KEY = 'veritix_wallet';
 
 function readWallet(): PersistedWallet | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -32,13 +32,13 @@ function readWallet(): PersistedWallet | null {
     }
     return null;
   } catch (e: unknown) {
-    console.error("Failed to read wallet from session storage", e);
+    console.error('Failed to read wallet from session storage', e);
     return null;
   }
 }
 
 function writeWallet(wallet: PersistedWallet | null): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     if (wallet) {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
@@ -46,7 +46,7 @@ function writeWallet(wallet: PersistedWallet | null): void {
       sessionStorage.removeItem(STORAGE_KEY);
     }
   } catch (e: unknown) {
-    console.error("Failed to write wallet to session storage", e);
+    console.error('Failed to write wallet to session storage', e);
   }
 }
 

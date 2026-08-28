@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { TrendingUp, Info } from "lucide-react";
-import { useState } from "react";
+import { TrendingUp, Info } from 'lucide-react';
+import { useState } from 'react';
 
 export interface ProjectedRevenueInput {
   /** Tickets still available for sale */
@@ -31,14 +31,9 @@ function computeProjection(input: ProjectedRevenueInput): {
   base: number;
   low: number;
   high: number;
-  confidence: "low" | "medium" | "high";
+  confidence: 'low' | 'medium' | 'high';
 } | null {
-  const {
-    remainingTickets,
-    averageTicketPrice,
-    sellThroughRate,
-    totalTickets,
-  } = input;
+  const { remainingTickets, averageTicketPrice, sellThroughRate, totalTickets } = input;
 
   // Require sufficient data
   if (
@@ -58,31 +53,31 @@ function computeProjection(input: ProjectedRevenueInput): {
   const low = Math.round(base * 0.8);
   const high = Math.round(base * 1.2);
 
-  const confidence: "low" | "medium" | "high" =
-    sellThroughRate >= 0.6 ? "high" : sellThroughRate >= 0.3 ? "medium" : "low";
+  const confidence: 'low' | 'medium' | 'high' =
+    sellThroughRate >= 0.6 ? 'high' : sellThroughRate >= 0.3 ? 'medium' : 'low';
 
   return { base: Math.round(base), low, high, confidence };
 }
 
 function fmt(n: number, symbol: string) {
-  return `${symbol} ${n.toLocaleString("en-NG", { minimumFractionDigits: 0 })}`;
+  return `${symbol} ${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
 }
 
 const CONFIDENCE_COLORS = {
-  high: "text-emerald-400",
-  medium: "text-yellow-400",
-  low: "text-red-400",
+  high: 'text-emerald-400',
+  medium: 'text-yellow-400',
+  low: 'text-red-400',
 } as const;
 
 const CONFIDENCE_LABELS = {
-  high: "High confidence",
-  medium: "Medium confidence",
-  low: "Low confidence",
+  high: 'High confidence',
+  medium: 'Medium confidence',
+  low: 'Low confidence',
 } as const;
 
 export function ProjectedRevenueCard({
   input,
-  currencySymbol = "₦",
+  currencySymbol = '₦',
 }: ProjectedRevenueCardProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const projection = computeProjection(input);
@@ -123,8 +118,8 @@ export function ProjectedRevenueCard({
               role="tooltip"
               className="absolute right-0 top-6 z-10 w-56 rounded-lg border border-[#4D21FF]/40 bg-[#1a2040] px-3 py-2 text-[11px] text-gray-300 shadow-lg"
             >
-              Estimated from remaining tickets × average ticket price, weighted
-              by current sell-through trend. Range shows ±20 % variance.
+              Estimated from remaining tickets × average ticket price, weighted by current
+              sell-through trend. Range shows ±20 % variance.
             </div>
           )}
         </div>
@@ -142,11 +137,11 @@ export function ProjectedRevenueCard({
       <div className="mt-3 flex items-center gap-1.5">
         <span
           className={`h-2 w-2 rounded-full ${
-            confidence === "high"
-              ? "bg-emerald-400"
-              : confidence === "medium"
-              ? "bg-yellow-400"
-              : "bg-red-400"
+            confidence === 'high'
+              ? 'bg-emerald-400'
+              : confidence === 'medium'
+                ? 'bg-yellow-400'
+                : 'bg-red-400'
           }`}
           aria-hidden="true"
         />

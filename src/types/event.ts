@@ -1,7 +1,13 @@
-export type EventStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "POSTPONED" | "COMPLETED";
+export type EventStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'POSTPONED' | 'COMPLETED';
 export type EventCategory =
-  | "music" | "festival" | "sports" | "art"
-  | "theater" | "comedy" | "conference" | "workshop";
+  | 'music'
+  | 'festival'
+  | 'sports'
+  | 'art'
+  | 'theater'
+  | 'comedy'
+  | 'conference'
+  | 'workshop';
 
 export interface Event {
   id: string;

@@ -8,7 +8,11 @@ interface Props {
   onQuantityChange?: (qty: number) => void;
 }
 
-export default function TicketQuantitySelector({ pricePerTicket, maxPerOrder = 10, onQuantityChange }: Props) {
+export default function TicketQuantitySelector({
+  pricePerTicket,
+  maxPerOrder = 10,
+  onQuantityChange,
+}: Props) {
   const [qty, setQty] = useState(1);
 
   const updateQty = (newQty: number) => {

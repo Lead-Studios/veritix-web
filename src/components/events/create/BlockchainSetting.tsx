@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React from "react";
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import RadioButton from "../ui/RadioButton";
-import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import React from 'react';
+import { EventFormData } from '@/app/(protected)/events/create/page';
+import RadioButton from '../ui/RadioButton';
+import type { CreateEventFormErrors } from '@/lib/createEventValidation';
 
 interface BlockchainSettingProps {
   formData: EventFormData;
@@ -36,10 +36,10 @@ export default function BlockchainSetting({
               id="ethereum"
               name="blockchainNetwork"
               value="ethereum"
-              checked={formData.blockchainNetwork === "ethereum"}
+              checked={formData.blockchainNetwork === 'ethereum'}
               onChange={(e) =>
                 updateFormData({
-                  blockchainNetwork: e.target.value as "ethereum",
+                  blockchainNetwork: e.target.value as 'ethereum',
                 })
               }
               label="Ethereum"
@@ -48,10 +48,10 @@ export default function BlockchainSetting({
               id="polygon"
               name="blockchainNetwork"
               value="polygon"
-              checked={formData.blockchainNetwork === "polygon"}
+              checked={formData.blockchainNetwork === 'polygon'}
               onChange={(e) =>
                 updateFormData({
-                  blockchainNetwork: e.target.value as "polygon",
+                  blockchainNetwork: e.target.value as 'polygon',
                 })
               }
               label="Polygon"
@@ -60,10 +60,10 @@ export default function BlockchainSetting({
               id="solana"
               name="blockchainNetwork"
               value="solana"
-              checked={formData.blockchainNetwork === "solana"}
+              checked={formData.blockchainNetwork === 'solana'}
               onChange={(e) =>
                 updateFormData({
-                  blockchainNetwork: e.target.value as "solana",
+                  blockchainNetwork: e.target.value as 'solana',
                 })
               }
               label="Solana"
@@ -87,7 +87,7 @@ export default function BlockchainSetting({
                   : 'e.g. 0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed'
               }
               aria-invalid={!!errors.treasuryAddress}
-              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.treasuryAddress ? "border-red-500" : "border-gray-700"}`}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.treasuryAddress ? 'border-red-500' : 'border-gray-700'}`}
             />
             <p className="text-xs text-gray-500 mt-1">
               {formData.blockchainNetwork === 'solana'
@@ -95,7 +95,9 @@ export default function BlockchainSetting({
                 : `${formData.blockchainNetwork.charAt(0).toUpperCase() + formData.blockchainNetwork.slice(1)} address starting with 0x (42 characters)`}
             </p>
             {errors.treasuryAddress && (
-              <p role="alert" className="mt-1 text-xs text-red-400">{errors.treasuryAddress}</p>
+              <p role="alert" className="mt-1 text-xs text-red-400">
+                {errors.treasuryAddress}
+              </p>
             )}
           </div>
         </div>

@@ -6,16 +6,11 @@
  * the UI to preview the upcoming dates before submission.
  */
 
-export type RecurrenceFrequency =
-  | "none"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "custom";
+export type RecurrenceFrequency = 'none' | 'daily' | 'weekly' | 'monthly' | 'custom';
 
-export type CustomUnit = "day" | "week" | "month";
+export type CustomUnit = 'day' | 'week' | 'month';
 
-export type RecurrenceEndType = "never" | "count" | "date";
+export type RecurrenceEndType = 'never' | 'count' | 'date';
 
 export interface RecurrenceConfig {
   frequency: RecurrenceFrequency;
@@ -33,13 +28,13 @@ export interface RecurrenceConfig {
 }
 
 export const DEFAULT_RECURRENCE: RecurrenceConfig = {
-  frequency: "none",
+  frequency: 'none',
   interval: 1,
-  customUnit: "week",
+  customUnit: 'week',
   daysOfWeek: [],
-  endType: "never",
+  endType: 'never',
   count: 10,
-  until: "",
+  until: '',
 };
 
 /** Hard cap for previews — protects the UI from runaway loops. */
@@ -47,7 +42,7 @@ export const PREVIEW_LIMIT = 5;
 /** Hard cap for any generation (defensive). */
 const ABSOLUTE_LIMIT = 365;
 
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
 export function dayLabel(d: number): string {
   return DAY_LABELS[((d % 7) + 7) % 7];
@@ -56,7 +51,7 @@ export function dayLabel(d: number): string {
 function parseLocalDate(yyyyMmDd: string): Date | null {
   if (!yyyyMmDd) return null;
   // Construct in local time to avoid TZ shifting the calendar day.
-  const parts = yyyyMmDd.split("-").map((p) => parseInt(p, 10));
+  const parts = yyyyMmDd.split('-').map((p) => parseInt(p, 10));
   if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return null;
   const [y, m, d] = parts;
   const date = new Date(y, m - 1, d);
@@ -93,7 +88,7 @@ function isAfter(a: Date, b: Date): boolean {
 
 function effectiveLimit(config: RecurrenceConfig, max: number): number {
   const ceil = Math.min(max, ABSOLUTE_LIMIT);
-  if (config.endType === "count") {
+  if (config.endType === 'count') {
     return Math.min(ceil, Math.max(1, Math.floor(config.count)));
   }
   return ceil;
@@ -109,16 +104,16 @@ function effectiveLimit(config: RecurrenceConfig, max: number): number {
 export function generateOccurrences(
   startDate: string,
   config: RecurrenceConfig,
-  max = PREVIEW_LIMIT
+  max = PREVIEW_LIMIT,
 ): Date[] {
   const start = parseLocalDate(startDate);
   if (!start) return [];
-  if (config.frequency === "none") return [start];
+  if (config.frequency === 'none') return [start];
 
   const limit = effectiveLimit(config, max);
   if (limit <= 0) return [];
 
-  const until = config.endType === "date" ? parseLocalDate(config.until) : null;
+  const until = config.endType === 'date' ? parseLocalDate(config.until) : null;
   const interval = Math.max(1, Math.floor(config.interval || 1));
 
   const out: Date[] = [];
@@ -129,15 +124,15 @@ export function generateOccurrences(
   };
 
   const unit: CustomUnit =
-    config.frequency === "daily"
-      ? "day"
-      : config.frequency === "weekly"
-      ? "week"
-      : config.frequency === "monthly"
-      ? "month"
-      : config.customUnit;
+    config.frequency === 'daily'
+      ? 'day'
+      : config.frequency === 'weekly'
+        ? 'week'
+        : config.frequency === 'monthly'
+          ? 'month'
+          : config.customUnit;
 
-  if (unit === "day") {
+  if (unit === 'day') {
     let cursor = start;
     while (out.length < limit) {
       if (!push(cursor)) break;
@@ -146,7 +141,7 @@ export function generateOccurrences(
     return out;
   }
 
-  if (unit === "week") {
+  if (unit === 'week') {
     const days =
       config.daysOfWeek.length > 0
         ? [...new Set(config.daysOfWeek)].sort((a, b) => a - b)
@@ -177,44 +172,43 @@ export function generateOccurrences(
 
 /** Short human-readable summary of the recurrence (for preview/summary panels). */
 export function describeRecurrence(config: RecurrenceConfig): string {
-  if (config.frequency === "none") return "Does not repeat";
+  if (config.frequency === 'none') return 'Does not repeat';
   const interval = Math.max(1, Math.floor(config.interval || 1));
   const unit: CustomUnit =
-    config.frequency === "daily"
-      ? "day"
-      : config.frequency === "weekly"
-      ? "week"
-      : config.frequency === "monthly"
-      ? "month"
-      : config.customUnit;
+    config.frequency === 'daily'
+      ? 'day'
+      : config.frequency === 'weekly'
+        ? 'week'
+        : config.frequency === 'monthly'
+          ? 'month'
+          : config.customUnit;
 
-  const every =
-    interval === 1 ? `Every ${unit}` : `Every ${interval} ${unit}s`;
+  const every = interval === 1 ? `Every ${unit}` : `Every ${interval} ${unit}s`;
 
   const dayPart =
-    unit === "week" && config.daysOfWeek.length > 0
+    unit === 'week' && config.daysOfWeek.length > 0
       ? ` on ${[...config.daysOfWeek]
           .sort((a, b) => a - b)
           .map(dayLabel)
-          .join(", ")}`
-      : "";
+          .join(', ')}`
+      : '';
 
   const endPart =
-    config.endType === "count"
+    config.endType === 'count'
       ? `, ${Math.max(1, Math.floor(config.count))} times`
-      : config.endType === "date" && config.until
-      ? `, until ${config.until}`
-      : "";
+      : config.endType === 'date' && config.until
+        ? `, until ${config.until}`
+        : '';
 
   return `${every}${dayPart}${endPart}`;
 }
 
 /** Format a Date as a short human label, e.g. "Mon, Jun 1, 2026". */
 export function formatOccurrenceLabel(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 }

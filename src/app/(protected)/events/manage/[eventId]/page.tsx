@@ -1,11 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { Breadcrumb } from "@/components/ui";
-import { CapacityWarningBanner } from "@/components/events/CapacityWarningBanner";
-import EventManagementTabs, { type ManagedEvent } from "@/features/events/components/EventManagementTabs";
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import { Breadcrumb } from '@/components/ui';
+import { CapacityWarningBanner } from '@/components/events/CapacityWarningBanner';
+import EventManagementTabs, {
+  type ManagedEvent,
+} from '@/features/events/components/EventManagementTabs';
 
 export default function ManageEventPage() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -20,10 +22,15 @@ export default function ManageEventPage() {
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
       .then((data: ManagedEvent | null) => {
-        if (!cancelled) setEvent(data ?? { id: eventId, name: `Event ${eventId}`, status: "DRAFT" });
+        if (!cancelled)
+          setEvent(data ?? { id: eventId, name: `Event ${eventId}`, status: 'DRAFT' });
       })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [eventId]);
 
   if (loading) {
@@ -57,8 +64,8 @@ export default function ManageEventPage() {
             <Breadcrumb
               className="mt-2 text-white/60"
               items={[
-                { label: "Dashboard", href: "/dashboard" },
-                { label: "Events", href: "/events/manage" },
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Events', href: '/events/manage' },
                 { label: event.name },
               ]}
             />
@@ -73,7 +80,9 @@ export default function ManageEventPage() {
         />
         <EventManagementTabs
           event={event}
-          onEventUpdate={(updates) => setEvent((prev) => prev ? { ...prev, ...updates } : prev)}
+          onEventUpdate={(updates) =>
+            setEvent((prev) => (prev ? { ...prev, ...updates } : prev))
+          }
         />
       </div>
     </main>

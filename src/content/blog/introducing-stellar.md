@@ -1,9 +1,9 @@
 ---
-title: "Introducing Stellar: The Future of Event Ticketing"
-author: "VeriTix Team"
-date: "2024-06-15"
-coverImage: "/concert.png"
-tags: ["Stellar", "Blockchain", "NFT"]
+title: 'Introducing Stellar: The Future of Event Ticketing'
+author: 'VeriTix Team'
+date: '2024-06-15'
+coverImage: '/concert.png'
+tags: ['Stellar', 'Blockchain', 'NFT']
 ---
 
 Welcome to the future of event ticketing. Today, we're excited to introduce **Stellar**, our revolutionary blockchain-powered ticketing system that's changing how people experience events.
@@ -37,4 +37,5 @@ Stellar is built on a high-performance blockchain that can handle thousands of t
 We're just getting started. Join thousands of early adopters who are already experiencing the future of event ticketing. Sign up today and be part of the movement.
 
 ---
-*Ready to experience Stellar? [Create your account](/sign-up) and discover events near you.*
+
+_Ready to experience Stellar? [Create your account](/sign-up) and discover events near you._

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
-const STORAGE_KEY = "veritix_cookie_consent";
+const STORAGE_KEY = 'veritix_cookie_consent';
 
 type Prefs = { analytics: boolean; marketing: boolean };
 type Consent = { functional: true } & Prefs;
@@ -32,7 +32,7 @@ export default function CookieBanner() {
     >
       <div className="mx-auto max-w-4xl space-y-4">
         <p className="text-sm text-white/80">
-          We use cookies to improve your experience.{" "}
+          We use cookies to improve your experience.{' '}
           <Link href="/cookies" className="underline hover:text-white">
             Cookie Policy
           </Link>

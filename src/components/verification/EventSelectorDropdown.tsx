@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { HiOutlineSelector } from "react-icons/hi";
+import { useState } from 'react';
+import { HiOutlineSelector } from 'react-icons/hi';
 
 interface EventOption {
   id: string;
@@ -32,8 +32,8 @@ export function EventSelectorDropdown({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className={selected ? "text-white" : "text-gray-500"}>
-          {selected ? selected.name : "Select an event…"}
+        <span className={selected ? 'text-white' : 'text-gray-500'}>
+          {selected ? selected.name : 'Select an event…'}
         </span>
         <HiOutlineSelector className="w-4 h-4 text-gray-400 flex-shrink-0" />
       </button>
@@ -54,8 +54,8 @@ export function EventSelectorDropdown({
                   }}
                   className={`px-4 py-3 text-sm cursor-pointer transition-colors ${
                     isSelected
-                      ? "bg-[#4D21FF]/20 text-[#4D21FF]"
-                      : "text-gray-300 hover:bg-white/5"
+                      ? 'bg-[#4D21FF]/20 text-[#4D21FF]'
+                      : 'text-gray-300 hover:bg-white/5'
                   }`}
                 >
                   <p className="font-medium">{event.name}</p>
@@ -67,14 +67,14 @@ export function EventSelectorDropdown({
             })}
           </ul>
           {events.length === 0 && (
-            <p className="px-4 py-6 text-sm text-gray-500 text-center">No events available</p>
+            <p className="px-4 py-6 text-sm text-gray-500 text-center">
+              No events available
+            </p>
           )}
         </div>
       )}
 
-      {open && (
-        <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-      )}
+      {open && <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />}
     </div>
   );
 }

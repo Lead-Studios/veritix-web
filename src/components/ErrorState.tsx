@@ -1,8 +1,7 @@
-
 type ErrorStateProps = {
   title?: string;
   message: string;
-  type?: "error" | "warning" | "info" | "notFound" | "unauthorized";
+  type?: 'error' | 'warning' | 'info' | 'notFound' | 'unauthorized';
   action?: {
     label: string;
     onClick: () => void;
@@ -16,16 +15,16 @@ type ErrorStateProps = {
 export function ErrorState({
   title,
   message,
-  type = "error",
+  type = 'error',
   action,
   secondaryAction,
 }: ErrorStateProps) {
   const getIconAndColor = () => {
     switch (type) {
-      case "warning":
+      case 'warning':
         return {
-          bg: "bg-yellow-100",
-          text: "text-yellow-600",
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-600',
           icon: (
             <svg
               className="w-8 h-8"
@@ -42,10 +41,10 @@ export function ErrorState({
             </svg>
           ),
         };
-      case "info":
+      case 'info':
         return {
-          bg: "bg-blue-100",
-          text: "text-blue-600",
+          bg: 'bg-blue-100',
+          text: 'text-blue-600',
           icon: (
             <svg
               className="w-8 h-8"
@@ -62,10 +61,10 @@ export function ErrorState({
             </svg>
           ),
         };
-      case "notFound":
+      case 'notFound':
         return {
-          bg: "bg-gray-100",
-          text: "text-gray-600",
+          bg: 'bg-gray-100',
+          text: 'text-gray-600',
           icon: (
             <svg
               className="w-8 h-8"
@@ -82,10 +81,10 @@ export function ErrorState({
             </svg>
           ),
         };
-      case "unauthorized":
+      case 'unauthorized':
         return {
-          bg: "bg-yellow-100",
-          text: "text-yellow-600",
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-600',
           icon: (
             <svg
               className="w-8 h-8"
@@ -104,8 +103,8 @@ export function ErrorState({
         };
       default:
         return {
-          bg: "bg-red-100",
-          text: "text-red-600",
+          bg: 'bg-red-100',
+          text: 'text-red-600',
           icon: (
             <svg
               className="w-8 h-8"
@@ -128,11 +127,11 @@ export function ErrorState({
   const { bg, text, icon } = getIconAndColor();
 
   const defaultTitles = {
-    error: "Something went wrong",
-    warning: "Warning",
-    info: "Information",
-    notFound: "Not Found",
-    unauthorized: "Access Denied",
+    error: 'Something went wrong',
+    warning: 'Warning',
+    info: 'Information',
+    notFound: 'Not Found',
+    unauthorized: 'Access Denied',
   };
 
   return (

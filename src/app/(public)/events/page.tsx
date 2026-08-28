@@ -21,7 +21,9 @@ function EventsPageContent() {
   const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
-  const [locationFilter, setLocationFilter] = useState(() => searchParams.get('location') || '');
+  const [locationFilter, setLocationFilter] = useState(
+    () => searchParams.get('location') || '',
+  );
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') || '');
 
   // Sync state if URL query params change
@@ -59,22 +61,34 @@ function EventsPageContent() {
 
   const filteredEvents = useMemo(() => {
     let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
-    if (activeFilters.length > 0) list = list.filter((e) => activeFilters.includes(e.category));
+    if (activeFilters.length > 0)
+      list = list.filter((e) => activeFilters.includes(e.category));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      list = list.filter((e) => e.name.toLowerCase().includes(q) || e.location.toLowerCase().includes(q) || e.venue.toLowerCase().includes(q));
+      list = list.filter(
+        (e) =>
+          e.name.toLowerCase().includes(q) ||
+          e.location.toLowerCase().includes(q) ||
+          e.venue.toLowerCase().includes(q),
+      );
     }
     if (locationFilter.trim()) {
       const loc = locationFilter.toLowerCase();
-      list = list.filter((e) => e.location.toLowerCase().includes(loc) || e.venue.toLowerCase().includes(loc));
+      list = list.filter(
+        (e) =>
+          e.location.toLowerCase().includes(loc) || e.venue.toLowerCase().includes(loc),
+      );
     }
-    if (dateFilter.trim()) list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
+    if (dateFilter.trim())
+      list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
     return list;
   }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Reset visible count when filters change
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
 
   // Infinite scroll via IntersectionObserver
   const loadMore = useCallback(() => {
@@ -84,7 +98,12 @@ function EventsPageContent() {
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver((entries) => { if (entries[0].isIntersecting) loadMore(); }, { threshold: 0.1 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      },
+      { threshold: 0.1 },
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, [loadMore]);
@@ -108,7 +127,10 @@ function EventsPageContent() {
             className="relative h-60 sm:h-70 md:h-100 rounded-2xl overflow-hidden"
           >
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: 'url(/images/events/event.png)' }} />
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: 'url(/images/events/event.png)' }}
+              />
               <div className="absolute inset-0 bg-black/30" />
             </div>
             <div className="relative h-full flex items-center justify-center px-8">
@@ -210,8 +232,18 @@ function EventsPageContent() {
             className="flex flex-col items-center justify-center py-20 space-y-4"
           >
             <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
-              <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                className="w-12 h-12 text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
             </div>
             <div className="text-center space-y-2">
@@ -253,7 +285,7 @@ function EventsPageContent() {
                   title="No events found"
                   description="Try adjusting your filters or search query to find more events"
                   action={{
-                    label: "Clear Filters",
+                    label: 'Clear Filters',
                     onClick: () => {
                       setActiveFilters([]);
                       setSearchQuery('');
@@ -273,12 +305,14 @@ function EventsPageContent() {
 
 export default function EventsPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#101428] flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
-        <p className="text-gray-400 text-sm">Loading events page...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#101428] flex flex-col items-center justify-center space-y-4">
+          <div className="w-12 h-12 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm">Loading events page...</p>
+        </div>
+      }
+    >
       <EventsPageContent />
     </Suspense>
   );

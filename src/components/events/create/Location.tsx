@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import RadioButton from "../ui/RadioButton";
-import type { CreateEventFormErrors } from "@/lib/createEventValidation";
-import { searchLocations, type LocationResult } from "@/lib/locationSearch";
+import React, { useEffect, useRef, useState } from 'react';
+import { EventFormData } from '@/app/(protected)/events/create/page';
+import RadioButton from '../ui/RadioButton';
+import type { CreateEventFormErrors } from '@/lib/createEventValidation';
+import { searchLocations, type LocationResult } from '@/lib/locationSearch';
 
 interface LocationProps {
   formData: EventFormData;
@@ -12,10 +12,14 @@ interface LocationProps {
   errors?: CreateEventFormErrors;
 }
 
-export default function Location({ formData, updateFormData, errors = {} }: LocationProps) {
-  const needsVenue = formData.eventType !== "online";
+export default function Location({
+  formData,
+  updateFormData,
+  errors = {},
+}: LocationProps) {
+  const needsVenue = formData.eventType !== 'online';
   const showStreamingUrl =
-    formData.eventType === "online" || formData.eventType === "hybrid";
+    formData.eventType === 'online' || formData.eventType === 'hybrid';
 
   // ---- Address autocomplete state ----
   const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
@@ -70,8 +74,8 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
       if (!wrapperRef.current) return;
       if (!wrapperRef.current.contains(e.target as Node)) setIsOpen(false);
     };
-    document.addEventListener("mousedown", handleDocClick);
-    return () => document.removeEventListener("mousedown", handleDocClick);
+    document.addEventListener('mousedown', handleDocClick);
+    return () => document.removeEventListener('mousedown', handleDocClick);
   }, []);
 
   const handleSelectSuggestion = (s: LocationResult) => {
@@ -100,16 +104,16 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
 
   const handleAddressKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen || suggestions.length === 0) return;
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveIdx((i) => (i + 1) % suggestions.length);
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setActiveIdx((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
-    } else if (e.key === "Enter" && activeIdx >= 0) {
+    } else if (e.key === 'Enter' && activeIdx >= 0) {
       e.preventDefault();
       handleSelectSuggestion(suggestions[activeIdx]);
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       setIsOpen(false);
     }
   };
@@ -141,9 +145,9 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
               id="physical"
               name="eventType"
               value="physical"
-              checked={formData.eventType === "physical"}
+              checked={formData.eventType === 'physical'}
               onChange={(e) =>
-                updateFormData({ eventType: e.target.value as "physical" })
+                updateFormData({ eventType: e.target.value as 'physical' })
               }
               label="Physical Event"
             />
@@ -151,20 +155,16 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
               id="online"
               name="eventType"
               value="online"
-              checked={formData.eventType === "online"}
-              onChange={(e) =>
-                updateFormData({ eventType: e.target.value as "online" })
-              }
+              checked={formData.eventType === 'online'}
+              onChange={(e) => updateFormData({ eventType: e.target.value as 'online' })}
               label="Online Event"
             />
             <RadioButton
               id="hybrid"
               name="eventType"
               value="hybrid"
-              checked={formData.eventType === "hybrid"}
-              onChange={(e) =>
-                updateFormData({ eventType: e.target.value as "hybrid" })
-              }
+              checked={formData.eventType === 'hybrid'}
+              onChange={(e) => updateFormData({ eventType: e.target.value as 'hybrid' })}
               label="Hybrid Event"
             />
           </div>
@@ -182,9 +182,13 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
               onChange={(e) => updateFormData({ venueName: e.target.value })}
               placeholder="Enter Venue name"
               aria-invalid={!!errors.venueName}
-              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.venueName ? "border-red-500" : "border-gray-700"}`}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.venueName ? 'border-red-500' : 'border-gray-700'}`}
             />
-            {errors.venueName && <p role="alert" className="mt-1 text-xs text-red-400">{errors.venueName}</p>}
+            {errors.venueName && (
+              <p role="alert" className="mt-1 text-xs text-red-400">
+                {errors.venueName}
+              </p>
+            )}
           </div>
         )}
 
@@ -197,75 +201,75 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
             >
               Address <span className="text-red-400">*</span>
             </label>
-          <div className="relative" ref={wrapperRef}>
-            <input
-              id="event-address"
-              type="text"
-              value={formData.address}
-              onChange={(e) => handleAddressChange(e.target.value)}
-              onFocus={() => {
-                if (suggestions.length > 0 || formData.address.trim().length >= 3) {
-                  setIsOpen(true);
+            <div className="relative" ref={wrapperRef}>
+              <input
+                id="event-address"
+                type="text"
+                value={formData.address}
+                onChange={(e) => handleAddressChange(e.target.value)}
+                onFocus={() => {
+                  if (suggestions.length > 0 || formData.address.trim().length >= 3) {
+                    setIsOpen(true);
+                  }
+                }}
+                onKeyDown={handleAddressKeyDown}
+                placeholder="Start typing an address…"
+                autoComplete="off"
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-autocomplete="list"
+                aria-controls="address-suggestions"
+                aria-activedescendant={
+                  activeIdx >= 0 ? `address-suggestion-${activeIdx}` : undefined
                 }
-              }}
-              onKeyDown={handleAddressKeyDown}
-              placeholder="Start typing an address…"
-              autoComplete="off"
-              role="combobox"
-              aria-expanded={isOpen}
-              aria-autocomplete="list"
-              aria-controls="address-suggestions"
-              aria-activedescendant={
-                activeIdx >= 0 ? `address-suggestion-${activeIdx}` : undefined
-              }
-              aria-invalid={!!errors.address}
-              aria-describedby={errors.address ? "error-address" : undefined}
-              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.address ? "border-red-500" : "border-gray-700"}`}
-            />
-            {isSearching && (
-              <span
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"
-                aria-live="polite"
-              >
-                Searching…
-              </span>
-            )}
-            {isOpen && suggestions.length > 0 && (
-              <ul
-                id="address-suggestions"
-                role="listbox"
-                className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-lg"
-              >
-                {suggestions.map((s, idx) => (
-                  <li
-                    key={`${s.lat},${s.lng},${idx}`}
-                    id={`address-suggestion-${idx}`}
-                    role="option"
-                    aria-selected={idx === activeIdx}
-                    onMouseDown={(e) => {
-                      // Use mouseDown so we beat the input blur
-                      e.preventDefault();
-                      handleSelectSuggestion(s);
-                    }}
-                    onMouseEnter={() => setActiveIdx(idx)}
-                    className={`px-4 py-2 text-sm text-white cursor-pointer ${idx === activeIdx ? "bg-blue-700" : "hover:bg-gray-800"}`}
-                  >
-                    {s.displayName}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {showNoResultsHint && (
-              <p className="mt-1 text-xs text-gray-400">
-                No matches found — you can keep typing the address manually.
+                aria-invalid={!!errors.address}
+                aria-describedby={errors.address ? 'error-address' : undefined}
+                className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.address ? 'border-red-500' : 'border-gray-700'}`}
+              />
+              {isSearching && (
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"
+                  aria-live="polite"
+                >
+                  Searching…
+                </span>
+              )}
+              {isOpen && suggestions.length > 0 && (
+                <ul
+                  id="address-suggestions"
+                  role="listbox"
+                  className="absolute z-20 left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-gray-900 border border-gray-700 rounded-lg shadow-lg"
+                >
+                  {suggestions.map((s, idx) => (
+                    <li
+                      key={`${s.lat},${s.lng},${idx}`}
+                      id={`address-suggestion-${idx}`}
+                      role="option"
+                      aria-selected={idx === activeIdx}
+                      onMouseDown={(e) => {
+                        // Use mouseDown so we beat the input blur
+                        e.preventDefault();
+                        handleSelectSuggestion(s);
+                      }}
+                      onMouseEnter={() => setActiveIdx(idx)}
+                      className={`px-4 py-2 text-sm text-white cursor-pointer ${idx === activeIdx ? 'bg-blue-700' : 'hover:bg-gray-800'}`}
+                    >
+                      {s.displayName}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {showNoResultsHint && (
+                <p className="mt-1 text-xs text-gray-400">
+                  No matches found — you can keep typing the address manually.
+                </p>
+              )}
+            </div>
+            {errors.address && (
+              <p id="error-address" role="alert" className="mt-1 text-xs text-red-400">
+                {errors.address}
               </p>
             )}
-          </div>
-          {errors.address && (
-            <p id="error-address" role="alert" className="mt-1 text-xs text-red-400">
-              {errors.address}
-            </p>
-          )}
           </div>
         )}
 
@@ -282,9 +286,13 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
                 onChange={(e) => updateFormData({ city: e.target.value })}
                 placeholder="City"
                 aria-invalid={!!errors.city}
-                className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.city ? "border-red-500" : "border-gray-700"}`}
+                className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.city ? 'border-red-500' : 'border-gray-700'}`}
               />
-              {errors.city && <p role="alert" className="mt-1 text-xs text-red-400">{errors.city}</p>}
+              {errors.city && (
+                <p role="alert" className="mt-1 text-xs text-red-400">
+                  {errors.city}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -331,15 +339,20 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
               placeholder="https://zoom.us/j/… or https://meet.google.com/…"
               aria-invalid={!!errors.streamingUrl}
               aria-describedby={
-                errors.streamingUrl ? "error-streaming-url" : "hint-streaming-url"
+                errors.streamingUrl ? 'error-streaming-url' : 'hint-streaming-url'
               }
-              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.streamingUrl ? "border-red-500" : "border-gray-700"}`}
+              className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.streamingUrl ? 'border-red-500' : 'border-gray-700'}`}
             />
             <p id="hint-streaming-url" className="mt-1 text-xs text-gray-500">
-              Provide a link attendees will use to join the event (Zoom, Meet, YouTube Live, etc.).
+              Provide a link attendees will use to join the event (Zoom, Meet, YouTube
+              Live, etc.).
             </p>
             {errors.streamingUrl && (
-              <p id="error-streaming-url" role="alert" className="mt-1 text-xs text-red-400">
+              <p
+                id="error-streaming-url"
+                role="alert"
+                className="mt-1 text-xs text-red-400"
+              >
                 {errors.streamingUrl}
               </p>
             )}
@@ -349,9 +362,7 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
         {/* Map Placeholder */}
         {needsVenue && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Map
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Map</label>
             <div className="w-full h-64 bg-gray-800 border-2 border-dashed border-gray-700 rounded-lg flex flex-col items-center justify-center">
               <svg
                 className="w-12 h-12 text-gray-600 mb-2"
@@ -372,9 +383,7 @@ export default function Location({ formData, updateFormData, errors = {} }: Loca
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <p className="text-gray-500 text-sm">
-                Map integration will appear here
-              </p>
+              <p className="text-gray-500 text-sm">Map integration will appear here</p>
             </div>
           </div>
         )}

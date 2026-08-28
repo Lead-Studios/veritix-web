@@ -1,8 +1,8 @@
-import useSWR, { mutate } from "swr";
-import { fetchEvents, fetchEventById } from "@/lib/eventsApi";
-import type { Event } from "@/types/event";
+import useSWR, { mutate } from 'swr';
+import { fetchEvents, fetchEventById } from '@/lib/eventsApi';
+import type { Event } from '@/types/event';
 
-const EVENTS_KEY = "events";
+const EVENTS_KEY = 'events';
 
 export function useEvents() {
   const { data, error, isLoading } = useSWR<Event[]>(EVENTS_KEY, fetchEvents, {
@@ -21,7 +21,7 @@ export function useEvent(id: string) {
   const { data, error, isLoading } = useSWR<Event | null>(
     id ? `event-${id}` : null,
     () => fetchEventById(id),
-    { revalidateOnFocus: false, dedupingInterval: 60_000 }
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
   );
 
   return { event: data ?? null, loading: isLoading, error: error?.message ?? null };

@@ -1,13 +1,19 @@
-import { AppImage } from '@/components/shared/AppImage'
+import { AppImage } from '@/components/shared/AppImage';
 
 interface EventImageProps {
-  src?: string | null
-  alt: string
-  borderColor?: string
+  src?: string | null;
+  alt: string;
+  borderColor?: string;
 }
 
-export const EventImage = ({ src, alt, borderColor = 'border-[#4D21FF]' }: EventImageProps) => (
-  <div className={`relative h-22 w-full rounded-lg overflow-hidden border ${borderColor} bg-[#1a1f3a]`}>
+export const EventImage = ({
+  src,
+  alt,
+  borderColor = 'border-[#4D21FF]',
+}: EventImageProps) => (
+  <div
+    className={`relative h-22 w-full rounded-lg overflow-hidden border ${borderColor} bg-[#1a1f3a]`}
+  >
     <AppImage
       src={src || '/placeholder-event.svg'}
       alt={alt}
@@ -17,4 +23,4 @@ export const EventImage = ({ src, alt, borderColor = 'border-[#4D21FF]' }: Event
       fallback="/placeholder-event.svg"
     />
   </div>
-)
+);

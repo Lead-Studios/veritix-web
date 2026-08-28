@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { useEffect } from "react";
-import { FocusTrap } from "./FocusTrap";
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
+import { FocusTrap } from './FocusTrap';
 
 interface ModalProps {
   open: boolean;
@@ -11,13 +11,13 @@ interface ModalProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const sizeClasses = {
-  sm: "max-w-sm",
-  md: "max-w-lg",
-  lg: "max-w-2xl",
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
 };
 
 export function Modal({
@@ -26,22 +26,24 @@ export function Modal({
   title,
   description,
   children,
-  size = "md",
+  size = 'md',
 }: ModalProps) {
   // Lock scroll when open
   useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = ""; };
+    if (open) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
   return (
@@ -65,7 +67,7 @@ export function Modal({
                 initial={{ opacity: 0, scale: 0.92, y: 16 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 16 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
               >
                 {/* Gradient top border accent */}
                 <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-[#4d21ff] to-[#21d4ff]" />

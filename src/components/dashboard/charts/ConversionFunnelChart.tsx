@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export interface FunnelStage {
   label: string;
@@ -26,7 +26,11 @@ export function ConversionFunnelChart({
   const maxCount = stages[0]?.count ?? 1;
 
   return (
-    <div className="rounded-xl bg-white/5 p-4" role="figure" aria-label="Conversion funnel chart">
+    <div
+      className="rounded-xl bg-white/5 p-4"
+      role="figure"
+      aria-label="Conversion funnel chart"
+    >
       <p className="mb-4 text-xs font-semibold uppercase text-[#21D4FF]">
         Conversion Funnel
       </p>
@@ -36,11 +40,8 @@ export function ConversionFunnelChart({
           const widthPct = maxCount > 0 ? (stage.count / maxCount) * 100 : 0;
           const prevCount = index > 0 ? stages[index - 1].count : stage.count;
           const dropOff =
-            prevCount > 0
-              ? Math.round(((prevCount - stage.count) / prevCount) * 100)
-              : 0;
-          const isHighDropOff =
-            index > 0 && dropOff >= dropOffThreshold;
+            prevCount > 0 ? Math.round(((prevCount - stage.count) / prevCount) * 100) : 0;
+          const isHighDropOff = index > 0 && dropOff >= dropOffThreshold;
           const isHovered = hoveredIndex === index;
 
           return (
@@ -57,15 +58,17 @@ export function ConversionFunnelChart({
                   {index > 0 && (
                     <span
                       className={`ml-1.5 ${
-                        isHighDropOff ? "text-red-400 font-semibold" : "text-gray-500"
+                        isHighDropOff ? 'text-red-400 font-semibold' : 'text-gray-500'
                       }`}
                     >
-                      ({index > 0 ? `${(stage.count / prevCount * 100).toFixed(0)}%` : "100%"})
+                      (
+                      {index > 0
+                        ? `${((stage.count / prevCount) * 100).toFixed(0)}%`
+                        : '100%'}
+                      )
                     </span>
                   )}
-                  {index === 0 && (
-                    <span className="ml-1.5 text-gray-500">(100%)</span>
-                  )}
+                  {index === 0 && <span className="ml-1.5 text-gray-500">(100%)</span>}
                 </span>
               </div>
 
@@ -74,8 +77,8 @@ export function ConversionFunnelChart({
                 <div
                   className={`absolute inset-y-0 left-0 rounded-lg transition-all duration-300 ${
                     isHighDropOff
-                      ? "bg-gradient-to-r from-red-500/60 to-red-400/40"
-                      : "bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]"
+                      ? 'bg-gradient-to-r from-red-500/60 to-red-400/40'
+                      : 'bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]'
                   }`}
                   style={{ width: `${widthPct}%` }}
                 />
@@ -105,13 +108,11 @@ export function ConversionFunnelChart({
       {/* Summary row */}
       {stages.length >= 2 && (
         <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-xs">
-          <span className="text-gray-400">
-            Overall conversion
-          </span>
+          <span className="text-gray-400">Overall conversion</span>
           <span className="font-semibold text-[#4D21FF]">
             {maxCount > 0
               ? `${((stages[stages.length - 1].count / maxCount) * 100).toFixed(1)}%`
-              : "0%"}
+              : '0%'}
           </span>
         </div>
       )}

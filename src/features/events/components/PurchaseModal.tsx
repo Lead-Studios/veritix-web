@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Modal } from "@/components/ui/Modal";
-import { StellarPaymentInstructions } from "@/components/payment/StellarPaymentInstructions";
-import type { TicketOption } from "./TicketSelector";
+import { useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
+import { StellarPaymentInstructions } from '@/components/payment/StellarPaymentInstructions';
+import type { TicketOption } from './TicketSelector';
 
 interface PurchaseModalProps {
   open: boolean;
@@ -38,9 +38,9 @@ export function PurchaseModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           eventId,
           ticketType: ticket.name,
@@ -49,12 +49,12 @@ export function PurchaseModal({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error((body as { message?: string }).message ?? "Order failed");
+        throw new Error((body as { message?: string }).message ?? 'Order failed');
       }
       const data = (await res.json()) as OrderResponse;
       setOrder(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export function PurchaseModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title={order ? "Payment Instructions" : "Confirm Purchase"}
+      title={order ? 'Payment Instructions' : 'Confirm Purchase'}
       size="md"
     >
       {order ? (
@@ -84,10 +84,10 @@ export function PurchaseModal({
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-white/70">
-            You are about to purchase{" "}
+            You are about to purchase{' '}
             <span className="font-semibold text-white">
               {quantity} × {ticket?.name}
-            </span>{" "}
+            </span>{' '}
             for <span className="font-semibold text-white">{eventName}</span>.
           </p>
           {ticket && (
@@ -105,7 +105,9 @@ export function PurchaseModal({
             </div>
           )}
           {error && (
-            <p role="alert" className="text-sm text-red-400">{error}</p>
+            <p role="alert" className="text-sm text-red-400">
+              {error}
+            </p>
           )}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button
@@ -125,7 +127,7 @@ export function PurchaseModal({
               {loading && (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               )}
-              {loading ? "Processing…" : "Confirm & Pay"}
+              {loading ? 'Processing…' : 'Confirm & Pay'}
             </button>
           </div>
         </div>

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ExternalLink, Copy, Check } from "lucide-react";
+import { useState } from 'react';
+import { ExternalLink, Copy, Check } from 'lucide-react';
 
 interface StellarExplorerLinkProps {
   /** The Stellar transaction hash */
   txHash: string;
   /** The Stellar network — determines the explorer URL */
-  network: "testnet" | "mainnet";
+  network: 'testnet' | 'mainnet';
   /** Optional CSS class names for the wrapper */
   className?: string;
 }
@@ -26,7 +26,7 @@ function truncateHash(hash: string, leading = 8, trailing = 8): string {
 export function StellarExplorerLink({
   txHash,
   network,
-  className = "",
+  className = '',
 }: StellarExplorerLinkProps) {
   const [copied, setCopied] = useState(false);
 
@@ -58,7 +58,7 @@ export function StellarExplorerLink({
           type="button"
           onClick={handleCopy}
           className="ml-1 text-gray-400 hover:text-white transition-colors"
-          aria-label={copied ? "Hash copied" : "Copy transaction hash"}
+          aria-label={copied ? 'Hash copied' : 'Copy transaction hash'}
         >
           {copied ? (
             <Check className="w-3.5 h-3.5 text-emerald-400" />

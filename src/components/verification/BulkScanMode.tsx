@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useRef, useState } from "react";
-import { HiOutlineCamera, HiOutlineStop } from "react-icons/hi";
+import { useCallback, useRef, useState } from 'react';
+import { HiOutlineCamera, HiOutlineStop } from 'react-icons/hi';
 
 interface BulkScanModeProps {
   onScan: (ticketCode: string) => void;
@@ -10,7 +10,12 @@ interface BulkScanModeProps {
   onToggle: () => void;
 }
 
-export function BulkScanMode({ onScan, onBatchComplete, isActive, onToggle }: BulkScanModeProps) {
+export function BulkScanMode({
+  onScan,
+  onBatchComplete,
+  isActive,
+  onToggle,
+}: BulkScanModeProps) {
   const queueRef = useRef<string[]>([]);
   const [queueCount, setQueueCount] = useState(0);
 
@@ -20,7 +25,7 @@ export function BulkScanMode({ onScan, onBatchComplete, isActive, onToggle }: Bu
       queueRef.current = [...queueRef.current, ticketCode];
       setQueueCount(queueRef.current.length);
     },
-    [onScan]
+    [onScan],
   );
 
   const handleFinishBatch = useCallback(() => {

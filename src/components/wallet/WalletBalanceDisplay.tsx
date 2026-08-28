@@ -1,24 +1,22 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { isConnected, getPublicKey } from "@stellar/freighter-api";
-import { HiOutlineRefresh } from "react-icons/hi";
-import { StellarNetworkBadge } from "@/components/shared/StellarNetworkBadge";
+import { useCallback, useEffect, useState } from 'react';
+import { isConnected, getPublicKey } from '@stellar/freighter-api';
+import { HiOutlineRefresh } from 'react-icons/hi';
+import { StellarNetworkBadge } from '@/components/shared/StellarNetworkBadge';
 
 interface WalletBalanceDisplayProps {
   onDisconnect?: () => void;
 }
 
 async function fetchXlmBalance(publicKey: string): Promise<string> {
-  const res = await fetch(
-    `https://horizon-testnet.stellar.org/accounts/${publicKey}`
-  );
-  if (!res.ok) throw new Error("Failed to fetch balance");
+  const res = await fetch(`https://horizon-testnet.stellar.org/accounts/${publicKey}`);
+  if (!res.ok) throw new Error('Failed to fetch balance');
   const data = await res.json();
   const xlmBalance = data.balances?.find(
-    (b: { asset_type: string }) => b.asset_type === "native"
+    (b: { asset_type: string }) => b.asset_type === 'native',
   );
-  return xlmBalance?.balance ?? "0";
+  return xlmBalance?.balance ?? '0';
 }
 
 export function WalletBalanceDisplay({ onDisconnect }: WalletBalanceDisplayProps) {
@@ -43,7 +41,7 @@ export function WalletBalanceDisplay({ onDisconnect }: WalletBalanceDisplayProps
       const bal = await fetchXlmBalance(key);
       setBalance(bal);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load balance");
+      setError(err instanceof Error ? err.message : 'Failed to load balance');
     } finally {
       setLoading(false);
     }
@@ -89,7 +87,7 @@ export function WalletBalanceDisplay({ onDisconnect }: WalletBalanceDisplayProps
               {Number(balance).toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })}{" "}
+              })}{' '}
               <span className="text-sm font-normal text-gray-400">XLM</span>
             </p>
           </div>
@@ -104,7 +102,7 @@ export function WalletBalanceDisplay({ onDisconnect }: WalletBalanceDisplayProps
           disabled={loading}
           className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:border-white/20 transition-colors disabled:opacity-50"
         >
-          <HiOutlineRefresh className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <HiOutlineRefresh className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </button>
         {onDisconnect && (

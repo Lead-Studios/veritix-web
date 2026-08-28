@@ -32,7 +32,7 @@ export async function generateCheckInPDF(
   attendees: AttendeeForPDF[],
 ): Promise<void> {
   // Dynamically import jsPDF to avoid bundling it in the main chunk
-  const { jsPDF } = await import("jspdf");
+  const { jsPDF } = await import('jspdf');
 
   const doc = new jsPDF();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -41,12 +41,12 @@ export async function generateCheckInPDF(
 
   // Header
   doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
+  doc.setFont('helvetica', 'bold');
   doc.text(event.name, margin, y);
   y += 8;
 
   doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
+  doc.setFont('helvetica', 'normal');
   doc.text(`Date: ${event.date}`, margin, y);
   y += 5;
   doc.text(`Venue: ${event.venue}`, margin, y);
@@ -56,25 +56,25 @@ export async function generateCheckInPDF(
 
   // Sort alphabetically by last name
   const sorted = [...attendees].sort((a, b) => {
-    const lastNameA = a.name.split(" ").pop() ?? "";
-    const lastNameB = b.name.split(" ").pop() ?? "";
+    const lastNameA = a.name.split(' ').pop() ?? '';
+    const lastNameB = b.name.split(' ').pop() ?? '';
     return lastNameA.localeCompare(lastNameB);
   });
 
   // Table header
   doc.setFontSize(9);
-  doc.setFont("helvetica", "bold");
-  doc.text("Name", margin, y);
-  doc.text("Email", margin + 50, y);
-  doc.text("Ticket Type", margin + 110, y);
-  doc.text("Code", margin + 150, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Name', margin, y);
+  doc.text('Email', margin + 50, y);
+  doc.text('Ticket Type', margin + 110, y);
+  doc.text('Code', margin + 150, y);
   y += 5;
   doc.setDrawColor(200);
   doc.line(margin, y, 195, y);
   y += 5;
 
   // Rows
-  doc.setFont("helvetica", "normal");
+  doc.setFont('helvetica', 'normal');
   for (const att of sorted) {
     if (y > pageHeight - margin) {
       doc.addPage();
@@ -94,8 +94,8 @@ export async function generateCheckInPDF(
   }
 
   // Generate filename
-  const slug = event.name.replace(/\s+/g, "-").toLowerCase();
-  const dateStr = new Date().toISOString().split("T")[0];
+  const slug = event.name.replace(/\s+/g, '-').toLowerCase();
+  const dateStr = new Date().toISOString().split('T')[0];
   const filename = `checkin-${slug}-${dateStr}.pdf`;
 
   // Trigger download

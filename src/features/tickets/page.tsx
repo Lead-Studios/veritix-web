@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { EmptyState } from "@/components/EmptyState";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { fetchMyTickets, type UserTicket } from "@/lib/ticketHelpers";
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { EmptyState } from '@/components/EmptyState';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { fetchMyTickets, type UserTicket } from '@/lib/ticketHelpers';
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<UserTicket[]>([]);
@@ -14,7 +14,7 @@ export default function TicketsPage() {
   useEffect(() => {
     fetchMyTickets()
       .then(setTickets)
-      .catch(() => setError("Failed to load tickets."))
+      .catch(() => setError('Failed to load tickets.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,9 +44,9 @@ export default function TicketsPage() {
           title="No tickets yet"
           description="You haven't purchased any tickets. Browse upcoming events and grab your spot!"
           action={{
-            label: "Browse Events",
+            label: 'Browse Events',
             onClick: () => {
-              window.location.href = "/events";
+              window.location.href = '/events';
             },
           }}
           icon={
@@ -85,9 +85,9 @@ export default function TicketsPage() {
           </p>
           <span
             className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full font-medium ${
-              ticket.status === "active"
-                ? "bg-green-900/60 text-green-300"
-                : "bg-gray-700 text-gray-400"
+              ticket.status === 'active'
+                ? 'bg-green-900/60 text-green-300'
+                : 'bg-gray-700 text-gray-400'
             }`}
           >
             {ticket.status}

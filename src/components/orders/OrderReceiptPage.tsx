@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useRef } from "react";
-import { HiOutlinePrinter } from "react-icons/hi";
+import { useRef } from 'react';
+import { HiOutlinePrinter } from 'react-icons/hi';
 
 interface OrderReceiptPageProps {
   order: {
@@ -45,7 +45,9 @@ export function OrderReceiptPage({ order }: OrderReceiptPageProps) {
       >
         <div className="text-center border-b border-gray-200 pb-6">
           <h1 className="text-2xl font-bold">Receipt</h1>
-          <p className="text-sm text-gray-500 mt-1">Order #{order.id.slice(0, 8).toUpperCase()}</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Order #{order.id.slice(0, 8).toUpperCase()}
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -56,7 +58,9 @@ export function OrderReceiptPage({ order }: OrderReceiptPageProps) {
             </div>
             <div>
               <p className="text-gray-500">Date</p>
-              <p className="font-semibold">{new Date(order.eventDate).toLocaleDateString()}</p>
+              <p className="font-semibold">
+                {new Date(order.eventDate).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <p className="text-gray-500">Venue</p>
@@ -110,7 +114,9 @@ export function OrderReceiptPage({ order }: OrderReceiptPageProps) {
 
         <div className="border-t border-gray-200 pt-6 text-center text-xs text-gray-400">
           <p>Veritix &middot; Stellar Network</p>
-          <p className="mt-0.5">This is your official receipt. Keep it for your records.</p>
+          <p className="mt-0.5">
+            This is your official receipt. Keep it for your records.
+          </p>
         </div>
       </div>
     </div>

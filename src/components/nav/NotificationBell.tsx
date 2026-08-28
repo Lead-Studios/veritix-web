@@ -13,8 +13,18 @@ interface NotificationItem {
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
-    { id: '1', message: 'New ticket purchase for Veritix Launch', timestamp: '5m ago', read: false },
-    { id: '2', message: 'Daily check-in target reached', timestamp: '1h ago', read: false },
+    {
+      id: '1',
+      message: 'New ticket purchase for Veritix Launch',
+      timestamp: '5m ago',
+      read: false,
+    },
+    {
+      id: '2',
+      message: 'Daily check-in target reached',
+      timestamp: '1h ago',
+      read: false,
+    },
   ]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -43,7 +53,10 @@ export default function NotificationBell() {
           <div className="flex justify-between items-center border-b border-white/10 pb-2">
             <h4 className="text-sm font-semibold text-white">Notifications</h4>
             {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-xs text-blue-400 hover:underline">
+              <button
+                onClick={markAllRead}
+                className="text-xs text-blue-400 hover:underline"
+              >
                 Mark all read
               </button>
             )}
@@ -53,11 +66,15 @@ export default function NotificationBell() {
               <div
                 key={item.id}
                 className={`p-2.5 rounded-lg text-xs transition-colors ${
-                  item.read ? 'bg-white/5 text-gray-400' : 'bg-blue-500/10 text-white font-medium'
+                  item.read
+                    ? 'bg-white/5 text-gray-400'
+                    : 'bg-blue-500/10 text-white font-medium'
                 }`}
               >
                 <p>{item.message}</p>
-                <span className="text-[10px] text-gray-400 block pt-1">{item.timestamp}</span>
+                <span className="text-[10px] text-gray-400 block pt-1">
+                  {item.timestamp}
+                </span>
               </div>
             ))}
           </div>

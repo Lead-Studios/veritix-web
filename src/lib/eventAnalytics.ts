@@ -1,6 +1,6 @@
 // FE-098: Manage-event analytics types and fetch helper
 
-import { buildUrl, API_ROUTES } from "./api-routes";
+import { buildUrl, API_ROUTES } from './api-routes';
 
 export interface EventAnalytics {
   totalSold: number;
@@ -13,11 +13,11 @@ export interface EventAnalytics {
 
 export async function fetchEventAnalytics(eventId: string): Promise<EventAnalytics> {
   const res = await fetch(buildUrl(API_ROUTES.events.analytics(eventId)));
-  if (!res.ok) throw new Error("Failed to fetch event analytics");
+  if (!res.ok) throw new Error('Failed to fetch event analytics');
   return res.json();
 }
 
-export function getSalesVelocity(salesByDay: EventAnalytics["salesByDay"]): number {
+export function getSalesVelocity(salesByDay: EventAnalytics['salesByDay']): number {
   if (salesByDay.length === 0) return 0;
   const total = salesByDay.reduce((sum, d) => sum + d.count, 0);
   return Math.round(total / salesByDay.length);

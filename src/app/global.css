@@ -12,8 +12,6 @@
   }
 }
 
-
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -140,7 +138,6 @@
   }
 }
 
-
 @keyframes scroll-up-once {
   0% {
     transform: translateY(0);
@@ -175,33 +172,32 @@
 }
 
 @font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf")
-    format("truetype");
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf")
-    format("truetype");
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf')
+    format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf")
-    format("truetype");
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf')
+    format('truetype');
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf")
-    format("truetype");
+  font-family: 'Proxima Nova';
+  src: url('/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf')
+    format('truetype');
   font-weight: 800;
   font-style: normal;
 }
@@ -209,7 +205,7 @@
 html,
 body {
   height: 100%;
-  font-family: "Proxima Nova", sans-serif;
+  font-family: 'Proxima Nova', sans-serif;
 }
 
 html {
@@ -217,13 +213,13 @@ html {
 }
 
 body {
-  font-family: var(--font-body), "Proxima Nova", sans-serif;
+  font-family: var(--font-body), 'Proxima Nova', sans-serif;
   background-color: #0b1025;
   color: #f6f7ff;
 }
 
 .font-display {
-  font-family: var(--font-display), "Proxima Nova", serif;
+  font-family: var(--font-display), 'Proxima Nova', serif;
 }
 
 .contact-form-graadient {
@@ -238,11 +234,7 @@ body {
 
 .contact-form-graadient-btn {
   background: #4d21ff;
-  background: linear-gradient(
-    90deg,
-    rgba(77, 33, 255, 1) 0%,
-    rgba(33, 212, 255, 1) 100%
-  );
+  background: linear-gradient(90deg, rgba(77, 33, 255, 1) 0%, rgba(33, 212, 255, 1) 100%);
 }
 
 /* High contrast mode for WCAG AA compliance */
@@ -274,7 +266,11 @@ body {
 }
 
 @media print {
-  nav, header, sidebar, footer, .print\:hidden {
+  nav,
+  header,
+  sidebar,
+  footer,
+  .print\:hidden {
     display: none !important;
   }
   body {

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { HiOutlineCalendar } from "react-icons/hi";
+import { useCallback } from 'react';
+import { HiOutlineCalendar } from 'react-icons/hi';
 
 interface AddToCalendarProps {
   eventName: string;
@@ -13,30 +13,30 @@ interface AddToCalendarProps {
 
 function buildGoogleCalendarUrl(event: AddToCalendarProps): string {
   const params = new URLSearchParams({
-    action: "TEMPLATE",
+    action: 'TEMPLATE',
     text: event.eventName,
-    details: event.description ?? "",
-    location: event.location ?? "",
-    dates: `${event.startDate.replace(/[-:]/g, "").replace(/\.\d{3}/, "")}/${event.endDate.replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`,
+    details: event.description ?? '',
+    location: event.location ?? '',
+    dates: `${event.startDate.replace(/[-:]/g, '').replace(/\.\d{3}/, '')}/${event.endDate.replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 function buildIcsContent(event: AddToCalendarProps): string {
   const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Veritix//AddToCalendar//EN",
-    "BEGIN:VEVENT",
-    `DTSTART:${event.startDate.replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`,
-    `DTEND:${event.endDate.replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`,
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Veritix//AddToCalendar//EN',
+    'BEGIN:VEVENT',
+    `DTSTART:${event.startDate.replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
+    `DTEND:${event.endDate.replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
     `SUMMARY:${event.eventName}`,
-    `DESCRIPTION:${event.description ?? ""}`,
-    `LOCATION:${event.location ?? ""}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
+    `DESCRIPTION:${event.description ?? ''}`,
+    `LOCATION:${event.location ?? ''}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
   ];
-  return lines.join("\r\n");
+  return lines.join('\r\n');
 }
 
 export function AddToCalendar(event: AddToCalendarProps) {
@@ -44,11 +44,11 @@ export function AddToCalendar(event: AddToCalendarProps) {
 
   const handleDownloadIcs = useCallback(() => {
     const ics = buildIcsContent(event);
-    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `${event.eventName.replace(/\s+/g, "_")}.ics`;
+    a.download = `${event.eventName.replace(/\s+/g, '_')}.ics`;
     a.click();
     URL.revokeObjectURL(url);
   }, [event]);

@@ -1,28 +1,31 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useCallback, useMemo } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
-export type PayoutDatePreset = "7d" | "30d" | "90d" | "ytd" | "custom";
+export type PayoutDatePreset = '7d' | '30d' | '90d' | 'ytd' | 'custom';
 
 export interface PayoutDateFilter {
   preset: PayoutDatePreset | null;
   from: string | null; // YYYY-MM-DD
-  to: string | null;   // YYYY-MM-DD
+  to: string | null; // YYYY-MM-DD
 }
 
-const PRESET_KEYS: Record<Exclude<PayoutDatePreset, "custom">, () => { from: string; to: string }> = {
-  "7d": () => {
+const PRESET_KEYS: Record<
+  Exclude<PayoutDatePreset, 'custom'>,
+  () => { from: string; to: string }
+> = {
+  '7d': () => {
     const to = new Date();
     const from = new Date(Date.now() - 7 * 86400000);
     return { from: toISO(from), to: toISO(to) };
   },
-  "30d": () => {
+  '30d': () => {
     const to = new Date();
     const from = new Date(Date.now() - 30 * 86400000);
     return { from: toISO(from), to: toISO(to) };
   },
-  "90d": () => {
+  '90d': () => {
     const to = new Date();
     const from = new Date(Date.now() - 90 * 86400000);
     return { from: toISO(from), to: toISO(to) };
@@ -52,11 +55,14 @@ export function usePayoutDateFilter() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const filter = useMemo<PayoutDateFilter>(() => ({
-    preset: (searchParams.get("preset") as PayoutDatePreset) ?? null,
-    from: searchParams.get("from"),
-    to: searchParams.get("to"),
-  }), [searchParams]);
+  const filter = useMemo<PayoutDateFilter>(
+    () => ({
+      preset: (searchParams.get('preset') as PayoutDatePreset) ?? null,
+      from: searchParams.get('from'),
+      to: searchParams.get('to'),
+    }),
+    [searchParams],
+  );
 
   const push = useCallback(
     (updates: Record<string, string | null>) => {
@@ -70,22 +76,22 @@ export function usePayoutDateFilter() {
       });
       router.push(`${pathname}?${params.toString()}`);
     },
-    [router, pathname, searchParams]
+    [router, pathname, searchParams],
   );
 
   const setPreset = useCallback(
-    (preset: Exclude<PayoutDatePreset, "custom">) => {
+    (preset: Exclude<PayoutDatePreset, 'custom'>) => {
       const { from, to } = PRESET_KEYS[preset]();
       push({ preset, from, to });
     },
-    [push]
+    [push],
   );
 
   const setCustomRange = useCallback(
     (from: string, to: string) => {
-      push({ preset: "custom", from, to });
+      push({ preset: 'custom', from, to });
     },
-    [push]
+    [push],
   );
 
   const clear = useCallback(() => {

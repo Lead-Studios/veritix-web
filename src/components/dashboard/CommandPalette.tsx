@@ -1,13 +1,7 @@
-"use client";
+'use client';
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useId,
-} from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useCallback, useId } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   PlusCircle,
   Ticket,
@@ -17,14 +11,14 @@ import {
   ShieldCheck,
   Search,
   X,
-} from "lucide-react";
+} from 'lucide-react';
 
 // ─── Static catalogue ─────────────────────────────────────────────────────────
 
 interface PaletteItem {
   id: string;
   label: string;
-  group: "Quick Actions" | "Navigation";
+  group: 'Quick Actions' | 'Navigation';
   href: string;
   icon: React.ReactNode;
   keywords: string[];
@@ -33,61 +27,61 @@ interface PaletteItem {
 const PALETTE_ITEMS: PaletteItem[] = [
   // Quick Actions
   {
-    id: "create-event",
-    label: "Create Event",
-    group: "Quick Actions",
-    href: "/events/create",
+    id: 'create-event',
+    label: 'Create Event',
+    group: 'Quick Actions',
+    href: '/events/create',
     icon: <PlusCircle size={15} aria-hidden="true" />,
-    keywords: ["create", "new", "event", "add"],
+    keywords: ['create', 'new', 'event', 'add'],
   },
   {
-    id: "manage-tickets",
-    label: "Manage Tickets",
-    group: "Quick Actions",
-    href: "/events/manage",
+    id: 'manage-tickets',
+    label: 'Manage Tickets',
+    group: 'Quick Actions',
+    href: '/events/manage',
     icon: <Ticket size={15} aria-hidden="true" />,
-    keywords: ["manage", "tickets", "edit"],
+    keywords: ['manage', 'tickets', 'edit'],
   },
   {
-    id: "view-analytics",
-    label: "View Analytics",
-    group: "Quick Actions",
-    href: "/events",
+    id: 'view-analytics',
+    label: 'View Analytics',
+    group: 'Quick Actions',
+    href: '/events',
     icon: <BarChart2 size={15} aria-hidden="true" />,
-    keywords: ["analytics", "stats", "reports", "view"],
+    keywords: ['analytics', 'stats', 'reports', 'view'],
   },
   // Navigation
   {
-    id: "nav-dashboard",
-    label: "Dashboard",
-    group: "Navigation",
-    href: "/dashboard",
+    id: 'nav-dashboard',
+    label: 'Dashboard',
+    group: 'Navigation',
+    href: '/dashboard',
     icon: <LayoutDashboard size={15} aria-hidden="true" />,
-    keywords: ["dashboard", "home", "overview"],
+    keywords: ['dashboard', 'home', 'overview'],
   },
   {
-    id: "nav-events",
-    label: "Events",
-    group: "Navigation",
-    href: "/events",
+    id: 'nav-events',
+    label: 'Events',
+    group: 'Navigation',
+    href: '/events',
     icon: <Calendar size={15} aria-hidden="true" />,
-    keywords: ["events", "calendar", "list"],
+    keywords: ['events', 'calendar', 'list'],
   },
   {
-    id: "nav-tickets",
-    label: "Tickets",
-    group: "Navigation",
-    href: "/tickets",
+    id: 'nav-tickets',
+    label: 'Tickets',
+    group: 'Navigation',
+    href: '/tickets',
     icon: <Ticket size={15} aria-hidden="true" />,
-    keywords: ["tickets", "my tickets"],
+    keywords: ['tickets', 'my tickets'],
   },
   {
-    id: "nav-verify",
-    label: "Verification",
-    group: "Navigation",
-    href: "/verify",
+    id: 'nav-verify',
+    label: 'Verification',
+    group: 'Navigation',
+    href: '/verify',
     icon: <ShieldCheck size={15} aria-hidden="true" />,
-    keywords: ["verify", "verification", "scan", "check-in", "gate"],
+    keywords: ['verify', 'verification', 'scan', 'check-in', 'gate'],
   },
 ];
 
@@ -96,10 +90,7 @@ const PALETTE_ITEMS: PaletteItem[] = [
 function fuzzyMatch(item: PaletteItem, query: string): boolean {
   if (!query.trim()) return true;
   const q = query.toLowerCase();
-  return (
-    item.label.toLowerCase().includes(q) ||
-    item.keywords.some((k) => k.includes(q))
-  );
+  return item.label.toLowerCase().includes(q) || item.keywords.some((k) => k.includes(q));
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -112,7 +103,7 @@ interface CommandPaletteProps {
 export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -125,8 +116,8 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
     ...eventNames.map((name, i) => ({
       id: `event-${i}`,
       label: name,
-      group: "Quick Actions" as const,
-      href: `/events/${encodeURIComponent(name.toLowerCase().replace(/\s+/g, "-"))}`,
+      group: 'Quick Actions' as const,
+      href: `/events/${encodeURIComponent(name.toLowerCase().replace(/\s+/g, '-'))}`,
       icon: <Calendar size={15} aria-hidden="true" />,
       keywords: name.toLowerCase().split(/\s+/),
     })),
@@ -141,13 +132,13 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
 
   const openPalette = useCallback(() => {
     setOpen(true);
-    setQuery("");
+    setQuery('');
     setActiveIndex(0);
   }, []);
 
   const closePalette = useCallback(() => {
     setOpen(false);
-    setQuery("");
+    setQuery('');
     setActiveIndex(0);
   }, []);
 
@@ -155,7 +146,7 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault();
         setOpen((prev) => {
           if (prev) {
@@ -167,12 +158,12 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
         });
       }
       // Allow Escape to close from anywhere (useful when focus is not in input)
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         closePalette();
       }
     }
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [openPalette, closePalette]);
 
   // Focus input when opened
@@ -192,19 +183,19 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
   // ── In-palette keyboard navigation ────────────────────────────────────────
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       closePalette();
       return;
     }
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       setActiveIndex((prev) => (prev + 1) % Math.max(filtered.length, 1));
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setActiveIndex((prev) =>
-        prev === 0 ? Math.max(filtered.length - 1, 0) : prev - 1
+        prev === 0 ? Math.max(filtered.length - 1, 0) : prev - 1,
       );
-    } else if (e.key === "Enter") {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
       const item = filtered[activeIndex];
       if (item) {
@@ -278,7 +269,11 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
           className="max-h-[360px] overflow-y-auto py-2"
         >
           {filtered.length === 0 ? (
-            <li className="px-4 py-6 text-center text-sm text-gray-500" role="option" aria-selected={false}>
+            <li
+              className="px-4 py-6 text-center text-sm text-gray-500"
+              role="option"
+              aria-selected={false}
+            >
               No results for &ldquo;{query}&rdquo;
             </li>
           ) : (
@@ -306,15 +301,11 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
                           }}
                           className={`flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                             isActive
-                              ? "bg-[#4D21FF]/20 text-white"
-                              : "text-gray-300 hover:bg-white/5 hover:text-white"
+                              ? 'bg-[#4D21FF]/20 text-white'
+                              : 'text-gray-300 hover:bg-white/5 hover:text-white'
                           }`}
                         >
-                          <span
-                            className={
-                              isActive ? "text-[#21D4FF]" : "text-gray-500"
-                            }
-                          >
+                          <span className={isActive ? 'text-[#21D4FF]' : 'text-gray-500'}>
                             {item.icon}
                           </span>
                           {item.label}
@@ -330,10 +321,23 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
 
         {/* Footer hint */}
         <div className="border-t border-white/5 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-600">
-          <span><kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">↑↓</kbd> Navigate</span>
-          <span><kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">↵</kbd> Open</span>
-          <span><kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">Esc</kbd> Close</span>
-          <span className="ml-auto"><kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">⌘/</kbd></span>
+          <span>
+            <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">↑↓</kbd>{' '}
+            Navigate
+          </span>
+          <span>
+            <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">↵</kbd>{' '}
+            Open
+          </span>
+          <span>
+            <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">
+              Esc
+            </kbd>{' '}
+            Close
+          </span>
+          <span className="ml-auto">
+            <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-[9px]">⌘/</kbd>
+          </span>
         </div>
       </div>
     </div>

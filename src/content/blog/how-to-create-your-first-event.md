@@ -1,9 +1,9 @@
 ---
-title: "How to Create Your First Event on VeriTix"
-author: "Sarah Chen"
-date: "2024-06-20"
-coverImage: "/eventaillustration.png"
-tags: ["Guide", "Event Creation", "Tutorial"]
+title: 'How to Create Your First Event on VeriTix'
+author: 'Sarah Chen'
+date: '2024-06-20'
+coverImage: '/eventaillustration.png'
+tags: ['Guide', 'Event Creation', 'Tutorial']
 ---
 
 Creating an event on VeriTix is simple and powerful. In this guide, we'll walk you through the process of launching your first blockchain-powered event.
@@ -11,6 +11,7 @@ Creating an event on VeriTix is simple and powerful. In this guide, we'll walk y
 ## Getting Started
 
 Before you create your first event, make sure you have:
+
 - A VeriTix organizer account
 - Your event details ready (date, time, venue, ticket tiers)
 - High-quality images for your event listing
@@ -32,6 +33,7 @@ Fill in the essential details about your event:
 ## Step 3: Visual Assets
 
 Upload high-quality images to make your event stand out:
+
 - **Cover Image**: A stunning hero image (recommended: 1920x1080px)
 - **Gallery**: Additional photos to showcase your event
 
@@ -40,16 +42,19 @@ Upload high-quality images to make your event stand out:
 Create different ticket tiers to offer flexibility to your attendees:
 
 ### General Admission
+
 - Standard entry ticket
 - Price: $25 - $50
 - No special perks
 
 ### VIP Access
+
 - Premium seating or early entry
 - Price: $75 - $150
 - Includes exclusive merchandise
 
 ### All-Access Pass
+
 - Full event access with backstage privileges
 - Price: $200+
 - Meet & greet opportunities
@@ -77,6 +82,7 @@ Review all your event details carefully. Once published, your event will be live
 ## Analytics and Insights
 
 After your event is live, use the VeriTix dashboard to track:
+
 - Ticket sales in real-time
 - Attendee demographics
 - Engagement metrics
@@ -89,4 +95,5 @@ Creating events on VeriTix gives you access to powerful tools and a growing comm
 Ready to create your first event? [Start now](/events/create) and join the future of event ticketing.
 
 ---
-*Need help? Check out our [support documentation](/contact) or reach out to our team.*
+
+_Need help? Check out our [support documentation](/contact) or reach out to our team._

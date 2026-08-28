@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { getToken } from "@/lib/auth";
-import { useCallback, useEffect, useState } from "react";
+import { getToken } from '@/lib/auth';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface UserProfile {
   id: string;
@@ -12,25 +12,23 @@ export interface UserProfile {
 }
 
 export async function fetchProfile(): Promise<UserProfile> {
-  const res = await fetch("/api/auth/me", { headers: authHeaders() });
-  if (!res.ok) throw new Error("Failed to load profile");
+  const res = await fetch('/api/auth/me', { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to load profile');
   return res.json();
 }
 
 export async function updateProfile(
-  patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>
+  patch: Partial<Pick<UserProfile, 'name' | 'email' | 'avatarUrl'>>,
 ): Promise<UserProfile> {
-  const res = await fetch("/api/auth/me", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
+  const res = await fetch('/api/auth/me', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(patch),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(
-      (err as { message?: string }).message ?? "Failed to save profile",
-    );
+    throw new Error((err as { message?: string }).message ?? 'Failed to save profile');
   }
   return res.json();
 }
@@ -47,7 +45,7 @@ export function useProfile() {
       const data = await fetchProfile();
       setProfile(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -58,9 +56,7 @@ export function useProfile() {
   }, [load]);
 
   const save = useCallback(
-    async (
-      patch: Partial<Pick<UserProfile, "name" | "email" | "avatarUrl">>,
-    ) => {
+    async (patch: Partial<Pick<UserProfile, 'name' | 'email' | 'avatarUrl'>>) => {
       const updated = await updateProfile(patch);
       setProfile(updated);
       return updated;

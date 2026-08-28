@@ -1,52 +1,52 @@
-"use client";
+'use client';
 
-import { useState, FormEvent } from "react";
-import { z } from "zod";
+import { useState, FormEvent } from 'react';
+import { z } from 'zod';
 
 const NEWSLETTER_ENDPOINT =
-  process.env.NEXT_PUBLIC_NEWSLETTER_ENDPOINT ?? "/api/newsletter";
+  process.env.NEXT_PUBLIC_NEWSLETTER_ENDPOINT ?? '/api/newsletter';
 
-const emailSchema = z.string().email("Please enter a valid email address");
+const emailSchema = z.string().email('Please enter a valid email address');
 
 export default function NewsletterForm() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const validationResult = emailSchema.safeParse(email);
     if (!validationResult.success) {
-      setStatus("error");
-      setErrorMsg(validationResult.error.issues[0]?.message || "Invalid email address");
+      setStatus('error');
+      setErrorMsg(validationResult.error.issues[0]?.message || 'Invalid email address');
       return;
     }
 
-    setStatus("loading");
-    setErrorMsg("");
+    setStatus('loading');
+    setErrorMsg('');
 
     try {
       const res = await fetch(NEWSLETTER_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: validationResult.data }),
       });
 
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { message?: string };
-        throw new Error(data.message ?? "Subscription failed. Please try again.");
+        throw new Error(data.message ?? 'Subscription failed. Please try again.');
       }
 
-      setStatus("success");
-      setEmail("");
+      setStatus('success');
+      setEmail('');
     } catch (err) {
-      setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
+      setStatus('error');
+      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong.');
     }
   };
 
-  if (status === "success") {
+  if (status === 'success') {
     return (
       <p className="text-sm text-green-400">
         ✓ You&apos;re subscribed! Check your inbox for a confirmation.
@@ -66,20 +66,20 @@ export default function NewsletterForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address..."
               aria-label="Email address for newsletter"
-              disabled={status === "loading"}
+              disabled={status === 'loading'}
               className="flex-1 bg-transparent text-xs text-white placeholder:text-white/50 focus:outline-none disabled:opacity-60"
             />
           </div>
         </div>
         <button
           type="submit"
-          disabled={status === "loading"}
+          disabled={status === 'loading'}
           className="whitespace-nowrap rounded-full bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
         >
-          {status === "loading" ? "Subscribing…" : "Subscribe Now"}
+          {status === 'loading' ? 'Subscribing…' : 'Subscribe Now'}
         </button>
       </div>
-      {status === "error" && (
+      {status === 'error' && (
         <p role="alert" className="mt-2 text-xs text-red-400">
           {errorMsg}
         </p>

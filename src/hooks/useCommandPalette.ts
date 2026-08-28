@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 interface UseCommandPaletteOptions {
   /** Keyboard shortcut key (default: "k") */
@@ -20,7 +20,7 @@ interface UseCommandPaletteOptions {
  * return <CommandPalette isOpen={isOpen} onClose={close} />;
  */
 export function useCommandPalette(options: UseCommandPaletteOptions = {}) {
-  const { key = "k", meta = true, ctrl = true } = options;
+  const { key = 'k', meta = true, ctrl = true } = options;
   const [isOpen, setIsOpen] = useState(false);
 
   const open = useCallback(() => setIsOpen(true), []);
@@ -37,13 +37,13 @@ export function useCommandPalette(options: UseCommandPaletteOptions = {}) {
         toggle();
       }
 
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         close();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [key, meta, ctrl, isOpen, toggle, close]);
 
   return { isOpen, open, close, toggle };

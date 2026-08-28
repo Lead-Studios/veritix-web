@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import React from "react";
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import { ImageUploadField } from "../ui/ImageUploadField";
-import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import React from 'react';
+import { EventFormData } from '@/app/(protected)/events/create/page';
+import { ImageUploadField } from '../ui/ImageUploadField';
+import type { CreateEventFormErrors } from '@/lib/createEventValidation';
 import {
   MAX_GALLERY_IMAGES,
   getGalleryLimitMessage,
   isGalleryFull,
-} from "@/lib/galleryLimit";
+} from '@/lib/galleryLimit';
 
 interface BasicInformationProps {
   formData: EventFormData;
@@ -21,8 +21,6 @@ export default function BasicInformation({
   updateFormData,
   errors = {},
 }: BasicInformationProps) {
-
-
   return (
     <section className="bg-gray-900 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-3 mb-6">
@@ -44,11 +42,13 @@ export default function BasicInformation({
             onChange={(e) => updateFormData({ title: e.target.value })}
             placeholder="Give your event a catchy title"
             aria-invalid={!!errors.title}
-            aria-describedby={errors.title ? "error-title" : undefined}
-            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.title ? "border-red-500" : "border-gray-700"}`}
+            aria-describedby={errors.title ? 'error-title' : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-700'}`}
           />
           {errors.title && (
-            <p id="error-title" role="alert" className="mt-1 text-xs text-red-400">{errors.title}</p>
+            <p id="error-title" role="alert" className="mt-1 text-xs text-red-400">
+              {errors.title}
+            </p>
           )}
         </div>
 
@@ -63,11 +63,13 @@ export default function BasicInformation({
             placeholder="Describe your event in details"
             rows={4}
             aria-invalid={!!errors.description}
-            aria-describedby={errors.description ? "error-description" : undefined}
-            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none ${errors.description ? "border-red-500" : "border-gray-700"}`}
+            aria-describedby={errors.description ? 'error-description' : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none ${errors.description ? 'border-red-500' : 'border-gray-700'}`}
           />
           {errors.description && (
-            <p id="error-description" role="alert" className="mt-1 text-xs text-red-400">{errors.description}</p>
+            <p id="error-description" role="alert" className="mt-1 text-xs text-red-400">
+              {errors.description}
+            </p>
           )}
         </div>
 
@@ -78,10 +80,12 @@ export default function BasicInformation({
           </label>
           <select
             value={formData.category}
-            onChange={(e) => updateFormData({ category: e.target.value as EventFormData['category'] })}
+            onChange={(e) =>
+              updateFormData({ category: e.target.value as EventFormData['category'] })
+            }
             aria-invalid={!!errors.category}
-            aria-describedby={errors.category ? "error-category" : undefined}
-            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.category ? "border-red-500" : "border-gray-700"}`}
+            aria-describedby={errors.category ? 'error-category' : undefined}
+            className={`w-full bg-gray-800 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${errors.category ? 'border-red-500' : 'border-gray-700'}`}
           >
             <option value="music">Music</option>
             <option value="festival">Festival</option>
@@ -93,7 +97,9 @@ export default function BasicInformation({
             <option value="workshop">Workshop</option>
           </select>
           {errors.category && (
-            <p id="error-category" role="alert" className="mt-1 text-xs text-red-400">{errors.category}</p>
+            <p id="error-category" role="alert" className="mt-1 text-xs text-red-400">
+              {errors.category}
+            </p>
           )}
         </div>
 
@@ -106,7 +112,9 @@ export default function BasicInformation({
             onUploadComplete={(imageUrl) => updateFormData({ coverImage: imageUrl })}
           />
           {errors.coverImage && (
-            <p role="alert" className="mt-1 text-xs text-red-400">{errors.coverImage}</p>
+            <p role="alert" className="mt-1 text-xs text-red-400">
+              {errors.coverImage}
+            </p>
           )}
         </div>
 
@@ -128,9 +136,7 @@ export default function BasicInformation({
             {formData.gallery.map((file, index) => (
               <div key={index}>TODO: ImageUpload</div>
             ))}
-            {!isGalleryFull(formData.gallery.length) && (
-              <div>TODO: ImageUpload</div>
-            )}
+            {!isGalleryFull(formData.gallery.length) && <div>TODO: ImageUpload</div>}
           </div>
           {isGalleryFull(formData.gallery.length) && (
             <p

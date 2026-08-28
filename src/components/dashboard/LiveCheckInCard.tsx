@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useCheckInCounter } from "@/hooks/useCheckInCounter";
+import { useCheckInCounter } from '@/hooks/useCheckInCounter';
 
 interface Props {
   eventId: string;
@@ -13,9 +13,7 @@ export function LiveCheckInCard({ eventId, eventName, isLive }: Props) {
 
   if (!isLive) {
     return (
-      <p className="text-sm text-[#21D4FF]">
-        No active events — check-in counter paused
-      </p>
+      <p className="text-sm text-[#21D4FF]">No active events — check-in counter paused</p>
     );
   }
 
@@ -28,7 +26,7 @@ export function LiveCheckInCard({ eventId, eventName, isLive }: Props) {
           <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
         </span>
         <span className="text-sm font-semibold text-emerald-400">
-          🚪 Live Check-ins: {checkInCount ?? "…"}
+          🚪 Live Check-ins: {checkInCount ?? '…'}
         </span>
       </div>
       <p className="text-xs text-[#21D4FF] pl-4">{eventName}</p>

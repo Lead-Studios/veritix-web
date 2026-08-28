@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { RouteErrorState } from "@/components/ui/RouteErrorState";
+import { useEffect } from 'react';
+import { RouteErrorState } from '@/components/ui/RouteErrorState';
 
 export default function VerifyError({
   error,
@@ -11,7 +11,7 @@ export default function VerifyError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Verify error boundary caught an error", error);
+    console.error('Verify error boundary caught an error', error);
   }, [error]);
 
   return (

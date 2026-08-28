@@ -1,6 +1,6 @@
-import useSWR from "swr";
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import useSWR from 'swr';
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,11 +61,11 @@ export function useOrganizerAnalytics(options: Options = {}) {
 
   const params = new URLSearchParams();
 
-  if (organizerId) params.set("organizerId", organizerId);
-  if (from) params.set("from", from);
-  if (to) params.set("to", to);
+  if (organizerId) params.set('organizerId', organizerId);
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
 
-  const qs = params.toString() ? `?${params.toString()}` : "";
+  const qs = params.toString() ? `?${params.toString()}` : '';
   const key = `/api/organizer/analytics${qs}`;
 
   const { data, error, isLoading, mutate } = useSWR<OrganizerAnalytics>(
@@ -75,14 +75,14 @@ export function useOrganizerAnalytics(options: Options = {}) {
 
       if (res.status === 401) {
         try {
-          localStorage.removeItem("session");
+          localStorage.removeItem('session');
           sessionStorage.clear();
         } catch {
           // Storage may not be available
         }
 
-        router.replace("/login?next=/dashboard");
-        throw new Error("Your session has expired. Redirecting to login...");
+        router.replace('/login?next=/dashboard');
+        throw new Error('Your session has expired. Redirecting to login...');
       }
 
       if (!res.ok) {

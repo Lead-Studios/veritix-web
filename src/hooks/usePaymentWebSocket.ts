@@ -1,25 +1,18 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type WebSocketStatus =
-  | "connecting"
-  | "connected"
-  | "disconnected"
-  | "error";
+export type WebSocketStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
 export interface PaymentEvent {
   txHash: string;
-  status: "pending" | "confirmed" | "failed";
+  status: 'pending' | 'confirmed' | 'failed';
   message?: string;
 }
 
 function isPaymentEvent(value: unknown): value is PaymentEvent {
   return (
-    typeof value === "object" &&
-    value !== null &&
-    "txHash" in value &&
-    "status" in value
+    typeof value === 'object' && value !== null && 'txHash' in value && 'status' in value
   );
 }
 
@@ -34,20 +27,20 @@ export function usePaymentWebSocket({
   onPaymentUpdate,
   reconnectInterval = 5000,
 }: UsePaymentWebSocketOptions) {
-  const [wsStatus, setWsStatus] = useState<WebSocketStatus>("disconnected");
+  const [wsStatus, setWsStatus] = useState<WebSocketStatus>('disconnected');
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    setWsStatus("connecting");
+    setWsStatus('connecting');
 
     try {
       const ws = new WebSocket(url);
 
       ws.onopen = () => {
-        setWsStatus("connected");
+        setWsStatus('connected');
       };
 
       ws.onmessage = (event) => {
@@ -57,25 +50,25 @@ export function usePaymentWebSocket({
             onPaymentUpdate?.(data);
           }
         } catch (e: unknown) {
-          console.error("Failed to parse WebSocket message", e);
+          console.error('Failed to parse WebSocket message', e);
         }
       };
 
       ws.onclose = () => {
-        setWsStatus("disconnected");
+        setWsStatus('disconnected');
         wsRef.current = null;
         reconnectTimerRef.current = setTimeout(connect, reconnectInterval);
       };
 
       ws.onerror = () => {
-        setWsStatus("error");
+        setWsStatus('error');
         ws.close();
       };
 
       wsRef.current = ws;
     } catch (e: unknown) {
-      console.error("Failed to create WebSocket", e);
-      setWsStatus("error");
+      console.error('Failed to create WebSocket', e);
+      setWsStatus('error');
       reconnectTimerRef.current = setTimeout(connect, reconnectInterval);
     }
   }, [url, onPaymentUpdate, reconnectInterval]);
@@ -89,7 +82,7 @@ export function usePaymentWebSocket({
       wsRef.current.close();
       wsRef.current = null;
     }
-    setWsStatus("disconnected");
+    setWsStatus('disconnected');
   }, []);
 
   useEffect(() => {

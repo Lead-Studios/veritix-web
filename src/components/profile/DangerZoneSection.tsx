@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
-import { toast } from "react-toastify";
-import { Modal } from "@/components/ui/Modal";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/button";
-import { deleteAccount } from "@/lib/profile";
-import { logout } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import z from 'zod';
+import { toast } from 'react-toastify';
+import { Modal } from '@/components/ui/Modal';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/button';
+import { deleteAccount } from '@/lib/profile';
+import { logout } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   /** The signed-in user's email, used for confirmation matching */
@@ -20,7 +20,7 @@ interface Props {
 const makeSchema = (email: string) =>
   z.object({
     email: z.string().refine((v) => v === email, {
-      message: "Email does not match your account email",
+      message: 'Email does not match your account email',
     }),
   });
 
@@ -41,11 +41,11 @@ export default function DangerZoneSection({ userEmail }: Props) {
   const onConfirm = async (data: FormValues) => {
     try {
       await deleteAccount(data.email);
-      toast.success("Account deleted.");
+      toast.success('Account deleted.');
       logout();
-      router.push("/");
+      router.push('/');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete account.");
+      toast.error(err instanceof Error ? err.message : 'Failed to delete account.');
     }
   };
 
@@ -63,7 +63,8 @@ export default function DangerZoneSection({ userEmail }: Props) {
         Danger Zone
       </h2>
       <p className="mb-4 text-sm text-white/60">
-        Permanently delete your account and all associated data. This action cannot be undone.
+        Permanently delete your account and all associated data. This action cannot be
+        undone.
       </p>
       <Button
         type="button"
@@ -101,7 +102,7 @@ export default function DangerZoneSection({ userEmail }: Props) {
               disabled={isSubmitting}
               className="flex-1 border border-red-500 bg-red-600 text-white hover:bg-red-700"
             >
-              {isSubmitting ? "Deleting…" : "Delete Account"}
+              {isSubmitting ? 'Deleting…' : 'Delete Account'}
             </Button>
           </div>
         </form>

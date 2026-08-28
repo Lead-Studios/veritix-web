@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/cn";
-import { Check, Copy, Wallet } from "lucide-react";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { cn } from '@/lib/cn';
+import { Check, Copy, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface WalletAddressDisplayProps {
   address?: string;
@@ -29,15 +29,15 @@ export function WalletAddressDisplay({
     try {
       await navigator.clipboard.writeText(address);
       setCopied(true);
-      toast.success("Wallet address copied!");
+      toast.success('Wallet address copied!');
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Could not copy to clipboard.");
+      toast.error('Could not copy to clipboard.');
     }
   };
 
   return (
-    <div className={cn("space-y-1.5", className)}>
+    <div className={cn('space-y-1.5', className)}>
       <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider">
         Linked Wallet
       </label>
@@ -60,17 +60,13 @@ export function WalletAddressDisplay({
             onClick={handleCopy}
             aria-label="Copy wallet address"
             className={cn(
-              "flex-shrink-0 rounded-md p-1.5 transition-colors",
+              'flex-shrink-0 rounded-md p-1.5 transition-colors',
               copied
-                ? "text-emerald-600 bg-emerald-50"
-                : "text-gray-400 hover:text-[#013237] hover:bg-gray-100"
+                ? 'text-emerald-600 bg-emerald-50'
+                : 'text-gray-400 hover:text-[#013237] hover:bg-gray-100',
             )}
           >
-            {copied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
         </div>
       ) : (

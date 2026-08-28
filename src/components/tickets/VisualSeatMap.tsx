@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import type { Seat } from "./SeatSelector";
+import { useState } from 'react';
+import type { Seat } from './SeatSelector';
 
 interface VisualSeatMapProps {
   seats: Seat[];
@@ -9,9 +9,13 @@ interface VisualSeatMapProps {
   onSelectionChange?: (selectedIds: string[]) => void;
 }
 
-const SECTION_COLORS = ["#4D21FF", "#21D4FF", "#FF6B6B", "#FFD93D", "#6BCB77", "#FF8C42"];
+const SECTION_COLORS = ['#4D21FF', '#21D4FF', '#FF6B6B', '#FFD93D', '#6BCB77', '#FF8C42'];
 
-export function VisualSeatMap({ seats, venueName, onSelectionChange }: VisualSeatMapProps) {
+export function VisualSeatMap({
+  seats,
+  venueName,
+  onSelectionChange,
+}: VisualSeatMapProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const rows = Array.from(
@@ -19,14 +23,14 @@ export function VisualSeatMap({ seats, venueName, onSelectionChange }: VisualSea
       if (!acc.has(seat.row)) acc.set(seat.row, []);
       acc.get(seat.row)!.push(seat);
       return acc;
-    }, new Map<string, typeof seats>())
+    }, new Map<string, typeof seats>()),
   );
 
   const sectionIndex = (row: string) =>
-    row.charCodeAt(0) - "A".charCodeAt(0) % SECTION_COLORS.length;
+    row.charCodeAt(0) - ('A'.charCodeAt(0) % SECTION_COLORS.length);
 
   const toggleSeat = (seat: Seat) => {
-    if (seat.status === "taken") return;
+    if (seat.status === 'taken') return;
 
     const next = new Set(selectedIds);
     if (next.has(seat.id)) {
@@ -61,24 +65,28 @@ export function VisualSeatMap({ seats, venueName, onSelectionChange }: VisualSea
               <div className="flex gap-1 flex-wrap">
                 {rowSeats.map((seat) => {
                   const isSelected = selectedIds.has(seat.id);
-                  const isTaken = seat.status === "taken";
+                  const isTaken = seat.status === 'taken';
 
                   return (
                     <button
                       key={seat.id}
                       onClick={() => toggleSeat(seat)}
                       disabled={isTaken}
-                      aria-label={`Row ${seat.row} Seat ${seat.number}${isTaken ? " (taken)" : ""}`}
+                      aria-label={`Row ${seat.row} Seat ${seat.number}${isTaken ? ' (taken)' : ''}`}
                       aria-pressed={isSelected}
                       className={`w-7 h-7 rounded-t-lg text-[10px] font-medium transition-all duration-150 ${
                         isTaken
-                          ? "bg-gray-800 text-gray-700 cursor-not-allowed"
+                          ? 'bg-gray-800 text-gray-700 cursor-not-allowed'
                           : isSelected
-                            ? "text-white shadow-lg scale-110"
-                            : "text-gray-300 hover:scale-105 hover:opacity-80 cursor-pointer"
+                            ? 'text-white shadow-lg scale-110'
+                            : 'text-gray-300 hover:scale-105 hover:opacity-80 cursor-pointer'
                       }`}
                       style={{
-                        backgroundColor: isSelected ? color : isTaken ? undefined : `${color}30`,
+                        backgroundColor: isSelected
+                          ? color
+                          : isTaken
+                            ? undefined
+                            : `${color}30`,
                         borderColor: isSelected ? color : `${color}40`,
                         borderWidth: 1,
                       }}
@@ -95,11 +103,20 @@ export function VisualSeatMap({ seats, venueName, onSelectionChange }: VisualSea
 
       <div className="flex items-center justify-center gap-6 text-xs text-gray-400">
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm inline-block" style={{ backgroundColor: `${SECTION_COLORS[0]}30`, border: `1px solid ${SECTION_COLORS[0]}40` }} />
+          <span
+            className="w-3 h-3 rounded-sm inline-block"
+            style={{
+              backgroundColor: `${SECTION_COLORS[0]}30`,
+              border: `1px solid ${SECTION_COLORS[0]}40`,
+            }}
+          />
           Available
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm inline-block" style={{ backgroundColor: SECTION_COLORS[0] }} />
+          <span
+            className="w-3 h-3 rounded-sm inline-block"
+            style={{ backgroundColor: SECTION_COLORS[0] }}
+          />
           Selected
         </span>
         <span className="flex items-center gap-1.5">
@@ -110,7 +127,7 @@ export function VisualSeatMap({ seats, venueName, onSelectionChange }: VisualSea
 
       {selectedIds.size > 0 && (
         <p className="text-center text-sm text-white">
-          {selectedIds.size} seat{selectedIds.size > 1 ? "s" : ""} selected
+          {selectedIds.size} seat{selectedIds.size > 1 ? 's' : ''} selected
         </p>
       )}
     </div>

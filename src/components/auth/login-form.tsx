@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { Input } from "../ui/input";
-import { TbUserPlus } from "react-icons/tb";
-import { FcGoogle } from "react-icons/fc";
-import { Button } from "../button";
-import Link from "next/link";
-import { toast } from "react-toastify";
-import { motion } from "framer-motion";
-import { sanitiseErrorMessage } from "@/utils";
-import { loginUser } from "@/lib/auth";
-import { useRouter, useSearchParams } from "next/navigation";
-import { isValidRedirect } from "@/lib/utils";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
+import { Input } from '../ui/input';
+import { TbUserPlus } from 'react-icons/tb';
+import { FcGoogle } from 'react-icons/fc';
+import { Button } from '../button';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
+import { sanitiseErrorMessage } from '@/utils';
+import { loginUser } from '@/lib/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { isValidRedirect } from '@/lib/utils';
 
 const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.email('Please enter a valid email address'),
   password: z
-    .string("Please enter your password")
-    .min(6, "Password must be at least 6 characters"),
+    .string('Please enter your password')
+    .min(6, 'Password must be at least 6 characters'),
   rememberMe: z.boolean().optional(),
 });
 
@@ -46,21 +46,21 @@ export default function LoginForm() {
         password: data.password,
         rememberMe: data.rememberMe,
       });
-      toast.success("Login successful!");
-      const next = searchParams.get("next");
-      router.push(isValidRedirect(next) ? next : "/dashboard");
+      toast.success('Login successful!');
+      const next = searchParams.get('next');
+      router.push(isValidRedirect(next) ? next : '/dashboard');
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Login failed. Please try again.";
-      setError("root", { message });
+        err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError('root', { message });
     }
   };
 
   const handleGoogleLogin = () => {
     try {
-      window.location.href = "/api/auth/google";
+      window.location.href = '/api/auth/google';
     } catch {
-      toast.error("Google sign-in failed. Please try again.");
+      toast.error('Google sign-in failed. Please try again.');
     }
   };
 
@@ -119,14 +119,11 @@ export default function LoginForm() {
             />
           </motion.div>
 
-          <motion.div
-            variants={itemVariants}
-            className="flex items-center gap-2"
-          >
+          <motion.div variants={itemVariants} className="flex items-center gap-2">
             <input
               id="rememberMe"
               type="checkbox"
-              {...register("rememberMe")}
+              {...register('rememberMe')}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <label
@@ -152,17 +149,14 @@ export default function LoginForm() {
                 </p>
               )}
               <Button disabled={isSubmitting} className="w-full py-4">
-                {isSubmitting ? "Signing In..." : "Sign In"}
+                {isSubmitting ? 'Signing In...' : 'Sign In'}
               </Button>
             </motion.div>
           </motion.div>
         </motion.form>
       </div>
 
-      <motion.div
-        className="flex items-center gap-4 my-4"
-        variants={itemVariants}
-      >
+      <motion.div className="flex items-center gap-4 my-4" variants={itemVariants}>
         <div className="flex-1 h-px bg-primary-black" />
         <span className="text-sm lg:text-xl">or continue with</span>
         <div className="flex-1 h-px bg-primary-black" />
@@ -190,13 +184,13 @@ export default function LoginForm() {
       </motion.div>
 
       <motion.p className="text-center lg:text-xl mt-6" variants={itemVariants}>
-        Don&apos;t have an account?{" "}
+        Don&apos;t have an account?{' '}
         <Link href="/sign-up" className="font-bold">
           Sign Up
         </Link>
       </motion.p>
 
-      {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true" && (
+      {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true' && (
         <motion.div variants={itemVariants} className="mt-4">
           <div className="flex items-center gap-4 my-4">
             <div className="flex-1 h-px bg-gray-300" />
@@ -208,7 +202,7 @@ export default function LoginForm() {
             variant="outline"
             className="w-full py-3 flex items-center justify-center gap-2"
             onClick={() => {
-              window.location.href = "/api/auth/google";
+              window.location.href = '/api/auth/google';
             }}
           >
             <FcGoogle size={20} />

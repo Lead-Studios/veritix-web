@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCheckInCounter } from "@/hooks/useCheckInCounter";
-import { cn } from "@/lib/cn";
-import { RefreshCw, Users, Wifi, WifiOff } from "lucide-react";
+import { useCheckInCounter } from '@/hooks/useCheckInCounter';
+import { cn } from '@/lib/cn';
+import { RefreshCw, Users, Wifi, WifiOff } from 'lucide-react';
 
 interface LiveCheckInCounterProps {
   eventId: string;
@@ -12,9 +12,9 @@ interface LiveCheckInCounterProps {
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   });
 }
 
@@ -26,8 +26,7 @@ function AttendanceBar({
   totalCapacity: number;
 }) {
   const pct = Math.min(100, Math.round((checkInCount / totalCapacity) * 100));
-  const colour =
-    pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-emerald-500";
+  const colour = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-emerald-500';
 
   return (
     <div className="mt-4 space-y-1">
@@ -37,7 +36,7 @@ function AttendanceBar({
       </div>
       <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
         <div
-          className={cn("h-full rounded-full transition-all duration-700", colour)}
+          className={cn('h-full rounded-full transition-all duration-700', colour)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -59,8 +58,8 @@ export function LiveCheckInCounter({
   return (
     <div
       className={cn(
-        "relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm",
-        className
+        'relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm',
+        className,
       )}
       role="region"
       aria-label="Live check-in counter"
@@ -99,8 +98,8 @@ export function LiveCheckInCounter({
         {checkInCount !== null ? (
           <span
             className={cn(
-              "text-5xl font-bold tabular-nums text-[#013237] transition-opacity duration-300",
-              loading && "opacity-60"
+              'text-5xl font-bold tabular-nums text-[#013237] transition-opacity duration-300',
+              loading && 'opacity-60',
             )}
           >
             {checkInCount.toLocaleString()}
@@ -110,17 +109,12 @@ export function LiveCheckInCounter({
         )}
 
         {/* Spinning indicator while fetching */}
-        {loading && (
-          <Wifi className="mb-1.5 h-5 w-5 animate-pulse text-emerald-500" />
-        )}
+        {loading && <Wifi className="mb-1.5 h-5 w-5 animate-pulse text-emerald-500" />}
       </div>
 
       {/* Capacity bar */}
       {checkInCount !== null && totalCapacity !== null && totalCapacity > 0 && (
-        <AttendanceBar
-          checkInCount={checkInCount}
-          totalCapacity={totalCapacity}
-        />
+        <AttendanceBar checkInCount={checkInCount} totalCapacity={totalCapacity} />
       )}
 
       {/* Error message */}
@@ -139,8 +133,8 @@ export function LiveCheckInCounter({
           {lastUpdated
             ? `Updated ${formatTime(lastUpdated)}`
             : isLive
-              ? "Fetching…"
-              : "Polling paused"}
+              ? 'Fetching…'
+              : 'Polling paused'}
         </p>
 
         <button
@@ -148,15 +142,13 @@ export function LiveCheckInCounter({
           disabled={loading || !isLive}
           aria-label="Manually refresh check-in count"
           className={cn(
-            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+            'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
             isLive
-              ? "bg-[#013237] text-white hover:bg-[#024a50] active:scale-95"
-              : "cursor-not-allowed bg-gray-100 text-gray-400"
+              ? 'bg-[#013237] text-white hover:bg-[#024a50] active:scale-95'
+              : 'cursor-not-allowed bg-gray-100 text-gray-400',
           )}
         >
-          <RefreshCw
-            className={cn("h-3.5 w-3.5", loading && "animate-spin")}
-          />
+          <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
           Refresh
         </button>
       </div>

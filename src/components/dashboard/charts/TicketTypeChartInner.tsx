@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import type { TicketTypeBreakdown } from "@/hooks/useOrganizerAnalytics";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { TicketTypeBreakdown } from '@/hooks/useOrganizerAnalytics';
 
-const COLORS = ["#4D21FF", "#21D4FF", "#a78bfa", "#34d399", "#f59e0b", "#f87171"];
+const COLORS = ['#4D21FF', '#21D4FF', '#a78bfa', '#34d399', '#f59e0b', '#f87171'];
 
 interface Props {
   data: TicketTypeBreakdown[];
@@ -15,14 +15,20 @@ interface TooltipPayload {
   payload: TicketTypeBreakdown & { percentage: number };
 }
 
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayload[] }) {
+function CustomTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: TooltipPayload[];
+}) {
   if (!active || !payload?.length) return null;
   const { name, value, payload: item } = payload[0];
   return (
     <div className="rounded bg-[#1a2040] border border-[#4D21FF] px-3 py-2 text-xs text-[#21D4FF]">
       <p className="font-semibold">{name}</p>
       <p>Count: {value}</p>
-      <p>Revenue: ₦{item.revenue.toLocaleString("en-NG")}</p>
+      <p>Revenue: ₦{item.revenue.toLocaleString('en-NG')}</p>
       <p>Share: {item.percentage}%</p>
     </div>
   );
@@ -55,9 +61,7 @@ export function TicketTypeChartInner({ data }: Props) {
         </Pie>
         <Tooltip content={<CustomTooltip />} />
         <Legend
-          formatter={(value) => (
-            <span className="text-xs text-[#21D4FF]">{value}</span>
-          )}
+          formatter={(value) => <span className="text-xs text-[#21D4FF]">{value}</span>}
         />
       </PieChart>
     </ResponsiveContainer>

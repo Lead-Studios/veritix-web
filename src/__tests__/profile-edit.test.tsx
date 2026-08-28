@@ -3,39 +3,45 @@
  * Covers: field rendering, Zod validation errors, successful save toast,
  * and API error toast.
  */
-import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock("react-toastify", () => ({
+vi.mock('react-toastify', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("framer-motion", () => {
+vi.mock('framer-motion', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
-  const motion: Record<string, React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>> = {};
-  ["div", "form", "h2", "p"].forEach((tag) => {
+  const React = require('react');
+  const motion: Record<
+    string,
+    React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>
+  > = {};
+  ['div', 'form', 'h2', 'p'].forEach((tag) => {
     motion[tag] = ({ children, ...rest }) => React.createElement(tag, rest, children);
   });
-  return { motion, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
+  return {
+    motion,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
 });
 
-vi.mock("next/link", () => ({
+vi.mock('next/link', () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
     <a href={href}>{children}</a>
   ),
 }));
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const mockGetProfile = vi.fn();
 const mockUpdateProfile = vi.fn();
 
-vi.mock("@/lib/profile", () => ({
+vi.mock('@/lib/profile', () => ({
   getProfile: (...args: unknown[]) => mockGetProfile(...args),
   updateProfile: (...args: unknown[]) => mockUpdateProfile(...args),
   changePassword: vi.fn(),
@@ -48,39 +54,41 @@ vi.mock("@/lib/profile", () => ({
   deleteAccount: vi.fn(),
 }));
 
-import ProfileEditSection from "../components/profile/ProfileEditSection";
-import { toast } from "react-toastify";
+import ProfileEditSection from '../components/profile/ProfileEditSection';
+import { toast } from 'react-toastify';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function submitForm(container: HTMLElement) {
-  const form = container.querySelector("form");
+  const form = container.querySelector('form');
   if (form) fireEvent.submit(form);
 }
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 
-describe("ProfileEditSection", () => {
+describe('ProfileEditSection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetProfile.mockResolvedValue({ name: "Alice", email: "alice@example.com" });
+    mockGetProfile.mockResolvedValue({ name: 'Alice', email: 'alice@example.com' });
   });
 
-  it("renders name and email fields pre-filled from session data", async () => {
+  it('renders name and email fields pre-filled from session data', async () => {
     render(<ProfileEditSection />);
 
     await waitFor(() => {
-      expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe("Alice");
-      expect((screen.getByLabelText(/email/i) as HTMLInputElement).value).toBe("alice@example.com");
+      expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe('Alice');
+      expect((screen.getByLabelText(/email/i) as HTMLInputElement).value).toBe(
+        'alice@example.com',
+      );
     });
   });
 
-  it("shows Zod validation errors when submitted with empty fields", async () => {
-    mockGetProfile.mockResolvedValue({ name: "", email: "" });
+  it('shows Zod validation errors when submitted with empty fields', async () => {
+    mockGetProfile.mockResolvedValue({ name: '', email: '' });
     const { container } = render(<ProfileEditSection />);
 
     await waitFor(() => {
-      expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe("");
+      expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe('');
     });
 
     submitForm(container);
@@ -90,13 +98,13 @@ describe("ProfileEditSection", () => {
     });
   });
 
-  it("shows Zod validation error for invalid email", async () => {
+  it('shows Zod validation error for invalid email', async () => {
     const { container } = render(<ProfileEditSection />);
 
     await waitFor(() => screen.getByLabelText(/email/i));
 
     await userEvent.clear(screen.getByLabelText(/email/i));
-    await userEvent.type(screen.getByLabelText(/email/i), "not-an-email");
+    await userEvent.type(screen.getByLabelText(/email/i), 'not-an-email');
 
     submitForm(container);
 
@@ -105,7 +113,7 @@ describe("ProfileEditSection", () => {
     });
   });
 
-  it("calls updateProfile and shows success toast on valid submit", async () => {
+  it('calls updateProfile and shows success toast on valid submit', async () => {
     mockUpdateProfile.mockResolvedValue(undefined);
     const { container } = render(<ProfileEditSection />);
 
@@ -115,15 +123,15 @@ describe("ProfileEditSection", () => {
 
     await waitFor(() => {
       expect(mockUpdateProfile).toHaveBeenCalledWith({
-        name: "Alice",
-        email: "alice@example.com",
+        name: 'Alice',
+        email: 'alice@example.com',
       });
-      expect(toast.success).toHaveBeenCalledWith("Profile saved!");
+      expect(toast.success).toHaveBeenCalledWith('Profile saved!');
     });
   });
 
-  it("shows error toast when updateProfile API call fails", async () => {
-    mockUpdateProfile.mockRejectedValue(new Error("Server error"));
+  it('shows error toast when updateProfile API call fails', async () => {
+    mockUpdateProfile.mockRejectedValue(new Error('Server error'));
     const { container } = render(<ProfileEditSection />);
 
     await waitFor(() => screen.getByLabelText(/name/i));
@@ -131,7 +139,7 @@ describe("ProfileEditSection", () => {
     submitForm(container);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Server error");
+      expect(toast.error).toHaveBeenCalledWith('Server error');
     });
   });
 });

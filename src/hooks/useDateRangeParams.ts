@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useCallback, useMemo } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 export interface DateRange {
   from: Date | undefined;
@@ -30,8 +30,8 @@ function formatDate(date: Date | undefined): string | undefined {
  * // URL: ?from=2024-01-01&to=2024-01-31
  */
 export function useDateRangeParams(
-  fromKey = "from",
-  toKey = "to"
+  fromKey = 'from',
+  toKey = 'to',
 ): {
   range: DateRange;
   setRange: (range: DateRange) => void;
@@ -46,7 +46,7 @@ export function useDateRangeParams(
       from: parseDate(searchParams.get(fromKey)),
       to: parseDate(searchParams.get(toKey)),
     }),
-    [searchParams, fromKey, toKey]
+    [searchParams, fromKey, toKey],
   );
 
   const setRange = useCallback(
@@ -70,7 +70,7 @@ export function useDateRangeParams(
 
       router.push(`${pathname}?${params.toString()}`);
     },
-    [router, pathname, searchParams, fromKey, toKey]
+    [router, pathname, searchParams, fromKey, toKey],
   );
 
   const clearRange = useCallback(() => {

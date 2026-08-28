@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { FaTwitter, FaWhatsapp, FaLink } from 'react-icons/fa';
 
-export default function SocialShareButtons({ title, url }: { title: string; url: string }) {
+export default function SocialShareButtons({
+  title,
+  url,
+}: {
+  title: string;
+  url: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   const encodedUrl = encodeURIComponent(url);
@@ -20,7 +26,9 @@ export default function SocialShareButtons({ title, url }: { title: string; url:
 
   return (
     <div className="flex items-center gap-3 py-4">
-      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Share:</span>
+      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        Share:
+      </span>
       <a
         href={twitterUrl}
         target="_blank"

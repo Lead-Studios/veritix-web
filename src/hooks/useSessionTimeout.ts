@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from 'react';
 
 interface Options {
   onWarn: () => void;
@@ -17,13 +17,13 @@ interface SessionApiResponse {
 
 function getTokenExpiry(): number | null {
   const token =
-    localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token");
+    localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
   if (!token) return null;
   try {
-    const payload: JwtPayload = JSON.parse(atob(token.split(".")[1]));
-    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+    const payload: JwtPayload = JSON.parse(atob(token.split('.')[1]));
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
   } catch (e: unknown) {
-    console.error("Failed to parse JWT", e);
+    console.error('Failed to parse JWT', e);
     return null;
   }
 }
@@ -38,11 +38,11 @@ export function useSessionTimeout({
 
   const schedule = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch('/api/auth/session');
       if (!res.ok) return;
 
       const { exp }: SessionApiResponse = await res.json();
-      if (typeof exp !== "number") return;
+      if (typeof exp !== 'number') return;
 
       const expiry = exp * 1000;
       const now = Date.now();
@@ -52,7 +52,7 @@ export function useSessionTimeout({
       if (warnAt > 0) warnTimer.current = setTimeout(onWarn, warnAt);
       if (logoutAt > 0) logoutTimer.current = setTimeout(onLogout, logoutAt);
     } catch (e: unknown) {
-      console.error("Failed to fetch session", e);
+      console.error('Failed to fetch session', e);
     }
   }, [onWarn, onLogout, warnBeforeMs]);
 

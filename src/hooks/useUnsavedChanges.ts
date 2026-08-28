@@ -27,10 +27,7 @@ export function useUnsavedChanges(isDirty: boolean) {
   // Intercept Next.js in-app navigation via the router push/replace
   const guardedPush = useCallback(
     (href: string) => {
-      if (
-        isDirty &&
-        !window.confirm('You have unsaved changes. Leave without saving?')
-      ) {
+      if (isDirty && !window.confirm('You have unsaved changes. Leave without saving?')) {
         return;
       }
       router.push(href);

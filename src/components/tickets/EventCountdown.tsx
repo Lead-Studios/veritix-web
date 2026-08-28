@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface TimeLeft {
   days: number;
@@ -21,7 +21,7 @@ function getTimeLeft(eventDate: string): TimeLeft | null {
 }
 
 function pad(n: number) {
-  return String(n).padStart(2, "0");
+  return String(n).padStart(2, '0');
 }
 
 interface EventCountdownProps {
@@ -49,10 +49,10 @@ export function EventCountdown({ eventDate }: EventCountdownProps) {
   }
 
   const units = [
-    { label: "Days", value: timeLeft.days },
-    { label: "Hours", value: timeLeft.hours },
-    { label: "Mins", value: timeLeft.minutes },
-    { label: "Secs", value: timeLeft.seconds },
+    { label: 'Days', value: timeLeft.days },
+    { label: 'Hours', value: timeLeft.hours },
+    { label: 'Mins', value: timeLeft.minutes },
+    { label: 'Secs', value: timeLeft.seconds },
   ];
 
   return (
@@ -64,11 +64,17 @@ export function EventCountdown({ eventDate }: EventCountdownProps) {
       {units.map(({ label, value }, i) => (
         <div key={label} className="flex items-center gap-3">
           <div className="flex flex-col items-center">
-            <span className="text-2xl font-bold text-white tabular-nums">{pad(value)}</span>
-            <span className="text-xs text-gray-500 uppercase tracking-wider">{label}</span>
+            <span className="text-2xl font-bold text-white tabular-nums">
+              {pad(value)}
+            </span>
+            <span className="text-xs text-gray-500 uppercase tracking-wider">
+              {label}
+            </span>
           </div>
           {i < units.length - 1 && (
-            <span className="text-xl text-gray-600 font-bold mb-3" aria-hidden="true">:</span>
+            <span className="text-xl text-gray-600 font-bold mb-3" aria-hidden="true">
+              :
+            </span>
           )}
         </div>
       ))}

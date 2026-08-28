@@ -16,7 +16,7 @@ export default function TabSelector<T extends string>({
   activeTab,
   onTabChange,
   className = '',
-  tabClassName = ''
+  tabClassName = '',
 }: TabSelectorProps<T>) {
   const buttonWidthClass = tabs.length > 2 ? 'md:w-[315px]' : 'md:w-[514px]';
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -40,7 +40,9 @@ export default function TabSelector<T extends string>({
   };
 
   return (
-    <section className={`relative container mx-auto px-4 sm:px-6 lg:px-8 py-4 ${className}`}>
+    <section
+      className={`relative container mx-auto px-4 sm:px-6 lg:px-8 py-4 ${className}`}
+    >
       <div
         role="tablist"
         className="rounded-[20px] bg-primary-dark-blue/50 border border-[#E0E0E033] p-4 flex flex-wrap gap-4 justify-center items-center"
@@ -48,7 +50,9 @@ export default function TabSelector<T extends string>({
         {tabs.map((tab, index) => (
           <motion.button
             key={tab}
-            ref={(el) => { tabRefs.current[index] = el; }}
+            ref={(el) => {
+              tabRefs.current[index] = el;
+            }}
             role="tab"
             aria-selected={activeTab === tab}
             tabIndex={activeTab === tab ? 0 : -1}
@@ -57,15 +61,20 @@ export default function TabSelector<T extends string>({
             className={`
               relative w-full ${buttonWidthClass} px-4 py-3 rounded-[10px] font-semibold text-sm capitalize transition-all duration-300
               focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white
-              ${activeTab === tab
-                ? 'text-white'
-                : 'bg-transparent text-gray-400 hover:text-white'
+              ${
+                activeTab === tab
+                  ? 'text-white'
+                  : 'bg-transparent text-gray-400 hover:text-white'
               }
               ${tabClassName}
             `}
-            style={activeTab === tab ? {
-              background: 'linear-gradient(90deg, #4D21FF 0%, #21D4FF 100%)'
-            } : undefined}
+            style={
+              activeTab === tab
+                ? {
+                    background: 'linear-gradient(90deg, #4D21FF 0%, #21D4FF 100%)',
+                  }
+                : undefined
+            }
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

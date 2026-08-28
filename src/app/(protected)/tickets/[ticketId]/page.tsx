@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
-import { TicketPass, AttendeeTicket } from "@/components/tickets/TicketPass";
-import { TransferHistory } from "@/components/tickets/TransferHistory";
-import { Loader } from "@/components/ui/Loader";
-import { Breadcrumb } from "@/components/ui";
-import { PostEventReviewModal } from "@/features/tickets/components/PostEventReviewModal";
-import { Star } from "lucide-react";
+import { useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { TicketPass, AttendeeTicket } from '@/components/tickets/TicketPass';
+import { TransferHistory } from '@/components/tickets/TransferHistory';
+import { Loader } from '@/components/ui/Loader';
+import { Breadcrumb } from '@/components/ui';
+import { PostEventReviewModal } from '@/features/tickets/components/PostEventReviewModal';
+import { Star } from 'lucide-react';
 
 // Fetch ticket from API; falls back to a demo stub when the endpoint is unavailable.
 async function fetchTicket(ticketId: string): Promise<AttendeeTicketExtended> {
@@ -20,14 +20,14 @@ async function fetchTicket(ticketId: string): Promise<AttendeeTicketExtended> {
   // Demo stub so the UI is always renderable
   return {
     id: ticketId,
-    eventName: "Demo Event",
-    eventDate: "TBD",
-    eventTime: "TBD",
-    venue: "TBD",
-    ticketType: "General Admission",
+    eventName: 'Demo Event',
+    eventDate: 'TBD',
+    eventTime: 'TBD',
+    venue: 'TBD',
+    ticketType: 'General Admission',
     ticketCode: ticketId,
-    walletStatus: "pending",
-    transferState: "none",
+    walletStatus: 'pending',
+    transferState: 'none',
   };
 }
 
@@ -55,16 +55,19 @@ export default function TicketPassPage() {
         const stored = getStoredRating(t.id);
         if (stored) setReviewedRating(stored);
       })
-      .catch(() => setError("Could not load ticket."));
+      .catch(() => setError('Could not load ticket.'));
   }, [ticketId]);
 
   // Determine if the "Leave a Review" button should be shown:
   // event date has passed AND ticket was issued AND not yet reviewed
   const canReview = (() => {
     if (!ticket || reviewedRating) return false;
-    if ((ticket as AttendeeTicket & { status?: string }).status !== undefined &&
-        (ticket as AttendeeTicket & { status?: string }).status !== "ISSUED") return false;
-    if (!ticket.eventDate || ticket.eventDate === "TBD") return false;
+    if (
+      (ticket as AttendeeTicket & { status?: string }).status !== undefined &&
+      (ticket as AttendeeTicket & { status?: string }).status !== 'ISSUED'
+    )
+      return false;
+    if (!ticket.eventDate || ticket.eventDate === 'TBD') return false;
     const eventDate = new Date(ticket.eventDate);
     return !isNaN(eventDate.getTime()) && eventDate < new Date();
   })();
@@ -92,7 +95,7 @@ export default function TicketPassPage() {
 
   const network =
     ticket.stellarNetwork ??
-    (process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet" ? "mainnet" : "testnet");
+    (process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet' ? 'mainnet' : 'testnet');
 
   return (
     <main className="min-h-screen bg-[#101428] flex items-center justify-center px-4 py-12">
@@ -100,16 +103,16 @@ export default function TicketPassPage() {
         <Breadcrumb
           className="mb-6 text-white/70"
           items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Tickets", href: "/tickets" },
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Tickets', href: '/tickets' },
             { label: ticket.eventName },
           ]}
         />
         <TicketPass
           ticket={ticket}
           onTransfer={
-            ticket.transferState === "transferable"
-              ? () => alert("Transfer flow coming soon.")
+            ticket.transferState === 'transferable'
+              ? () => alert('Transfer flow coming soon.')
               : undefined
           }
         />

@@ -3,9 +3,18 @@
 import { useState, useEffect } from 'react';
 
 const STEPS = [
-  { title: 'Create Event', text: 'Set up your first event, configure ticket tiers, and publish.' },
-  { title: 'Manage Events', text: 'View active events, edit details, and monitor sales.' },
-  { title: 'Analytics', text: 'Track revenue trends, attendee demographics, and conversion.' },
+  {
+    title: 'Create Event',
+    text: 'Set up your first event, configure ticket tiers, and publish.',
+  },
+  {
+    title: 'Manage Events',
+    text: 'View active events, edit details, and monitor sales.',
+  },
+  {
+    title: 'Analytics',
+    text: 'Track revenue trends, attendee demographics, and conversion.',
+  },
   { title: 'Verification', text: 'Use QR scan tools for seamless gate check-ins.' },
 ];
 

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import Link from "next/link";
-import { X } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 interface MobileNavDrawerProps {
   isOpen: boolean;
@@ -11,11 +11,11 @@ interface MobileNavDrawerProps {
 }
 
 const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/events/manage", label: "My Events" },
-  { href: "/events/create", label: "Create Event" },
-  { href: "/verify", label: "Verify Tickets" },
-  { href: "/tickets", label: "My Tickets" },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/events/manage', label: 'My Events' },
+  { href: '/events/create', label: 'Create Event' },
+  { href: '/verify', label: 'Verify Tickets' },
+  { href: '/tickets', label: 'My Tickets' },
 ];
 
 export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
@@ -27,15 +27,19 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    if (isOpen) document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
 
   // Prevent body scroll when open
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -74,8 +78,8 @@ export function MobileNavDrawer({ isOpen, onClose }: MobileNavDrawerProps) {
                 onClick={onClose}
                 className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
                   pathname === href
-                    ? "bg-[#4d21ff]/20 text-white"
-                    : "text-white/70 hover:bg-white/5 hover:text-white"
+                    ? 'bg-[#4d21ff]/20 text-white'
+                    : 'text-white/70 hover:bg-white/5 hover:text-white'
                 }`}
               >
                 {label}

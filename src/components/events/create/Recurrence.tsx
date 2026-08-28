@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useMemo } from "react";
-import { EventFormData } from "@/app/(protected)/events/create/page";
-import RadioButton from "../ui/RadioButton";
-import type { CreateEventFormErrors } from "@/lib/createEventValidation";
+import React, { useMemo } from 'react';
+import { EventFormData } from '@/app/(protected)/events/create/page';
+import RadioButton from '../ui/RadioButton';
+import type { CreateEventFormErrors } from '@/lib/createEventValidation';
 import {
   DEFAULT_RECURRENCE,
   PREVIEW_LIMIT,
@@ -15,7 +15,7 @@ import {
   type RecurrenceConfig,
   type RecurrenceEndType,
   type RecurrenceFrequency,
-} from "@/lib/recurrence";
+} from '@/lib/recurrence';
 
 interface RecurrenceProps {
   formData: EventFormData;
@@ -28,11 +28,11 @@ const FREQUENCY_OPTIONS: Array<{
   label: string;
   description: string;
 }> = [
-  { value: "none", label: "None", description: "Single occurrence (default)" },
-  { value: "daily", label: "Daily", description: "Every day" },
-  { value: "weekly", label: "Weekly", description: "Same weekday each week" },
-  { value: "monthly", label: "Monthly", description: "Same day each month" },
-  { value: "custom", label: "Custom", description: "Pick your own pattern" },
+  { value: 'none', label: 'None', description: 'Single occurrence (default)' },
+  { value: 'daily', label: 'Daily', description: 'Every day' },
+  { value: 'weekly', label: 'Weekly', description: 'Same weekday each week' },
+  { value: 'monthly', label: 'Monthly', description: 'Same day each month' },
+  { value: 'custom', label: 'Custom', description: 'Pick your own pattern' },
 ];
 
 const WEEK_DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
@@ -43,14 +43,14 @@ export default function Recurrence({
   errors = {},
 }: RecurrenceProps) {
   const recurrence: RecurrenceConfig = formData.recurrence ?? DEFAULT_RECURRENCE;
-  const isRepeating = recurrence.frequency !== "none";
+  const isRepeating = recurrence.frequency !== 'none';
 
   const update = (patch: Partial<RecurrenceConfig>) => {
     updateFormData({ recurrence: { ...recurrence, ...patch } });
   };
 
   const setFrequency = (frequency: RecurrenceFrequency) => {
-    if (frequency === "none") {
+    if (frequency === 'none') {
       // Reset to defaults when skipping recurrence.
       updateFormData({ recurrence: { ...DEFAULT_RECURRENCE } });
       return;
@@ -70,17 +70,17 @@ export default function Recurrence({
       isRepeating && formData.startDate
         ? generateOccurrences(formData.startDate, recurrence, PREVIEW_LIMIT)
         : [],
-    [formData.startDate, recurrence, isRepeating]
+    [formData.startDate, recurrence, isRepeating],
   );
 
   const showWeekdayPicker =
-    recurrence.frequency === "weekly" ||
-    (recurrence.frequency === "custom" && recurrence.customUnit === "week");
+    recurrence.frequency === 'weekly' ||
+    (recurrence.frequency === 'custom' && recurrence.customUnit === 'week');
 
   const customUnitLabel: Record<CustomUnit, string> = {
-    day: "day(s)",
-    week: "week(s)",
-    month: "month(s)",
+    day: 'day(s)',
+    week: 'week(s)',
+    month: 'month(s)',
   };
 
   return (
@@ -92,10 +92,7 @@ export default function Recurrence({
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
           2
         </div>
-        <h2
-          id="recurrence-heading"
-          className="text-2xl font-bold text-white"
-        >
+        <h2 id="recurrence-heading" className="text-2xl font-bold text-white">
           Recurrence
         </h2>
         <span className="ml-2 text-xs uppercase tracking-wide text-gray-500">
@@ -104,15 +101,13 @@ export default function Recurrence({
       </div>
 
       <p className="text-sm text-gray-400 mb-6">
-        Run this event on a repeating schedule. We&apos;ll create one event per
-        occurrence on the backend. Skip this step to keep it as a single event.
+        Run this event on a repeating schedule. We&apos;ll create one event per occurrence
+        on the backend. Skip this step to keep it as a single event.
       </p>
 
       {/* Frequency picker */}
       <div className="mb-6">
-        <span className="block text-sm font-medium text-gray-300 mb-3">
-          Frequency
-        </span>
+        <span className="block text-sm font-medium text-gray-300 mb-3">Frequency</span>
         <div
           role="radiogroup"
           aria-label="Recurrence frequency"
@@ -124,8 +119,8 @@ export default function Recurrence({
               htmlFor={`recurrence-${opt.value}`}
               className={`flex flex-col gap-1 rounded-lg border px-4 py-3 cursor-pointer transition-colors ${
                 recurrence.frequency === opt.value
-                  ? "border-blue-500 bg-blue-950/30"
-                  : "border-gray-700 bg-gray-800 hover:border-gray-600"
+                  ? 'border-blue-500 bg-blue-950/30'
+                  : 'border-gray-700 bg-gray-800 hover:border-gray-600'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -141,14 +136,12 @@ export default function Recurrence({
                 <span
                   className={`w-4 h-4 rounded-full border-2 ${
                     recurrence.frequency === opt.value
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-500"
+                      ? 'border-blue-500 bg-blue-500'
+                      : 'border-gray-500'
                   }`}
                   aria-hidden="true"
                 />
-                <span className="text-sm font-semibold text-white">
-                  {opt.label}
-                </span>
+                <span className="text-sm font-semibold text-white">{opt.label}</span>
               </div>
               <span className="text-xs text-gray-400">{opt.description}</span>
             </label>
@@ -159,7 +152,7 @@ export default function Recurrence({
       {isRepeating && (
         <div className="space-y-6">
           {/* Custom controls */}
-          {recurrence.frequency === "custom" && (
+          {recurrence.frequency === 'custom' && (
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label
@@ -177,25 +170,18 @@ export default function Recurrence({
                     value={recurrence.interval}
                     onChange={(e) =>
                       update({
-                        interval: Math.max(
-                          1,
-                          parseInt(e.target.value || "1", 10) || 1
-                        ),
+                        interval: Math.max(1, parseInt(e.target.value || '1', 10) || 1),
                       })
                     }
-                    aria-invalid={!!errors["recurrence.interval"]}
+                    aria-invalid={!!errors['recurrence.interval']}
                     className={`w-24 bg-gray-800 border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-                      errors["recurrence.interval"]
-                        ? "border-red-500"
-                        : "border-gray-700"
+                      errors['recurrence.interval'] ? 'border-red-500' : 'border-gray-700'
                     }`}
                   />
                   <select
                     aria-label="Custom recurrence unit"
                     value={recurrence.customUnit}
-                    onChange={(e) =>
-                      update({ customUnit: e.target.value as CustomUnit })
-                    }
+                    onChange={(e) => update({ customUnit: e.target.value as CustomUnit })}
                     className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="day">{customUnitLabel.day}</option>
@@ -203,9 +189,9 @@ export default function Recurrence({
                     <option value="month">{customUnitLabel.month}</option>
                   </select>
                 </div>
-                {errors["recurrence.interval"] && (
+                {errors['recurrence.interval'] && (
                   <p role="alert" className="mt-1 text-xs text-red-400">
-                    {errors["recurrence.interval"]}
+                    {errors['recurrence.interval']}
                   </p>
                 )}
               </div>
@@ -232,8 +218,8 @@ export default function Recurrence({
                       aria-pressed={selected}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                         selected
-                          ? "bg-blue-600 text-white border-blue-500"
-                          : "bg-gray-800 text-gray-300 border-gray-700 hover:border-gray-500"
+                          ? 'bg-blue-600 text-white border-blue-500'
+                          : 'bg-gray-800 text-gray-300 border-gray-700 hover:border-gray-500'
                       }`}
                     >
                       {dayLabel(d)}
@@ -246,18 +232,14 @@ export default function Recurrence({
 
           {/* End condition */}
           <div>
-            <span className="block text-sm font-medium text-gray-300 mb-3">
-              Ends
-            </span>
+            <span className="block text-sm font-medium text-gray-300 mb-3">Ends</span>
             <div className="flex flex-wrap items-center gap-4">
               <RadioButton
                 id="recurrence-end-never"
                 name="recurrence-end"
                 value="never"
-                checked={recurrence.endType === "never"}
-                onChange={() =>
-                  update({ endType: "never" as RecurrenceEndType })
-                }
+                checked={recurrence.endType === 'never'}
+                onChange={() => update({ endType: 'never' as RecurrenceEndType })}
                 label="Never"
               />
               <div className="flex items-center gap-2">
@@ -265,10 +247,8 @@ export default function Recurrence({
                   id="recurrence-end-count"
                   name="recurrence-end"
                   value="count"
-                  checked={recurrence.endType === "count"}
-                  onChange={() =>
-                    update({ endType: "count" as RecurrenceEndType })
-                  }
+                  checked={recurrence.endType === 'count'}
+                  onChange={() => update({ endType: 'count' as RecurrenceEndType })}
                   label="After"
                 />
                 <input
@@ -277,20 +257,15 @@ export default function Recurrence({
                   max={365}
                   aria-label="Number of occurrences"
                   value={recurrence.count}
-                  disabled={recurrence.endType !== "count"}
+                  disabled={recurrence.endType !== 'count'}
                   onChange={(e) =>
                     update({
-                      count: Math.max(
-                        1,
-                        parseInt(e.target.value || "1", 10) || 1
-                      ),
+                      count: Math.max(1, parseInt(e.target.value || '1', 10) || 1),
                     })
                   }
-                  aria-invalid={!!errors["recurrence.count"]}
+                  aria-invalid={!!errors['recurrence.count']}
                   className={`w-20 bg-gray-800 border rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 ${
-                    errors["recurrence.count"]
-                      ? "border-red-500"
-                      : "border-gray-700"
+                    errors['recurrence.count'] ? 'border-red-500' : 'border-gray-700'
                   }`}
                 />
                 <span className="text-sm text-gray-400">occurrences</span>
@@ -300,10 +275,8 @@ export default function Recurrence({
                   id="recurrence-end-date"
                   name="recurrence-end"
                   value="date"
-                  checked={recurrence.endType === "date"}
-                  onChange={() =>
-                    update({ endType: "date" as RecurrenceEndType })
-                  }
+                  checked={recurrence.endType === 'date'}
+                  onChange={() => update({ endType: 'date' as RecurrenceEndType })}
                   label="On date"
                 />
                 <input
@@ -311,25 +284,23 @@ export default function Recurrence({
                   aria-label="End date"
                   min={formData.startDate || undefined}
                   value={recurrence.until}
-                  disabled={recurrence.endType !== "date"}
+                  disabled={recurrence.endType !== 'date'}
                   onChange={(e) => update({ until: e.target.value })}
-                  aria-invalid={!!errors["recurrence.until"]}
+                  aria-invalid={!!errors['recurrence.until']}
                   className={`bg-gray-800 border rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 [color-scheme:dark] ${
-                    errors["recurrence.until"]
-                      ? "border-red-500"
-                      : "border-gray-700"
+                    errors['recurrence.until'] ? 'border-red-500' : 'border-gray-700'
                   }`}
                 />
               </div>
             </div>
-            {errors["recurrence.count"] && (
+            {errors['recurrence.count'] && (
               <p role="alert" className="mt-2 text-xs text-red-400">
-                {errors["recurrence.count"]}
+                {errors['recurrence.count']}
               </p>
             )}
-            {errors["recurrence.until"] && (
+            {errors['recurrence.until'] && (
               <p role="alert" className="mt-2 text-xs text-red-400">
-                {errors["recurrence.until"]}
+                {errors['recurrence.until']}
               </p>
             )}
           </div>
@@ -340,9 +311,7 @@ export default function Recurrence({
             className="rounded-lg border border-gray-700 bg-gray-800/60 p-4"
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-white">
-                Upcoming occurrences
-              </p>
+              <p className="text-sm font-semibold text-white">Upcoming occurrences</p>
               <span className="text-xs text-gray-400">
                 {describeRecurrence(recurrence)}
               </span>
@@ -375,8 +344,8 @@ export default function Recurrence({
             )}
             {occurrences.length === PREVIEW_LIMIT && (
               <p className="mt-3 text-xs text-gray-500">
-                Showing the next {PREVIEW_LIMIT} occurrences. Additional
-                occurrences will be generated on submission.
+                Showing the next {PREVIEW_LIMIT} occurrences. Additional occurrences will
+                be generated on submission.
               </p>
             )}
           </div>

@@ -1,13 +1,8 @@
-import {
-  Control,
-  useController,
-  FieldValues,
-  FieldPath,
-} from "react-hook-form";
-import { cn } from "@/lib/cn";
-import usePasswordToggle from "@/hooks/usePasswordToggle";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import Link from "next/link";
+import { Control, useController, FieldValues, FieldPath } from 'react-hook-form';
+import { cn } from '@/lib/cn';
+import usePasswordToggle from '@/hooks/usePasswordToggle';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa6';
+import Link from 'next/link';
 
 type FormInputProps<TFieldValues extends FieldValues = FieldValues> = {
   name: FieldPath<TFieldValues>;
@@ -20,7 +15,7 @@ type FormInputProps<TFieldValues extends FieldValues = FieldValues> = {
   showForgotPassword?: boolean;
 } & Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  "name" | "type" | "disabled" | "placeholder"
+  'name' | 'type' | 'disabled' | 'placeholder'
 >;
 
 export const Input = <TFieldValues extends FieldValues = FieldValues>({
@@ -28,7 +23,7 @@ export const Input = <TFieldValues extends FieldValues = FieldValues>({
   control,
   label,
   placeholder,
-  type = "text",
+  type = 'text',
   disabled = false,
   icon,
   showForgotPassword,
@@ -43,7 +38,7 @@ export const Input = <TFieldValues extends FieldValues = FieldValues>({
     control,
   });
 
-  const isPassword = type === "password";
+  const isPassword = type === 'password';
 
   return (
     <div className="w-full space-y-3">
@@ -58,12 +53,10 @@ export const Input = <TFieldValues extends FieldValues = FieldValues>({
       <div>
         <div
           className={cn(
-            "flex items-center gap-2 rounded-md border bg-[#EEF2FF] px-3 py-2 transition",
-            "focus-within:ring-1 focus-within:ring-primary-black mt-4 mb-2",
-            error
-              ? "border-red-500 focus-within:ring-red-500"
-              : "border-[#CCCCCCCC]",
-            disabled && "opacity-50 cursor-not-allowed",
+            'flex items-center gap-2 rounded-md border bg-[#EEF2FF] px-3 py-2 transition',
+            'focus-within:ring-1 focus-within:ring-primary-black mt-4 mb-2',
+            error ? 'border-red-500 focus-within:ring-red-500' : 'border-[#CCCCCCCC]',
+            disabled && 'opacity-50 cursor-not-allowed',
           )}
         >
           {icon && (
@@ -75,13 +68,13 @@ export const Input = <TFieldValues extends FieldValues = FieldValues>({
             {...field}
             {...restProps}
             id={name}
-            type={isPassword && showPassword ? "text" : type}
+            type={isPassword && showPassword ? 'text' : type}
             placeholder={placeholder}
             disabled={disabled}
             aria-invalid={!!error}
             className={cn(
-              "w-full bg-transparent text-sm text-gray-900 placeholder-gray-500 outline-none",
-              disabled && "cursor-not-allowed",
+              'w-full bg-transparent text-sm text-gray-900 placeholder-gray-500 outline-none',
+              disabled && 'cursor-not-allowed',
             )}
           />
           {isPassword && (
@@ -89,14 +82,10 @@ export const Input = <TFieldValues extends FieldValues = FieldValues>({
               type="button"
               onClick={handleClickShowPassword}
               disabled={disabled}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
               className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? (
-                <FaRegEyeSlash size={18} />
-              ) : (
-                <FaRegEye size={18} />
-              )}
+              {showPassword ? <FaRegEyeSlash size={18} /> : <FaRegEye size={18} />}
             </button>
           )}
         </div>

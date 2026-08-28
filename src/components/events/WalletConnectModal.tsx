@@ -32,13 +32,13 @@ interface XBullApi {
 function getFreighter(): FreighterApi | null {
   if (typeof window === 'undefined') return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).freighter as FreighterApi | null ?? null;
+  return ((window as any).freighter as FreighterApi | null) ?? null;
 }
 
 function getXBull(): XBullApi | null {
   if (typeof window === 'undefined') return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).xBullSDK as XBullApi | null ?? null;
+  return ((window as any).xBullSDK as XBullApi | null) ?? null;
 }
 
 const WALLETS = [
@@ -89,12 +89,21 @@ export default function WalletConnectModal({
 
       if (walletId === 'freighter') {
         const freighter = getFreighter();
-        if (!freighter) { setStatus('not_installed'); return; }
+        if (!freighter) {
+          setStatus('not_installed');
+          return;
+        }
         await freighter.requestAccess();
-        [address, network] = await Promise.all([freighter.getPublicKey(), freighter.getNetwork()]);
+        [address, network] = await Promise.all([
+          freighter.getPublicKey(),
+          freighter.getNetwork(),
+        ]);
       } else {
         const xbull = getXBull();
-        if (!xbull) { setStatus('not_installed'); return; }
+        if (!xbull) {
+          setStatus('not_installed');
+          return;
+        }
         const result = await xbull.connect();
         address = result.publicKey;
         network = await xbull.getNetwork();
@@ -133,7 +142,13 @@ export default function WalletConnectModal({
 
         <AnimatePresence mode="wait">
           {status === 'idle' && (
-            <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+            <motion.div
+              key="idle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-3"
+            >
               <p className="text-gray-400 text-sm">Choose a Stellar wallet to connect:</p>
               {WALLETS.map((w) => (
                 <button
@@ -152,35 +167,71 @@ export default function WalletConnectModal({
           )}
 
           {status === 'pending' && (
-            <motion.div key="pending" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-3 text-gray-300 text-sm">
+            <motion.div
+              key="pending"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-3 text-gray-300 text-sm"
+            >
               <div className="w-5 h-5 border-2 border-[#4D21FF] border-t-transparent rounded-full animate-spin flex-shrink-0" />
               Waiting for {activeWalletInfo?.name ?? 'wallet'} approval…
             </motion.div>
           )}
 
           {status === 'success' && wallet && (
-            <motion.div key="success" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              <p className="text-green-400 text-sm font-semibold">✓ {wallet.walletType} connected</p>
+            <motion.div
+              key="success"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              <p className="text-green-400 text-sm font-semibold">
+                ✓ {wallet.walletType} connected
+              </p>
               <p className="text-gray-400 text-xs break-all">
-                <span className="text-gray-300 font-medium">Address: </span>{wallet.address}
+                <span className="text-gray-300 font-medium">Address: </span>
+                {wallet.address}
               </p>
               <p className="text-gray-400 text-xs">
-                <span className="text-gray-300 font-medium">Network: </span>{wallet.network}
+                <span className="text-gray-300 font-medium">Network: </span>
+                {wallet.network}
               </p>
             </motion.div>
           )}
 
           {status === 'error' && (
-            <motion.p key="error" role="alert" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-red-400 text-sm">
+            <motion.p
+              key="error"
+              role="alert"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-red-400 text-sm"
+            >
               {errorMsg || 'Connection failed. Please try again.'}
             </motion.p>
           )}
 
           {status === 'not_installed' && (
-            <motion.div key="not_installed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              <p className="text-yellow-400 text-sm">{activeWalletInfo?.name} wallet not detected.</p>
+            <motion.div
+              key="not_installed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              <p className="text-yellow-400 text-sm">
+                {activeWalletInfo?.name} wallet not detected.
+              </p>
               {activeWalletInfo && (
-                <a href={activeWalletInfo.installUrl} target="_blank" rel="noopener noreferrer" className="text-[#6B8CFF] text-sm underline">
+                <a
+                  href={activeWalletInfo.installUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#6B8CFF] text-sm underline"
+                >
                   Install {activeWalletInfo.name} →
                 </a>
               )}

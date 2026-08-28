@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
-import { logout } from "@/lib/auth";
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { logout } from '@/lib/auth';
 
 const WARN_BEFORE_MS = 5 * 60 * 1000; // 5 minutes
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export default function SessionExpiredBanner() {
   const router = useRouter();
@@ -16,21 +16,21 @@ export default function SessionExpiredBanner() {
 
   const handleLogout = useCallback(() => {
     logout();
-    router.replace("/login");
+    router.replace('/login');
   }, [router]);
 
   const handleExtend = useCallback(async () => {
     setExtending(true);
     try {
       const res = await fetch(`${API_BASE}/api/auth/refresh`, {
-        method: "POST",
-        credentials: "include",
+        method: 'POST',
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Refresh failed");
+      if (!res.ok) throw new Error('Refresh failed');
       setShowWarning(false);
-      toast.success("Session extended successfully.");
+      toast.success('Session extended successfully.');
     } catch {
-      toast.error("Could not extend session. Please sign in again.");
+      toast.error('Could not extend session. Please sign in again.');
       handleLogout();
     } finally {
       setExtending(false);
@@ -46,7 +46,7 @@ export default function SessionExpiredBanner() {
       const remaining = expiry - Date.now();
       if (remaining <= 0) {
         logout();
-        router.replace("/login?expired=1");
+        router.replace('/login?expired=1');
       } else if (remaining <= WARN_BEFORE_MS) {
         setShowWarning(true);
       } else {
@@ -60,7 +60,7 @@ export default function SessionExpiredBanner() {
   }, [router]);
 
   // Static expired message (redirected from useSession)
-  if (params.get("expired") === "1") {
+  if (params.get('expired') === '1') {
     return (
       <div
         role="alert"
@@ -85,7 +85,7 @@ export default function SessionExpiredBanner() {
           disabled={extending}
           className="rounded bg-orange-500 px-3 py-1 text-white text-xs font-medium hover:bg-orange-600 disabled:opacity-50"
         >
-          {extending ? "Extending…" : "Extend Session"}
+          {extending ? 'Extending…' : 'Extend Session'}
         </button>
         <button
           onClick={handleLogout}

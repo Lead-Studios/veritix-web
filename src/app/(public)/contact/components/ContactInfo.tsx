@@ -1,5 +1,5 @@
-import { Phone, Mail, MapPin, Linkedin, Twitter, Github } from "lucide-react";
-import { contactDetails, socialLinks } from "@/lib/contactConfig";
+import { Phone, Mail, MapPin, Linkedin, Twitter, Github } from 'lucide-react';
+import { contactDetails, socialLinks } from '@/lib/contactConfig';
 
 export default function ContactInfo() {
   return (
@@ -7,22 +7,14 @@ export default function ContactInfo() {
       <h1 className="text-4xl font-bold mb-6">Get in Touch</h1>
 
       <p className="text-white/70 max-w-md mb-10">
-        Have questions about Veritix or need assistance with our
-        blockchain-powered ticketing platform? Our team is here to help you
-        revolutionize your event experience.
+        Have questions about Veritix or need assistance with our blockchain-powered
+        ticketing platform? Our team is here to help you revolutionize your event
+        experience.
       </p>
 
       <div className="space-y-6">
-        <InfoItem
-          icon={<Phone size={18} />}
-          title="Phone"
-          value={contactDetails.phone}
-        />
-        <InfoItem
-          icon={<Mail size={18} />}
-          title="Email"
-          value={contactDetails.email}
-        />
+        <InfoItem icon={<Phone size={18} />} title="Phone" value={contactDetails.phone} />
+        <InfoItem icon={<Mail size={18} />} title="Email" value={contactDetails.email} />
         <InfoItem
           icon={<MapPin size={18} />}
           title="Location"

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
 export default function CreateMyEventRedirect() {
-  redirect("/events/create");
+  redirect('/events/create');
 }

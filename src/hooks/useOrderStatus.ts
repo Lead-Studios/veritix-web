@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type OrderStatus = "PENDING" | "PAID" | "EXPIRED" | "FAILED" | "CANCELLED";
+export type OrderStatus = 'PENDING' | 'PAID' | 'EXPIRED' | 'FAILED' | 'CANCELLED';
 
 export type OrderStatusResponse = {
   id?: string;
@@ -28,7 +28,7 @@ type UseOrderStatusResult = {
 
 export function useOrderStatus(
   orderId: string | null | undefined,
-  { enabled = true, intervalMs = 5000 }: UseOrderStatusOptions = {}
+  { enabled = true, intervalMs = 5000 }: UseOrderStatusOptions = {},
 ): UseOrderStatusResult {
   const [data, setData] = useState<OrderStatusResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -57,11 +57,12 @@ export function useOrderStatus(
       setData(nextData);
       return nextData;
     } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
+      if (err instanceof DOMException && err.name === 'AbortError') {
         return null;
       }
 
-      const message = err instanceof Error ? err.message : "Could not refresh order status.";
+      const message =
+        err instanceof Error ? err.message : 'Could not refresh order status.';
       setError(message);
       return null;
     } finally {

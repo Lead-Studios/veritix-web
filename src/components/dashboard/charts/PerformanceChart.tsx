@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { X, ArrowLeft, TrendingUp } from "lucide-react";
+import { useState, useEffect, useCallback } from 'react';
+import { X, ArrowLeft, TrendingUp } from 'lucide-react';
 
 export interface EventBreakdown {
   eventId: string;
@@ -26,10 +26,10 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
   // Close on Escape
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
   }, [onClose]);
 
   const events = day.events ?? [];
@@ -95,10 +95,7 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
               {events.map((ev) => {
                 const pct = day.value > 0 ? (ev.sales / day.value) * 100 : 0;
                 return (
-                  <li
-                    key={ev.eventId}
-                    className="rounded-lg bg-white/5 p-3"
-                  >
+                  <li key={ev.eventId} className="rounded-lg bg-white/5 p-3">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <span className="text-sm font-medium text-white leading-snug">
                         {ev.eventName}
@@ -152,9 +149,9 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
 
   function handleBarKeyDown(
     e: React.KeyboardEvent<HTMLButtonElement>,
-    item: PerformanceDataPoint
+    item: PerformanceDataPoint,
   ) {
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       setSelectedDay(item);
     }
@@ -180,7 +177,7 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
               aria-label={`${item.month}: ${item.value.toLocaleString()} sales. Press to view breakdown.`}
               title={`Click to drill down into ${item.month}`}
               className="group relative flex w-full flex-col items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF] rounded-t-md"
-              style={{ height: "100%" }}
+              style={{ height: '100%' }}
             >
               <span className="sr-only">
                 {item.value.toLocaleString()} sales on {item.month}
@@ -204,9 +201,7 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
         ))}
       </div>
 
-      {selectedDay && (
-        <DrillDownPanel day={selectedDay} onClose={handleClose} />
-      )}
+      {selectedDay && <DrillDownPanel day={selectedDay} onClose={handleClose} />}
     </>
   );
 };

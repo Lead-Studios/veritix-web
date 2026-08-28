@@ -1,13 +1,9 @@
-import * as React from "react";
-import { cn } from "../lib/cn";
+import * as React from 'react';
+import { cn } from '../lib/cn';
 
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "danger";
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
 
-type ButtonSize = "sm" | "md" | "lg";
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -19,29 +15,23 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gradient-to-r from-[#000625] via-[#0A1854] to-[#1E3A8A] shadow-[0px_4px_12px_0px_rgba(0,6,37,0.3)] text-white",
-  secondary:
-    "",
-  outline:
-    "border border-primary-black hover:bg-primary-black/10",
-  danger:
-    "bg-red-600 text-white hover:bg-red-700",
+    'bg-gradient-to-r from-[#000625] via-[#0A1854] to-[#1E3A8A] shadow-[0px_4px_12px_0px_rgba(0,6,37,0.3)] text-white',
+  secondary: '',
+  outline: 'border border-primary-black hover:bg-primary-black/10',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: 'h-8 px-3 text-sm',
+  md: 'h-10 px-4 text-sm',
+  lg: 'h-12 px-6 text-base',
 };
 
-export const Button = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      variant = "primary",
-      size = "md",
+      variant = 'primary',
+      size = 'md',
       isLoading = false,
       leftIcon,
       rightIcon,
@@ -50,7 +40,7 @@ export const Button = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const isDisabled = disabled || isLoading;
 
@@ -59,11 +49,11 @@ export const Button = React.forwardRef<
         ref={ref}
         disabled={isDisabled}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-md font-medium transition",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
+          'inline-flex items-center justify-center gap-2 rounded-md font-medium transition',
+          'disabled:opacity-50 disabled:cursor-not-allowed',
           variantStyles[variant],
           sizeStyles[size],
-          className
+          className,
         )}
         {...props}
       >
@@ -76,7 +66,7 @@ export const Button = React.forwardRef<
         {!isLoading && rightIcon}
       </button>
     );
-  }
+  },
 );
 
-Button.displayName = "Button";
+Button.displayName = 'Button';

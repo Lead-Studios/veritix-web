@@ -10,21 +10,21 @@
  */
 export const API_ROUTES = {
   auth: {
-    login: "/auth/login",
-    register: "/auth/register",
-    logout: "/auth/logout",
-    refresh: "/auth/refresh",
-    me: "/auth/me",
-    forgotPassword: "/auth/forgot-password",
-    resetPassword: "/auth/reset-password",
-    changePassword: "/auth/change-password",
-    resendVerification: "/auth/resend-verification",
+    login: '/auth/login',
+    register: '/auth/register',
+    logout: '/auth/logout',
+    refresh: '/auth/refresh',
+    me: '/auth/me',
+    forgotPassword: '/auth/forgot-password',
+    resetPassword: '/auth/reset-password',
+    changePassword: '/auth/change-password',
+    resendVerification: '/auth/resend-verification',
   },
 
   events: {
-    list: "/events",
+    list: '/events',
     detail: (id: string) => `/events/${id}`,
-    create: "/events",
+    create: '/events',
     update: (id: string) => `/events/${id}`,
     delete: (id: string) => `/events/${id}`,
     checkIn: (eventId: string) => `/events/${eventId}/check-in`,
@@ -36,7 +36,7 @@ export const API_ROUTES = {
     demographics: (eventId: string) => `/events/${eventId}/demographics`,
     actions: (eventId: string) => `/events/${eventId}/actions`,
     tickets: (eventId: string) => `/events/${eventId}/tickets`,
-    drafts: "/events/drafts",
+    drafts: '/events/drafts',
     draftDetail: (draftId: string) => `/events/drafts/${draftId}`,
     duplicate: (eventId: string) => `/events/${eventId}/duplicate`,
     waitlist: (eventId: string) => `/events/${eventId}/waitlist`,
@@ -45,40 +45,38 @@ export const API_ROUTES = {
   },
 
   tickets: {
-    list: "/tickets",
+    list: '/tickets',
     detail: (id: string) => `/tickets/${id}`,
-    purchase: "/tickets/purchase",
-    verify: "/tickets/verify",
-    checkIn: "/tickets/check-in",
-    status: (ticketCode: string) =>
-      `/tickets/${encodeURIComponent(ticketCode)}/status`,
+    purchase: '/tickets/purchase',
+    verify: '/tickets/verify',
+    checkIn: '/tickets/check-in',
+    status: (ticketCode: string) => `/tickets/${encodeURIComponent(ticketCode)}/status`,
     transfer: (ticketId: string) => `/tickets/${ticketId}/transfer`,
     transfers: (ticketId: string) => `/tickets/${ticketId}/transfers`,
     gift: (ticketId: string) => `/tickets/${ticketId}/gift`,
     resale: (ticketId: string) => `/tickets/${ticketId}/resale`,
     cancel: (ticketId: string) => `/tickets/${ticketId}/cancel`,
-    userTickets: "/tickets/user",
+    userTickets: '/tickets/user',
     applePass: (ticketId: string) =>
       `/tickets/${encodeURIComponent(ticketId)}/pass/apple`,
     googlePass: (ticketId: string) =>
       `/tickets/${encodeURIComponent(ticketId)}/pass/google`,
-    groupPurchase: (ticketTypeId: string) =>
-      `/tickets/${ticketTypeId}/group-purchase`,
+    groupPurchase: (ticketTypeId: string) => `/tickets/${ticketTypeId}/group-purchase`,
   },
 
   wallet: {
-    balance: "/wallet/balance",
-    transactions: "/wallet/transactions",
-    payoutRequest: "/wallet/payout-request",
-    payoutHistory: "/wallet/payout-history",
+    balance: '/wallet/balance',
+    transactions: '/wallet/transactions',
+    payoutRequest: '/wallet/payout-request',
+    payoutHistory: '/wallet/payout-history',
   },
 
   organizer: {
-    dashboard: "/organizer/dashboard",
-    events: "/organizer/events",
-    payouts: "/organizer/payouts",
-    profile: "/organizer/profile",
-    analytics: "/organizer/analytics",
+    dashboard: '/organizer/dashboard',
+    events: '/organizer/events',
+    payouts: '/organizer/payouts',
+    profile: '/organizer/profile',
+    analytics: '/organizer/analytics',
   },
 
   admin: {
@@ -87,9 +85,9 @@ export const API_ROUTES = {
   },
 
   profile: {
-    base: "/profile",
-    notificationPreferences: "/profile/notification-preferences",
-    account: "/profile/account",
+    base: '/profile',
+    notificationPreferences: '/profile/notification-preferences',
+    account: '/profile/account',
   },
 
   orders: {
@@ -98,26 +96,24 @@ export const API_ROUTES = {
   },
 
   notifications: {
-    list: "/notifications",
+    list: '/notifications',
     markRead: (id: string) => `/notifications/${id}/read`,
-    markAllRead: "/notifications/read-all",
+    markAllRead: '/notifications/read-all',
   },
 
   upload: {
-    image: "/upload/image",
+    image: '/upload/image',
     eventImage: (eventId: string) => `/events/${eventId}/image`,
     eventImages: (eventId: string) => `/events/${eventId}/images`,
   },
 
-  contact: "/contact",
-  testimonials: "/testimonials",
+  contact: '/contact',
+  testimonials: '/testimonials',
   verify: (ticketId: string) => `/verify/${encodeURIComponent(ticketId.trim())}`,
 } as const;
 
 /** Helper to build a full URL from a route path. */
 export function buildUrl(path: string): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
-    "http://localhost:4000/api";
-  return `${base.replace(/\/$/, "")}${path}`;
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/api';
+  return `${base.replace(/\/$/, '')}${path}`;
 }

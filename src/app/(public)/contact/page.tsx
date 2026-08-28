@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import ContactInfo from "./components/ContactInfo";
-import ContactForm from "./components/ContactForm";
-import PublicShell from "@/components/shared/PublicShell";
+import { motion } from 'framer-motion';
+import ContactInfo from './components/ContactInfo';
+import ContactForm from './components/ContactForm';
+import PublicShell from '@/components/shared/PublicShell';
 
 export default function ContactPage() {
   return (
@@ -15,7 +15,10 @@ export default function ContactPage() {
         >
           Skip to main content
         </a>
-        <div id="contact-main" className="mx-auto max-w-7xl px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+        <div
+          id="contact-main"
+          className="mx-auto max-w-7xl px-6 py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16"
+        >
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

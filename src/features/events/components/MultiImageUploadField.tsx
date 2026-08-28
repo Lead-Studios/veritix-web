@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useId } from "react";
-import { useDropzone, FileRejection } from "react-dropzone";
-import { X, GripVertical, ImagePlus } from "lucide-react";
+import React, { useState, useCallback, useId } from 'react';
+import { useDropzone, FileRejection } from 'react-dropzone';
+import { X, GripVertical, ImagePlus } from 'lucide-react';
 
 const MAX_IMAGES = 6;
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -32,10 +32,7 @@ function nextKey() {
   return `img-${++_keyCounter}`;
 }
 
-export function MultiImageUploadField({
-  onChange,
-  eventId,
-}: MultiImageUploadFieldProps) {
+export function MultiImageUploadField({ onChange, eventId }: MultiImageUploadFieldProps) {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
@@ -70,11 +67,11 @@ export function MultiImageUploadField({
       }
 
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append('image', file);
 
       try {
         const res = await fetch(`/api/events/${eventId}/images`, {
-          method: "POST",
+          method: 'POST',
           body: formData,
         });
 
@@ -95,8 +92,7 @@ export function MultiImageUploadField({
               ? {
                   ...img,
                   uploading: false,
-                  error:
-                    err instanceof Error ? err.message : "Upload failed",
+                  error: err instanceof Error ? err.message : 'Upload failed',
                 }
               : img,
           ),
@@ -115,7 +111,7 @@ export function MultiImageUploadField({
 
       const newEntries: UploadedImage[] = toAdd.map((file) => ({
         key: nextKey(),
-        url: "",
+        url: '',
         file,
         preview: URL.createObjectURL(file),
         uploading: true,
@@ -137,9 +133,9 @@ export function MultiImageUploadField({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/png": [".png"],
-      "image/jpeg": [".jpg", ".jpeg"],
-      "image/webp": [".webp"],
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/webp': ['.webp'],
     },
     maxSize: MAX_SIZE_BYTES,
     multiple: true,
@@ -205,11 +201,9 @@ export function MultiImageUploadField({
               onDrop={() => handleDrop(index)}
               onDragEnd={handleDragEnd}
               className={`relative rounded-xl overflow-hidden border-2 transition-all cursor-grab active:cursor-grabbing ${
-                dragOverIndex === index
-                  ? "border-[#4D21FF] scale-105"
-                  : "border-white/10"
-              } ${dragSourceIndex === index ? "opacity-50" : "opacity-100"}`}
-              aria-label={`Image ${index + 1}${index === 0 ? " (cover)" : ""}`}
+                dragOverIndex === index ? 'border-[#4D21FF] scale-105' : 'border-white/10'
+              } ${dragSourceIndex === index ? 'opacity-50' : 'opacity-100'}`}
+              aria-label={`Image ${index + 1}${index === 0 ? ' (cover)' : ''}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -273,8 +267,8 @@ export function MultiImageUploadField({
           id={dropzoneId}
           className={`w-full p-6 border-2 border-dashed rounded-xl text-center cursor-pointer transition-colors ${
             isDragActive
-              ? "border-[#4D21FF] bg-[#4D21FF]/10"
-              : "border-white/20 hover:border-white/40"
+              ? 'border-[#4D21FF] bg-[#4D21FF]/10'
+              : 'border-white/20 hover:border-white/40'
           }`}
         >
           <input {...getInputProps()} aria-labelledby={dropzoneId} />
@@ -282,7 +276,7 @@ export function MultiImageUploadField({
             <ImagePlus className="w-8 h-8" />
             <p className="text-sm font-medium">
               {isDragActive
-                ? "Drop images here…"
+                ? 'Drop images here…'
                 : `Drag & drop or click to add images (${images.length}/${MAX_IMAGES})`}
             </p>
             <p className="text-xs text-white/40">PNG, JPG, WEBP — max 5 MB each</p>

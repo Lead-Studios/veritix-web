@@ -1,25 +1,43 @@
-import Link from "next/link";
-import { FaDiscord, FaFacebookF, FaXTwitter } from "react-icons/fa6";
-import NewsletterForm from "@/components/NewsletterForm";
-import { StellarNetworkBadge } from "@/components/shared/StellarNetworkBadge";
+import Link from 'next/link';
+import { FaDiscord, FaFacebookF, FaXTwitter } from 'react-icons/fa6';
+import NewsletterForm from '@/components/NewsletterForm';
+import { StellarNetworkBadge } from '@/components/shared/StellarNetworkBadge';
 
 export default function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0a0f24]/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5">
-          <Link href="/" className="text-2xl font-semibold tracking-wide text-white" aria-label="VeriTix home">
+          <Link
+            href="/"
+            className="text-2xl font-semibold tracking-wide text-white"
+            aria-label="VeriTix home"
+          >
             VeriTix
           </Link>
-          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
-            <Link href="/" className="transition hover:text-white">Home</Link>
-            <Link href="/events" className="transition hover:text-white">Explore</Link>
-            <Link href="/#how-it-works" className="transition hover:text-white">How it Works</Link>
-            <Link href="/contact" className="transition hover:text-white">Contact</Link>
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-8 text-sm text-white/80 lg:flex"
+          >
+            <Link href="/" className="transition hover:text-white">
+              Home
+            </Link>
+            <Link href="/events" className="transition hover:text-white">
+              Explore
+            </Link>
+            <Link href="/#how-it-works" className="transition hover:text-white">
+              How it Works
+            </Link>
+            <Link href="/contact" className="transition hover:text-white">
+              Contact
+            </Link>
           </nav>
           <div className="flex items-center gap-3">
             <StellarNetworkBadge />
-            <Link href="/login" className="hidden text-sm text-white/80 transition hover:text-white sm:inline-flex">
+            <Link
+              href="/login"
+              className="hidden text-sm text-white/80 transition hover:text-white sm:inline-flex"
+            >
               Login
             </Link>
             <Link
@@ -45,13 +63,25 @@ export default function PublicShell({ children }: { children: React.ReactNode })
               Your gateway to unforgettable events — live, virtual, or in the metaverse.
             </p>
             <div className="flex items-center gap-3">
-              <a href="#" aria-label="Twitter" className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white">
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white"
+              >
                 <FaXTwitter size={16} />
               </a>
-              <a href="#" aria-label="Discord" className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white">
+              <a
+                href="#"
+                aria-label="Discord"
+                className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white"
+              >
                 <FaDiscord size={16} />
               </a>
-              <a href="#" aria-label="Facebook" className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white">
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="rounded-full bg-white/10 p-2 text-white/80 transition hover:text-white"
+              >
                 <FaFacebookF size={16} />
               </a>
             </div>
@@ -60,30 +90,78 @@ export default function PublicShell({ children }: { children: React.ReactNode })
           <div>
             <h4 className="text-sm font-semibold text-white">Quick Links</h4>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              <li><Link href="/events" className="transition hover:text-white">Attendees</Link></li>
-              <li><Link href="/events/create" className="transition hover:text-white">Organiser</Link></li>
-              <li><Link href="/events" className="transition hover:text-white">Promoters</Link></li>
-              <li><Link href="/#how-it-works" className="transition hover:text-white">How it Works</Link></li>
+              <li>
+                <Link href="/events" className="transition hover:text-white">
+                  Attendees
+                </Link>
+              </li>
+              <li>
+                <Link href="/events/create" className="transition hover:text-white">
+                  Organiser
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className="transition hover:text-white">
+                  Promoters
+                </Link>
+              </li>
+              <li>
+                <Link href="/#how-it-works" className="transition hover:text-white">
+                  How it Works
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-white">Plan Events</h4>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              <li><Link href="/events/create" className="transition hover:text-white">Create and Setup</Link></li>
-              <li><Link href="/events" className="transition hover:text-white">Sell Tickets</Link></li>
-              <li><Link href="/events" className="transition hover:text-white">Online RSVP</Link></li>
-              <li><Link href="/events" className="transition hover:text-white">Online Event</Link></li>
+              <li>
+                <Link href="/events/create" className="transition hover:text-white">
+                  Create and Setup
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className="transition hover:text-white">
+                  Sell Tickets
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className="transition hover:text-white">
+                  Online RSVP
+                </Link>
+              </li>
+              <li>
+                <Link href="/events" className="transition hover:text-white">
+                  Online Event
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-white">Legal</h4>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              <li><Link href="/privacy" className="transition hover:text-white">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="transition hover:text-white">Terms of Service</Link></li>
-              <li><Link href="/cookies" className="transition hover:text-white">Cookie Policy</Link></li>
-              <li><Link href="/events/create" className="transition hover:text-white">Host Events</Link></li>
+              <li>
+                <Link href="/privacy" className="transition hover:text-white">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="transition hover:text-white">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookies" className="transition hover:text-white">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/events/create" className="transition hover:text-white">
+                  Host Events
+                </Link>
+              </li>
             </ul>
           </div>
 

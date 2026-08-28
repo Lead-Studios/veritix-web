@@ -8,7 +8,11 @@ interface CategoryFilterProps {
   onClearAll?: () => void;
 }
 
-export default function CategoryFilter({ activeFilters, onRemoveFilter, onClearAll }: CategoryFilterProps) {
+export default function CategoryFilter({
+  activeFilters,
+  onRemoveFilter,
+  onClearAll,
+}: CategoryFilterProps) {
   if (activeFilters.length === 0) return null;
 
   return (
