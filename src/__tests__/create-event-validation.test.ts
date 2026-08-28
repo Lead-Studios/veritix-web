@@ -13,7 +13,7 @@ import { DEFAULT_RECURRENCE } from "../lib/recurrence";
 const baseTicket = {
   name: "General Admission",
   quantity: 100,
-  price: "0.05",
+  price: 0.05,
   description: "",
   transferable: true,
   resellable: false,
@@ -44,8 +44,8 @@ const validPhysicalData = {
   streamingUrl: "",
   tickets: [baseTicket],
   recurrence: DEFAULT_RECURRENCE,
-  blockchainNetwork: "ethereum" as const,
-  treasuryAddress: "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed",
+  blockchainNetwork: "stellar" as const,
+  treasuryAddress: "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
   creatorRoyalty: 5,
 };
 
@@ -120,6 +120,23 @@ describe("createEventSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("reports an error on eventClosingDate when it is before the event start", () => {
+    const result = parse({
+      ...validPhysicalData,
+      eventClosingDate: "2026-08-31",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["eventClosingDate"],
+          message: "Closing date must be after the event start date",
+        }),
+      );
+    }
+  });
+
   // Physical event location rules
   it("fails when venueName is missing for physical event", () => {
     const result = parse({ ...validPhysicalData, venueName: "" });
@@ -174,30 +191,71 @@ describe("createEventSchema", () => {
   });
 
   // Treasury address validation
-  it("fails with invalid Ethereum treasury address", () => {
+  it("fails with an invalid Stellar treasury address and formats the error", () => {
     const result = parse({ ...validPhysicalData, treasuryAddress: "0xinvalid" });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((i) => i.path.includes("treasuryAddress"))).toBe(true);
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["treasuryAddress"],
+          message:
+            "Invalid stellar address. Example: GASW2... (56-character base32 G-address)",
+        }),
+      );
     }
   });
 
-  it("fails with invalid Solana treasury address", () => {
+  it("passes with a valid Stellar treasury address", () => {
     const result = parse({
       ...validPhysicalData,
-      blockchainNetwork: "solana",
-      treasuryAddress: "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed",
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("passes with valid Solana treasury address", () => {
-    const result = parse({
-      ...validPhysicalData,
-      blockchainNetwork: "solana",
-      treasuryAddress: "So11111111111111111111111111111111111111112",
+      treasuryAddress: "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
     });
     expect(result.success).toBe(true);
+  });
+
+  it("reports an error when a recurring date end has no until date", () => {
+    const result = parse({
+      ...validPhysicalData,
+      recurrence: {
+        ...DEFAULT_RECURRENCE,
+        frequency: "weekly",
+        endType: "date",
+        until: "",
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["recurrence", "until"],
+          message: "End date is required when 'On date' is selected",
+        }),
+      );
+    }
+  });
+
+  it("reports duplicate ticket names on both conflicting indices", () => {
+    const result = parse({
+      ...validPhysicalData,
+      tickets: [
+        baseTicket,
+        { ...baseTicket, name: "  general admission " },
+      ],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const duplicateIssues = result.error.issues.filter(
+        (issue) => issue.message === "Duplicate ticket name. Each ticket type must have a unique name.",
+      );
+      expect(duplicateIssues.map((issue) => issue.path)).toEqual(
+        expect.arrayContaining([
+          ["tickets", 0, "name"],
+          ["tickets", 1, "name"],
+        ]),
+      );
+    }
   });
 
   // Ticket sub-schema
