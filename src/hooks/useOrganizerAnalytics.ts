@@ -91,10 +91,8 @@ export function useOrganizerAnalytics(options: Options = {}) {
 
       return (await res.json()) as OrganizerAnalytics;
     },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60_000,
-    },
+    // revalidateOnFocus/dedupingInterval come from the SWRConfig provider in
+    // src/app/(protected)/layout.tsx — this hook is only used under that layout.
   );
 
   const refresh = useCallback(() => {

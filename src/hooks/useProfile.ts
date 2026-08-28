@@ -1,6 +1,5 @@
 'use client';
 
-import { getToken } from '@/lib/auth';
 import { useCallback, useEffect, useState } from 'react';
 
 export interface UserProfile {

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const response = await fetch('https://api.example.com/events');
     const data = await response.json();
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
         'Cache-Control': 'public, max-age=300, s-maxage=600',
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
   }
 }

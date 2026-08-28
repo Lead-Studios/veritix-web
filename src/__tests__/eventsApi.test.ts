@@ -2,7 +2,7 @@
  * eventsApi unit tests (FE-231 related).
  * Covers fetchEvents, fetchEventById, fetchOrganizerById, fetchEventsByOrganizer.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   fetchEvents,
   fetchEventById,

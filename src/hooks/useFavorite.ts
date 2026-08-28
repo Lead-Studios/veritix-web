@@ -57,7 +57,7 @@ export function useFavorite(eventId: string) {
     setIsPending(true);
     try {
       await syncFavoriteToApi(eventId, next);
-    } catch (e: unknown) {
+    } catch {
       // Rollback on API failure
       setIsLiked(!next);
       const rollback = getStoredFavorites();

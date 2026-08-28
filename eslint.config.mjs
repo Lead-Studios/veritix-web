@@ -30,6 +30,9 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+      // FE-218: catch dead variables/imports/types at lint time instead of
+      // letting them accumulate silently (previously "warn" via eslint-config-next).
+      "@typescript-eslint/no-unused-vars": "error",
     },
   },
   // Override default ignores of eslint-config-next.

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { THEME_COLORS } from '@/lib/themeColors';
 
 interface ScrollColumnProps {
   animationClass: string;
@@ -15,7 +16,7 @@ export const ScrollColumn = ({
     <div
       className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b"
       style={{
-        backgroundImage: 'linear-gradient(to bottom, #101428, transparent, #101428)',
+        backgroundImage: `linear-gradient(to bottom, ${THEME_COLORS.surfaceDark}, transparent, ${THEME_COLORS.surfaceDark})`,
       }}
     />
     <div

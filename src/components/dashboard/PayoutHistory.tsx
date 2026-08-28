@@ -72,7 +72,7 @@ export function PayoutHistory({ organizerId }: PayoutHistoryProps) {
             onClick={() => setPreset(value)}
             className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
               filter.preset === value
-                ? 'bg-[#4D21FF] text-white'
+                ? 'bg-brand-primary text-white'
                 : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
             }`}
           >
@@ -90,7 +90,7 @@ export function PayoutHistory({ organizerId }: PayoutHistoryProps) {
                   filter.to ?? new Date().toISOString().slice(0, 10),
                 )
               }
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-[#4D21FF] focus:outline-none [color-scheme:dark]"
+              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-brand-primary focus:outline-none [color-scheme:dark]"
               aria-label="From date"
             />
             <span className="text-gray-500">–</span>
@@ -98,7 +98,7 @@ export function PayoutHistory({ organizerId }: PayoutHistoryProps) {
               type="date"
               value={filter.to}
               onChange={(e) => setCustomRange(filter.from ?? '', e.target.value)}
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-[#4D21FF] focus:outline-none [color-scheme:dark]"
+              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-brand-primary focus:outline-none [color-scheme:dark]"
               aria-label="To date"
             />
           </>

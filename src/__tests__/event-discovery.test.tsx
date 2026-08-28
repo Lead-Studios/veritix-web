@@ -30,8 +30,6 @@ vi.mock('@/lib/eventsApi', () => ({
     Promise.resolve(mockEvents.find((e) => e.id === id) ?? null),
 }));
 vi.mock('framer-motion', () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react') as typeof import('react');
   const proxy = new Proxy(
     {},
     {

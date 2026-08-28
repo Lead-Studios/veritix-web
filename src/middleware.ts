@@ -30,6 +30,7 @@ export function middleware(request: NextRequest) {
     'Content-Security-Policy',
     cspHeader.replace(/\s{2,}/g, ' ').trim(),
   );
+}
 import { jwtVerify } from 'jose';
 import { canAccessVerificationTools, UserRole } from './lib/verificationAccess';
 

@@ -14,7 +14,7 @@ export interface ActivityEntry {
 }
 
 const TYPE_META: Record<ActivityType, { Icon: LucideIcon; color: string }> = {
-  ticket_sold: { Icon: Ticket, color: 'text-[#21D4FF]' },
+  ticket_sold: { Icon: Ticket, color: 'text-brand-accent' },
   event_published: { Icon: Globe, color: 'text-green-400' },
   verification_scan: { Icon: ShieldCheck, color: 'text-yellow-400' },
 };
@@ -94,10 +94,10 @@ const DEMO_FEED: ActivityEntry[] = [
 function SkeletonRow() {
   return (
     <div className="flex items-center gap-3 animate-pulse">
-      <div className="h-8 w-8 rounded-full bg-[#4D21FF]/20 shrink-0" />
+      <div className="h-8 w-8 rounded-full bg-brand-primary/20 shrink-0" />
       <div className="flex-1 space-y-1">
-        <div className="h-3 w-3/4 rounded bg-[#4D21FF]/20" />
-        <div className="h-2 w-1/4 rounded bg-[#4D21FF]/10" />
+        <div className="h-3 w-3/4 rounded bg-brand-primary/20" />
+        <div className="h-2 w-1/4 rounded bg-brand-primary/10" />
       </div>
     </div>
   );
@@ -115,15 +115,15 @@ export const RecentActivity = () => {
   return (
     <section
       aria-label="Recent activity"
-      className="rounded-xl border border-[#4D21FF]/40 bg-[#000625]/60 p-6"
+      className="rounded-xl border border-brand-primary/40 bg-[#000625]/60 p-6"
     >
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-widest text-[#21D4FF]">
+        <p className="text-xs uppercase tracking-widest text-brand-accent">
           Recent Activity
         </p>
         <Link
           href="/events"
-          className="text-xs text-[#4D21FF] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+          className="text-xs text-brand-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
         >
           View all
         </Link>
@@ -145,7 +145,7 @@ export const RecentActivity = () => {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-sm text-white">{entry.description}</p>
-                    <p className="text-xs text-[#21D4FF]/70">
+                    <p className="text-xs text-brand-accent/70">
                       {relativeTime(entry.timestamp)}
                     </p>
                   </div>

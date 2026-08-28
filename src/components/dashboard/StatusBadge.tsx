@@ -10,9 +10,9 @@ const statusStyles: Record<
   { dot: string; text: string; border: string; bg: string }
 > = {
   active: {
-    dot: 'bg-[#21D4FF]',
-    text: 'text-[#21D4FF]',
-    border: 'border-[#4D21FF]',
+    dot: 'bg-brand-accent',
+    text: 'text-brand-accent',
+    border: 'border-brand-primary',
     bg: 'bg-[#000625]',
   },
   draft: {

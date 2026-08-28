@@ -31,7 +31,7 @@ export function ConversionFunnelChart({
       role="figure"
       aria-label="Conversion funnel chart"
     >
-      <p className="mb-4 text-xs font-semibold uppercase text-[#21D4FF]">
+      <p className="mb-4 text-xs font-semibold uppercase text-brand-accent">
         Conversion Funnel
       </p>
 
@@ -51,7 +51,7 @@ export function ConversionFunnelChart({
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <div className="flex items-center justify-between text-xs text-[#21D4FF] mb-1">
+              <div className="flex items-center justify-between text-xs text-brand-accent mb-1">
                 <span className="font-medium">{stage.label}</span>
                 <span className="tabular-nums">
                   {stage.count.toLocaleString()}
@@ -78,7 +78,7 @@ export function ConversionFunnelChart({
                   className={`absolute inset-y-0 left-0 rounded-lg transition-all duration-300 ${
                     isHighDropOff
                       ? 'bg-gradient-to-r from-red-500/60 to-red-400/40'
-                      : 'bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]'
+                      : 'bg-gradient-to-r from-brand-primary to-brand-accent'
                   }`}
                   style={{ width: `${widthPct}%` }}
                 />
@@ -94,7 +94,7 @@ export function ConversionFunnelChart({
               {isHovered && (
                 <div
                   role="tooltip"
-                  className="absolute right-0 -top-12 z-10 rounded-lg border border-[#4D21FF]/40 bg-[#1a2040] px-3 py-2 text-[11px] text-[#21D4FF] shadow-lg whitespace-nowrap"
+                  className="absolute right-0 -top-12 z-10 rounded-lg border border-brand-primary/40 bg-[#1a2040] px-3 py-2 text-[11px] text-brand-accent shadow-lg whitespace-nowrap"
                 >
                   {stage.count.toLocaleString()} attendees
                   {index > 0 && ` — ${dropOff}% drop from previous stage`}
@@ -109,7 +109,7 @@ export function ConversionFunnelChart({
       {stages.length >= 2 && (
         <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-xs">
           <span className="text-gray-400">Overall conversion</span>
-          <span className="font-semibold text-[#4D21FF]">
+          <span className="font-semibold text-brand-primary">
             {maxCount > 0
               ? `${((stages[stages.length - 1].count / maxCount) * 100).toFixed(1)}%`
               : '0%'}

@@ -6,26 +6,8 @@ interface Options {
   warnBeforeMs?: number;
 }
 
-interface JwtPayload {
-  exp?: number;
-  [key: string]: unknown;
-}
-
 interface SessionApiResponse {
   exp?: number;
-}
-
-function getTokenExpiry(): number | null {
-  const token =
-    localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token');
-  if (!token) return null;
-  try {
-    const payload: JwtPayload = JSON.parse(atob(token.split('.')[1]));
-    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
-  } catch (e: unknown) {
-    console.error('Failed to parse JWT', e);
-    return null;
-  }
 }
 
 export function useSessionTimeout({

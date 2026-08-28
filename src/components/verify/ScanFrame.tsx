@@ -1,5 +1,5 @@
 'use client';
-import { HiArrowLeft, HiCheck, HiX, HiTicket, HiRefresh, HiSearch } from 'react-icons/hi';
+import { HiArrowLeft } from 'react-icons/hi';
 import { HiQrCode } from 'react-icons/hi2';
 
 interface Props {

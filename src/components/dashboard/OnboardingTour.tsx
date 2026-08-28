@@ -48,7 +48,7 @@ export default function OnboardingTour({ forceShow = false }: { forceShow?: bool
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-[#101428] border border-white/20 rounded-xl p-6 max-w-md w-full shadow-2xl text-white space-y-4">
+      <div className="bg-surface-dark border border-white/20 rounded-xl p-6 max-w-md w-full shadow-2xl text-white space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">
             Step {activeStep + 1} of {STEPS.length}

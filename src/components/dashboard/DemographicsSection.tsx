@@ -3,8 +3,16 @@
 import dynamic from 'next/dynamic';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { Demographics } from '@/hooks/useOrganizerAnalytics';
+import { THEME_COLORS } from '@/lib/themeColors';
 
-const PIE_COLORS = ['#4D21FF', '#21D4FF', '#a78bfa', '#34d399', '#f59e0b', '#f87171'];
+const PIE_COLORS = [
+  THEME_COLORS.brandPrimary,
+  THEME_COLORS.brandAccent,
+  '#a78bfa',
+  '#34d399',
+  '#f59e0b',
+  '#f87171',
+];
 
 // Lazy-load the map so it never SSR-crashes
 const GeoHeatmap = dynamic(() => import('./GeoHeatmap'), {
@@ -25,15 +33,15 @@ function DemoGroup({
 }) {
   return (
     <div className="rounded-lg bg-white/5 p-4">
-      <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">{title}</p>
+      <p className="mb-3 text-xs font-semibold uppercase text-brand-accent">{title}</p>
       <div className="space-y-2">
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex items-center justify-between text-xs text-[#21D4FF]"
+            className="flex items-center justify-between text-xs text-brand-accent"
           >
             <span className="truncate">{item.label}</span>
-            <span className="ml-2 shrink-0 font-semibold text-[#4D21FF]">
+            <span className="ml-2 shrink-0 font-semibold text-brand-primary">
               {item.count.toLocaleString()} ({item.percentage}%)
             </span>
           </div>
@@ -62,7 +70,7 @@ function PieChartSection({
       role="img"
       aria-label={`${title} pie chart`}
     >
-      <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">{title}</p>
+      <p className="mb-3 text-xs font-semibold uppercase text-brand-accent">{title}</p>
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
@@ -80,7 +88,7 @@ function PieChartSection({
           </Pie>
           <Tooltip
             contentStyle={{
-              background: '#101428',
+              background: THEME_COLORS.surfaceDark,
               border: '1px solid rgba(77,33,255,0.4)',
               borderRadius: 8,
               color: '#fff',
@@ -97,7 +105,7 @@ function PieChartSection({
           />
           <Legend
             formatter={(value: string) => (
-              <span className="text-xs text-[#21D4FF]">{value}</span>
+              <span className="text-xs text-brand-accent">{value}</span>
             )}
           />
         </PieChart>
@@ -125,82 +133,6 @@ function PieChartSection({
   );
 }
 
-const BAR_COLORS = ['#4D21FF', '#21D4FF', '#7c85ff', '#39c6ff', '#6f7bff', '#21d4aa'];
-
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer as BarResponsiveContainer,
-  Cell as BarCell,
-} from 'recharts';
-
-function ReferralSourceChart({
-  items,
-}: {
-  items: { label: string; count: number; percentage: number }[];
-}) {
-  const data = items.map((item) => ({
-    name: item.label,
-    count: item.count,
-    pct: item.percentage,
-  }));
-
-  return (
-    <div className="rounded-lg bg-white/5 p-4">
-      <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">
-        How did they find you?
-      </p>
-      <BarResponsiveContainer width="100%" height={items.length * 36 + 16}>
-        <BarChart
-          layout="vertical"
-          data={data}
-          margin={{ top: 0, right: 48, left: 8, bottom: 0 }}
-        >
-          <XAxis type="number" hide />
-          <YAxis
-            type="category"
-            dataKey="name"
-            width={90}
-            tick={{ fill: '#21D4FF', fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip
-            cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-            contentStyle={{
-              background: '#101428',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 8,
-            }}
-            formatter={(
-              value: number,
-              _name: string,
-              props: { payload?: { pct?: number } },
-            ) => [`${value.toLocaleString()} (${props.payload?.pct ?? 0}%)`, 'Attendees']}
-            labelStyle={{ color: '#21D4FF', fontSize: 11 }}
-          />
-          <Bar
-            dataKey="count"
-            radius={[0, 4, 4, 0]}
-            label={{
-              position: 'right',
-              fill: '#4D21FF',
-              fontSize: 11,
-              formatter: (v: number) => v.toLocaleString(),
-            }}
-          >
-            {data.map((_entry, index) => (
-              <BarCell key={index} fill={BAR_COLORS[index % BAR_COLORS.length]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </BarResponsiveContainer>
-    </div>
-  );
-}
-
 export function DemographicsSection({ demographics }: Props) {
   const hasData =
     demographics.region.length > 0 ||
@@ -211,7 +143,7 @@ export function DemographicsSection({ demographics }: Props) {
 
   return (
     <section aria-label="Demographic breakdown">
-      <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">
+      <p className="mb-4 text-sm font-semibold uppercase text-brand-accent">
         Audience Demographics
       </p>
 

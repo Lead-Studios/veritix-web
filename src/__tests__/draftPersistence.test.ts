@@ -56,6 +56,7 @@ describe('draftPersistence', () => {
 
     expect(result.formData).toEqual(formData);
     expect(result.savedAt).toBeDefined();
+    expect(apiClient.post).toHaveBeenCalledWith('/api/events/drafts', { formData });
     expect(
       JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) as string).formData,
     ).toEqual(formData);
@@ -74,6 +75,7 @@ describe('draftPersistence', () => {
     const result = await loadDraft('draft-2');
 
     expect(result).toEqual(localDraft);
+    expect(apiClient.get).not.toHaveBeenCalled();
   });
 
   it('purges drafts older than seven days on load', async () => {

@@ -40,9 +40,6 @@ export function WalletNavDropdown({
     if (!open || balance !== null) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingBalance(true);
-    const horizonBase = network.toLowerCase().includes('test')
-      ? 'https://horizon-testnet.stellar.org'
-      : 'https://horizon.stellar.org';
 
     const loadBalance = async () => {
       setLoadingBalance(true);

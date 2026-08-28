@@ -224,7 +224,7 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
 
       {/* Modal */}
       <div
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-[#4D21FF]/50 bg-[#101428] shadow-2xl"
+        className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-brand-primary/50 bg-surface-dark shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -254,7 +254,7 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
           />
           <button
             onClick={closePalette}
-            className="shrink-0 text-gray-500 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] rounded"
+            className="shrink-0 text-gray-500 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary rounded"
             aria-label="Close command palette"
           >
             <X size={15} aria-hidden="true" />
@@ -301,11 +301,13 @@ export function CommandPalette({ eventNames = [] }: CommandPaletteProps) {
                           }}
                           className={`flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                             isActive
-                              ? 'bg-[#4D21FF]/20 text-white'
+                              ? 'bg-brand-primary/20 text-white'
                               : 'text-gray-300 hover:bg-white/5 hover:text-white'
                           }`}
                         >
-                          <span className={isActive ? 'text-[#21D4FF]' : 'text-gray-500'}>
+                          <span
+                            className={isActive ? 'text-brand-accent' : 'text-gray-500'}
+                          >
                             {item.icon}
                           </span>
                           {item.label}

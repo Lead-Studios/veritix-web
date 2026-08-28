@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 export default function WaitlistButton({
-  eventId,
   isSoldOut,
 }: {
   eventId: string;

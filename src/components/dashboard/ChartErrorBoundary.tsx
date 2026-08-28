@@ -62,7 +62,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={this.reset}
-            className="mt-3 rounded-lg bg-[#4D21FF]/20 px-4 py-1.5 text-xs font-medium text-[#21D4FF] transition-colors hover:bg-[#4D21FF]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF]"
+            className="mt-3 rounded-lg bg-brand-primary/20 px-4 py-1.5 text-xs font-medium text-brand-accent transition-colors hover:bg-brand-primary/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary"
           >
             Try again
           </button>

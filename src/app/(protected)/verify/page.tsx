@@ -4,15 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useVerifyStats } from '@/hooks/useVerifyStats';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  HiArrowLeft,
-  HiCheck,
-  HiX,
-  HiTicket,
-  HiRefresh,
-  HiSearch,
-  HiQrcode,
-} from 'react-icons/hi';
+import { HiArrowLeft, HiCheck, HiX, HiTicket, HiRefresh, HiSearch } from 'react-icons/hi';
 import QRScanner from '@/components/verification/QRScanner';
 import {
   getVerificationErrorMessage,
@@ -41,57 +33,6 @@ const STATE_TO_ERROR_TYPE: Partial<Record<VerifyState, VerificationErrorType>> =
   'service-error': 'service-failure',
   'network-error': 'network-error',
 };
-
-// ─── Scan Frame Animation ─────────────────────────────────────────────────────
-function ScanFrame({ skipAnimation }: { skipAnimation?: boolean }) {
-  return (
-    <div className="relative w-56 h-56 mx-auto">
-      {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => {
-        const isTop = corner.startsWith('top');
-        const isLeft = corner.endsWith('left');
-        return (
-          <div
-            key={corner}
-            className={`absolute w-8 h-8 ${isTop ? 'top-0' : 'bottom-0'} ${
-              isLeft ? 'left-0' : 'right-0'
-            }`}
-          >
-            <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${
-                isLeft ? 'left-0' : 'right-0'
-              } w-full h-0.5`}
-            />
-            <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${
-                isLeft ? 'left-0' : 'right-0'
-              } w-0.5 h-full`}
-            />
-          </div>
-        );
-      })}
-
-      {!skipAnimation && (
-        <motion.div
-          className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#21D4FF] to-transparent"
-          animate={{ top: ['10%', '90%', '10%'] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      )}
-
-      <div className="absolute inset-4 opacity-10">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 20px), repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 20px)',
-          }}
-        />
-      </div>
-
-      <HiQrcode className="absolute inset-0 m-auto w-20 h-20 text-white/10" />
-    </div>
-  );
-}
 
 // ─── Result Card ──────────────────────────────────────────────────────────────
 function ResultCard({
@@ -297,7 +238,7 @@ export default function VerifyPage() {
   const [ticketDetails, setTicketDetails] = useState<VerificationResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [recentAttempts, setRecentAttempts] = useState<number[]>([]);
-  const { toggle } = useCommandPalette();
+  useCommandPalette();
 
   useEffect(() => {
     const handleFocusShortcut = (e: KeyboardEvent) => {
