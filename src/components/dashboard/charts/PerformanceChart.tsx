@@ -142,8 +142,6 @@ interface PerformanceChartProps {
 export const PerformanceChart = ({ data }: PerformanceChartProps) => {
   const [selectedDay, setSelectedDay] = useState<PerformanceDataPoint | null>(null);
   const maxValue = Math.max(...data.map((item) => item.value), 1);
-  const summary = `Performance chart showing ${data.length} periods with total sales of ${data.reduce((s, d) => s + d.value, 0).toLocaleString()}`;
-
   const handleClose = useCallback(() => setSelectedDay(null), []);
 
   function handleBarClick(item: PerformanceDataPoint) {
