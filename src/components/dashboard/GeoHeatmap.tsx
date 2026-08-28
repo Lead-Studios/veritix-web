@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Map as MapIcon, Table } from "lucide-react";
+import { THEME_COLORS } from "@/lib/themeColors";
 
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -45,13 +46,13 @@ function RegionTable({ regions }: { regions: RegionEntry[] }) {
       <table className="w-full text-left text-xs" aria-label="Attendee geographic distribution">
         <thead>
           <tr className="border-b border-white/10">
-            <th scope="col" className="px-4 py-2 font-semibold text-[#21D4FF]">
+            <th scope="col" className="px-4 py-2 font-semibold text-brand-accent">
               Region
             </th>
-            <th scope="col" className="px-4 py-2 text-right font-semibold text-[#21D4FF]">
+            <th scope="col" className="px-4 py-2 text-right font-semibold text-brand-accent">
               Attendees
             </th>
-            <th scope="col" className="px-4 py-2 text-right font-semibold text-[#21D4FF]">
+            <th scope="col" className="px-4 py-2 text-right font-semibold text-brand-accent">
               Share
             </th>
           </tr>
@@ -63,7 +64,7 @@ function RegionTable({ regions }: { regions: RegionEntry[] }) {
               className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors"
             >
               <td className="px-4 py-2 text-white">{r.label}</td>
-              <td className="px-4 py-2 text-right text-[#4D21FF] font-medium">
+              <td className="px-4 py-2 text-right text-brand-primary font-medium">
                 {r.count.toLocaleString()}
               </td>
               <td className="px-4 py-2 text-right text-gray-400">{r.percentage}%</td>
@@ -85,7 +86,7 @@ export default function GeoHeatmap({ regions }: Props) {
     <div className="relative rounded-xl bg-white/5 p-4">
       {/* Header row */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase text-[#21D4FF]">
+        <p className="text-xs font-semibold uppercase text-brand-accent">
           Geographic Distribution
         </p>
 
@@ -98,9 +99,9 @@ export default function GeoHeatmap({ regions }: Props) {
           <button
             onClick={() => setShowTable(false)}
             aria-pressed={!showTable}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               !showTable
-                ? "bg-[#4D21FF] text-white"
+                ? "bg-brand-primary text-white"
                 : "bg-transparent text-gray-400 hover:bg-white/10 hover:text-white"
             }`}
           >
@@ -110,9 +111,9 @@ export default function GeoHeatmap({ regions }: Props) {
           <button
             onClick={() => setShowTable(true)}
             aria-pressed={showTable}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               showTable
-                ? "bg-[#4D21FF] text-white"
+                ? "bg-brand-primary text-white"
                 : "bg-transparent text-gray-400 hover:bg-white/10 hover:text-white"
             }`}
           >
@@ -160,7 +161,7 @@ export default function GeoHeatmap({ regions }: Props) {
                         }}
                         onMouseLeave={() => setTooltip(null)}
                         style={{
-                          hover: { fill: "#21D4FF", outline: "none" },
+                          hover: { fill: THEME_COLORS.brandAccent, outline: "none" },
                           pressed: { outline: "none" },
                           default: { outline: "none" },
                         }}
@@ -196,7 +197,7 @@ export default function GeoHeatmap({ regions }: Props) {
       {!showTable && tooltip && (
         <div
           role="tooltip"
-          className="pointer-events-none fixed z-50 rounded bg-[#1a2040] border border-[#4D21FF] px-3 py-2 text-xs text-[#21D4FF] shadow-lg"
+          className="pointer-events-none fixed z-50 rounded bg-[#1a2040] border border-brand-primary px-3 py-2 text-xs text-brand-accent shadow-lg"
           style={{ left: tooltip.x + 12, top: tooltip.y - 28 }}
         >
           {tooltip.content}

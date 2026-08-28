@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 import { sanitiseErrorMessage } from 'utils';
@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 export const useWaitlist = (eventId: string, initialPosition: number | null) => {
   const [position, setPosition] = useState(initialPosition);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   const joinWaitlist = async () => {

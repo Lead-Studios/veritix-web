@@ -14,18 +14,6 @@ export interface Covert {
   banReason?: string;
 }
 
-interface ApiConvert {
-  id: string;
-  name: string;
-  email: string;
-  ticket_type: string;
-  order_id: string;
-  checked_in: boolean;
-  purchased_at: string;
-  banned?: boolean;
-  ban_reason?: string;
-}
-
 interface FetchAttendeesResponse {
   attendees: ApiAttendee[];
 }

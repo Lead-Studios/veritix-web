@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, ArrowLeft, TrendingUp } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 
 export interface EventBreakdown {
   eventId: string;
@@ -51,14 +51,14 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
 
       {/* Side panel */}
       <aside
-        className="relative z-50 flex h-full w-full max-w-sm flex-col bg-[#101428] border-l border-[#4D21FF]/40 shadow-2xl"
+        className="relative z-50 flex h-full w-full max-w-sm flex-col bg-surface-dark border-l border-brand-primary/40 shadow-2xl"
         tabIndex={-1}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#4D21FF]/30 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-brand-primary/30 px-5 py-4">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-xs text-[#21D4FF] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] rounded"
+            className="flex items-center gap-2 text-xs text-brand-accent hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary rounded"
             aria-label="Back to aggregate chart"
           >
             <ArrowLeft size={14} aria-hidden="true" />
@@ -67,7 +67,7 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
           <p className="text-sm font-semibold text-white">{day.month}</p>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] rounded"
+            className="text-gray-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary rounded"
             aria-label="Close panel"
           >
             <X size={16} aria-hidden="true" />
@@ -76,15 +76,15 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
 
         {/* Summary */}
         <div className="border-b border-white/5 px-5 py-4">
-          <p className="text-xs uppercase tracking-widest text-[#21D4FF]">Total Sales</p>
-          <p className="text-2xl font-bold text-[#4D21FF]">
+          <p className="text-xs uppercase tracking-widest text-brand-accent">Total Sales</p>
+          <p className="text-2xl font-bold text-brand-primary">
             {day.value.toLocaleString()}
           </p>
         </div>
 
         {/* Event list */}
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <p className="mb-3 text-xs font-semibold uppercase text-[#21D4FF]">
+          <p className="mb-3 text-xs font-semibold uppercase text-brand-accent">
             Events active on this day
           </p>
 
@@ -103,7 +103,7 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
                       <span className="text-sm font-medium text-white leading-snug">
                         {ev.eventName}
                       </span>
-                      <span className="shrink-0 text-sm font-bold text-[#4D21FF]">
+                      <span className="shrink-0 text-sm font-bold text-brand-primary">
                         {ev.sales.toLocaleString()}
                       </span>
                     </div>
@@ -117,7 +117,7 @@ function DrillDownPanel({ day, onClose }: DrillDownPanelProps) {
                       aria-label={`${ev.eventName}: ${Math.round(pct)}% of day's sales`}
                     >
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#4D21FF] to-[#21D4FF]"
+                        className="h-full rounded-full bg-gradient-to-r from-brand-primary to-brand-accent"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -177,27 +177,27 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
               onKeyDown={(e) => handleBarKeyDown(e, item)}
               aria-label={`${item.month}: ${item.value.toLocaleString()} sales. Press to view breakdown.`}
               title={`Click to drill down into ${item.month}`}
-              className="group relative flex w-full flex-col items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4D21FF] rounded-t-md"
+              className="group relative flex w-full flex-col items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary rounded-t-md"
               style={{ height: "100%" }}
             >
               <span className="sr-only">
                 {item.value.toLocaleString()} sales on {item.month}
               </span>
               <div
-                className="w-full rounded-t-md bg-[#4D21FF] transition-colors group-hover:bg-[#21D4FF] cursor-pointer"
+                className="w-full rounded-t-md bg-brand-primary transition-colors group-hover:bg-brand-accent cursor-pointer"
                 style={{ height: `${(item.value / maxValue) * 100}%` }}
                 aria-hidden="true"
               >
                 {/* Tooltip on hover */}
                 <div
-                  className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#1a2040] border border-[#4D21FF] px-2 py-1 text-[10px] text-[#21D4FF] opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#1a2040] border border-brand-primary px-2 py-1 text-[10px] text-brand-accent opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-hidden="true"
                 >
                   {item.value.toLocaleString()}
                 </div>
               </div>
             </button>
-            <span className="text-[10px] text-[#21D4FF]">{item.month}</span>
+            <span className="text-[10px] text-brand-accent">{item.month}</span>
           </div>
         ))}
       </div>

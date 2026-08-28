@@ -3,13 +3,13 @@
 exports[`StatusBadge > snapshot — active 1`] = `
 <div
   aria-label="Status: Active"
-  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-[#4D21FF] bg-[#000625]"
+  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 border-brand-primary bg-[#000625]"
 >
   <span
-    class="inline-block h-2 w-2 rounded-full bg-[#21D4FF]"
+    class="inline-block h-2 w-2 rounded-full bg-brand-accent"
   />
   <span
-    class="text-sm text-[#21D4FF]"
+    class="text-sm text-brand-accent"
   >
     Active
   </span>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { useOrganizerAnalytics, type OrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 
 vi.mock("swr", () => ({

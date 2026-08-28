@@ -10,18 +10,9 @@ interface BulkScanModeProps {
   onToggle: () => void;
 }
 
-export function BulkScanMode({ onScan, onBatchComplete, isActive, onToggle }: BulkScanModeProps) {
+export function BulkScanMode({ onBatchComplete, isActive, onToggle }: BulkScanModeProps) {
   const queueRef = useRef<string[]>([]);
   const [queueCount, setQueueCount] = useState(0);
-
-  const handleScan = useCallback(
-    (ticketCode: string) => {
-      onScan(ticketCode);
-      queueRef.current = [...queueRef.current, ticketCode];
-      setQueueCount(queueRef.current.length);
-    },
-    [onScan]
-  );
 
   const handleFinishBatch = useCallback(() => {
     onBatchComplete?.(queueRef.current);

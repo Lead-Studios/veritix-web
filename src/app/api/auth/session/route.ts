@@ -15,7 +15,7 @@ export async function GET() {
     const { payload } = await jose.jwtVerify(token, secret);
 
     return NextResponse.json({ isAuthenticated: true, exp: payload.exp });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ isAuthenticated: false }, { status: 401 });
   }
 }

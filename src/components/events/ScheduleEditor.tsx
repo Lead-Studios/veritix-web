@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 
 interface ScheduleItem { time: string; title: string; description: string; }
 interface Props { value: ScheduleItem[]; onChange: (v: ScheduleItem[]) => void; }

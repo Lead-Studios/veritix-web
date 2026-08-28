@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { THEME_COLORS } from "@/lib/themeColors";
 
 export interface SalesVelocityPoint {
   date: string;
@@ -43,11 +44,11 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
   );
 
   return (
-    <div className="rounded-2xl border border-[#4D21FF]/30 bg-[#0a0f24] p-6">
+    <div className="rounded-2xl border border-brand-primary/30 bg-[#0a0f24] p-6">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-base font-semibold text-white">Sales Velocity</h3>
-          <p className="text-xs text-[#21D4FF]/70">
+          <p className="text-xs text-brand-accent/70">
             {total} tickets sold in {window} days
           </p>
         </div>
@@ -59,7 +60,7 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
               onClick={() => setWindow(value)}
               className={`px-4 py-1.5 text-xs font-medium transition-colors ${
                 window === value
-                  ? "bg-[#4D21FF] text-white"
+                  ? "bg-brand-primary text-white"
                   : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
               }`}
             >
@@ -73,19 +74,19 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
         <AreaChart data={sliced} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#4D21FF" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#4D21FF" stopOpacity={0} />
+              <stop offset="5%" stopColor={THEME_COLORS.brandPrimary} stopOpacity={0.4} />
+              <stop offset="95%" stopColor={THEME_COLORS.brandPrimary} stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
           <XAxis
             dataKey="date"
-            tick={{ fill: "#21D4FF", fontSize: 10 }}
+            tick={{ fill: THEME_COLORS.brandAccent, fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
           />
-          <YAxis tick={{ fill: "#21D4FF", fontSize: 10 }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fill: THEME_COLORS.brandAccent, fontSize: 10 }} tickLine={false} axisLine={false} />
           <Tooltip
             contentStyle={{
               background: "#0a0f24",
@@ -101,12 +102,12 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
                 "Sold",
               ];
             }}
-            labelStyle={{ color: "#21D4FF" }}
+            labelStyle={{ color: THEME_COLORS.brandAccent }}
           />
           <Area
             type="monotone"
             dataKey="ticketsSold"
-            stroke="#4D21FF"
+            stroke={THEME_COLORS.brandPrimary}
             strokeWidth={2}
             fill="url(#salesGradient)"
             dot={(props) => {
@@ -118,7 +119,7 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
                   cx={cx}
                   cy={cy}
                   r={5}
-                  fill="#21D4FF"
+                  fill={THEME_COLORS.brandAccent}
                   stroke="#fff"
                   strokeWidth={2}
                 />

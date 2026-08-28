@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPostBySlug, getAllPosts } from "@/lib/blog";
-import type { BlogPost } from "@/lib/blog";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Calendar, Clock, User, Tag, ArrowLeft, Share2 } from "lucide-react";
 
