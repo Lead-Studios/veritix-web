@@ -13,6 +13,60 @@ import {
   HiOutlineHeart,
 } from 'react-icons/hi';
 import { useFavorite } from '@/hooks/useFavorite';
+import { CapacityProgressBar } from '@/components/events/EventCapacityProgress';
+
+const CATEGORY_STYLES: Record<string, { bg: string; text: string; border: string }> = {
+  music: {
+    bg: 'bg-purple-500/20',
+    text: 'text-purple-300',
+    border: 'border-purple-500/30',
+  },
+  festival: {
+    bg: 'bg-pink-500/20',
+    text: 'text-pink-300',
+    border: 'border-pink-500/30',
+  },
+  sports: {
+    bg: 'bg-emerald-500/20',
+    text: 'text-emerald-300',
+    border: 'border-emerald-500/30',
+  },
+  art: {
+    bg: 'bg-amber-500/20',
+    text: 'text-amber-300',
+    border: 'border-amber-500/30',
+  },
+  theater: {
+    bg: 'bg-rose-500/20',
+    text: 'text-rose-300',
+    border: 'border-rose-500/30',
+  },
+  comedy: {
+    bg: 'bg-yellow-500/20',
+    text: 'text-yellow-300',
+    border: 'border-yellow-500/30',
+  },
+  conference: {
+    bg: 'bg-blue-500/20',
+    text: 'text-blue-300',
+    border: 'border-blue-500/30',
+  },
+  workshop: {
+    bg: 'bg-cyan-500/20',
+    text: 'text-cyan-300',
+    border: 'border-cyan-500/30',
+  },
+};
+
+export function getCategoryBadgeStyle(category?: string): string {
+  if (!category) return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+  const normalized = category.toLowerCase().trim();
+  const style = CATEGORY_STYLES[normalized];
+  if (style) {
+    return `${style.bg} ${style.text} ${style.border}`;
+  }
+  return 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+}
 
 function FavoriteToggle({ eventId }: { eventId: string }) {
   const { isLiked, toggle } = useFavorite(eventId);
@@ -44,6 +98,8 @@ function EventCard({ event, index = 0 }: EventCardProps) {
   const imageSrc = ((event as Event & { image?: string }).image ??
     event.imageUrl ??
     '/images/events/event.png') as string;
+  const imageSrc = (event.image ?? event.imageUrl ?? '/images/events/event.png') as string;
+  const imageSrc = (event.image ?? event.imageUrl ?? "/images/events/event.png") as string;
   const eventDate = event.eventDate
     ? new Date(event.eventDate).toLocaleDateString('en', {
         month: 'short',
@@ -52,6 +108,13 @@ function EventCard({ event, index = 0 }: EventCardProps) {
       })
     : 'Date TBD';
   const eventTime = (event as Event & { time?: string }).time ?? 'Time TBD';
+    : event.date ?? 'Date TBD';
+  const eventTime = event.time ?? 'Time TBD';
+    : event.date ?? "Date TBD";
+  const eventTime = event.time ?? "Time TBD";
+  const soldCount = event.sold ?? event.soldTickets ?? event.attendees ?? 0;
+  const hasCapacity = typeof event.capacity === 'number' && event.capacity > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -93,12 +156,17 @@ function EventCard({ event, index = 0 }: EventCardProps) {
           <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between">
             <div className="space-y-3">
               {event.category && (
-                <Link
-                  href={`/events?category=${encodeURIComponent(event.category)}`}
-                  className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors"
-                >
-                  {event.category}
-                </Link>
+                <div>
+                  <Link
+                    href={`/events?category=${encodeURIComponent(event.category.toLowerCase())}`}
+                    className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border capitalize transition-all duration-200 hover:scale-105 ${getCategoryBadgeStyle(
+                      event.category
+                    )}`}
+                    aria-label={`Category: ${event.category}`}
+                  >
+                    {event.category}
+                  </Link>
+                </div>
               )}
               {/* Event Name and Price - Same Line */}
               <div className="flex items-start justify-between gap-3">
@@ -134,6 +202,16 @@ function EventCard({ event, index = 0 }: EventCardProps) {
                   <span>{event.location}</span>
                 </div>
               </div>
+
+              {/* Capacity Progress Bar */}
+              {hasCapacity && (
+                <div className="pt-2">
+                  <CapacityProgressBar
+                    sold={soldCount}
+                    total={event.capacity!}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Button */}

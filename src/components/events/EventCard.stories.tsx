@@ -17,6 +17,8 @@ const sampleEvent: Event = {
   organizer: { name: 'Sunset Records', verified: true },
   price: '$45',
   featured: true,
+  capacity: 100,
+  attendees: 75,
 };
 
 const meta: Meta<typeof EventCard> = {
@@ -30,6 +32,18 @@ type Story = StoryObj<typeof EventCard>;
 
 export const Default: Story = {};
 
+export const WithCapacity: Story = {
+  args: {
+    event: { ...sampleEvent, capacity: 100, attendees: 75 },
+  },
+};
+
+export const HighUrgency: Story = {
+  args: {
+    event: { ...sampleEvent, capacity: 100, attendees: 95 },
+  },
+};
+
 export const WithoutImage: Story = {
   args: {
     event: { ...sampleEvent, imageUrl: undefined },
@@ -39,5 +53,6 @@ export const WithoutImage: Story = {
 export const SoldOut: Story = {
   args: {
     event: { ...sampleEvent, price: 'Sold out' },
+    event: { ...sampleEvent, price: "Sold out", capacity: 100, attendees: 100 },
   },
 };

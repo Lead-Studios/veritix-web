@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import CategoryFilter from '@/components/events/CategoryFilter';
 import FilterInput from '@/components/events/FilterInput';
 import TabSelector from '@/components/TabSelector';
@@ -17,8 +17,8 @@ type ViewMode = 'upcoming' | 'featured';
 
 function EventsPageContent() {
   const { events, loading, error } = useEvents();
-  const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
-  const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
   const [locationFilter, setLocationFilter] = useState(
@@ -26,17 +26,57 @@ function EventsPageContent() {
   );
   const [dateFilter, setDateFilter] = useState(() => searchParams.get('date') || '');
 
+  const parseCategories = useCallback((params: ReturnType<typeof useSearchParams> | null) => {
+    if (!params) return ['music', 'festival'];
+    const cat = params.get('category');
+    if (cat !== null) {
+      return cat ? cat.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean) : [];
+    }
+    return ['music', 'festival'];
+  }, []);
+
+  const [activeFilters, setActiveFilters] = useState<string[]>(() => parseCategories(searchParams));
+  const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
+  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('q') || '');
+  const [locationFilter, setLocationFilter] = useState(() => searchParams?.get('location') || '');
+  const [dateFilter, setDateFilter] = useState(() => searchParams?.get('date') || '');
+
   // Sync state if URL query params change
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!searchParams) return;
+    const catParam = searchParams.get('category');
+    if (catParam !== null) {
+      const parsed = catParam ? catParam.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean) : [];
+      setActiveFilters(parsed);
+    }
     setSearchQuery(searchParams.get('q') || '');
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocationFilter(searchParams.get('location') || '');
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDateFilter(searchParams.get('date') || '');
   }, [searchParams]);
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const updateUrlParams = useCallback((newFilters: string[], newQ?: string, newLoc?: string, newDate?: string) => {
+    setActiveFilters(newFilters);
+    setVisibleCount(PAGE_SIZE);
+
+    const params = new URLSearchParams();
+    if (newFilters.length > 0) {
+      params.set('category', newFilters.join(','));
+    }
+    const q = newQ !== undefined ? newQ : searchQuery;
+    if (q.trim()) params.set('q', q.trim());
+    const loc = newLoc !== undefined ? newLoc : locationFilter;
+    if (loc.trim()) params.set('location', loc.trim());
+    const d = newDate !== undefined ? newDate : dateFilter;
+    if (d.trim()) params.set('date', d.trim());
+
+    const qs = params.toString();
+    const target = qs ? `${pathname}?${qs}` : pathname;
+    if (router?.replace) {
+      router.replace(target, { scroll: false });
+    }
+  }, [searchQuery, locationFilter, dateFilter, pathname, router]);
 
   const handleSearchQueryChange = (value: string) => {
     setSearchQuery(value);
@@ -112,8 +152,12 @@ function EventsPageContent() {
   const hasMore = visibleCount < filteredEvents.length;
 
   const removeFilter = (filter: string) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== filter));
-    setVisibleCount(PAGE_SIZE);
+    const next = activeFilters.filter((f) => f.toLowerCase() !== filter.toLowerCase());
+    updateUrlParams(next);
+  };
+
+  const clearAllFilters = () => {
+    updateUrlParams([]);
   };
 
   return (
@@ -188,10 +232,7 @@ function EventsPageContent() {
             <CategoryFilter
               activeFilters={activeFilters}
               onRemoveFilter={removeFilter}
-              onClearAll={() => {
-                setActiveFilters([]);
-                setVisibleCount(PAGE_SIZE);
-              }}
+              onClearAll={clearAllFilters}
             />
             <motion.p
               key={filteredEvents.length}

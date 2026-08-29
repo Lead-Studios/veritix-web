@@ -1,34 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { StatusBadge } from '@/components/dashboard/StatusBadge';
-import { HeroContent } from '@/components/dashboard/HeroContent';
-import { CTAButton } from '@/components/dashboard/CTAButton';
-import { QuickActions } from '@/components/dashboard/QuickActions';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
-import { ScrollColumn } from '@/components/dashboard/ScrollColumn';
-import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card';
-import { EventImage } from '@/components/dashboard/EventImage';
-import { RevenueChart } from '@/components/dashboard/charts/RevenueChart';
-import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart';
-import { EmptyState } from '@/components/EmptyState';
-import dynamic from 'next/dynamic';
-import { DemographicsSection } from '@/components/dashboard/DemographicsSection';
-import { DateRangePicker } from '@/components/dashboard/DateRangePicker';
-import { PayoutHistory } from '@/components/dashboard/PayoutHistory';
-import { LiveCheckInCard } from '@/components/dashboard/LiveCheckInCard';
-import { ProjectedRevenueCard } from '@/components/dashboard/ProjectedRevenueCard';
-import {
-  useOrganizerAnalytics,
-  selectRevenue,
-  selectTicketBreakdown,
-  selectLiveCheckIns,
-} from '@/hooks/useOrganizerAnalytics';
-import { ChartErrorBoundary } from '@/components/dashboard/ChartErrorBoundary';
-import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { HeroContent } from "@/components/dashboard/HeroContent";
+import { CTAButton } from "@/components/dashboard/CTAButton";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
+import { ScrollColumn } from "@/components/dashboard/ScrollColumn";
+import { Card, CardHeader, StatDisplay } from "@/components/dashboard/Card";
+import { EventImage } from "@/components/dashboard/EventImage";
+import { RevenueChart } from "@/components/dashboard/charts/RevenueChart";
+import { PerformanceChart } from "@/components/dashboard/charts/PerformanceChart";
+import { EmptyState } from "@/components/EmptyState";
+import dynamic from "next/dynamic";
+import { DemographicsSection } from "@/components/dashboard/DemographicsSection";
+import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
+import { PayoutHistory } from "@/components/dashboard/PayoutHistory";
+import { LiveCheckInCard } from "@/components/dashboard/LiveCheckInCard";
+import { ProjectedRevenueCard } from "@/components/dashboard/ProjectedRevenueCard";
+import { useOrganizerAnalytics, selectRevenue, selectTicketBreakdown, selectLiveCheckIns } from "@/hooks/useOrganizerAnalytics";
+import { ChartErrorBoundary } from "@/components/dashboard/ChartErrorBoundary";
+import { exportAnalyticsCsv } from "@/lib/exportAnalyticsCsv";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import UnverifiedBanner from "@/components/dashboard/UnverifiedBanner";
+import { useProfile } from "@/hooks/useProfile";
 
 const TicketTypeChart = dynamic(
   () =>
@@ -98,6 +95,10 @@ function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void 
 export default function DashboardPage() {
   const router = useRouter();
   const params = useSearchParams();
+  const from = params.get("from") ?? undefined;
+  const { data, loading, error, mutate } = useOrganizerAnalytics({ from, to });
+  const { profile } = useProfile();
+  const isVerified = profile?.isVerified ?? profile?.emailVerified ?? false;
   const from = params.get('from') ?? undefined;
   const to = params.get('to') ?? undefined;
   const user = getUser();
@@ -192,6 +193,8 @@ export default function DashboardPage() {
       </div>
       <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
         <div className="mx-auto max-w-7xl">
+          <UnverifiedBanner isVerified={isVerified} email={profile?.email} className="mb-6" />
+
           <div className="mb-6 flex justify-center">
             <StatusBadge text="Tailored to all your event needs" />
           </div>
