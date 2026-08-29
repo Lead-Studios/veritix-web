@@ -24,27 +24,21 @@ async function getHeaders(body?: unknown) {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-    throw new ApiError(errorData.message || 'API request failed', response.status);
     const errorData: unknown = await response
       .json()
-      .catch(() => ({ message: "Unknown error" }));
+      .catch(() => ({ message: 'Unknown error' }));
     const message =
-      typeof errorData === "object" &&
+      typeof errorData === 'object' &&
       errorData !== null &&
-      "message" in errorData &&
-      typeof errorData.message === "string"
-        ? errorData.message
-        : "API request failed";
-    throw new ApiError(
-      message,
-      response.status,
-    );
+      'message' in errorData &&
+      typeof (errorData as { message?: unknown }).message === 'string'
+        ? (errorData as { message: string }).message
+        : 'API request failed';
+    throw new ApiError(message, response.status);
   }
   return response.json();
 }
 
-async function request<T>(method: string, path: string, body?: any): Promise<T> {
 async function request<T>(
   method: string,
   path: string,
@@ -66,13 +60,8 @@ async function request<T>(
 
 export const apiClient = {
   get: <T>(path: string) => request<T>('GET', path),
-  post: <T>(path: string, body: any) => request<T>('POST', path, body),
-  put: <T>(path: string, body: any) => request<T>('PUT', path, body),
-  patch: <T>(path: string, body: any) => request<T>('PATCH', path, body),
+  post: <T>(path: string, body: unknown) => request<T>('POST', path, body),
+  put: <T>(path: string, body: unknown) => request<T>('PUT', path, body),
+  patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
   del: <T>(path: string) => request<T>('DELETE', path),
-  get: <T>(path: string) => request<T>("GET", path),
-  post: <T>(path: string, body: unknown) => request<T>("POST", path, body),
-  put: <T>(path: string, body: unknown) => request<T>("PUT", path, body),
-  patch: <T>(path: string, body: unknown) => request<T>("PATCH", path, body),
-  del: <T>(path: string) => request<T>("DELETE", path),
 };

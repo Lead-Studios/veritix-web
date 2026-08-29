@@ -1,6 +1,5 @@
-import { apiClient } from './apiClient';
+import { ApiError, apiClient } from './apiClient';
 import { getToken } from './auth';
-import { ApiError, apiClient } from "./apiClient";
 
 export class AuthError extends Error {
   constructor(message = 'Authentication required. Please log in to verify tickets.') {
@@ -31,10 +30,8 @@ export async function verifyTicket(code: string): Promise<TicketVerificationResu
       { headers: { Authorization: `Bearer ${token}` } },
     );
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 401) {
-      throw new AuthError('Session expired. Please log in again.');
     if (error instanceof ApiError && error.status === 401) {
-      throw new AuthError("Session expired. Please log in again.");
+      throw new AuthError('Session expired. Please log in again.');
     }
     return {
       valid: false,
@@ -58,10 +55,8 @@ export async function checkInTicket(
       { headers: { Authorization: `Bearer ${token}` } },
     );
   } catch (error) {
-    if (error instanceof Error && (error as any).status === 401) {
-      throw new AuthError('Session expired. Please log in again.');
     if (error instanceof ApiError && error.status === 401) {
-      throw new AuthError("Session expired. Please log in again.");
+      throw new AuthError('Session expired. Please log in again.');
     }
     return { success: false, message: 'Check-in failed. Please try again.' };
   }
