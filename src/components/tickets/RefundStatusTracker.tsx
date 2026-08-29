@@ -42,7 +42,6 @@ export function RefundStatusTracker({
           {STEPS.map((step, i) => {
             const isCompleted = i <= currentIndex;
             const isCurrent = i === currentIndex;
-            const isPending = i > currentIndex;
 
             let timestamp: string | undefined;
             if (step === "requested") timestamp = requestedAt;

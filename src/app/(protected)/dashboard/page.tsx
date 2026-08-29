@@ -83,7 +83,7 @@ function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void 
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all"
+        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition-all"
       >
         <RefreshCw className="w-4 h-4" />
         Retry
@@ -187,7 +187,7 @@ export default function DashboardPage() {
   })();
 
   return (
-    <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
+    <div className="dark min-h-screen overflow-y-auto flex flex-col bg-surface-dark">
       <div role="status" aria-live="polite" className="sr-only">
         {announcement}
       </div>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               onClick={() => data && exportAnalyticsCsv(data)}
               disabled={!hasData}
               title={!hasData ? 'No analytics data available to export' : undefined}
-              className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-full border border-brand-primary px-6 py-2 text-sm font-semibold text-brand-accent transition hover:bg-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Export CSV
             </button>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
               {/* Middle Column - Attendees / Check-ins */}
               <ScrollColumn animationClass="animate-scroll-down-once" className="gap-0">
                 <Card>
-                  <p className="text-xs uppercase text-[#21D4FF] mb-2">
+                  <p className="text-xs uppercase text-brand-accent mb-2">
                     Latest check-ins
                   </p>
                   <LiveCheckInCard
@@ -292,7 +292,7 @@ export default function DashboardPage() {
 
                 <Card>
                   <div className="mb-4">
-                    <p className="text-2xl font-bold text-[#4D21FF]">
+                    <p className="text-2xl font-bold text-brand-primary">
                       {formatCurrency(totalEarned)}
                     </p>
                     {revenueTrend !== null ? (
@@ -312,30 +312,30 @@ export default function DashboardPage() {
               {/* Right Column - Performance */}
               <ScrollColumn animationClass="animate-scroll-up-once" className="gap-6">
                 <Card className="rounded-lg">
-                  <p className="text-xs uppercase text-[#21D4FF]">Performance</p>
-                  <p className="text-sm text-[#21D4FF]">Top-selling tickets this week</p>
-                  <div className="mt-3 text-xs text-[#4D21FF]">Updated 2 mins ago</div>
+                  <p className="text-xs uppercase text-brand-accent">Performance</p>
+                  <p className="text-sm text-brand-accent">Top-selling tickets this week</p>
+                  <div className="mt-3 text-xs text-brand-primary">Updated 2 mins ago</div>
                 </Card>
 
                 <Card className="rounded-lg">
                   <div className="mb-4 flex justify-between items-start">
                     <div>
-                      <p className="text-xs uppercase text-[#21D4FF]">Trending</p>
+                      <p className="text-xs uppercase text-brand-accent">Trending</p>
                       <p className={`text-sm font-semibold ${trendColor}`}>{trendText}</p>
-                      <p className="text-xs text-[#21D4FF]">Past 7 days</p>
+                      <p className="text-xs text-brand-accent">Past 7 days</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
+                    <span className="text-sm font-semibold text-brand-primary">7d</span>
                   </div>
                   <div className="h-48 w-full min-h-[192px]">
                     <ChartErrorBoundary chartName="Performance">
                       <PerformanceChart data={barData} />
                     </ChartErrorBoundary>
                   </div>
-                  <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">
+                  <div className="mt-4 border-t pt-4 border-brand-primary">
+                    <p className="text-xs font-semibold uppercase text-brand-accent">
                       Total Earned
                     </p>
-                    <p className="text-xl font-bold text-[#4D21FF]">
+                    <p className="text-xl font-bold text-brand-primary">
                       {formatCurrency(totalEarned)}
                     </p>
                     {revenueTrend !== null ? (
@@ -395,7 +395,7 @@ export default function DashboardPage() {
 
           {!isLoading && !error && hasEvents && (
             <div className="mt-10">
-              <p className="mb-4 text-sm font-semibold uppercase text-[#21D4FF]">
+              <p className="mb-4 text-sm font-semibold uppercase text-brand-accent">
                 Payout History
               </p>
               <PayoutHistory />

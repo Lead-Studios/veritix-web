@@ -2,8 +2,8 @@
  * Custom hooks unit tests (FE-232 related).
  * Covers useEvents, useOrganizerAnalytics, useFavorite.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook } from "@testing-library/react";
 import { useEvents, invalidateEvents } from "@/hooks/useEvents";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 import { useFavorite } from "@/hooks/useFavorite";

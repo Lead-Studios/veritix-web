@@ -94,14 +94,14 @@ export function ProjectedRevenueCard({
 
   return (
     <div
-      className="rounded-xl border border-[#4D21FF]/40 bg-[#000625]/60 p-5"
+      className="rounded-xl border border-brand-primary/40 bg-[#000625]/60 p-5"
       aria-label="Projected revenue card"
     >
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <TrendingUp size={14} className="text-[#21D4FF]" aria-hidden="true" />
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#21D4FF]">
+          <TrendingUp size={14} className="text-brand-accent" aria-hidden="true" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
             Projected Revenue
           </p>
         </div>
@@ -114,14 +114,14 @@ export function ProjectedRevenueCard({
             onFocus={() => setShowTooltip(true)}
             onBlur={() => setShowTooltip(false)}
             aria-label="How is this calculated?"
-            className="text-gray-500 hover:text-[#21D4FF] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] rounded"
+            className="text-gray-500 hover:text-brand-accent transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary rounded"
           >
             <Info size={13} aria-hidden="true" />
           </button>
           {showTooltip && (
             <div
               role="tooltip"
-              className="absolute right-0 top-6 z-10 w-56 rounded-lg border border-[#4D21FF]/40 bg-[#1a2040] px-3 py-2 text-[11px] text-gray-300 shadow-lg"
+              className="absolute right-0 top-6 z-10 w-56 rounded-lg border border-brand-primary/40 bg-[#1a2040] px-3 py-2 text-[11px] text-gray-300 shadow-lg"
             >
               Estimated from remaining tickets × average ticket price, weighted
               by current sell-through trend. Range shows ±20 % variance.
@@ -170,7 +170,7 @@ export function ProjectedRevenueCard({
           aria-label={`Sell-through rate: ${Math.round(input.sellThroughRate * 100)}%`}
         >
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] transition-[width] duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-brand-primary to-brand-accent transition-[width] duration-500"
             style={{ width: `${Math.min(input.sellThroughRate * 100, 100)}%` }}
           />
         </div>

@@ -5,10 +5,10 @@ interface HeroContentProps {
 
 export const HeroContent = ({ title, subtitle }: HeroContentProps) => (
   <div className="mb-6 text-center">
-    <h1 className="text-balance text-4xl font-bold sm:text-5xl lg:text-6xl text-[#4D21FF]">
+    <h1 className="text-balance text-4xl font-bold sm:text-5xl lg:text-6xl text-brand-primary">
       {title}
     </h1>
-    <p className="mx-auto mt-4 max-w-2xl text-lg text-[#21D4FF]">
+    <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-accent">
       {subtitle}
     </p>
   </div>

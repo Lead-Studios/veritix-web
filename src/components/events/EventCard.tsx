@@ -86,6 +86,7 @@ interface EventCardProps {
 
 function EventCard({ event, index = 0 }: EventCardProps) {
   const imageSrc = (event.image ?? event.imageUrl ?? '/images/events/event.png') as string;
+  const imageSrc = (event.image ?? event.imageUrl ?? "/images/events/event.png") as string;
   const eventDate = event.eventDate
     ? new Date(event.eventDate).toLocaleDateString('en', {
         month: 'short',
@@ -94,6 +95,8 @@ function EventCard({ event, index = 0 }: EventCardProps) {
       })
     : event.date ?? 'Date TBD';
   const eventTime = event.time ?? 'Time TBD';
+    : event.date ?? "Date TBD";
+  const eventTime = event.time ?? "Time TBD";
   const soldCount = event.sold ?? event.soldTickets ?? event.attendees ?? 0;
   const hasCapacity = typeof event.capacity === 'number' && event.capacity > 0;
 
