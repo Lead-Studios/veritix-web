@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { HiCalendar, HiClock, HiLocationMarker, HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { useFavorite } from '@/hooks/useFavorite';
+import { CapacityProgressBar } from '@/components/events/EventCapacityProgress';
 
 function FavoriteToggle({ eventId }: { eventId: string }) {
   const { isLiked, toggle } = useFavorite(eventId);
@@ -31,15 +32,18 @@ interface EventCardProps {
 }
 
 function EventCard({ event, index = 0 }: EventCardProps) {
-  const imageSrc = ((event as Event & { image?: string }).image ?? event.imageUrl ?? "/images/events/event.png") as string;
+  const imageSrc = (event.image ?? event.imageUrl ?? "/images/events/event.png") as string;
   const eventDate = event.eventDate
     ? new Date(event.eventDate).toLocaleDateString("en", {
         month: "short",
         day: "numeric",
         year: "numeric",
       })
-    : "Date TBD";
-  const eventTime = (event as Event & { time?: string }).time ?? "Time TBD";
+    : event.date ?? "Date TBD";
+  const eventTime = event.time ?? "Time TBD";
+  const soldCount = event.sold ?? event.soldTickets ?? event.attendees ?? 0;
+  const hasCapacity = typeof event.capacity === 'number' && event.capacity > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -119,6 +123,16 @@ function EventCard({ event, index = 0 }: EventCardProps) {
                   <span>{event.location}</span>
                 </div>
               </div>
+
+              {/* Capacity Progress Bar */}
+              {hasCapacity && (
+                <div className="pt-2">
+                  <CapacityProgressBar
+                    sold={soldCount}
+                    total={event.capacity!}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Button */}

@@ -19,11 +19,26 @@ export interface Event {
   isVirtual?: boolean;
   streamingUrl?: string;
   imageUrl?: string;
+  image?: string;
   organizerId: string;
-  organizer?: { name: string; verified: boolean; description?: string };
+  organizer?: { id?: string; name: string; verified: boolean; description?: string };
   price: string;
+  priceInEth?: number;
   featured?: boolean;
   attendees?: number;
+  soldTickets?: number;
+  sold?: number;
+  date?: string;
+  dateEnd?: string;
+  time?: string;
+  ticketOptions?: {
+    name: string;
+    description: string;
+    benefits: string[];
+    price: number;
+    remaining: number;
+    popular?: boolean;
+  }[];
   schedule?: { time: string; title: string; description: string }[];
-  performers?: { name: string; role?: string }[];
+  performers?: { name: string; role?: string; image?: string }[];
 }

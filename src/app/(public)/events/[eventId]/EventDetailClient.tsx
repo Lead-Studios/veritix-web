@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { WaitlistButton } from "@/features/events/components/WaitlistButton";
 import { PurchaseModal } from "@/features/events/components/PurchaseModal";
-import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiShare, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
+import { HiCalendar, HiClock, HiLocationMarker, HiUsers, HiHeart, HiCheck, HiArrowLeft } from 'react-icons/hi';
 import TabSelector from '@/components/TabSelector';
 import { Breadcrumb } from '@/components/ui';
 import { AppImage } from '@/components/shared/AppImage';
@@ -13,6 +13,7 @@ import { useEvent } from '@/hooks/useEvents';
 import { useFavorite } from '@/hooks/useFavorite';
 import DOMPurify from 'dompurify';
 import { EventReviews } from '@/features/events/components/EventReviews';
+import { SocialShareButtons } from '@/components/events/SocialShareButtons';
 
 type TabType = 'about' | 'schedule' | 'performers';
 
@@ -46,24 +47,8 @@ export default function EventDetailClient() {
   const [activeTab, setActiveTab] = useState<TabType>('about');
   const { isLiked, isPending, error: favoriteError, toggle: toggleFavorite } = useFavorite(eventId);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
   const [selectedTicketIndex, setSelectedTicketIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-
-  const handleShare = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: event?.name, url });
-      } catch {
-        // user cancelled or error — do nothing
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    }
-  };
 
   if (eventLoading) {
     return (
@@ -136,21 +121,13 @@ export default function EventDetailClient() {
                   { label: event.name },
                 ]}
               />
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h1 className="text-4xl sm:text-5xl font-bold text-white">
                   {event.name}
                 </h1>
 
-                <div className="flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleShare}
-                    aria-label={shareCopied ? 'Link copied!' : 'Share event'}
-                    className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all duration-300"
-                  >
-                    {shareCopied ? <HiCheck className="w-5 h-5 text-green-400" /> : <HiShare className="w-5 h-5" />}
-                  </motion.button>
+                <div className="flex items-center gap-3">
+                  <SocialShareButtons title={event.name} className="py-0" />
 
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -532,6 +509,20 @@ export default function EventDetailClient() {
                 </div>
               </motion.div>
             )}
+
+            {/* Social Share Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="mt-4 p-6 border-t border-[#E0E0E033]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            >
+              <div>
+                <h3 className="text-base font-bold text-white mb-1">Share this event</h3>
+                <p className="text-xs text-gray-400">Invite your friends and network to join {event.name}</p>
+              </div>
+              <SocialShareButtons title={event.name} />
+            </motion.div>
             </motion.div>
 
           </div>

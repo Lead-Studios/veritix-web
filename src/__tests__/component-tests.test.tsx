@@ -59,9 +59,9 @@ describe("EventCard", () => {
 
   it("renders a link to the event detail page", async () => {
     const { default: EventCard } = await import("@/components/events/EventCard");
-    render(<EventCard event={mockEvent as any} />);
+    const { container } = render(<EventCard event={mockEvent as any} />);
 
-    const links = screen.getAllByhref("/events/evt-1");
+    const links = container.querySelectorAll('a[href="/events/evt-1"]');
     expect(links.length).toBeGreaterThan(0);
   });
 
@@ -70,6 +70,50 @@ describe("EventCard", () => {
     render(<EventCard event={mockEvent as any} />);
 
     expect(screen.getByText("Get Tickets")).toBeInTheDocument();
+  });
+
+  it("renders capacity progress bar with '75% sold' and remaining spots when capacity is provided", async () => {
+    const { default: EventCard } = await import("@/components/events/EventCard");
+    render(
+      <EventCard
+        event={{
+          ...mockEvent,
+          capacity: 1000,
+          attendees: 750,
+        } as any}
+      />
+    );
+
+    expect(screen.getByText("75% sold")).toBeInTheDocument();
+    expect(screen.getByText("250 spots left")).toBeInTheDocument();
+
+    const progressbar = screen.getByRole("progressbar");
+    expect(progressbar).toBeInTheDocument();
+    expect(progressbar).toHaveAttribute("aria-valuenow", "75");
+    expect(progressbar).toHaveAttribute("aria-label", "75% sold");
+  });
+
+  it("does not render capacity progress bar when capacity is not provided", async () => {
+    const { default: EventCard } = await import("@/components/events/EventCard");
+    render(<EventCard event={mockEvent as any} />);
+
+    expect(screen.queryByRole("progressbar")).toBeNull();
+  });
+
+  it("renders 'Sold out' remaining text when sold meets capacity", async () => {
+    const { default: EventCard } = await import("@/components/events/EventCard");
+    render(
+      <EventCard
+        event={{
+          ...mockEvent,
+          capacity: 500,
+          attendees: 500,
+        } as any}
+      />
+    );
+
+    expect(screen.getByText("100% sold")).toBeInTheDocument();
+    expect(screen.getByText("Sold out")).toBeInTheDocument();
   });
 });
 
