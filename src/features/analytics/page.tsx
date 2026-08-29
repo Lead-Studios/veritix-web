@@ -89,23 +89,24 @@ export default function AnalyticsPage() {
 
   const revenueData = useMemo(
     () => data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? [],
-    [data]
+    [data],
   );
 
   const performanceData = useMemo(
     () => data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? [],
-    [data]
+    [data],
   );
 
   return (
     <div className="min-h-screen bg-[#101428] text-white px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">Analytics</h1>
-            <p className="text-gray-400 text-sm mt-1">Organizer metrics and revenue overview</p>
+            <p className="text-gray-400 text-sm mt-1">
+              Organizer metrics and revenue overview
+            </p>
           </div>
           <DateRangePicker />
         </div>
@@ -200,7 +201,9 @@ function StatCard({
   return (
     <div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-1">
       <p className="text-xs uppercase tracking-wider text-gray-500">{label}</p>
-      <p className={`text-2xl font-bold ${highlight ? 'text-emerald-400' : 'text-white'}`}>
+      <p
+        className={`text-2xl font-bold ${highlight ? 'text-emerald-400' : 'text-white'}`}
+      >
         {value}
       </p>
       <p className="text-xs text-gray-500">{sub}</p>

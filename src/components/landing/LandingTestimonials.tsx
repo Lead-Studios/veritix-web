@@ -17,7 +17,8 @@ const testimonials: Testimonial[] = [
   {
     id: '1',
     name: 'Alex Martinez',
-    quote: 'VeriTix made buying tickets so easy — and knowing they\'re on-chain gives me peace of mind. The NFT collectibles are a bonus!',
+    quote:
+      "VeriTix made buying tickets so easy — and knowing they're on-chain gives me peace of mind. The NFT collectibles are a bonus!",
     role: 'Event Attendee',
     avatar: 'AM',
     rating: 5,
@@ -25,7 +26,8 @@ const testimonials: Testimonial[] = [
   {
     id: '2',
     name: 'Sarah Kim',
-    quote: 'As an organizer, the analytics and NFT ticketing have transformed how I run events. Revenue tracking is transparent and instant.',
+    quote:
+      'As an organizer, the analytics and NFT ticketing have transformed how I run events. Revenue tracking is transparent and instant.',
     role: 'Event Organizer',
     avatar: 'SK',
     rating: 5,
@@ -33,7 +35,8 @@ const testimonials: Testimonial[] = [
   {
     id: '3',
     name: 'James Thompson',
-    quote: 'No more fake tickets at the door. The QR verification is instant and reliable. Our gate operations are 50% faster now.',
+    quote:
+      'No more fake tickets at the door. The QR verification is instant and reliable. Our gate operations are 50% faster now.',
     role: 'Gate Operator',
     avatar: 'JT',
     rating: 4,
@@ -41,7 +44,8 @@ const testimonials: Testimonial[] = [
   {
     id: '4',
     name: 'Emily Chen',
-    quote: 'I love being able to resell my tickets on the secondary market without worrying about scams. The smart contracts handle everything.',
+    quote:
+      'I love being able to resell my tickets on the secondary market without worrying about scams. The smart contracts handle everything.',
     role: 'Concert Goer',
     avatar: 'EC',
     rating: 5,
@@ -49,7 +53,8 @@ const testimonials: Testimonial[] = [
   {
     id: '5',
     name: 'Michael Roberts',
-    quote: 'The platform fee is reasonable for the features you get. NFT minting, analytics, and 24/7 support — worth every penny.',
+    quote:
+      'The platform fee is reasonable for the features you get. NFT minting, analytics, and 24/7 support — worth every penny.',
     role: 'Festival Organizer',
     avatar: 'MR',
     rating: 5,
@@ -57,7 +62,8 @@ const testimonials: Testimonial[] = [
   {
     id: '6',
     name: 'Lisa Wang',
-    quote: 'Finally, a ticketing platform that understands crypto. I can pay with ETH and my tickets are immediately in my wallet.',
+    quote:
+      'Finally, a ticketing platform that understands crypto. I can pay with ETH and my tickets are immediately in my wallet.',
     role: 'Crypto Enthusiast',
     avatar: 'LW',
     rating: 5,
@@ -88,7 +94,9 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
       className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4 backdrop-blur"
     >
       <StarRating rating={testimonial.rating} />
-      <p className="text-sm text-white/80 leading-relaxed">&ldquo;{testimonial.quote}&rdquo;</p>
+      <p className="text-sm text-white/80 leading-relaxed">
+        &ldquo;{testimonial.quote}&rdquo;
+      </p>
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#4d21ff] to-[#21d4ff] text-sm font-semibold text-white">
           {testimonial.avatar}
@@ -142,7 +150,9 @@ export default function LandingTestimonials() {
       });
 
       if (response.ok) {
-        alert('Thank you for your testimonial! It will be reviewed before being published.');
+        alert(
+          'Thank you for your testimonial! It will be reviewed before being published.',
+        );
         setIsFormOpen(false);
         setFormData({ name: '', email: '', role: '', quote: '', rating: 5 });
       } else {
@@ -257,7 +267,9 @@ export default function LandingTestimonials() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-white">Share Your Experience</h3>
+                <h3 className="text-xl font-semibold text-white">
+                  Share Your Experience
+                </h3>
                 <button
                   onClick={() => setIsFormOpen(false)}
                   className="rounded-full p-2 text-white/60 transition hover:text-white"
@@ -269,7 +281,10 @@ export default function LandingTestimonials() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Name
                   </label>
                   <input
@@ -284,7 +299,10 @@ export default function LandingTestimonials() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Email
                   </label>
                   <input
@@ -299,7 +317,10 @@ export default function LandingTestimonials() {
                 </div>
 
                 <div>
-                  <label htmlFor="role" className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="role"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Role
                   </label>
                   <input
@@ -314,7 +335,10 @@ export default function LandingTestimonials() {
                 </div>
 
                 <div>
-                  <label htmlFor="quote" className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="quote"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Your Experience
                   </label>
                   <textarea

@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { Download, FileDown, Loader2, MoreVertical, Search } from "lucide-react";
-import { toast } from "react-toastify";
+import { useEffect, useMemo, useState } from 'react';
+import { Download, FileDown, Loader2, MoreVertical, Search } from 'lucide-react';
+import { toast } from 'react-toastify';
 import {
   type Attendee,
   banAttendee,
   checkInAttendee,
   fetchEventAttendees,
-} from "@/lib/attendeeManagement";
-import { exportAttendeesCsv, fetchAllTickets } from "@/lib/exportAttendeesCsv";
-import { generateCheckInPDF } from "@/lib/generateCheckInPDF";
-import BanAttendeeDialog from "./BanAttendeeDialog";
+} from '@/lib/attendeeManagement';
+import { exportAttendeesCsv, fetchAllTickets } from '@/lib/exportAttendeesCsv';
+import { generateCheckInPDF } from '@/lib/generateCheckInPDF';
+import BanAttendeeDialog from './BanAttendeeDialog';
 
 interface AttendeesTabProps {
   eventId: string;
@@ -24,14 +24,14 @@ const PAGE_SIZE = 10;
 
 export default function AttendeesTab({
   eventId,
-  eventName = "Event",
-  eventDate = "",
-  eventVenue = "",
+  eventName = 'Event',
+  eventDate = '',
+  eventVenue = '',
 }: AttendeesTabProps) {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
   const [banningId, setBanningId] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export default function AttendeesTab({
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load attendees.");
+          setError(err instanceof Error ? err.message : 'Failed to load attendees.');
         }
       })
       .finally(() => {
@@ -67,8 +67,7 @@ export default function AttendeesTab({
     const q = search.trim().toLowerCase();
     if (!q) return attendees;
     return attendees.filter(
-      (a) =>
-        a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q),
+      (a) => a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q),
     );
   }, [attendees, search]);
 
@@ -96,7 +95,7 @@ export default function AttendeesTab({
       );
       toast.success(`Checked in ${attendee.name}.`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Check-in failed.");
+      toast.error(err instanceof Error ? err.message : 'Check-in failed.');
     } finally {
       setCheckingInId(null);
     }
@@ -107,12 +106,12 @@ export default function AttendeesTab({
     try {
       const tickets = await fetchAllTickets(eventId);
       if (tickets.length === 0) {
-        toast.info("No attendees to export.");
+        toast.info('No attendees to export.');
         return;
       }
       exportAttendeesCsv(tickets, eventId);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Export failed.");
+      toast.error(err instanceof Error ? err.message : 'Export failed.');
     } finally {
       setExporting(false);
     }
@@ -120,7 +119,7 @@ export default function AttendeesTab({
 
   const handleGeneratePDF = async () => {
     if (attendees.length === 0) {
-      toast.info("No attendees to include in the PDF.");
+      toast.info('No attendees to include in the PDF.');
       return;
     }
     setGeneratingPDF(true);
@@ -134,15 +133,15 @@ export default function AttendeesTab({
           totalAttendees: allTickets.length,
         },
         allTickets.map((t) => ({
-          name: t.holderName ?? t.name ?? "Unknown",
-          email: t.email ?? "",
-          ticketType: t.ticketType ?? "General",
-          ticketCode: t.ticketCode ?? t.id ?? "",
+          name: t.holderName ?? t.name ?? 'Unknown',
+          email: t.email ?? '',
+          ticketType: t.ticketType ?? 'General',
+          ticketCode: t.ticketCode ?? t.id ?? '',
         })),
       );
-      toast.success("Check-in sheet downloaded.");
+      toast.success('Check-in sheet downloaded.');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "PDF generation failed.");
+      toast.error(err instanceof Error ? err.message : 'PDF generation failed.');
     } finally {
       setGeneratingPDF(false);
     }
@@ -175,7 +174,7 @@ export default function AttendeesTab({
       );
       toast.success(`Banned ${selectedAttendee.name}.`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Ban failed.");
+      toast.error(err instanceof Error ? err.message : 'Ban failed.');
     } finally {
       setBanningId(null);
     }
@@ -215,7 +214,7 @@ export default function AttendeesTab({
             ) : (
               <FileDown size={16} aria-hidden="true" />
             )}
-            {generatingPDF ? "Generating…" : "Check-in Sheet"}
+            {generatingPDF ? 'Generating…' : 'Check-in Sheet'}
           </button>
 
           {/* Export CSV */}
@@ -230,7 +229,7 @@ export default function AttendeesTab({
             ) : (
               <Download size={16} aria-hidden="true" />
             )}
-            {exporting ? "Exporting…" : "Export CSV"}
+            {exporting ? 'Exporting…' : 'Export CSV'}
           </button>
         </div>
       </div>
@@ -274,8 +273,8 @@ export default function AttendeesTab({
               <tr>
                 <td colSpan={5} className="px-6 py-10 text-center text-white/60">
                   {attendees.length === 0
-                    ? "No attendees yet."
-                    : "No attendees match your search."}
+                    ? 'No attendees yet.'
+                    : 'No attendees match your search.'}
                 </td>
               </tr>
             ) : (
@@ -325,7 +324,7 @@ export default function AttendeesTab({
       {!loading && !error && filtered.length > 0 && (
         <div className="flex flex-col items-center justify-between gap-2 text-sm text-white/70 sm:flex-row">
           <span aria-live="polite">
-            Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of{" "}
+            Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of{' '}
             {filtered.length}
           </span>
           <div className="flex items-center gap-2">
@@ -356,7 +355,7 @@ export default function AttendeesTab({
         open={showBanDialog}
         onClose={handleCloseBanDialog}
         onConfirm={handleBan}
-        attendeeName={selectedAttendee?.name ?? ""}
+        attendeeName={selectedAttendee?.name ?? ''}
       />
     </section>
   );
@@ -406,7 +405,7 @@ function KebabMenu({
             className="block w-full px-4 py-2 text-left text-sm text-white/90 transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
             role="menuitem"
           >
-            {isCheckingIn ? "Checking in..." : "Mark checked in"}
+            {isCheckingIn ? 'Checking in...' : 'Mark checked in'}
           </button>
           <button
             type="button"

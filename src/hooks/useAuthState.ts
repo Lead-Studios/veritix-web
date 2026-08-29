@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSession } from "./useSession";
+import { useEffect, useState } from 'react';
+import { useSession } from './useSession';
 
 export function useAuthState() {
   const [isLoading, setIsLoading] = useState(true);

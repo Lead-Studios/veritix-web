@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 export interface BlogPost {
   slug: string;
@@ -20,7 +20,7 @@ interface Frontmatter {
   tags: string[];
 }
 
-const CONTENT_DIR = path.join(process.cwd(), "src", "content", "blog");
+const CONTENT_DIR = path.join(process.cwd(), 'src', 'content', 'blog');
 
 export function getAllPosts(): BlogPost[] {
   if (!fs.existsSync(CONTENT_DIR)) {
@@ -29,14 +29,14 @@ export function getAllPosts(): BlogPost[] {
 
   const files = fs.readdirSync(CONTENT_DIR);
   const posts = files
-    .filter((file) => file.endsWith(".md"))
+    .filter((file) => file.endsWith('.md'))
     .map((file) => {
       const filePath = path.join(CONTENT_DIR, file);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
       const { frontmatter, content } = parseFrontmatter(fileContent);
 
       return {
-        slug: file.replace(".md", ""),
+        slug: file.replace('.md', ''),
         ...frontmatter,
         content,
         readingTime: calculateReadingTime(content),
@@ -54,7 +54,7 @@ export function getPostBySlug(slug: string): BlogPost | null {
     return null;
   }
 
-  const fileContent = fs.readFileSync(filePath, "utf-8");
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { frontmatter, content } = parseFrontmatter(fileContent);
 
   return {
@@ -75,10 +75,10 @@ function parseFrontmatter(content: string): {
   if (!match) {
     return {
       frontmatter: {
-        title: "",
-        author: "",
-        date: "",
-        coverImage: "",
+        title: '',
+        author: '',
+        date: '',
+        coverImage: '',
         tags: [],
       },
       content,
@@ -89,17 +89,22 @@ function parseFrontmatter(content: string): {
   const body = match[2];
 
   const frontmatter: Partial<Frontmatter> = {};
-  frontmatterStr.split("\n").forEach((line) => {
-    const [key, ...valueParts] = line.split(":");
+  frontmatterStr.split('\n').forEach((line) => {
+    const [key, ...valueParts] = line.split(':');
     if (key && valueParts.length > 0) {
-      const value = valueParts.join(":").trim().replace(/^"|"$/g, "");
+      const value = valueParts.join(':').trim().replace(/^"|"$/g, '');
 
-      if (key === "tags") {
+      if (key === 'tags') {
         frontmatter.tags = value
-          .replace(/^\[|\]$/g, "")
-          .split(",")
-          .map((tag: string) => tag.trim().replace(/^"|"$/g, ""));
-      } else if (key === "title" || key === "author" || key === "date" || key === "coverImage") {
+          .replace(/^\[|\]$/g, '')
+          .split(',')
+          .map((tag: string) => tag.trim().replace(/^"|"$/g, ''));
+      } else if (
+        key === 'title' ||
+        key === 'author' ||
+        key === 'date' ||
+        key === 'coverImage'
+      ) {
         frontmatter[key] = value;
       }
     }
@@ -107,10 +112,10 @@ function parseFrontmatter(content: string): {
 
   return {
     frontmatter: {
-      title: frontmatter.title || "",
-      author: frontmatter.author || "",
-      date: frontmatter.date || "",
-      coverImage: frontmatter.coverImage || "",
+      title: frontmatter.title || '',
+      author: frontmatter.author || '',
+      date: frontmatter.date || '',
+      coverImage: frontmatter.coverImage || '',
       tags: frontmatter.tags || [],
     },
     content: body,

@@ -7,10 +7,9 @@ export interface PayoutRecord {
   transactionRef: string;
 }
 
-
-
-
-export async function fetchOrganizerPayouts(organizerId: string): Promise<PayoutRecord[]> {
+export async function fetchOrganizerPayouts(
+  organizerId: string,
+): Promise<PayoutRecord[]> {
   const response = await fetch(`/api/organizers/${organizerId}/payouts`, {
     headers: {
       'Content-Type': 'application/json',

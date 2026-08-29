@@ -11,10 +11,10 @@ interface SearchFiltersProps {
   onDateChange?: (date: string) => void;
 }
 
-export default function SearchFilters({ 
-  onSearch, 
-  onLocationChange, 
-  onDateChange 
+export default function SearchFilters({
+  onSearch,
+  onLocationChange,
+  onDateChange,
 }: SearchFiltersProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('');

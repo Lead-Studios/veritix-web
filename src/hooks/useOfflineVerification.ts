@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 interface CachedTicket {
   ticketCode: string;
-  status: "valid" | "invalid";
+  status: 'valid' | 'invalid';
   cachedAt: number;
 }
 
@@ -13,16 +13,16 @@ function isCachedTicketArray(value: unknown): value is CachedTicket[] {
     Array.isArray(value) &&
     value.every(
       (item) =>
-        typeof item === "object" &&
+        typeof item === 'object' &&
         item !== null &&
-        "ticketCode" in item &&
-        "status" in item &&
-        "cachedAt" in item,
+        'ticketCode' in item &&
+        'status' in item &&
+        'cachedAt' in item,
     )
   );
 }
 
-const CACHE_KEY = "veritix_offline_cache";
+const CACHE_KEY = 'veritix_offline_cache';
 const CACHE_TTL_MS = 30 * 60 * 1000;
 
 export function useOfflineVerification() {
@@ -35,8 +35,8 @@ export function useOfflineVerification() {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     try {
       const stored = localStorage.getItem(CACHE_KEY);
@@ -50,12 +50,12 @@ export function useOfflineVerification() {
         }
       }
     } catch (e: unknown) {
-      console.error("Failed to load or parse offline cache", e);
+      console.error('Failed to load or parse offline cache', e);
     }
 
     return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
@@ -71,7 +71,7 @@ export function useOfflineVerification() {
   );
 
   const cacheResult = useCallback(
-    (ticketCode: string, status: "valid" | "invalid") => {
+    (ticketCode: string, status: 'valid' | 'invalid') => {
       const entry: CachedTicket = {
         ticketCode,
         status,
@@ -81,12 +81,9 @@ export function useOfflineVerification() {
       next.set(ticketCode, entry);
 
       try {
-        localStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify(Array.from(next.values())),
-        );
+        localStorage.setItem(CACHE_KEY, JSON.stringify(Array.from(next.values())));
       } catch (e: unknown) {
-        console.error("Failed to save to offline cache", e);
+        console.error('Failed to save to offline cache', e);
       }
 
       setCache(next);
@@ -98,7 +95,7 @@ export function useOfflineVerification() {
     try {
       localStorage.removeItem(CACHE_KEY);
     } catch (e: unknown) {
-      console.error("Failed to clear offline cache", e);
+      console.error('Failed to clear offline cache', e);
     }
     setCache(new Map());
   }, []);

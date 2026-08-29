@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { X, Star } from "lucide-react";
+import { useState } from 'react';
+import { X, Star } from 'lucide-react';
 
 interface PostEventReviewModalProps {
   eventId: string;
@@ -21,16 +21,14 @@ export function PostEventReviewModal({
 }: PostEventReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [review, setReview] = useState("");
+  const [review, setReview] = useState('');
   const [anonymous, setAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reviewLength = review.trim().length;
   const isValid =
-    rating >= 1 &&
-    reviewLength >= MIN_REVIEW_LENGTH &&
-    reviewLength <= MAX_REVIEW_LENGTH;
+    rating >= 1 && reviewLength >= MIN_REVIEW_LENGTH && reviewLength <= MAX_REVIEW_LENGTH;
 
   const handleSubmit = async () => {
     if (!isValid) return;
@@ -39,8 +37,8 @@ export function PostEventReviewModal({
 
     try {
       const res = await fetch(`/api/events/${eventId}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating, review: review.trim(), anonymous }),
       });
 
@@ -60,7 +58,9 @@ export function PostEventReviewModal({
 
       onSuccess(rating);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Submission failed. Please try again.");
+      setError(
+        err instanceof Error ? err.message : 'Submission failed. Please try again.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -97,7 +97,11 @@ export function PostEventReviewModal({
             <legend className="text-sm font-semibold text-white mb-3">
               Your rating <span className="text-red-400">*</span>
             </legend>
-            <div className="flex items-center gap-2" role="group" aria-label="Star rating">
+            <div
+              className="flex items-center gap-2"
+              role="group"
+              aria-label="Star rating"
+            >
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -106,24 +110,24 @@ export function PostEventReviewModal({
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") setRating(star);
+                    if (e.key === 'Enter' || e.key === ' ') setRating(star);
                   }}
-                  aria-label={`${star} star${star > 1 ? "s" : ""}`}
+                  aria-label={`${star} star${star > 1 ? 's' : ''}`}
                   aria-pressed={rating === star}
                   className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4D21FF] rounded"
                 >
                   <Star
                     className={`w-8 h-8 transition-colors ${
                       star <= displayRating
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-white/30"
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-white/30'
                     }`}
                   />
                 </button>
               ))}
               {rating > 0 && (
                 <span className="ml-2 text-sm text-amber-400 font-semibold">
-                  {["", "Poor", "Fair", "Good", "Very Good", "Excellent"][rating]}
+                  {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating]}
                 </span>
               )}
             </div>
@@ -150,19 +154,19 @@ export function PostEventReviewModal({
               <span
                 className={
                   reviewLength > 0 && reviewLength < MIN_REVIEW_LENGTH
-                    ? "text-red-400"
-                    : "text-gray-500"
+                    ? 'text-red-400'
+                    : 'text-gray-500'
                 }
               >
                 {reviewLength < MIN_REVIEW_LENGTH
                   ? `${MIN_REVIEW_LENGTH - reviewLength} more characters needed`
-                  : "Minimum length met ✓"}
+                  : 'Minimum length met ✓'}
               </span>
               <span
                 className={
                   reviewLength > MAX_REVIEW_LENGTH * 0.9
-                    ? "text-amber-400"
-                    : "text-gray-500"
+                    ? 'text-amber-400'
+                    : 'text-gray-500'
                 }
               >
                 {reviewLength}/{MAX_REVIEW_LENGTH}
@@ -181,12 +185,12 @@ export function PostEventReviewModal({
               />
               <div
                 className={`w-10 h-6 rounded-full transition-colors ${
-                  anonymous ? "bg-[#4D21FF]" : "bg-white/20"
+                  anonymous ? 'bg-[#4D21FF]' : 'bg-white/20'
                 }`}
               />
               <div
                 className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                  anonymous ? "translate-x-5" : "translate-x-1"
+                  anonymous ? 'translate-x-5' : 'translate-x-1'
                 }`}
               />
             </div>
@@ -195,7 +199,10 @@ export function PostEventReviewModal({
 
           {/* Error */}
           {error && (
-            <p role="alert" className="text-sm text-red-400 bg-red-950/30 border border-red-500/30 rounded-lg px-4 py-2">
+            <p
+              role="alert"
+              className="text-sm text-red-400 bg-red-950/30 border border-red-500/30 rounded-lg px-4 py-2"
+            >
               {error}
             </p>
           )}
@@ -222,7 +229,7 @@ export function PostEventReviewModal({
                   Submitting…
                 </>
               ) : (
-                "Submit Review"
+                'Submit Review'
               )}
             </button>
           </div>

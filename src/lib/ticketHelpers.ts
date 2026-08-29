@@ -7,37 +7,37 @@ export interface UserTicket {
   eventDate: string;
   ticketType: string;
   seatOrReference: string;
-  status: "active" | "used" | "cancelled" | "expired";
+  status: 'active' | 'used' | 'cancelled' | 'expired';
   qrCode: string;
 }
 
 export async function fetchMyTickets(): Promise<UserTicket[]> {
-  const res = await fetch("/api/tickets/me");
-  if (!res.ok) throw new Error("Failed to fetch tickets");
+  const res = await fetch('/api/tickets/me');
+  if (!res.ok) throw new Error('Failed to fetch tickets');
   return res.json();
 }
 
 export function groupTicketsByStatus(tickets: UserTicket[]) {
-  return tickets.reduce<Record<UserTicket["status"], UserTicket[]>>(
+  return tickets.reduce<Record<UserTicket['status'], UserTicket[]>>(
     (acc, ticket) => {
       acc[ticket.status].push(ticket);
       return acc;
     },
-    { active: [], used: [], cancelled: [], expired: [] }
+    { active: [], used: [], cancelled: [], expired: [] },
   );
 }
 
-export function resolveStatusLabel(status: UserTicket["status"]): string {
-  const labels: Record<UserTicket["status"], string> = {
-    active: "Active",
-    used: "Used",
-    cancelled: "Cancelled",
-    expired: "Expired",
+export function resolveStatusLabel(status: UserTicket['status']): string {
+  const labels: Record<UserTicket['status'], string> = {
+    active: 'Active',
+    used: 'Used',
+    cancelled: 'Cancelled',
+    expired: 'Expired',
   };
-  return labels[status] || "Unknown";
+  return labels[status] || 'Unknown';
 }
 
 export function formatTicketPrice(price: number): string {
-  if (price === 0) return "Free";
+  if (price === 0) return 'Free';
   return `${price.toFixed(2)} ETH`;
 }

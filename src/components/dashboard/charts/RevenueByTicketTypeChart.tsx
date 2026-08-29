@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import type { TicketTypeBreakdown } from "@/hooks/useOrganizerAnalytics";
-import { THEME_COLORS } from "@/lib/themeColors";
+import { useState } from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { TicketTypeBreakdown } from '@/hooks/useOrganizerAnalytics';
+import { THEME_COLORS } from '@/lib/themeColors';
 
-const COLORS = [THEME_COLORS.brandPrimary, THEME_COLORS.brandAccent, "#a78bfa", "#34d399", "#f59e0b", "#f87171"];
-const PRIOR_COLORS = ["#6b4fff", "#5be0ff", "#c4b5fd", "#6ee7b7", "#fcd34d", "#fca5a5"];
+const COLORS = [
+  THEME_COLORS.brandPrimary,
+  THEME_COLORS.brandAccent,
+  '#a78bfa',
+  '#34d399',
+  '#f59e0b',
+  '#f87171',
+];
+const PRIOR_COLORS = ['#6b4fff', '#5be0ff', '#c4b5fd', '#6ee7b7', '#fcd34d', '#fca5a5'];
 
 interface TicketTypeBreakdownWithPrior extends TicketTypeBreakdown {
   priorRevenue?: number;
@@ -25,18 +25,32 @@ interface Props {
 
 interface TooltipPayload {
   name: string;
-  payload: TicketTypeBreakdownWithPrior & { percentage: number; priorPercentage?: number };
+  payload: TicketTypeBreakdownWithPrior & {
+    percentage: number;
+    priorPercentage?: number;
+  };
 }
 
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayload[] }) {
+function CustomTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: TooltipPayload[];
+}) {
   if (!active || !payload?.length) return null;
   const { name, payload: item } = payload[0];
   return (
     <div className="rounded bg-[#1a2040] border border-brand-primary px-3 py-2 text-xs text-brand-accent">
       <p className="font-semibold">{name}</p>
-      <p>Current: ₦ {item.revenue.toLocaleString("en-NG")} ({item.percentage}%)</p>
+      <p>
+        Current: ₦ {item.revenue.toLocaleString('en-NG')} ({item.percentage}%)
+      </p>
       {item.priorRevenue != null && (
-        <p className="text-gray-400">Prior: ₦ {item.priorRevenue.toLocaleString("en-NG")} ({item.priorPercentage ?? 0}%)</p>
+        <p className="text-gray-400">
+          Prior: ₦ {item.priorRevenue.toLocaleString('en-NG')} (
+          {item.priorPercentage ?? 0}%)
+        </p>
       )}
     </div>
   );
@@ -54,7 +68,10 @@ export function RevenueByTicketTypeChart({ data }: Props) {
     name: d.type,
     value: showPrior && d.priorRevenue != null ? d.priorRevenue : d.revenue,
     percentage: totalRevenue > 0 ? Math.round((d.revenue / totalRevenue) * 100) : 0,
-    priorPercentage: totalPriorRevenue > 0 ? Math.round(((d.priorRevenue ?? 0) / totalPriorRevenue) * 100) : 0,
+    priorPercentage:
+      totalPriorRevenue > 0
+        ? Math.round(((d.priorRevenue ?? 0) / totalPriorRevenue) * 100)
+        : 0,
   }));
 
   const activeColors = showPrior ? PRIOR_COLORS : COLORS;
@@ -68,8 +85,8 @@ export function RevenueByTicketTypeChart({ data }: Props) {
             onClick={() => setShowPrior(false)}
             className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
               !showPrior
-                ? "bg-brand-primary text-white"
-                : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                ? 'bg-brand-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
             }`}
           >
             This period
@@ -79,8 +96,8 @@ export function RevenueByTicketTypeChart({ data }: Props) {
             onClick={() => setShowPrior(true)}
             className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
               showPrior
-                ? "bg-brand-primary text-white"
-                : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                ? 'bg-brand-primary text-white'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
             }`}
           >
             vs previous
@@ -106,10 +123,10 @@ export function RevenueByTicketTypeChart({ data }: Props) {
           <Tooltip content={<CustomTooltip />} />
           <Legend
             formatter={(value, entry) => {
-              const item = entry.payload as typeof chartData[0];
+              const item = entry.payload as (typeof chartData)[0];
               return (
                 <span className="text-xs text-brand-accent">
-                  {value} — ₦ {item.revenue.toLocaleString("en-NG")} ({item.percentage}%)
+                  {value} — ₦ {item.revenue.toLocaleString('en-NG')} ({item.percentage}%)
                 </span>
               );
             }}

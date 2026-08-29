@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-export type TransferStatus = "completed" | "pending" | "failed";
+export type TransferStatus = 'completed' | 'pending' | 'failed';
 
 export interface TransferRecord {
   id: string;
@@ -22,46 +22,46 @@ interface TransferHistoryTableProps {
 }
 
 const STATUS_STYLES: Record<TransferStatus, string> = {
-  completed: "bg-emerald-100 text-emerald-700",
-  pending: "bg-amber-100 text-amber-700",
-  failed: "bg-red-100 text-red-700",
+  completed: 'bg-emerald-100 text-emerald-700',
+  pending: 'bg-amber-100 text-amber-700',
+  failed: 'bg-red-100 text-red-700',
 };
 
 function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("en-NG", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
+  return new Intl.DateTimeFormat('en-NG', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   }).format(new Date(iso));
 }
 
-function formatAmount(amount: number, currency = "NGN") {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
+function formatAmount(amount: number, currency = 'NGN') {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
     currency,
     maximumFractionDigits: 0,
   }).format(amount);
 }
 
 const COLUMNS = [
-  { key: "date", label: "Date" },
-  { key: "description", label: "Description" },
-  { key: "reference", label: "Reference" },
-  { key: "amount", label: "Amount" },
-  { key: "status", label: "Status" },
+  { key: 'date', label: 'Date' },
+  { key: 'description', label: 'Description' },
+  { key: 'reference', label: 'Reference' },
+  { key: 'amount', label: 'Amount' },
+  { key: 'status', label: 'Status' },
 ] as const;
 
 export const TransferHistoryTable: React.FC<TransferHistoryTableProps> = ({
   transfers,
   isLoading = false,
   onRowClick,
-  className = "",
+  className = '',
 }) => {
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const sorted = [...transfers].sort((a, b) => {
     const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
-    return sortDir === "asc" ? diff : -diff;
+    return sortDir === 'asc' ? diff : -diff;
   });
 
   if (isLoading) {
@@ -75,11 +75,7 @@ export const TransferHistoryTable: React.FC<TransferHistoryTableProps> = ({
   }
 
   if (!transfers.length) {
-    return (
-      <p className="py-10 text-center text-sm text-gray-400">
-        No transfers found.
-      </p>
-    );
+    return <p className="py-10 text-center text-sm text-gray-400">No transfers found.</p>;
   }
 
   return (
@@ -88,21 +84,15 @@ export const TransferHistoryTable: React.FC<TransferHistoryTableProps> = ({
         <thead className="border-b border-gray-700 bg-gray-900 text-xs uppercase text-gray-400">
           <tr>
             {COLUMNS.map((col) => (
-              <th
-                key={col.key}
-                scope="col"
-                className="px-4 py-3 text-left"
-              >
-                {col.key === "date" ? (
+              <th key={col.key} scope="col" className="px-4 py-3 text-left">
+                {col.key === 'date' ? (
                   <button
                     className="flex items-center gap-1 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-                    onClick={() =>
-                      setSortDir((d) => (d === "asc" ? "desc" : "asc"))
-                    }
-                    aria-label={`Sort by date ${sortDir === "asc" ? "descending" : "ascending"}`}
+                    onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                    aria-label={`Sort by date ${sortDir === 'asc' ? 'descending' : 'ascending'}`}
                   >
                     {col.label}
-                    <span aria-hidden="true">{sortDir === "asc" ? "↑" : "↓"}</span>
+                    <span aria-hidden="true">{sortDir === 'asc' ? '↑' : '↓'}</span>
                   </button>
                 ) : (
                   col.label
@@ -115,16 +105,16 @@ export const TransferHistoryTable: React.FC<TransferHistoryTableProps> = ({
           {sorted.map((tx) => (
             <tr
               key={tx.id}
-              className={`transition-colors hover:bg-gray-800/60 ${onRowClick ? "cursor-pointer" : ""}`}
+              className={`transition-colors hover:bg-gray-800/60 ${onRowClick ? 'cursor-pointer' : ''}`}
               onClick={() => onRowClick?.(tx)}
               tabIndex={onRowClick ? 0 : undefined}
               onKeyDown={(e) => {
-                if (onRowClick && (e.key === "Enter" || e.key === " ")) {
+                if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
                   e.preventDefault();
                   onRowClick(tx);
                 }
               }}
-              role={onRowClick ? "button" : undefined}
+              role={onRowClick ? 'button' : undefined}
               aria-label={
                 onRowClick
                   ? `View details for ${tx.description} on ${formatDate(tx.date)}`
@@ -134,7 +124,7 @@ export const TransferHistoryTable: React.FC<TransferHistoryTableProps> = ({
               <td className="whitespace-nowrap px-4 py-3">{formatDate(tx.date)}</td>
               <td className="px-4 py-3">{tx.description}</td>
               <td className="px-4 py-3 font-mono text-xs text-gray-400">
-                {tx.reference ?? "—"}
+                {tx.reference ?? '—'}
               </td>
               <td className="whitespace-nowrap px-4 py-3 font-medium">
                 {formatAmount(tx.amount, tx.currency)}

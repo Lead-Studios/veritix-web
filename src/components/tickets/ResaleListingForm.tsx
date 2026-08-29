@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const resaleSchema = z.object({
   price: z
     .string()
-    .min(1, "Price is required")
-    .refine((v) => !isNaN(Number(v)) && Number(v) > 0, "Price must be a positive number"),
+    .min(1, 'Price is required')
+    .refine((v) => !isNaN(Number(v)) && Number(v) > 0, 'Price must be a positive number'),
 });
 
 type ResaleFormValues = z.infer<typeof resaleSchema>;
@@ -41,10 +41,10 @@ export function ResaleListingForm({
     formState: { errors },
   } = useForm<ResaleFormValues>({
     resolver: zodResolver(
-      resaleSchema.refine(
-        (v) => Number(v.price) <= maxPrice,
-        { message: `Price cannot exceed ${maxResellPercent}% of original (${maxPrice.toFixed(2)} XLM)`, path: ["price"] }
-      )
+      resaleSchema.refine((v) => Number(v.price) <= maxPrice, {
+        message: `Price cannot exceed ${maxResellPercent}% of original (${maxPrice.toFixed(2)} XLM)`,
+        path: ['price'],
+      }),
     ),
   });
 
@@ -53,18 +53,18 @@ export function ResaleListingForm({
     setServerError(null);
     try {
       const res = await fetch(`/api/tickets/${encodeURIComponent(ticketId)}/resale`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ price: Number(data.price) }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message ?? "Failed to list ticket for resale.");
+        throw new Error(body.message ?? 'Failed to list ticket for resale.');
       }
       setSuccess(true);
       onSuccess?.();
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Something went wrong.");
+      setServerError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setSubmitting(false);
     }
@@ -82,7 +82,7 @@ export function ResaleListingForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <h3 className="text-sm font-semibold text-white">List for Resale</h3>
       <p className="text-xs text-gray-400">
-        Original price: <span className="text-gray-300">{originalPrice} XLM</span> · Max:{" "}
+        Original price: <span className="text-gray-300">{originalPrice} XLM</span> · Max:{' '}
         <span className="text-gray-300">{maxPrice.toFixed(2)} XLM</span>
       </p>
 
@@ -95,11 +95,11 @@ export function ResaleListingForm({
           type="number"
           step="0.01"
           min="0.01"
-          {...register("price")}
+          {...register('price')}
           aria-invalid={!!errors.price}
           placeholder={`e.g. ${originalPrice}`}
           className={`w-full rounded-lg bg-white/5 border px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#4D21FF] ${
-            errors.price ? "border-red-500" : "border-white/10"
+            errors.price ? 'border-red-500' : 'border-white/10'
           }`}
         />
         {errors.price && (
@@ -120,7 +120,7 @@ export function ResaleListingForm({
         disabled={submitting}
         className="w-full py-2.5 rounded-lg bg-[#4D21FF] hover:bg-[#3d18cc] text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {submitting ? "Listing…" : "List for Resale"}
+        {submitting ? 'Listing…' : 'List for Resale'}
       </button>
     </form>
   );

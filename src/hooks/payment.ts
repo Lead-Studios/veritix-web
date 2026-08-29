@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const POLL_INTERVAL_MS = 15_000;
 
@@ -12,17 +12,14 @@ export interface CheckInCounterState {
 }
 
 async function fetchCheckInCount(
-  eventId: string
+  eventId: string,
 ): Promise<{ checkInCount: number; totalCapacity: number }> {
   const res = await fetch(`/api/events/${eventId}/check-ins/count`);
   if (!res.ok) throw new Error(`Server responded ${res.status}`);
   return res.json();
 }
 
-export function useCheckInCounter(
-  eventId: string,
-  isLive: boolean
-): CheckInCounterState {
+export function useCheckInCounter(eventId: string, isLive: boolean): CheckInCounterState {
   const [checkInCount, setCheckInCount] = useState<number | null>(null);
   const [totalCapacity, setTotalCapacity] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -45,7 +42,7 @@ export function useCheckInCounter(
       setTotalCapacity(data.totalCapacity);
       setLastUpdated(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch count");
+      setError(err instanceof Error ? err.message : 'Failed to fetch count');
     } finally {
       setLoading(false);
     }

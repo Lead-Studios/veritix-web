@@ -1,10 +1,7 @@
 // FE-085: Verification error state classification
 
 export type VerificationErrorType =
-  | "invalid-ticket"
-  | "already-used"
-  | "service-failure"
-  | "network-error";
+  'invalid-ticket' | 'already-used' | 'service-failure' | 'network-error';
 
 export interface VerificationError {
   type: VerificationErrorType;
@@ -27,41 +24,41 @@ const VERIFICATION_ERROR_MESSAGES: Record<
   VerificationErrorType,
   VerificationErrorMessage
 > = {
-  "invalid-ticket": {
-    title: "Invalid ticket",
+  'invalid-ticket': {
+    title: 'Invalid ticket',
     description:
-      "We couldn\u2019t find a ticket matching this code. Double-check the code with the attendee and try again.",
-    actionLabel: "Verify another ticket",
+      'We couldn\u2019t find a ticket matching this code. Double-check the code with the attendee and try again.',
+    actionLabel: 'Verify another ticket',
     retryable: false,
   },
-  "already-used": {
-    title: "Already used",
+  'already-used': {
+    title: 'Already used',
     description:
-      "This ticket has already been checked in. Please direct the attendee to a supervisor for assistance.",
-    actionLabel: "Verify another ticket",
+      'This ticket has already been checked in. Please direct the attendee to a supervisor for assistance.',
+    actionLabel: 'Verify another ticket',
     retryable: false,
   },
-  "service-failure": {
-    title: "Service unavailable",
+  'service-failure': {
+    title: 'Service unavailable',
     description:
-      "The verification service is temporarily unavailable. Please wait a moment and retry.",
-    actionLabel: "Retry verification",
+      'The verification service is temporarily unavailable. Please wait a moment and retry.',
+    actionLabel: 'Retry verification',
     retryable: true,
   },
-  "network-error": {
-    title: "Connection lost",
+  'network-error': {
+    title: 'Connection lost',
     description:
-      "We couldn\u2019t reach the verification service. Check your internet connection and try again.",
-    actionLabel: "Retry verification",
+      'We couldn\u2019t reach the verification service. Check your internet connection and try again.',
+    actionLabel: 'Retry verification',
     retryable: true,
   },
 };
 
 export const FALLBACK_VERIFICATION_ERROR_MESSAGE: VerificationErrorMessage = {
-  title: "Verification failed",
+  title: 'Verification failed',
   description:
-    "Something went wrong while verifying this ticket. Please try again or contact support if the issue persists.",
-  actionLabel: "Try again",
+    'Something went wrong while verifying this ticket. Please try again or contact support if the issue persists.',
+  actionLabel: 'Try again',
   retryable: true,
 };
 
@@ -85,13 +82,13 @@ export function classifyVerificationError(
 ): VerificationError {
   let type: VerificationErrorType;
   if (httpStatus === null) {
-    type = "network-error";
+    type = 'network-error';
   } else if (httpStatus >= 500) {
-    type = "service-failure";
-  } else if (serverCode === "ALREADY_USED") {
-    type = "already-used";
+    type = 'service-failure';
+  } else if (serverCode === 'ALREADY_USED') {
+    type = 'already-used';
   } else {
-    type = "invalid-ticket";
+    type = 'invalid-ticket';
   }
   const { description, retryable } = getVerificationErrorMessage(type);
   return { type, message: description, retryable };

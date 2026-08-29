@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export interface TicketOption {
   name: string;
@@ -44,13 +44,16 @@ export function TicketSelector({
               <button
                 type="button"
                 disabled={soldOut}
-                onClick={() => { onSelect(i); onQuantityChange(1); }}
+                onClick={() => {
+                  onSelect(i);
+                  onQuantityChange(1);
+                }}
                 className={`w-full rounded-xl border p-4 text-left transition-colors ${
                   isActive
-                    ? "border-[#4D21FF] bg-[#4D21FF]/10"
+                    ? 'border-[#4D21FF] bg-[#4D21FF]/10'
                     : soldOut
-                    ? "cursor-not-allowed border-white/10 opacity-50"
-                    : "border-white/10 bg-white/5 hover:border-[#4D21FF]/40"
+                      ? 'cursor-not-allowed border-white/10 opacity-50'
+                      : 'border-white/10 bg-white/5 hover:border-[#4D21FF]/40'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -83,7 +86,7 @@ export function TicketSelector({
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-semibold text-white">
-                      {ticket.price === 0 ? "Free" : `${ticket.price} ETH`}
+                      {ticket.price === 0 ? 'Free' : `${ticket.price} ETH`}
                     </p>
                     <p className="text-xs text-white/50">{ticket.remaining} left</p>
                   </div>
@@ -107,7 +110,9 @@ export function TicketSelector({
             >
               −
             </button>
-            <span className="w-6 text-center text-sm font-medium text-white">{quantity}</span>
+            <span className="w-6 text-center text-sm font-medium text-white">
+              {quantity}
+            </span>
             <button
               type="button"
               disabled={quantity >= maxQty}
@@ -124,7 +129,7 @@ export function TicketSelector({
             onClick={onPurchase}
             className="flex-1 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
-            Buy {quantity > 1 ? `${quantity} tickets` : "ticket"} ·{" "}
+            Buy {quantity > 1 ? `${quantity} tickets` : 'ticket'} ·{' '}
             {(selected.price * quantity).toFixed(3)} ETH
           </button>
         </div>

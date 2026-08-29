@@ -5,7 +5,13 @@ import Link from 'next/link';
 import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { HiCalendar, HiClock, HiLocationMarker, HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import {
+  HiCalendar,
+  HiClock,
+  HiLocationMarker,
+  HiHeart,
+  HiOutlineHeart,
+} from 'react-icons/hi';
 import { useFavorite } from '@/hooks/useFavorite';
 import { CapacityProgressBar } from '@/components/events/EventCapacityProgress';
 
@@ -74,7 +80,11 @@ function FavoriteToggle({ eventId }: { eventId: string }) {
       className="p-1.5 rounded-full hover:bg-white/10 text-rose-500 transition-colors"
       aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
     >
-      {isLiked ? <HiHeart className="w-5 h-5 fill-current" /> : <HiOutlineHeart className="w-5 h-5" />}
+      {isLiked ? (
+        <HiHeart className="w-5 h-5 fill-current" />
+      ) : (
+        <HiOutlineHeart className="w-5 h-5" />
+      )}
     </button>
   );
 }
@@ -85,6 +95,9 @@ interface EventCardProps {
 }
 
 function EventCard({ event, index = 0 }: EventCardProps) {
+  const imageSrc = ((event as Event & { image?: string }).image ??
+    event.imageUrl ??
+    '/images/events/event.png') as string;
   const imageSrc = (event.image ?? event.imageUrl ?? '/images/events/event.png') as string;
   const imageSrc = (event.image ?? event.imageUrl ?? "/images/events/event.png") as string;
   const eventDate = event.eventDate
@@ -93,6 +106,8 @@ function EventCard({ event, index = 0 }: EventCardProps) {
         day: 'numeric',
         year: 'numeric',
       })
+    : 'Date TBD';
+  const eventTime = (event as Event & { time?: string }).time ?? 'Time TBD';
     : event.date ?? 'Date TBD';
   const eventTime = event.time ?? 'Time TBD';
     : event.date ?? "Date TBD";
@@ -104,17 +119,17 @@ function EventCard({ event, index = 0 }: EventCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 0.5, 
+      transition={{
+        duration: 0.5,
         delay: index * 0.05,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        ease: [0.25, 0.46, 0.45, 0.94],
       }}
     >
       <div className="relative overflow-hidden rounded-xl bg-primary-dark-blue/50 border border-[#E0E0E0]/20 hover:border-white/10 transition-all duration-300 group">
         <div className="flex flex-col sm:flex-row gap-0">
           {/* Event Image - Top on mobile, Left on larger */}
           <div className="relative w-full sm:w-48 h-48 sm:h-auto shrink-0 overflow-hidden">
-            <Link 
+            <Link
               href={`/events/${event.id}`}
               prefetch
               className="absolute inset-0 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-inset"
@@ -128,10 +143,13 @@ function EventCard({ event, index = 0 }: EventCardProps) {
               sizes="(max-width: 640px) 100vw, 12rem"
             />
             {/* Pattern overlay for texture */}
-            <div className="absolute inset-0 opacity-20" style={{
-              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.2) 1px, transparent 0)`,
-              backgroundSize: '16px 16px'
-            }} />
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.2) 1px, transparent 0)`,
+                backgroundSize: '16px 16px',
+              }}
+            />
           </div>
 
           {/* Event Details - Bottom on mobile, Right on larger */}
@@ -152,7 +170,7 @@ function EventCard({ event, index = 0 }: EventCardProps) {
               )}
               {/* Event Name and Price - Same Line */}
               <div className="flex items-start justify-between gap-3">
-                <Link 
+                <Link
                   href={`/events/${event.id}`}
                   prefetch
                   className="text-xl font-semibold text-white group-hover:text-gray-200 transition-colors flex-1 focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428] rounded"
@@ -198,7 +216,7 @@ function EventCard({ event, index = 0 }: EventCardProps) {
 
             {/* Button */}
             <div className="flex items-center justify-end mt-4">
-              <Link 
+              <Link
                 href={`/events/${event.id}`}
                 prefetch
                 className="px-6 py-2.5 bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#6B8CFF] focus:ring-offset-2 focus:ring-offset-[#101428]"

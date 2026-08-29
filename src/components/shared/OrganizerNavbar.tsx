@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Search } from "lucide-react";
-import { ORGANIZER_NAV_ITEMS, isActiveRoute } from "@/lib/organizerNav";
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, Search } from 'lucide-react';
+import { ORGANIZER_NAV_ITEMS, isActiveRoute } from '@/lib/organizerNav';
 
 // ─── Search ───────────────────────────────────────────────────────────────────
 
 interface SearchResult {
   id: string;
   label: string;
-  category: "Events" | "Tickets" | "Attendees";
+  category: 'Events' | 'Tickets' | 'Attendees';
   href: string;
 }
 
@@ -21,18 +21,18 @@ function useGlobalSearch(query: string): SearchResult[] {
     if (!query.trim()) return [];
     // Simulated grouped results — swap for real fetch
     return [
-      { id: "e1", label: `Event: "${query}"`, category: "Events", href: "/events" },
-      { id: "t1", label: `Ticket: "${query}"`, category: "Tickets", href: "/tickets" },
-      { id: "a1", label: `Attendee: "${query}"`, category: "Attendees", href: "/verify" },
+      { id: 'e1', label: `Event: "${query}"`, category: 'Events', href: '/events' },
+      { id: 't1', label: `Ticket: "${query}"`, category: 'Tickets', href: '/tickets' },
+      { id: 'a1', label: `Attendee: "${query}"`, category: 'Attendees', href: '/verify' },
     ];
   }, [query]);
 }
 
-const CATEGORIES: SearchResult["category"][] = ["Events", "Tickets", "Attendees"];
+const CATEGORIES: SearchResult['category'][] = ['Events', 'Tickets', 'Attendees'];
 
 function GlobalSearch() {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -41,15 +41,15 @@ function GlobalSearch() {
   // Cmd+K / Ctrl+K shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setOpen(true);
         setTimeout(() => inputRef.current?.focus(), 0);
       }
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === 'Escape') setOpen(false);
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
 
   // Close on outside click
@@ -59,17 +59,17 @@ function GlobalSearch() {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   const handleSelect = useCallback(
     (href: string) => {
       setOpen(false);
-      setQuery("");
+      setQuery('');
       router.push(href);
     },
-    [router]
+    [router],
   );
 
   return (
@@ -84,7 +84,9 @@ function GlobalSearch() {
       >
         <Search size={14} />
         <span className="hidden sm:inline">Search…</span>
-        <kbd className="hidden sm:inline rounded bg-white/10 px-1.5 py-0.5 text-xs">⌘K</kbd>
+        <kbd className="hidden sm:inline rounded bg-white/10 px-1.5 py-0.5 text-xs">
+          ⌘K
+        </kbd>
       </button>
 
       {open && (
@@ -106,14 +108,14 @@ function GlobalSearch() {
               aria-label="Search"
             />
             {query && (
-              <button onClick={() => setQuery("")} aria-label="Clear search">
+              <button onClick={() => setQuery('')} aria-label="Clear search">
                 <X size={14} className="text-white/40 hover:text-white" />
               </button>
             )}
           </div>
 
           <div className="max-h-72 overflow-y-auto py-2">
-            {query.trim() === "" ? (
+            {query.trim() === '' ? (
               <p className="px-4 py-6 text-center text-xs text-white/30">
                 Type to search across events, tickets, and attendees
               </p>
@@ -165,16 +167,18 @@ function MobileDrawer({
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
   // Prevent body scroll when open
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   if (!open) return null;
@@ -215,10 +219,10 @@ function MobileDrawer({
                   onClick={onClose}
                   className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
                     active
-                      ? "bg-[#4D21FF]/20 text-[#21D4FF]"
-                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                      ? 'bg-[#4D21FF]/20 text-[#21D4FF]'
+                      : 'text-white/60 hover:bg-white/5 hover:text-white'
                   }`}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={active ? 'page' : undefined}
                 >
                   {item.label}
                 </Link>
@@ -265,10 +269,10 @@ export function OrganizerNavbar() {
                   href={item.href}
                   className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
                     active
-                      ? "bg-[#4D21FF]/20 text-[#21D4FF]"
-                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                      ? 'bg-[#4D21FF]/20 text-[#21D4FF]'
+                      : 'text-white/60 hover:bg-white/5 hover:text-white'
                   }`}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={active ? 'page' : undefined}
                 >
                   {item.label}
                 </Link>

@@ -1,1 +1,1 @@
-export { validateEnvironment, getStellarNetwork } from "./validateEnv";
+export { validateEnvironment, getStellarNetwork } from './validateEnv';

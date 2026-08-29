@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { buildUrl, API_ROUTES } from "@/lib/api-routes";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { buildUrl, API_ROUTES } from '@/lib/api-routes';
 
 export interface CheckInStats {
   eventId: string;
@@ -26,10 +26,7 @@ interface UseLiveCheckInOptions {
  * @example
  * const { stats, isLoading, error, refresh } = useLiveCheckIn(eventId);
  */
-export function useLiveCheckIn(
-  eventId: string,
-  options: UseLiveCheckInOptions = {}
-) {
+export function useLiveCheckIn(eventId: string, options: UseLiveCheckInOptions = {}) {
   const { interval = 15_000, pauseOnHidden = true } = options;
 
   const [stats, setStats] = useState<CheckInStats | null>(null);
@@ -46,16 +43,16 @@ export function useLiveCheckIn(
     abortRef.current = ac;
 
     try {
-      const res = await fetch(
-        buildUrl(API_ROUTES.events.checkIn(eventId)),
-        { signal: ac.signal, credentials: "include" }
-      );
+      const res = await fetch(buildUrl(API_ROUTES.events.checkIn(eventId)), {
+        signal: ac.signal,
+        credentials: 'include',
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: CheckInStats = await res.json();
       setStats(data);
       setError(null);
     } catch (err) {
-      if ((err as Error).name !== "AbortError") {
+      if ((err as Error).name !== 'AbortError') {
         setError((err as Error).message);
       }
     } finally {
@@ -81,13 +78,13 @@ export function useLiveCheckIn(
     };
 
     if (pauseOnHidden) {
-      document.addEventListener("visibilitychange", handleVisibility);
+      document.addEventListener('visibilitychange', handleVisibility);
     }
 
     return () => {
       abortRef.current?.abort();
       if (timerRef.current) clearTimeout(timerRef.current);
-      document.removeEventListener("visibilitychange", handleVisibility);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [fetchStats, scheduleNext, pauseOnHidden]);
 

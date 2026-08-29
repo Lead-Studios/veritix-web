@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface Transfer {
   from: string;
@@ -18,18 +18,22 @@ function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
-function stellarExplorerLink(hash: string, network: "testnet" | "mainnet" = "testnet"): string {
-  const base = network === "mainnet"
-    ? "https://stellar.expert/explorer/public"
-    : "https://stellar.expert/explorer/testnet";
+function stellarExplorerLink(
+  hash: string,
+  network: 'testnet' | 'mainnet' = 'testnet',
+): string {
+  const base =
+    network === 'mainnet'
+      ? 'https://stellar.expert/explorer/public'
+      : 'https://stellar.expert/explorer/testnet';
   return `${base}/tx/${hash}`;
 }
 
 function getInitials(name: string) {
   return name
-    .split(" ")
+    .split(' ')
     .map((n) => n[0])
-    .join("")
+    .join('')
     .toUpperCase()
     .slice(0, 2);
 }
@@ -37,8 +41,8 @@ function getInitials(name: string) {
 function relativeDate(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const days = Math.floor(diff / 86400000);
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
   if (days < 30) return `${days} days ago`;
   if (days < 365) return `${Math.floor(days / 30)} months ago`;
   return `${Math.floor(days / 365)} years ago`;
@@ -58,8 +62,20 @@ export function TransferHistory({ ticketId }: TransferHistoryProps) {
 
   const steps = transfers
     ? [
-        { label: "Issued to", name: transfers[0]?.from ?? "Original owner", date: null, reason: null, txHash: null },
-        ...transfers.map((t) => ({ label: "Transferred to", name: t.to, date: t.date, reason: t.reason, txHash: (t as Transfer & { txHash?: string }).txHash ?? null })),
+        {
+          label: 'Issued to',
+          name: transfers[0]?.from ?? 'Original owner',
+          date: null,
+          reason: null,
+          txHash: null,
+        },
+        ...transfers.map((t) => ({
+          label: 'Transferred to',
+          name: t.to,
+          date: t.date,
+          reason: t.reason,
+          txHash: (t as Transfer & { txHash?: string }).txHash ?? null,
+        })),
       ]
     : [];
 
@@ -72,12 +88,17 @@ export function TransferHistory({ ticketId }: TransferHistoryProps) {
       >
         <span>Transfer History</span>
         <svg
-          className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -103,16 +124,20 @@ export function TransferHistory({ ticketId }: TransferHistoryProps) {
                   </div>
                   <div className="pt-1 pb-4">
                     <p className="text-sm text-white">
-                      {step.label}{" "}
+                      {step.label}{' '}
                       <span className="font-semibold" title={step.name}>
                         {truncateAddress(step.name)}
                       </span>
                       {step.reason && (
-                        <span className="ml-1 text-xs text-gray-400">({step.reason})</span>
+                        <span className="ml-1 text-xs text-gray-400">
+                          ({step.reason})
+                        </span>
                       )}
                     </p>
                     {step.date && (
-                      <p className="text-xs text-gray-500 mt-0.5">{relativeDate(step.date)}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {relativeDate(step.date)}
+                      </p>
                     )}
                     {step.txHash && (
                       <a

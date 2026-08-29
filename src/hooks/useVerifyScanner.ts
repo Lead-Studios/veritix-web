@@ -1,9 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 
-type ScanMode = "camera" | "manual";
+type ScanMode = 'camera' | 'manual';
 
 export function useVerifyScanner() {
-  const [mode, setMode] = useState<ScanMode>("camera");
+  const [mode, setMode] = useState<ScanMode>('camera');
   const [scannerError, setScannerError] = useState<string | null>(null);
   const [lastScan, setLastScan] = useState<string | null>(null);
 

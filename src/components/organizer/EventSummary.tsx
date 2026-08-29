@@ -6,7 +6,11 @@ export interface SummaryProps {
   checkedIn: number;
 }
 
-export default function EventSummary({ eventName, ticketsSold, checkedIn }: SummaryProps) {
+export default function EventSummary({
+  eventName,
+  ticketsSold,
+  checkedIn,
+}: SummaryProps) {
   const noShows = Math.max(0, ticketsSold - checkedIn);
   const rate = ticketsSold > 0 ? ((checkedIn / ticketsSold) * 100).toFixed(1) : '0';
 

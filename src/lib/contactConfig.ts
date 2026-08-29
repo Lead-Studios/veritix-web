@@ -1,24 +1,22 @@
-import { buildUrl, API_ROUTES } from "./api-routes";
+import { buildUrl, API_ROUTES } from './api-routes';
 
 /**
  * Centralised contact details and social links for the contact page.
  * Update this file to change support information without touching component markup.
  */
 export const contactDetails = {
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+1 (555) 123-4567",
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "support@veritix.io",
+  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '+1 (555) 123-4567',
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'support@veritix.io',
   address:
     process.env.NEXT_PUBLIC_CONTACT_ADDRESS ??
-    "123 Blockchain Avenue, San Francisco, CA 94105",
+    '123 Blockchain Avenue, San Francisco, CA 94105',
 };
 
 export const socialLinks = {
   linkedin:
-    process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN ??
-    "https://linkedin.com/company/veritix",
-  twitter:
-    process.env.NEXT_PUBLIC_SOCIAL_TWITTER ?? "https://twitter.com/veritix",
-  github: process.env.NEXT_PUBLIC_SOCIAL_GITHUB ?? "https://github.com/veritix",
+    process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN ?? 'https://linkedin.com/company/veritix',
+  twitter: process.env.NEXT_PUBLIC_SOCIAL_TWITTER ?? 'https://twitter.com/veritix',
+  github: process.env.NEXT_PUBLIC_SOCIAL_GITHUB ?? 'https://github.com/veritix',
 };
 
 interface ErrorResponse {
@@ -38,16 +36,14 @@ export async function submitContactForm(data: {
   message: string;
 }) {
   const res = await fetch(buildUrl(API_ROUTES.contact), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
   if (!res.ok) {
     const err: ErrorResponse = await res.json().catch(() => ({}));
-    throw new Error(
-      err?.message || "Failed to send your message. Please try again.",
-    );
+    throw new Error(err?.message || 'Failed to send your message. Please try again.');
   }
 
   return res.json();

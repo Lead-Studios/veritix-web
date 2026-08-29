@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { Star } from "lucide-react";
+import { useEffect, useState, useCallback } from 'react';
+import { Star } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -24,23 +24,15 @@ interface EventReviewsProps {
 
 const PAGE_LIMIT = 5;
 
-function StarRating({
-  rating,
-  size = "sm",
-}: {
-  rating: number;
-  size?: "sm" | "lg";
-}) {
-  const cls = size === "lg" ? "w-6 h-6" : "w-4 h-4";
+function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg' }) {
+  const cls = size === 'lg' ? 'w-6 h-6' : 'w-4 h-4';
   return (
     <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
           className={`${cls} ${
-            star <= Math.round(rating)
-              ? "fill-amber-400 text-amber-400"
-              : "text-white/20"
+            star <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'text-white/20'
           }`}
         />
       ))}
@@ -76,7 +68,7 @@ function RatingBar({
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return 'just now';
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
@@ -116,7 +108,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
         setReviews((prev) => (append ? [...prev, ...data.reviews] : data.reviews));
         setPage(pageNum);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Could not load reviews.");
+        setError(err instanceof Error ? err.message : 'Could not load reviews.');
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -151,10 +143,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
       {loading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="h-24 animate-pulse rounded-xl bg-white/5"
-            />
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-white/5" />
           ))}
         </div>
       ) : error ? (
@@ -179,7 +168,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
               </span>
               <StarRating rating={avgRating} size="lg" />
               <span className="text-xs text-gray-500">
-                {total} review{total !== 1 ? "s" : ""}
+                {total} review{total !== 1 ? 's' : ''}
               </span>
             </div>
 
@@ -202,10 +191,7 @@ export function EventReviews({ eventId }: EventReviewsProps) {
                     <p className="text-sm font-semibold text-white">{r.authorName}</p>
                     <StarRating rating={r.rating} />
                   </div>
-                  <time
-                    dateTime={r.createdAt}
-                    className="text-xs text-gray-500 shrink-0"
-                  >
+                  <time dateTime={r.createdAt} className="text-xs text-gray-500 shrink-0">
                     {timeAgo(r.createdAt)}
                   </time>
                 </div>

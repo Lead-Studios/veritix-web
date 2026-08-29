@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef } from 'react';
 
-type Direction = "horizontal" | "vertical" | "both";
+type Direction = 'horizontal' | 'vertical' | 'both';
 
 interface UseRovingTabindexOptions {
   /** Movement axis for arrow key navigation */
@@ -32,7 +32,7 @@ interface UseRovingTabindexOptions {
  * );
  */
 export function useRovingTabindex(options: UseRovingTabindexOptions = {}) {
-  const { direction = "horizontal", wrap = true } = options;
+  const { direction = 'horizontal', wrap = true } = options;
   const containerRef = useRef<HTMLElement | null>(null);
   const currentIndexRef = useRef<number>(0);
 
@@ -40,8 +40,8 @@ export function useRovingTabindex(options: UseRovingTabindexOptions = {}) {
     if (!containerRef.current) return [];
     return Array.from(
       containerRef.current.querySelectorAll<HTMLElement>(
-        '[tabindex], button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
-      )
+        '[tabindex], button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
+      ),
     ).filter((el) => !el.closest('[aria-disabled="true"]'));
   }, []);
 
@@ -59,38 +59,38 @@ export function useRovingTabindex(options: UseRovingTabindexOptions = {}) {
 
       // Reset all to -1
       items.forEach((el) => {
-        el.setAttribute("tabindex", "-1");
+        el.setAttribute('tabindex', '-1');
       });
 
       // Set focused to 0
-      items[next].setAttribute("tabindex", "0");
+      items[next].setAttribute('tabindex', '0');
       items[next].focus();
       currentIndexRef.current = next;
     },
-    [getFocusableItems, wrap]
+    [getFocusableItems, wrap],
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, index: number) => {
       currentIndexRef.current = index;
-      const isHoriz = direction === "horizontal" || direction === "both";
-      const isVert = direction === "vertical" || direction === "both";
+      const isHoriz = direction === 'horizontal' || direction === 'both';
+      const isVert = direction === 'vertical' || direction === 'both';
 
-      if ((isHoriz && e.key === "ArrowRight") || (isVert && e.key === "ArrowDown")) {
+      if ((isHoriz && e.key === 'ArrowRight') || (isVert && e.key === 'ArrowDown')) {
         e.preventDefault();
         moveFocus(1);
-      } else if ((isHoriz && e.key === "ArrowLeft") || (isVert && e.key === "ArrowUp")) {
+      } else if ((isHoriz && e.key === 'ArrowLeft') || (isVert && e.key === 'ArrowUp')) {
         e.preventDefault();
         moveFocus(-1);
-      } else if (e.key === "Home") {
+      } else if (e.key === 'Home') {
         e.preventDefault();
         moveFocus(-Infinity);
-      } else if (e.key === "End") {
+      } else if (e.key === 'End') {
         e.preventDefault();
         moveFocus(Infinity);
       }
     },
-    [direction, moveFocus]
+    [direction, moveFocus],
   );
 
   const getItemProps = useCallback(
@@ -101,7 +101,7 @@ export function useRovingTabindex(options: UseRovingTabindexOptions = {}) {
         currentIndexRef.current = index;
       },
     }),
-    [handleKeyDown]
+    [handleKeyDown],
   );
 
   return { containerRef, getItemProps };

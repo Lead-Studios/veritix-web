@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useRef } from "react";
-import { WalletPassCTA } from "./WalletPassCTA";
+import React, { useRef } from 'react';
+import { WalletPassCTA } from './WalletPassCTA';
 
-export type WalletStatus = "confirmed" | "pending" | "failed";
-export type TransferState = "none" | "transferable" | "transfer-pending" | "transferred";
+export type WalletStatus = 'confirmed' | 'pending' | 'failed';
+export type TransferState = 'none' | 'transferable' | 'transfer-pending' | 'transferred';
 
 export interface AttendeeTicket {
   id: string;
@@ -20,28 +20,47 @@ export interface AttendeeTicket {
   /** Stellar transaction hash for the on-chain confirmation */
   txHash?: string;
   /** Stellar network: testnet or mainnet */
-  network?: "testnet" | "mainnet";
+  network?: 'testnet' | 'mainnet';
 }
 
 const WALLET_BADGE: Record<WalletStatus, { label: string; className: string }> = {
-  confirmed: { label: "On-chain confirmed", className: "bg-green-900/60 text-green-300 border border-green-700" },
-  pending:   { label: "Pending confirmation", className: "bg-yellow-900/60 text-yellow-300 border border-yellow-700" },
-  failed:    { label: "Chain error", className: "bg-red-900/60 text-red-300 border border-red-700" },
+  confirmed: {
+    label: 'On-chain confirmed',
+    className: 'bg-green-900/60 text-green-300 border border-green-700',
+  },
+  pending: {
+    label: 'Pending confirmation',
+    className: 'bg-yellow-900/60 text-yellow-300 border border-yellow-700',
+  },
+  failed: {
+    label: 'Chain error',
+    className: 'bg-red-900/60 text-red-300 border border-red-700',
+  },
 };
 
-const TRANSFER_BADGE: Record<TransferState, { label: string; className: string } | null> = {
-  none:             null,
-  transferable:     { label: "Transferable", className: "bg-blue-900/60 text-blue-300 border border-blue-700" },
-  "transfer-pending": { label: "Transfer pending", className: "bg-yellow-900/60 text-yellow-300 border border-yellow-700" },
-  transferred:      { label: "Transferred", className: "bg-gray-700/60 text-gray-400 border border-gray-600" },
-};
+const TRANSFER_BADGE: Record<TransferState, { label: string; className: string } | null> =
+  {
+    none: null,
+    transferable: {
+      label: 'Transferable',
+      className: 'bg-blue-900/60 text-blue-300 border border-blue-700',
+    },
+    'transfer-pending': {
+      label: 'Transfer pending',
+      className: 'bg-yellow-900/60 text-yellow-300 border border-yellow-700',
+    },
+    transferred: {
+      label: 'Transferred',
+      className: 'bg-gray-700/60 text-gray-400 border border-gray-600',
+    },
+  };
 
 /** Downloads the QR SVG element as a PNG file. */
 function downloadQR(svgEl: SVGSVGElement, filename: string) {
   const serialized = new XMLSerializer().serializeToString(svgEl);
-  const blob = new Blob([serialized], { type: "image/svg+xml" });
+  const blob = new Blob([serialized], { type: 'image/svg+xml' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `${filename}.svg`;
   a.click();
@@ -49,20 +68,24 @@ function downloadQR(svgEl: SVGSVGElement, filename: string) {
 }
 
 /** Minimal inline QR using an SVG grid — no external dependency required. */
-const QRCode = React.forwardRef<SVGSVGElement, { value: string }>(function QRCode({ value }, ref) {
+const QRCode = React.forwardRef<SVGSVGElement, { value: string }>(function QRCode(
+  { value },
+  ref,
+) {
   // Deterministic pseudo-random grid from the ticket code string
   const SIZE = 11;
   const cells: boolean[][] = Array.from({ length: SIZE }, (_, r) =>
     Array.from({ length: SIZE }, (_, c) => {
       // Always fill the three finder-pattern corners
       const inCorner =
-        (r < 3 && c < 3) ||
-        (r < 3 && c >= SIZE - 3) ||
-        (r >= SIZE - 3 && c < 3);
+        (r < 3 && c < 3) || (r < 3 && c >= SIZE - 3) || (r >= SIZE - 3 && c < 3);
       if (inCorner) return true;
-      const hash = [...value].reduce((acc, ch) => acc ^ (ch.charCodeAt(0) * (r * SIZE + c + 1)), 0);
+      const hash = [...value].reduce(
+        (acc, ch) => acc ^ (ch.charCodeAt(0) * (r * SIZE + c + 1)),
+        0,
+      );
       return hash % 3 !== 0;
-    })
+    }),
   );
 
   return (
@@ -77,8 +100,8 @@ const QRCode = React.forwardRef<SVGSVGElement, { value: string }>(function QRCod
         row.map((filled, c) =>
           filled ? (
             <rect key={`${r}-${c}`} x={c} y={r} width={1} height={1} fill="white" />
-          ) : null
-        )
+          ) : null,
+        ),
       )}
     </svg>
   );
@@ -92,7 +115,7 @@ interface TicketPassProps {
 export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
   const walletBadge = WALLET_BADGE[ticket.walletStatus];
   const transferBadge = TRANSFER_BADGE[ticket.transferState];
-  const isTransferred = ticket.transferState === "transferred";
+  const isTransferred = ticket.transferState === 'transferred';
   const qrRef = useRef<SVGSVGElement>(null);
 
   const handleDownloadQR = () => {
@@ -102,7 +125,7 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
   return (
     <article
       className={`rounded-2xl overflow-hidden border ${
-        isTransferred ? "border-gray-700 opacity-60" : "border-[#4D21FF]/60"
+        isTransferred ? 'border-gray-700 opacity-60' : 'border-[#4D21FF]/60'
       } bg-[#101428] max-w-sm w-full`}
       aria-label={`Ticket pass for ${ticket.eventName}`}
     >
@@ -180,11 +203,15 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
 
       {/* Status badges */}
       <div className="px-5 pb-4 flex flex-wrap gap-2">
-        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${walletBadge.className}`}>
+        <span
+          className={`text-xs px-2.5 py-1 rounded-full font-medium ${walletBadge.className}`}
+        >
           {walletBadge.label}
         </span>
         {transferBadge && (
-          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${transferBadge.className}`}>
+          <span
+            className={`text-xs px-2.5 py-1 rounded-full font-medium ${transferBadge.className}`}
+          >
             {transferBadge.label}
           </span>
         )}
@@ -195,7 +222,7 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
         <div className="px-5 pb-4">
           <p className="text-xs text-gray-500 mb-1">On-chain confirmation</p>
           <a
-            href={`https://stellar.expert/explorer/${ticket.network ?? "testnet"}/tx/${ticket.txHash}`}
+            href={`https://stellar.expert/explorer/${ticket.network ?? 'testnet'}/tx/${ticket.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-mono text-[#6B8CFF] hover:text-[#4D21FF] break-all underline"
@@ -207,7 +234,7 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
       )}
 
       {/* Transfer action */}
-      {ticket.transferState === "transferable" && onTransfer && (
+      {ticket.transferState === 'transferable' && onTransfer && (
         <div className="px-5 pb-5">
           <button
             onClick={onTransfer}
@@ -218,7 +245,7 @@ export function TicketPass({ ticket, onTransfer }: TicketPassProps) {
         </div>
       )}
 
-      {ticket.transferState === "transfer-pending" && (
+      {ticket.transferState === 'transfer-pending' && (
         <div className="px-5 pb-5">
           <p className="text-xs text-yellow-400 text-center">
             Transfer in progress — awaiting on-chain confirmation.

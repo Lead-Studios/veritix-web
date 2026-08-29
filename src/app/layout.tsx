@@ -1,39 +1,33 @@
-import { ToastContainer } from "react-toastify";
-import { Manrope, Playfair_Display } from "next/font/google";
-import type { Metadata } from "next";
-import "./global.css";
-import { AuthProvider } from "@/context/authContext";
-import { validateEnvironment } from "@/lib/validateEnv";
-import { KeyboardShortcutHelp } from "@/components/KeyboardShortcutHelp";
+import { ToastContainer } from 'react-toastify';
+import { Manrope, Playfair_Display } from 'next/font/google';
+import type { Metadata } from 'next';
+import './global.css';
+import { AuthProvider } from '@/context/authContext';
+import { validateEnvironment } from '@/lib/validateEnv';
+import { KeyboardShortcutHelp } from '@/components/KeyboardShortcutHelp';
 
 const bodyFont = Manrope({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
 });
 
 const displayFont = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "VeriTix",
-    template: "%s | VeriTix",
+    default: 'VeriTix',
+    template: '%s | VeriTix',
   },
-  description: "Blockchain-powered ticketing on Stellar",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://veritix.io",
-  ),
+  description: 'Blockchain-powered ticketing on Stellar',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://veritix.io'),
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   validateEnvironment();
   return (
     <html lang="en" dir="ltr">

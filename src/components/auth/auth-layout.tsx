@@ -1,5 +1,5 @@
-import Image from "next/image";
-import BackButton from "./back-button";
+import Image from 'next/image';
+import BackButton from './back-button';
 
 const BrandContent = () => (
   <div className="h-48 lg:h-full rounded-3xl relative bg-primary-dark-blue p-8 flex flex-col justify-between overflow-hidden">
@@ -13,7 +13,8 @@ const BrandContent = () => (
         Start Your Event Journey 🚀
       </h1>
       <p className="text-gray-300 text-sm md:text-lg mx-auto lg:px-5 hidden sm:block">
-        Sign up to unlock NFT tickets, crypto rewards, and exclusive access. Your adventure in live events and Web3 begins here!
+        Sign up to unlock NFT tickets, crypto rewards, and exclusive access. Your
+        adventure in live events and Web3 begins here!
       </p>
     </div>
 

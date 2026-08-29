@@ -14,7 +14,7 @@ export interface LocationResult {
 export async function searchLocations(query: string): Promise<LocationResult[]> {
   if (!query || query.length < 3) return [];
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`;
-  const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
   if (!res.ok) return [];
   const data = await res.json();
   return data.map((item: Record<string, unknown>) => ({
@@ -23,8 +23,8 @@ export async function searchLocations(query: string): Promise<LocationResult[]> 
     lng: parseFloat(item.lon as string),
     address: {
       street: (item.address as Record<string, string>)?.road,
-      city:   (item.address as Record<string, string>)?.city,
-      country:(item.address as Record<string, string>)?.country,
+      city: (item.address as Record<string, string>)?.city,
+      country: (item.address as Record<string, string>)?.country,
     },
   }));
 }

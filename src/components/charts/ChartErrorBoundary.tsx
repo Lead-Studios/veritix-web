@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -76,7 +76,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
           <p className="text-sm font-medium text-red-700">
             {this.props.chartName
               ? `Could not load "${this.props.chartName}"`
-              : "Chart failed to load"}
+              : 'Chart failed to load'}
           </p>
           <p className="text-xs text-red-500">{this.state.error.message}</p>
           <button

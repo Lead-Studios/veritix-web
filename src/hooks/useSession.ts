@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { getToken, logout } from "@/lib/auth";
+import { useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { getToken, logout } from '@/lib/auth';
 
 interface JwtPayload {
   exp?: number;
@@ -12,20 +12,20 @@ interface JwtPayload {
 
 export function isTokenExpired(token: string): boolean {
   try {
-    const payload: JwtPayload = JSON.parse(atob(token.split(".")[1]));
-    return typeof payload.exp !== "number" || payload.exp * 1000 < Date.now();
+    const payload: JwtPayload = JSON.parse(atob(token.split('.')[1]));
+    return typeof payload.exp !== 'number' || payload.exp * 1000 < Date.now();
   } catch (error: unknown) {
-    console.error("Failed to parse JWT", error);
+    console.error('Failed to parse JWT', error);
     return true;
   }
 }
 
 export function getTokenExpiry(token: string): number | null {
   try {
-    const payload: JwtPayload = JSON.parse(atob(token.split(".")[1]));
-    return typeof payload.exp === "number" ? payload.exp * 1000 : null;
+    const payload: JwtPayload = JSON.parse(atob(token.split('.')[1]));
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
   } catch (error: unknown) {
-    console.error("Failed to parse JWT", error);
+    console.error('Failed to parse JWT', error);
     return null;
   }
 }
@@ -42,25 +42,25 @@ export function useSession() {
     try {
       const token = getToken();
       if (!token) {
-        router.replace("/login");
+        router.replace('/login');
         return;
       }
       if (isTokenExpired(token)) {
         logout();
-        toast.warn("Your session has expired. Please sign in again.", {
-          toastId: "session-expired",
+        toast.warn('Your session has expired. Please sign in again.', {
+          toastId: 'session-expired',
         });
-        router.replace("/login?expired=1");
+        router.replace('/login?expired=1');
         return;
       }
       if (msUntilExpiry(token) <= 5 * 60 * 1000) {
-        toast.info("Your session will expire in less than 5 minutes.", {
-          toastId: "session-expiring-soon",
+        toast.info('Your session will expire in less than 5 minutes.', {
+          toastId: 'session-expiring-soon',
         });
       }
     } catch (error: unknown) {
-      console.error("Session check failed", error);
-      router.replace("/login");
+      console.error('Session check failed', error);
+      router.replace('/login');
     }
   }, [router]);
 

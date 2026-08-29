@@ -10,7 +10,10 @@ export default function EventsLoading() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-3xl border border-white/10 bg-white/5 p-5 space-y-3">
+            <div
+              key={i}
+              className="rounded-3xl border border-white/10 bg-white/5 p-5 space-y-3"
+            >
               <div className="flex justify-between">
                 <div className="h-6 w-16 animate-pulse rounded-lg bg-white/10" />
                 <div className="flex gap-3">

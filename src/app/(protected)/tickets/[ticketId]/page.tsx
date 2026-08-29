@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
-import { TicketPass } from "@/components/tickets/TicketPass";
-import { TransferHistory } from "@/components/tickets/TransferHistory";
-import { Loader } from "@/components/ui/Loader";
-import { Breadcrumb } from "@/components/ui";
-import { PostEventReviewModal } from "@/features/tickets/components/PostEventReviewModal";
+import { useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { TicketPass } from '@/components/tickets/TicketPass';
+import { TransferHistory } from '@/components/tickets/TransferHistory';
+import { Loader } from '@/components/ui/Loader';
+import { Breadcrumb } from '@/components/ui';
+import { PostEventReviewModal } from '@/features/tickets/components/PostEventReviewModal';
 
 // Fetch ticket from API; falls back to a demo stub when the endpoint is unavailable.
 async function fetchTicket(ticketId: string): Promise<AttendeeTicketExtended> {
@@ -19,14 +19,14 @@ async function fetchTicket(ticketId: string): Promise<AttendeeTicketExtended> {
   // Demo stub so the UI is always renderable
   return {
     id: ticketId,
-    eventName: "Demo Event",
-    eventDate: "TBD",
-    eventTime: "TBD",
-    venue: "TBD",
-    ticketType: "General Admission",
+    eventName: 'Demo Event',
+    eventDate: 'TBD',
+    eventTime: 'TBD',
+    venue: 'TBD',
+    ticketType: 'General Admission',
     ticketCode: ticketId,
-    walletStatus: "pending",
-    transferState: "none",
+    walletStatus: 'pending',
+    transferState: 'none',
   };
 }
 
@@ -54,7 +54,7 @@ export default function TicketPassPage() {
         const stored = getStoredRating(t.id);
         if (stored) setReviewedRating(stored);
       })
-      .catch(() => setError("Could not load ticket."));
+      .catch(() => setError('Could not load ticket.'));
   }, [ticketId]);
 
   const handleReviewSuccess = (rating: number) => {
@@ -84,16 +84,16 @@ export default function TicketPassPage() {
         <Breadcrumb
           className="mb-6 text-white/70"
           items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Tickets", href: "/tickets" },
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Tickets', href: '/tickets' },
             { label: ticket.eventName },
           ]}
         />
         <TicketPass
           ticket={ticket}
           onTransfer={
-            ticket.transferState === "transferable"
-              ? () => alert("Transfer flow coming soon.")
+            ticket.transferState === 'transferable'
+              ? () => alert('Transfer flow coming soon.')
               : undefined
           }
         />

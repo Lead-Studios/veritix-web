@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Skeleton, SkeletonCard, SkeletonList, SkeletonTable } from "./Skeleton";
+import type { Meta, StoryObj } from '@storybook/react';
+import { Skeleton, SkeletonCard, SkeletonList, SkeletonTable } from './Skeleton';
 
 const meta: Meta = {
-  title: "Components/UI/Skeleton",
+  title: 'Components/UI/Skeleton',
 };
 
 export default meta;

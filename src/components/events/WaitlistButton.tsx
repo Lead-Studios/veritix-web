@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 
-export default function WaitlistButton({ isSoldOut }: { eventId: string; isSoldOut: boolean }) {
+export default function WaitlistButton({
+  isSoldOut,
+}: {
+  eventId: string;
+  isSoldOut: boolean;
+}) {
   const [joined, setJoined] = useState(false);
   const [queuePos, setQueuePos] = useState<number | null>(null);
 

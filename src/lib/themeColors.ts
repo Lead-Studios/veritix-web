@@ -10,9 +10,9 @@
  */
 export const THEME_COLORS = {
   /** Matches the `brand-primary` Tailwind token. */
-  brandPrimary: "#4D21FF",
+  brandPrimary: '#4D21FF',
   /** Matches the `brand-accent` Tailwind token. */
-  brandAccent: "#21D4FF",
+  brandAccent: '#21D4FF',
   /** Matches the `surface-dark` Tailwind token. */
-  surfaceDark: "#101428",
+  surfaceDark: '#101428',
 } as const;

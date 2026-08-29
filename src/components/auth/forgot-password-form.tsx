@@ -1,18 +1,22 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { Input } from "../ui/input";
-import { TbUserPlus } from "react-icons/tb";
-import { Button } from "../button";
-import { toast } from "react-toastify";
-import { motion } from "framer-motion";
-import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
-import { forgotPassword } from "@/lib/auth";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
+import { Input } from '../ui/input';
+import { TbUserPlus } from 'react-icons/tb';
+import { Button } from '../button';
+import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
+import {
+  containerVariants,
+  itemVariants,
+  headerVariants,
+} from '@/lib/animations/motionVariants';
+import { forgotPassword } from '@/lib/auth';
 
 const forgotPasswordSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.email('Please enter a valid email address'),
 });
 
 type FormValues = z.infer<typeof forgotPasswordSchema>;
@@ -29,13 +33,15 @@ export default function ForgotPasswordForm() {
   const onSubmit = async (data: FormValues) => {
     try {
       await forgotPassword(data.email);
-      toast.success("Magic link sent! Check your inbox.");
+      toast.success('Magic link sent! Check your inbox.');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send reset link. Please try again.");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Failed to send reset link. Please try again.',
+      );
     }
   };
-
-
 
   return (
     <motion.div
@@ -44,14 +50,11 @@ export default function ForgotPasswordForm() {
       animate="visible"
       variants={containerVariants}
     >
-      <motion.div
-        className="mb-10 text-center space-y-5"
-        variants={headerVariants}
-      >
+      <motion.div className="mb-10 text-center space-y-5" variants={headerVariants}>
         <h2 className="text-3xl md:text-4xl font-bold">Forgot Password</h2>
         <p className="text-primary-gray">
-          No worries, we&apos;ll help you reset it and get you back to your
-          events in no time.
+          No worries, we&apos;ll help you reset it and get you back to your events in no
+          time.
         </p>
       </motion.div>
 
@@ -79,7 +82,7 @@ export default function ForgotPasswordForm() {
               transition={{ duration: 0.2 }}
             >
               <Button disabled={isSubmitting} className="w-full py-4">
-                {isSubmitting ? "Sending Magic Link..." : "Send Magic Link"}
+                {isSubmitting ? 'Sending Magic Link...' : 'Send Magic Link'}
               </Button>
             </motion.div>
           </motion.div>

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 interface PayoutRequestModalProps {
   isOpen: boolean;
@@ -19,26 +19,26 @@ export interface PayoutFormData {
 }
 
 const BANKS = [
-  { code: "044", name: "Access Bank" },
-  { code: "050", name: "EcoBank" },
-  { code: "011", name: "First Bank" },
-  { code: "058", name: "GTBank" },
-  { code: "030", name: "Heritage Bank" },
-  { code: "301", name: "Jaiz Bank" },
-  { code: "082", name: "Keystone Bank" },
-  { code: "076", name: "Polaris Bank" },
-  { code: "039", name: "Stanbic IBTC" },
-  { code: "232", name: "Sterling Bank" },
-  { code: "032", name: "Union Bank" },
-  { code: "033", name: "UBA" },
-  { code: "215", name: "Unity Bank" },
-  { code: "035", name: "Wema Bank" },
-  { code: "057", name: "Zenith Bank" },
+  { code: '044', name: 'Access Bank' },
+  { code: '050', name: 'EcoBank' },
+  { code: '011', name: 'First Bank' },
+  { code: '058', name: 'GTBank' },
+  { code: '030', name: 'Heritage Bank' },
+  { code: '301', name: 'Jaiz Bank' },
+  { code: '082', name: 'Keystone Bank' },
+  { code: '076', name: 'Polaris Bank' },
+  { code: '039', name: 'Stanbic IBTC' },
+  { code: '232', name: 'Sterling Bank' },
+  { code: '032', name: 'Union Bank' },
+  { code: '033', name: 'UBA' },
+  { code: '215', name: 'Unity Bank' },
+  { code: '035', name: 'Wema Bank' },
+  { code: '057', name: 'Zenith Bank' },
 ];
 
-function formatCurrency(amount: number, currency = "NGN") {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
+function formatCurrency(amount: number, currency = 'NGN') {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
     currency,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -49,14 +49,14 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
   onClose,
   onSubmit,
   availableBalance,
-  currency = "NGN",
+  currency = 'NGN',
 }) => {
   const [form, setForm] = useState<PayoutFormData>({
     amount: 0,
-    bankCode: "",
-    accountNumber: "",
-    accountName: "",
-    narration: "",
+    bankCode: '',
+    accountNumber: '',
+    accountName: '',
+    narration: '',
   });
   const [errors, setErrors] = useState<Partial<Record<keyof PayoutFormData, string>>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -70,21 +70,21 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
     firstInputRef.current?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   const validate = (): boolean => {
     const next: typeof errors = {};
-    if (!form.amount || form.amount <= 0) next.amount = "Enter a valid amount";
+    if (!form.amount || form.amount <= 0) next.amount = 'Enter a valid amount';
     if (form.amount > availableBalance)
       next.amount = `Max ${formatCurrency(availableBalance, currency)}`;
-    if (!form.bankCode) next.bankCode = "Select a bank";
+    if (!form.bankCode) next.bankCode = 'Select a bank';
     if (!/^\d{10}$/.test(form.accountNumber))
-      next.accountNumber = "Account number must be 10 digits";
-    if (!form.accountName.trim()) next.accountName = "Enter account name";
+      next.accountNumber = 'Account number must be 10 digits';
+    if (!form.accountName.trim()) next.accountName = 'Enter account name';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -129,7 +129,7 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
         </div>
 
         <p className="mb-5 text-sm text-gray-400">
-          Available balance:{" "}
+          Available balance:{' '}
           <span className="font-semibold text-white">
             {formatCurrency(availableBalance, currency)}
           </span>
@@ -138,7 +138,10 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Amount */}
           <div>
-            <label htmlFor="payout-amount" className="mb-1 block text-xs font-medium text-gray-300">
+            <label
+              htmlFor="payout-amount"
+              className="mb-1 block text-xs font-medium text-gray-300"
+            >
               Amount
             </label>
             <input
@@ -147,17 +150,19 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
               type="number"
               min={1}
               max={availableBalance}
-              value={form.amount || ""}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, amount: Number(e.target.value) }))
-              }
-              aria-describedby={errors.amount ? "payout-amount-error" : undefined}
+              value={form.amount || ''}
+              onChange={(e) => setForm((f) => ({ ...f, amount: Number(e.target.value) }))}
+              aria-describedby={errors.amount ? 'payout-amount-error' : undefined}
               aria-invalid={!!errors.amount}
               className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-500 focus-visible:border-purple-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
               placeholder="0"
             />
             {errors.amount && (
-              <p id="payout-amount-error" role="alert" className="mt-1 text-xs text-red-400">
+              <p
+                id="payout-amount-error"
+                role="alert"
+                className="mt-1 text-xs text-red-400"
+              >
                 {errors.amount}
               </p>
             )}
@@ -165,15 +170,16 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
 
           {/* Bank */}
           <div>
-            <label htmlFor="payout-bank" className="mb-1 block text-xs font-medium text-gray-300">
+            <label
+              htmlFor="payout-bank"
+              className="mb-1 block text-xs font-medium text-gray-300"
+            >
               Bank
             </label>
             <select
               id="payout-bank"
               value={form.bankCode}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, bankCode: e.target.value }))
-              }
+              onChange={(e) => setForm((f) => ({ ...f, bankCode: e.target.value }))}
               aria-invalid={!!errors.bankCode}
               className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus-visible:border-purple-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
             >
@@ -193,7 +199,10 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
 
           {/* Account number */}
           <div>
-            <label htmlFor="payout-acct" className="mb-1 block text-xs font-medium text-gray-300">
+            <label
+              htmlFor="payout-acct"
+              className="mb-1 block text-xs font-medium text-gray-300"
+            >
               Account Number
             </label>
             <input
@@ -203,7 +212,10 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
               maxLength={10}
               value={form.accountNumber}
               onChange={(e) =>
-                setForm((f) => ({ ...f, accountNumber: e.target.value.replace(/\D/g, "") }))
+                setForm((f) => ({
+                  ...f,
+                  accountNumber: e.target.value.replace(/\D/g, ''),
+                }))
               }
               aria-invalid={!!errors.accountNumber}
               className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-500 focus-visible:border-purple-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
@@ -218,16 +230,17 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
 
           {/* Account name */}
           <div>
-            <label htmlFor="payout-name" className="mb-1 block text-xs font-medium text-gray-300">
+            <label
+              htmlFor="payout-name"
+              className="mb-1 block text-xs font-medium text-gray-300"
+            >
               Account Name
             </label>
             <input
               id="payout-name"
               type="text"
               value={form.accountName}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, accountName: e.target.value }))
-              }
+              onChange={(e) => setForm((f) => ({ ...f, accountName: e.target.value }))}
               aria-invalid={!!errors.accountName}
               className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-500 focus-visible:border-purple-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
               placeholder="As on bank records"
@@ -241,7 +254,10 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
 
           {/* Narration */}
           <div>
-            <label htmlFor="payout-narration" className="mb-1 block text-xs font-medium text-gray-300">
+            <label
+              htmlFor="payout-narration"
+              className="mb-1 block text-xs font-medium text-gray-300"
+            >
               Narration <span className="text-gray-500">(optional)</span>
             </label>
             <input
@@ -249,9 +265,7 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
               type="text"
               maxLength={100}
               value={form.narration}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, narration: e.target.value }))
-              }
+              onChange={(e) => setForm((f) => ({ ...f, narration: e.target.value }))}
               className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-500 focus-visible:border-purple-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
               placeholder="e.g. Event proceeds"
             />
@@ -270,7 +284,7 @@ export const PayoutRequestModal: React.FC<PayoutRequestModalProps> = ({
               disabled={submitting}
               className="flex-1 rounded-lg bg-purple-600 py-2 text-sm font-semibold text-white hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-purple-500 disabled:opacity-60"
             >
-              {submitting ? "Submitting…" : "Request Payout"}
+              {submitting ? 'Submitting…' : 'Request Payout'}
             </button>
           </div>
         </form>

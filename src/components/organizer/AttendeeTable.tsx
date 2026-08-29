@@ -22,7 +22,10 @@ export default function AttendeeTable({ attendees }: { attendees: Attendee[] }) 
   });
 
   return (
-    <div ref={parentRef} className="h-[500px] overflow-auto border border-white/10 rounded-xl bg-[#101428]">
+    <div
+      ref={parentRef}
+      className="h-[500px] overflow-auto border border-white/10 rounded-xl bg-[#101428]"
+    >
       <div
         className="w-full relative"
         style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
@@ -41,7 +44,9 @@ export default function AttendeeTable({ attendees }: { attendees: Attendee[] }) 
               <span className="w-1/4 font-medium text-white">{attendee.name}</span>
               <span className="w-1/3 text-gray-400">{attendee.email}</span>
               <span className="w-1/4">{attendee.ticketType}</span>
-              <span className={`w-1/6 text-xs font-semibold ${attendee.checkedIn ? 'text-emerald-400' : 'text-amber-400'}`}>
+              <span
+                className={`w-1/6 text-xs font-semibold ${attendee.checkedIn ? 'text-emerald-400' : 'text-amber-400'}`}
+              >
                 {attendee.checkedIn ? 'Checked In' : 'Pending'}
               </span>
             </div>

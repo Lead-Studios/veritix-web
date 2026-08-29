@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import * as jose from "jose";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import * as jose from 'jose';
 
 export async function GET() {
   const cookieStore = cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const token = cookieStore.get('auth_token')?.value;
 
   if (!token) {
     return NextResponse.json({ isAuthenticated: false }, { status: 401 });

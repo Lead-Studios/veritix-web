@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-import { Map as MapIcon, Table } from "lucide-react";
-import { THEME_COLORS } from "@/lib/themeColors";
+import { useState } from 'react';
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import { Map as MapIcon, Table } from 'lucide-react';
+import { THEME_COLORS } from '@/lib/themeColors';
 
-const GEO_URL =
-  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
 export interface RegionEntry {
   label: string;
@@ -43,16 +42,25 @@ interface TooltipState {
 function RegionTable({ regions }: { regions: RegionEntry[] }) {
   return (
     <div className="overflow-x-auto rounded-lg bg-white/5">
-      <table className="w-full text-left text-xs" aria-label="Attendee geographic distribution">
+      <table
+        className="w-full text-left text-xs"
+        aria-label="Attendee geographic distribution"
+      >
         <thead>
           <tr className="border-b border-white/10">
             <th scope="col" className="px-4 py-2 font-semibold text-brand-accent">
               Region
             </th>
-            <th scope="col" className="px-4 py-2 text-right font-semibold text-brand-accent">
+            <th
+              scope="col"
+              className="px-4 py-2 text-right font-semibold text-brand-accent"
+            >
               Attendees
             </th>
-            <th scope="col" className="px-4 py-2 text-right font-semibold text-brand-accent">
+            <th
+              scope="col"
+              className="px-4 py-2 text-right font-semibold text-brand-accent"
+            >
               Share
             </th>
           </tr>
@@ -101,8 +109,8 @@ export default function GeoHeatmap({ regions }: Props) {
             aria-pressed={!showTable}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               !showTable
-                ? "bg-brand-primary text-white"
-                : "bg-transparent text-gray-400 hover:bg-white/10 hover:text-white"
+                ? 'bg-brand-primary text-white'
+                : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
             }`}
           >
             <MapIcon size={11} aria-hidden="true" />
@@ -113,8 +121,8 @@ export default function GeoHeatmap({ regions }: Props) {
             aria-pressed={showTable}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               showTable
-                ? "bg-brand-primary text-white"
-                : "bg-transparent text-gray-400 hover:bg-white/10 hover:text-white"
+                ? 'bg-brand-primary text-white'
+                : 'bg-transparent text-gray-400 hover:bg-white/10 hover:text-white'
             }`}
           >
             <Table size={11} aria-hidden="true" />
@@ -128,26 +136,24 @@ export default function GeoHeatmap({ regions }: Props) {
       ) : (
         <>
           {/* Responsive map — uses aspect-ratio to stay mobile-friendly */}
-          <div className="w-full" style={{ aspectRatio: "16 / 7", minHeight: 200 }}>
+          <div className="w-full" style={{ aspectRatio: '16 / 7', minHeight: 200 }}>
             <ComposableMap
               projectionConfig={{ scale: 140 }}
-              style={{ width: "100%", height: "100%" }}
+              style={{ width: '100%', height: '100%' }}
               aria-label="World choropleth map of attendee distribution"
               role="img"
             >
               <Geographies geography={GEO_URL}>
                 {({ geographies }) =>
                   geographies.map((geo) => {
-                    const name: string = geo.properties.name ?? "";
+                    const name: string = geo.properties.name ?? '';
                     const entry = regionMap.get(name.toLowerCase());
                     return (
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}
                         fill={
-                          entry
-                            ? getColor(entry.percentage)
-                            : "rgba(255,255,255,0.05)"
+                          entry ? getColor(entry.percentage) : 'rgba(255,255,255,0.05)'
                         }
                         stroke="rgba(255,255,255,0.1)"
                         strokeWidth={0.5}
@@ -161,9 +167,9 @@ export default function GeoHeatmap({ regions }: Props) {
                         }}
                         onMouseLeave={() => setTooltip(null)}
                         style={{
-                          hover: { fill: THEME_COLORS.brandAccent, outline: "none" },
-                          pressed: { outline: "none" },
-                          default: { outline: "none" },
+                          hover: { fill: THEME_COLORS.brandAccent, outline: 'none' },
+                          pressed: { outline: 'none' },
+                          default: { outline: 'none' },
                         }}
                         aria-label={
                           entry
@@ -184,7 +190,7 @@ export default function GeoHeatmap({ regions }: Props) {
               className="h-2 w-16 rounded-full"
               style={{
                 background:
-                  "linear-gradient(to right, rgba(77,33,255,0.15), rgba(77,33,255,1))",
+                  'linear-gradient(to right, rgba(77,33,255,0.15), rgba(77,33,255,1))',
               }}
               aria-hidden="true"
             />

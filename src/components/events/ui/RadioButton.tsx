@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 interface RadioButtonProps {
   id: string;
@@ -20,10 +20,7 @@ export default function RadioButton({
   label,
 }: RadioButtonProps) {
   return (
-    <label
-      htmlFor={id}
-      className="flex items-center gap-2 cursor-pointer group"
-    >
+    <label htmlFor={id} className="flex items-center gap-2 cursor-pointer group">
       <div className="relative">
         <input
           type="radio"
@@ -37,8 +34,8 @@ export default function RadioButton({
         <div
           className={`w-5 h-5 rounded-full border-2 transition-colors ${
             checked
-              ? "border-blue-600 bg-blue-600"
-              : "border-gray-600 bg-transparent group-hover:border-gray-500"
+              ? 'border-blue-600 bg-blue-600'
+              : 'border-gray-600 bg-transparent group-hover:border-gray-500'
           }`}
         >
           {checked && (
@@ -48,11 +45,7 @@ export default function RadioButton({
           )}
         </div>
       </div>
-      <span
-        className={`text-sm ${
-          checked ? "text-white font-medium" : "text-gray-400"
-        }`}
-      >
+      <span className={`text-sm ${checked ? 'text-white font-medium' : 'text-gray-400'}`}>
         {label}
       </span>
     </label>

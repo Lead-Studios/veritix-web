@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface DuplicateEventResponse {
   id: string;
@@ -12,9 +12,9 @@ export function useDuplicateEvent() {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("auth_token") ?? "";
+      const token = localStorage.getItem('auth_token') ?? '';
       const res = await fetch(`/api/events/${eventId}/duplicate`, {
-        method: "POST",
+        method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`Failed to duplicate event: ${res.status}`);
@@ -24,7 +24,7 @@ export function useDuplicateEvent() {
       if (e instanceof Error) {
         setError(e.message);
       } else {
-        setError("An unknown error occurred");
+        setError('An unknown error occurred');
       }
       return null;
     } finally {

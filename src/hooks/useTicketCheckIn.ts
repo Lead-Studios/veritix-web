@@ -18,7 +18,7 @@ async function checkInFetcher(url: string, { arg }: { arg: { ticketId: string } 
 export function useTicketCheckIn() {
   const { trigger, isMutating, error } = useSWRMutation(
     '/api/tickets/check-in',
-    checkInFetcher
+    checkInFetcher,
   );
 
   const checkInOptimistic = async (ticketId: string) => {
@@ -28,7 +28,7 @@ export function useTicketCheckIn() {
         optimisticData: { success: true, ticketId, status: 'CHECKED_IN' },
         rollbackOnError: true,
         revalidate: false,
-      }
+      },
     );
   };
 

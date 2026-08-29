@@ -32,10 +32,15 @@ export default function VerificationPage() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch(`/api/verify/${encodeURIComponent(ticketId.trim())}`, { method: 'POST' });
+      const res = await fetch(`/api/verify/${encodeURIComponent(ticketId.trim())}`, {
+        method: 'POST',
+      });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setResult({ status: data.status ?? 'valid', message: data.message ?? 'Ticket is valid.' });
+        setResult({
+          status: data.status ?? 'valid',
+          message: data.message ?? 'Ticket is valid.',
+        });
       } else {
         const err = classifyVerificationError(res.status, data.code);
         const status = err.type === 'already-used' ? 'used' : 'invalid';
@@ -60,7 +65,11 @@ export default function VerificationPage() {
     const text = await file.text();
     const codes = parseCsv(text);
     if (codes.length === 0) {
-      setCsvSummary({ succeeded: 0, failed: 0, errors: ['CSV is empty or has no valid rows.'] });
+      setCsvSummary({
+        succeeded: 0,
+        failed: 0,
+        errors: ['CSV is empty or has no valid rows.'],
+      });
       return;
     }
 
@@ -87,7 +96,7 @@ export default function VerificationPage() {
         } catch {
           errors.push(`${code}: Network error`);
         }
-      })
+      }),
     );
 
     setCsvSummary({ succeeded, failed: errors.length, errors });
@@ -99,14 +108,17 @@ export default function VerificationPage() {
   const startCamera = async () => {
     setCameraError(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
       setCameraActive(true);
     } catch (err) {
-      const msg = err instanceof Error && err.name === 'NotAllowedError'
-        ? 'Camera permission denied. Please allow camera access and try again.'
-        : 'Camera not available on this device.';
+      const msg =
+        err instanceof Error && err.name === 'NotAllowedError'
+          ? 'Camera permission denied. Please allow camera access and try again.'
+          : 'Camera not available on this device.';
       setCameraError(msg);
     }
   };
@@ -117,7 +129,12 @@ export default function VerificationPage() {
     setCameraActive(false);
   };
 
-  useEffect(() => () => { streamRef.current?.getTracks().forEach((t) => t.stop()); }, []);
+  useEffect(
+    () => () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    },
+    [],
+  );
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +142,11 @@ export default function VerificationPage() {
     setManualId('');
   };
 
-  const resultColors = { valid: 'text-green-400 border-green-500/30 bg-green-500/10', invalid: 'text-red-400 border-red-500/30 bg-red-500/10', used: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' };
+  const resultColors = {
+    valid: 'text-green-400 border-green-500/30 bg-green-500/10',
+    invalid: 'text-red-400 border-red-500/30 bg-red-500/10',
+    used: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10',
+  };
 
   return (
     <div className="min-h-screen bg-[#0b1025] text-white flex flex-col items-center px-4 py-10 gap-6">
@@ -143,17 +164,30 @@ export default function VerificationPage() {
         ) : (
           <div className="space-y-2">
             <div className="relative rounded-xl overflow-hidden border border-white/10">
-              <video ref={videoRef} autoPlay playsInline muted className="w-full aspect-square object-cover" />
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full aspect-square object-cover"
+              />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-48 h-48 border-2 border-[#21d4ff] rounded-lg opacity-70" />
               </div>
             </div>
-            <button onClick={stopCamera} className="w-full py-2 rounded-xl border border-white/20 text-sm text-white/70 hover:text-white">
+            <button
+              onClick={stopCamera}
+              className="w-full py-2 rounded-xl border border-white/20 text-sm text-white/70 hover:text-white"
+            >
               Stop Camera
             </button>
           </div>
         )}
-        {cameraError && <p role="alert" className="text-sm text-red-400 text-center">{cameraError}</p>}
+        {cameraError && (
+          <p role="alert" className="text-sm text-red-400 text-center">
+            {cameraError}
+          </p>
+        )}
       </div>
 
       {/* Manual entry fallback */}
@@ -180,7 +214,9 @@ export default function VerificationPage() {
 
       {/* Result */}
       {result && (
-        <div className={`w-full max-w-sm rounded-xl border p-4 text-center text-sm font-medium ${resultColors[result.status]}`}>
+        <div
+          className={`w-full max-w-sm rounded-xl border p-4 text-center text-sm font-medium ${resultColors[result.status]}`}
+        >
           {result.message}
         </div>
       )}
@@ -188,7 +224,9 @@ export default function VerificationPage() {
       {/* Bulk CSV check-in */}
       <div className="w-full max-w-sm space-y-3 border-t border-white/10 pt-6">
         <p className="text-sm text-white/60">Bulk Check-in via CSV</p>
-        <p className="text-xs text-white/40">Upload a CSV file with one ticket code per row.</p>
+        <p className="text-xs text-white/40">
+          Upload a CSV file with one ticket code per row.
+        </p>
         <input
           ref={csvInputRef}
           type="file"
@@ -208,12 +246,17 @@ export default function VerificationPage() {
 
         {csvSummary && (
           <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-2 text-sm">
-            <p className="text-green-400 font-medium">✓ {csvSummary.succeeded} check-in{csvSummary.succeeded !== 1 ? 's' : ''} succeeded</p>
+            <p className="text-green-400 font-medium">
+              ✓ {csvSummary.succeeded} check-in{csvSummary.succeeded !== 1 ? 's' : ''}{' '}
+              succeeded
+            </p>
             {csvSummary.failed > 0 && (
               <>
                 <p className="text-red-400 font-medium">✗ {csvSummary.failed} failed</p>
                 <ul className="text-xs text-red-300/80 space-y-1 max-h-32 overflow-y-auto">
-                  {csvSummary.errors.map((err, i) => <li key={i}>{err}</li>)}
+                  {csvSummary.errors.map((err, i) => (
+                    <li key={i}>{err}</li>
+                  ))}
                 </ul>
               </>
             )}

@@ -1,50 +1,64 @@
-import React from "react";
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   useSearchParams: () => ({ get: vi.fn(() => null) }),
 }));
-vi.mock("framer-motion", () => {
+vi.mock('framer-motion', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
-  const proxy = new Proxy({}, {
-    get: (_t, tag: string) =>
-      ({ children, ...rest }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
-        React.createElement(tag === "button" ? "button" : "div", rest, children),
-  });
-  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
+  const React = require('react');
+  const proxy = new Proxy(
+    {},
+    {
+      get:
+        (_t, tag: string) =>
+        ({
+          children,
+          ...rest
+        }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) =>
+          React.createElement(tag === 'button' ? 'button' : 'div', rest, children),
+    },
+  );
+  return {
+    motion: proxy,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
 });
 
-import VerifyPage from "@/app/(protected)/verify/page";
+import VerifyPage from '@/app/(protected)/verify/page';
 
-const VALID_ID = "TKT-2024-ALPHA-001";
-const INVALID_ID = "TKT-INVALID-000";
+const VALID_ID = 'TKT-2024-ALPHA-001';
+const INVALID_ID = 'TKT-INVALID-000';
 
 async function submitTicketId(id: string) {
   const user = userEvent.setup();
   render(<VerifyPage />);
   const input = screen.getByPlaceholderText(/TKT-2024-ALPHA-001/i);
   await user.type(input, id);
-  const btn = screen.getByRole("button", { name: /verify ticket/i });
+  const btn = screen.getByRole('button', { name: /verify ticket/i });
   await user.click(btn);
 }
 
-describe("Ticket Verification", () => {
-  it("renders the manual ticket-entry input in idle state", () => {
+describe('Ticket Verification', () => {
+  it('renders the manual ticket-entry input in idle state', () => {
     render(<VerifyPage />);
     expect(screen.getByPlaceholderText(/TKT-2024-ALPHA-001/i)).toBeTruthy();
   });
 
-  it("shows success for a valid ticket ID", async () => {
+  it('shows success for a valid ticket ID', async () => {
     await submitTicketId(VALID_ID);
-    await waitFor(() => expect(screen.getByText(/valid|verified|success|entry granted/i)).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByText(/valid|verified|success|entry granted/i)).toBeTruthy(),
+    );
   });
 
-  it("shows failure for an invalid ticket ID", async () => {
+  it('shows failure for an invalid ticket ID', async () => {
     await submitTicketId(INVALID_ID);
-    await waitFor(() => expect(screen.getByText(/invalid|not found|failed/i)).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByText(/invalid|not found|failed/i)).toBeTruthy(),
+    );
   });
 });

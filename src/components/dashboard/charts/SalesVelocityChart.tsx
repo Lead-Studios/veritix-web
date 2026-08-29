@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -9,8 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { THEME_COLORS } from "@/lib/themeColors";
+} from 'recharts';
+import { THEME_COLORS } from '@/lib/themeColors';
 
 export interface SalesVelocityPoint {
   date: string;
@@ -23,9 +23,9 @@ interface SalesVelocityChartProps {
 
 type Window = 7 | 30 | 90;
 const WINDOWS: { label: string; value: Window }[] = [
-  { label: "7d", value: 7 },
-  { label: "30d", value: 30 },
-  { label: "90d", value: 90 },
+  { label: '7d', value: 7 },
+  { label: '30d', value: 30 },
+  { label: '90d', value: 90 },
 ];
 
 export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
@@ -39,7 +39,11 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
   );
 
   const peak = useMemo(
-    () => sliced.reduce((max, d) => (d.ticketsSold > max.ticketsSold ? d : max), sliced[0] ?? { date: "", ticketsSold: 0 }),
+    () =>
+      sliced.reduce(
+        (max, d) => (d.ticketsSold > max.ticketsSold ? d : max),
+        sliced[0] ?? { date: '', ticketsSold: 0 },
+      ),
     [sliced],
   );
 
@@ -60,8 +64,8 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
               onClick={() => setWindow(value)}
               className={`px-4 py-1.5 text-xs font-medium transition-colors ${
                 window === value
-                  ? "bg-brand-primary text-white"
-                  : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  ? 'bg-brand-primary text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
               }`}
             >
               {label}
@@ -86,21 +90,22 @@ export function SalesVelocityChart({ data }: SalesVelocityChartProps) {
             axisLine={false}
             interval="preserveStartEnd"
           />
-          <YAxis tick={{ fill: THEME_COLORS.brandAccent, fontSize: 10 }} tickLine={false} axisLine={false} />
+          <YAxis
+            tick={{ fill: THEME_COLORS.brandAccent, fontSize: 10 }}
+            tickLine={false}
+            axisLine={false}
+          />
           <Tooltip
             contentStyle={{
-              background: "#0a0f24",
-              border: "1px solid rgba(77,33,255,0.4)",
+              background: '#0a0f24',
+              border: '1px solid rgba(77,33,255,0.4)',
               borderRadius: 8,
-              color: "#fff",
+              color: '#fff',
               fontSize: 12,
             }}
             formatter={(value: number, _: string, entry) => {
               const isPeak = entry.payload.date === peak.date;
-              return [
-                `${value} tickets${isPeak ? " 🔥 Peak" : ""}`,
-                "Sold",
-              ];
+              return [`${value} tickets${isPeak ? ' 🔥 Peak' : ''}`, 'Sold'];
             }}
             labelStyle={{ color: THEME_COLORS.brandAccent }}
           />

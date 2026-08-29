@@ -1,12 +1,12 @@
-import { buildUrl, API_ROUTES } from "./api-routes";
+import { buildUrl, API_ROUTES } from './api-routes';
 
 function authHeaders(): HeadersInit {
   const token =
-    typeof window !== "undefined"
-      ? (localStorage.getItem("auth_token") ?? sessionStorage.getItem("auth_token"))
+    typeof window !== 'undefined'
+      ? (localStorage.getItem('auth_token') ?? sessionStorage.getItem('auth_token'))
       : null;
   return {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
@@ -18,13 +18,13 @@ export async function changePassword(payload: {
   newPassword: string;
 }): Promise<void> {
   const res = await fetch(buildUrl(API_ROUTES.auth.changePassword), {
-    method: "POST",
+    method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to update password.");
+    throw new Error(err?.message ?? 'Failed to update password.');
   }
 }
 
@@ -40,7 +40,7 @@ export async function getNotificationPreferences(): Promise<NotificationPreferen
   const res = await fetch(buildUrl(API_ROUTES.profile.notificationPreferences), {
     headers: authHeaders(),
   });
-  if (!res.ok) throw new Error("Failed to load notification preferences.");
+  if (!res.ok) throw new Error('Failed to load notification preferences.');
   return res.json() as Promise<NotificationPreferences>;
 }
 
@@ -49,13 +49,13 @@ export async function patchNotificationPreference(
   value: boolean,
 ): Promise<void> {
   const res = await fetch(buildUrl(API_ROUTES.profile.notificationPreferences), {
-    method: "PATCH",
+    method: 'PATCH',
     headers: authHeaders(),
     body: JSON.stringify({ [key]: value }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to update preference.");
+    throw new Error(err?.message ?? 'Failed to update preference.');
   }
 }
 
@@ -63,13 +63,13 @@ export async function patchNotificationPreference(
 
 export async function deleteAccount(email: string): Promise<void> {
   const res = await fetch(buildUrl(API_ROUTES.profile.account), {
-    method: "DELETE",
+    method: 'DELETE',
     headers: authHeaders(),
     body: JSON.stringify({ email }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to delete account.");
+    throw new Error(err?.message ?? 'Failed to delete account.');
   }
 }
 
@@ -82,18 +82,18 @@ export interface ProfileData {
 
 export async function getProfile(): Promise<ProfileData> {
   const res = await fetch(buildUrl(API_ROUTES.profile.base), { headers: authHeaders() });
-  if (!res.ok) throw new Error("Failed to load profile.");
+  if (!res.ok) throw new Error('Failed to load profile.');
   return res.json() as Promise<ProfileData>;
 }
 
 export async function updateProfile(payload: ProfileData): Promise<void> {
   const res = await fetch(buildUrl(API_ROUTES.profile.base), {
-    method: "PATCH",
+    method: 'PATCH',
     headers: authHeaders(),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message ?? "Failed to save profile.");
+    throw new Error(err?.message ?? 'Failed to save profile.');
   }
 }

@@ -7,25 +7,27 @@ export interface TicketRow {
 }
 
 export interface TicketValidationError {
-  field: "name" | "quantity" | "price";
+  field: 'name' | 'quantity' | 'price';
   message: string;
 }
 
 export function validateTicketRow(ticket: TicketRow): TicketValidationError[] {
   const errors: TicketValidationError[] = [];
   if (!ticket.name.trim()) {
-    errors.push({ field: "name", message: "Ticket name is required." });
+    errors.push({ field: 'name', message: 'Ticket name is required.' });
   }
   if (!Number.isInteger(ticket.quantity) || ticket.quantity < 1) {
-    errors.push({ field: "quantity", message: "Quantity must be at least 1." });
+    errors.push({ field: 'quantity', message: 'Quantity must be at least 1.' });
   }
   if (ticket.price < 0) {
-    errors.push({ field: "price", message: "Price cannot be negative." });
+    errors.push({ field: 'price', message: 'Price cannot be negative.' });
   }
   return errors;
 }
 
-export function validateAllTickets(tickets: TicketRow[]): Map<number, TicketValidationError[]> {
+export function validateAllTickets(
+  tickets: TicketRow[],
+): Map<number, TicketValidationError[]> {
   const result = new Map<number, TicketValidationError[]>();
   tickets.forEach((ticket, index) => {
     const errors = validateTicketRow(ticket);
@@ -43,23 +45,26 @@ export interface TicketDetails {
   expirationDate?: string;
 }
 
-export function validateTicketDetails(ticket: TicketDetails, purchaseQuantity: number): string[] {
+export function validateTicketDetails(
+  ticket: TicketDetails,
+  purchaseQuantity: number,
+): string[] {
   const errors: string[] = [];
-  
+
   if (purchaseQuantity < 1) {
-    errors.push("Purchase quantity must be at least 1.");
+    errors.push('Purchase quantity must be at least 1.');
   }
-  
+
   if (ticket.expirationDate) {
     const expDate = new Date(ticket.expirationDate);
     if (!isNaN(expDate.getTime()) && expDate.getTime() < Date.now()) {
-      errors.push("Ticket has expired.");
+      errors.push('Ticket has expired.');
     }
   }
-  
+
   if (ticket.quantitySold + purchaseQuantity > ticket.quantityLimit) {
-    errors.push("Purchase quantity exceeds available ticket limit.");
+    errors.push('Purchase quantity exceeds available ticket limit.');
   }
-  
+
   return errors;
 }

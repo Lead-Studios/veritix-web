@@ -3,6 +3,13 @@
 import { useState, useEffect } from 'react';
 import { FaTwitter, FaWhatsapp, FaLink, FaCheck } from 'react-icons/fa';
 
+export default function SocialShareButtons({
+  title,
+  url,
+}: {
+  title: string;
+  url: string;
+}) {
 export interface SocialShareButtonsProps {
   title?: string;
   url?: string;
@@ -54,6 +61,10 @@ export function SocialShareButtons({
   };
 
   return (
+    <div className="flex items-center gap-3 py-4">
+      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        Share:
+      </span>
     <div className={`flex items-center gap-3 py-2 ${className}`} aria-label="Social share buttons">
       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Share:</span>
       <a

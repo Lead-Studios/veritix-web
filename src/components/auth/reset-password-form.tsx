@@ -1,33 +1,37 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
-import { useSearchParams, useRouter } from "next/navigation";
-import z from "zod";
-import { Input } from "../ui/input";
-import { TbUserPlus } from "react-icons/tb";
-import { Button } from "../button";
-import { toast } from "react-toastify";
-import { motion } from "framer-motion";
-import { containerVariants, itemVariants, headerVariants } from "@/lib/animations/motionVariants";
-import PasswordStrengthGuide from "./PasswordStrengthGuide";
-import Link from "next/link";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import { useSearchParams, useRouter } from 'next/navigation';
+import z from 'zod';
+import { Input } from '../ui/input';
+import { TbUserPlus } from 'react-icons/tb';
+import { Button } from '../button';
+import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
+import {
+  containerVariants,
+  itemVariants,
+  headerVariants,
+} from '@/lib/animations/motionVariants';
+import PasswordStrengthGuide from './PasswordStrengthGuide';
+import Link from 'next/link';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 const resetPasswordSchema = z
   .object({
     password: z
-      .string("Password is required")
-      .min(6, "Password must be at least 6 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number"),
-    confirmPassword: z.string("Please confirm your password"),
+      .string('Password is required')
+      .min(6, 'Password must be at least 6 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number'),
+    confirmPassword: z.string('Please confirm your password'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ['confirmPassword'],
   });
 
 type FormValues = z.infer<typeof resetPasswordSchema>;
@@ -35,7 +39,7 @@ type FormValues = z.infer<typeof resetPasswordSchema>;
 export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
   const {
     handleSubmit,
@@ -45,7 +49,7 @@ export default function ResetPasswordForm() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const passwordValue = useWatch({ control, name: "password", defaultValue: "" });
+  const passwordValue = useWatch({ control, name: 'password', defaultValue: '' });
 
   // No token — show recovery path immediately
   if (!token) {
@@ -53,8 +57,8 @@ export default function ResetPasswordForm() {
       <div className="flex flex-col items-center justify-center h-full text-center space-y-4 pt-20">
         <h2 className="text-2xl font-bold">Invalid or Expired Link</h2>
         <p className="text-primary-gray max-w-sm">
-          This password reset link is missing or has expired. Request a new one
-          to continue.
+          This password reset link is missing or has expired. Request a new one to
+          continue.
         </p>
         <Link
           href="/forgot-password"
@@ -69,30 +73,34 @@ export default function ResetPasswordForm() {
   const onSubmit = async (data: FormValues) => {
     try {
       const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password: data.password }),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        const message: string = err?.message ?? "";
-        if (res.status === 400 || message.toLowerCase().includes("expired") || message.toLowerCase().includes("invalid")) {
-          toast.error("This reset link has expired or is invalid. Please request a new one.");
+        const message: string = err?.message ?? '';
+        if (
+          res.status === 400 ||
+          message.toLowerCase().includes('expired') ||
+          message.toLowerCase().includes('invalid')
+        ) {
+          toast.error(
+            'This reset link has expired or is invalid. Please request a new one.',
+          );
         } else {
-          toast.error(message || "Failed to reset password. Please try again.");
+          toast.error(message || 'Failed to reset password. Please try again.');
         }
         return;
       }
 
-      toast.success("Password reset successful! You can now log in.");
-      router.push("/login");
+      toast.success('Password reset successful! You can now log in.');
+      router.push('/login');
     } catch {
-      toast.error("Network error. Please check your connection and try again.");
+      toast.error('Network error. Please check your connection and try again.');
     }
   };
-
-
 
   return (
     <motion.div
@@ -142,7 +150,7 @@ export default function ResetPasswordForm() {
               transition={{ duration: 0.2 }}
             >
               <Button disabled={isSubmitting} className="w-full py-4">
-                {isSubmitting ? "Resetting Password..." : "Reset Password"}
+                {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
               </Button>
             </motion.div>
           </motion.div>

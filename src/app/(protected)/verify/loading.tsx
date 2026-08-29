@@ -39,8 +39,11 @@ export default function VerifyLoading() {
 
           {/* Stats bar skeleton */}
           <div className="grid grid-cols-3 gap-3">
-            {["Checked In", "Capacity", "Remaining"].map((label) => (
-              <div key={label} className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center">
+            {['Checked In', 'Capacity', 'Remaining'].map((label) => (
+              <div
+                key={label}
+                className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
+              >
                 <div className="h-7 w-16 mx-auto rounded animate-pulse bg-white/10" />
                 <p className="text-gray-500 text-xs mt-0.5">{label}</p>
               </div>

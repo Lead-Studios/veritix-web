@@ -14,12 +14,12 @@ export default function AuthLoadingShell() {
       >
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           className="inline-flex items-center justify-center w-16 h-16"
         >
           <HiOutlineTicket className="w-12 h-12 text-[#6B8CFF]" />
         </motion.div>
-        
+
         <div className="space-y-2">
           <motion.div
             animate={{ opacity: [0.5, 1, 0.5] }}
@@ -28,7 +28,7 @@ export default function AuthLoadingShell() {
           >
             <motion.div
               animate={{ x: ['-100%', '100%'] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
               className="h-full w-1/2 bg-gradient-to-r from-[#6B8CFF] to-[#5AB9EA]"
             />
           </motion.div>

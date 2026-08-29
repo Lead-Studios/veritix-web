@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
-type LoaderSize = "sm" | "md" | "lg";
-type LoaderVariant = "spinner" | "dots" | "pulse";
+type LoaderSize = 'sm' | 'md' | 'lg';
+type LoaderVariant = 'spinner' | 'dots' | 'pulse';
 
 interface LoaderProps {
   size?: LoaderSize;
@@ -21,8 +21,8 @@ function Spinner({ size }: { size: number }) {
       style={{
         width: size,
         height: size,
-        borderTopColor: "#7c85ff",
-        borderRightColor: "#21d4ff",
+        borderTopColor: '#7c85ff',
+        borderRightColor: '#21d4ff',
       }}
     />
   );
@@ -42,7 +42,7 @@ function Dots({ size }: { size: number }) {
             duration: 0.9,
             repeat: Infinity,
             delay: i * 0.15,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
       ))}
@@ -52,12 +52,15 @@ function Dots({ size }: { size: number }) {
 
 function Pulse({ size }: { size: number }) {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <motion.div
         className="absolute rounded-full bg-gradient-to-br from-[#4d21ff]/30 to-[#21d4ff]/30"
         style={{ width: size, height: size }}
         animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
-        transition={{ duration: 1.2, repeat: Infinity, ease: "easeOut" }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }}
       />
       <div
         className="rounded-full bg-gradient-to-br from-[#4d21ff] to-[#21d4ff]"
@@ -68,8 +71,8 @@ function Pulse({ size }: { size: number }) {
 }
 
 export function Loader({
-  size = "md",
-  variant = "spinner",
+  size = 'md',
+  variant = 'spinner',
   label,
   fullPage = false,
 }: LoaderProps) {
@@ -77,9 +80,9 @@ export function Loader({
 
   const inner = (
     <div className="flex flex-col items-center gap-3">
-      {variant === "spinner" && <Spinner size={px} />}
-      {variant === "dots" && <Dots size={px} />}
-      {variant === "pulse" && <Pulse size={px} />}
+      {variant === 'spinner' && <Spinner size={px} />}
+      {variant === 'dots' && <Dots size={px} />}
+      {variant === 'pulse' && <Pulse size={px} />}
       {label && <p className="text-sm text-white/60">{label}</p>}
     </div>
   );

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 
 export interface FieldError {
   /** Field name / id — used to build the href anchor */
@@ -32,8 +32,8 @@ interface ErrorSummaryProps {
  */
 export const ErrorSummary: React.FC<ErrorSummaryProps> = ({
   errors,
-  heading = "There are errors in this form",
-  className = "",
+  heading = 'There are errors in this form',
+  className = '',
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 

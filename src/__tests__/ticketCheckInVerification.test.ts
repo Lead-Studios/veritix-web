@@ -19,21 +19,28 @@ function mockFetch(status: number, body: unknown) {
 // ---------------------------------------------------------------------------
 
 describe('ticketCheckIn', () => {
-  beforeEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   describe('markTicketUsed', () => {
     it('resolves without error on successful check-in', async () => {
       global.fetch = mockFetch(200, { success: true });
       await expect(markTicketUsed('TKT-001')).resolves.toBeUndefined();
-      expect(fetch).toHaveBeenCalledWith('/api/tickets/check-in', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ ticketCode: 'TKT-001' }),
-      }));
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/tickets/check-in',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ ticketCode: 'TKT-001' }),
+        }),
+      );
     });
 
     it('throws when the ticket is already checked in (non-ok response)', async () => {
       global.fetch = mockFetch(409, { message: 'Already checked in' });
-      await expect(markTicketUsed('TKT-USED')).rejects.toThrow('Failed to record check-in');
+      await expect(markTicketUsed('TKT-USED')).rejects.toThrow(
+        'Failed to record check-in',
+      );
     });
 
     it('throws on network error', async () => {
@@ -65,11 +72,18 @@ describe('ticketCheckIn', () => {
 // ---------------------------------------------------------------------------
 
 describe('ticketVerification', () => {
-  beforeEach(() => { vi.restoreAllMocks(); });
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   describe('verifyTicket', () => {
     it('returns valid result for a valid token', async () => {
-      global.fetch = mockFetch(200, { valid: true, holderName: 'Alice', ticketType: 'VIP', event: 'Fest' });
+      global.fetch = mockFetch(200, {
+        valid: true,
+        holderName: 'Alice',
+        ticketType: 'VIP',
+        event: 'Fest',
+      });
       const result = await verifyTicket('VALID-CODE');
       expect(result.valid).toBe(true);
       expect(result.holderName).toBe('Alice');

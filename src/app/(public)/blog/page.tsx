@@ -1,8 +1,8 @@
-import Link from "next/link";
-import Image from "next/image";
-import { getAllPosts } from "@/lib/blog";
-import type { BlogPost } from "@/lib/blog";
-import { Calendar, Clock, User, Tag } from "lucide-react";
+import Link from 'next/link';
+import Image from 'next/image';
+import { getAllPosts } from '@/lib/blog';
+import type { BlogPost } from '@/lib/blog';
+import { Calendar, Clock, User, Tag } from 'lucide-react';
 
 export default function BlogPage() {
   const posts = getAllPosts();
@@ -19,7 +19,10 @@ export default function BlogPage() {
             VeriTix
           </Link>
 
-          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-8 text-sm text-white/80 lg:flex"
+          >
             <Link href="/" className="transition hover:text-white">
               Home
             </Link>
@@ -54,9 +57,7 @@ export default function BlogPage() {
 
       <main className="mx-auto w-full max-w-7xl px-6 py-16">
         <div className="mb-12">
-          <h1 className="font-display text-4xl text-white sm:text-5xl">
-            Blog
-          </h1>
+          <h1 className="font-display text-4xl text-white sm:text-5xl">Blog</h1>
           <p className="mt-4 text-lg text-white/70">
             Latest news, updates, and insights about VeriTix and Stellar
           </p>
@@ -84,7 +85,7 @@ function BlogCard({ post }: { post: BlogPost }) {
       <article className="h-full rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(10,16,40,0.5)] backdrop-blur transition hover:border-[#4d21ff]/50">
         <div className="overflow-hidden rounded-2xl bg-[#141b3b]">
           <Image
-            src={post.coverImage || "/concert.png"}
+            src={post.coverImage || '/concert.png'}
             alt={post.title}
             width={420}
             height={260}
@@ -116,7 +117,13 @@ function BlogCard({ post }: { post: BlogPost }) {
             </div>
             <div className="flex items-center gap-1">
               <Calendar size={14} />
-              <span>{new Date(post.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+              <span>
+                {new Date(post.date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Clock size={14} />

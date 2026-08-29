@@ -7,13 +7,10 @@ export async function GET() {
 
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'public, max-age=300, s-maxage=600'
-      }
+        'Cache-Control': 'public, max-age=300, s-maxage=600',
+      },
     });
   } catch {
-    return NextResponse.json(
-      { error: 'Failed to fetch events' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
   }
 }

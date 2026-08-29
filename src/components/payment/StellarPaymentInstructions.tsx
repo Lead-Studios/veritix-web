@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { HiOutlineClipboardCopy, HiOutlineCheck } from "react-icons/hi";
+import { useCallback, useState } from 'react';
+import { HiOutlineClipboardCopy, HiOutlineCheck } from 'react-icons/hi';
 
 interface PaymentInstructionsProps {
   amount: number;
   assetCode?: string;
   destinationAddress: string;
   memo?: string;
-  memoType?: "text" | "id" | "hash";
+  memoType?: 'text' | 'id' | 'hash';
   expiresAt?: string;
 }
 
@@ -31,18 +31,22 @@ function CopyButton({ text }: { text: string }) {
       className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
       aria-label={`Copy ${text}`}
     >
-      {copied ? <HiOutlineCheck className="w-3.5 h-3.5" /> : <HiOutlineClipboardCopy className="w-3.5 h-3.5" />}
-      {copied ? "Copied!" : "Copy"}
+      {copied ? (
+        <HiOutlineCheck className="w-3.5 h-3.5" />
+      ) : (
+        <HiOutlineClipboardCopy className="w-3.5 h-3.5" />
+      )}
+      {copied ? 'Copied!' : 'Copy'}
     </button>
   );
 }
 
 export function StellarPaymentInstructions({
   amount,
-  assetCode = "XLM",
+  assetCode = 'XLM',
   destinationAddress,
   memo,
-  memoType = "text",
+  memoType = 'text',
   expiresAt,
 }: PaymentInstructionsProps) {
   return (
@@ -53,7 +57,11 @@ export function StellarPaymentInstructions({
         </div>
         <h2 className="text-xl font-bold text-white">Payment Instructions</h2>
         <p className="text-sm text-gray-400 mt-1">
-          Send exactly <span className="text-white font-semibold">{amount} {assetCode}</span> to the address below.
+          Send exactly{' '}
+          <span className="text-white font-semibold">
+            {amount} {assetCode}
+          </span>{' '}
+          to the address below.
         </p>
       </div>
 
@@ -84,7 +92,8 @@ export function StellarPaymentInstructions({
           <div>
             <span className="text-xs text-gray-500">Amount</span>
             <p className="text-lg font-bold text-white mt-0.5">
-              {amount} <span className="text-sm font-normal text-gray-400">{assetCode}</span>
+              {amount}{' '}
+              <span className="text-sm font-normal text-gray-400">{assetCode}</span>
             </p>
           </div>
         </div>
@@ -99,7 +108,12 @@ export function StellarPaymentInstructions({
           <p className="font-semibold">Important</p>
           <ul className="list-disc list-inside text-yellow-200/80 space-y-0.5">
             <li>Send only {assetCode} on the Stellar network.</li>
-            {memo && <li>The memo <strong>must</strong> be included for your payment to be credited.</li>}
+            {memo && (
+              <li>
+                The memo <strong>must</strong> be included for your payment to be
+                credited.
+              </li>
+            )}
             <li>Transactions typically confirm in 3&ndash;5 seconds.</li>
           </ul>
         </div>

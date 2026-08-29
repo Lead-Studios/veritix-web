@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useRef, useMemo, useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useRef, useMemo, useEffect, useState } from 'react';
+import Image from 'next/image';
 
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_SIZE_MB = 5;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 const MIN_WIDTH = 400;
@@ -12,25 +12,22 @@ const MIN_HEIGHT = 400;
 interface ImageUploadProps {
   file: File | null;
   onChange: (file: File | null) => void;
-  aspectRatio?: "wide" | "square";
-  size?: "normal" | "small";
+  aspectRatio?: 'wide' | 'square';
+  size?: 'normal' | 'small';
   recommendedSize?: string;
 }
 
 export default function ImageUpload({
   file,
   onChange,
-  aspectRatio = "square",
-  size = "normal",
+  aspectRatio = 'square',
+  size = 'normal',
   recommendedSize,
 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const previewUrl = useMemo(
-    () => (file ? URL.createObjectURL(file) : null),
-    [file]
-  );
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
 
   useEffect(() => {
     return () => {
@@ -52,7 +49,7 @@ export default function ImageUpload({
         URL.revokeObjectURL(url);
         if (img.width < MIN_WIDTH || img.height < MIN_HEIGHT) {
           resolve(
-            `Image too small. Minimum dimensions are ${MIN_WIDTH}×${MIN_HEIGHT} px.`
+            `Image too small. Minimum dimensions are ${MIN_WIDTH}×${MIN_HEIGHT} px.`,
           );
         } else {
           resolve(null);
@@ -60,7 +57,7 @@ export default function ImageUpload({
       };
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        resolve("Could not read image dimensions.");
+        resolve('Could not read image dimensions.');
       };
       img.src = url;
     });
@@ -79,7 +76,7 @@ export default function ImageUpload({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) handleFile(e.target.files[0]);
     // reset so the same file can be re-selected after removal
-    e.target.value = "";
+    e.target.value = '';
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -99,16 +96,16 @@ export default function ImageUpload({
     onChange(null);
   };
 
-  const aspectClass = aspectRatio === "wide" ? "aspect-video" : "aspect-square";
-  const heightClass = size === "small" ? "h-24" : "h-48";
+  const aspectClass = aspectRatio === 'wide' ? 'aspect-video' : 'aspect-square';
+  const heightClass = size === 'small' ? 'h-24' : 'h-48';
 
   return (
     <div className="w-full">
       <div
         className={`relative border-2 border-dashed rounded-lg ${aspectClass} ${heightClass} w-full cursor-pointer transition-colors overflow-hidden ${
           error
-            ? "border-red-500 hover:border-red-400"
-            : "border-gray-700 hover:border-blue-600"
+            ? 'border-red-500 hover:border-red-400'
+            : 'border-gray-700 hover:border-blue-600'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -117,7 +114,7 @@ export default function ImageUpload({
         <input
           ref={inputRef}
           type="file"
-          accept={ACCEPTED_TYPES.join(",")}
+          accept={ACCEPTED_TYPES.join(',')}
           onChange={handleFileChange}
           className="hidden"
         />
@@ -137,22 +134,45 @@ export default function ImageUpload({
               className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
               aria-label="Remove image"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            <svg
+              className="w-8 h-8 mb-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
             </svg>
             <p className="text-sm text-center px-4">Drag or drop an image, or browse</p>
             <p className="text-xs text-gray-600 mt-1">
-              JPEG, PNG, WebP, GIF · max ${MAX_SIZE_MB} MB · min ${MIN_WIDTH}×${MIN_HEIGHT} px
+              JPEG, PNG, WebP, GIF · max ${MAX_SIZE_MB} MB · min ${MIN_WIDTH}×$
+              {MIN_HEIGHT} px
             </p>
             {recommendedSize && (
-              <p className="text-xs text-gray-600 mt-0.5">Recommended: {recommendedSize}</p>
+              <p className="text-xs text-gray-600 mt-0.5">
+                Recommended: {recommendedSize}
+              </p>
             )}
           </div>
         )}

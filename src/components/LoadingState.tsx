@@ -1,15 +1,15 @@
 type LoadingStateProps = {
-  variant?: "spinner" | "skeleton" | "card" | "list";
+  variant?: 'spinner' | 'skeleton' | 'card' | 'list';
   text?: string;
   count?: number;
 };
 
 export function LoadingState({
-  variant = "spinner",
-  text = "Loading...",
+  variant = 'spinner',
+  text = 'Loading...',
   count = 3,
 }: LoadingStateProps) {
-  if (variant === "spinner") {
+  if (variant === 'spinner') {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mb-4" />
@@ -18,7 +18,7 @@ export function LoadingState({
     );
   }
 
-  if (variant === "skeleton") {
+  if (variant === 'skeleton') {
     return (
       <div className="space-y-4 animate-pulse">
         <div className="h-8 bg-gray-200 rounded w-1/4" />
@@ -28,7 +28,7 @@ export function LoadingState({
     );
   }
 
-  if (variant === "card") {
+  if (variant === 'card') {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: count }).map((_, i) => (
@@ -46,7 +46,7 @@ export function LoadingState({
     );
   }
 
-  if (variant === "list") {
+  if (variant === 'list') {
     return (
       <div className="space-y-4">
         {Array.from({ length: count }).map((_, i) => (

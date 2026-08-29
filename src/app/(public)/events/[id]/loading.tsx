@@ -19,7 +19,10 @@ export default function EventDetailLoading() {
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
           <div className="h-6 w-36 animate-pulse rounded bg-white/10" />
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-white/10">
+            <div
+              key={i}
+              className="flex items-center justify-between p-4 rounded-xl border border-white/10"
+            >
               <div className="space-y-2">
                 <div className="h-5 w-32 animate-pulse rounded bg-white/10" />
                 <div className="h-4 w-20 animate-pulse rounded bg-white/5" />

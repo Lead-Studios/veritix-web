@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const attendeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email is required"),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Valid email is required'),
 });
 
 const groupSchema = z.object({
-  attendees: z.array(attendeeSchema).min(1, "Add at least one attendee"),
+  attendees: z.array(attendeeSchema).min(1, 'Add at least one attendee'),
 });
 
 type GroupFormValues = z.infer<typeof groupSchema>;
@@ -42,18 +42,18 @@ export function GroupPurchaseForm({
     formState: { errors },
   } = useForm<GroupFormValues>({
     resolver: zodResolver(groupSchema),
-    defaultValues: { attendees: [{ name: "", email: "" }] },
+    defaultValues: { attendees: [{ name: '', email: '' }] },
   });
 
-  const { fields, append, remove } = useFieldArray({ control, name: "attendees" });
+  const { fields, append, remove } = useFieldArray({ control, name: 'attendees' });
 
   const onSubmit = async (data: GroupFormValues) => {
     setSubmitting(true);
     setServerError(null);
     try {
       const res = await fetch(`/api/tickets/${ticketTypeId}/group-purchase`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ticketTypeId,
           attendees: data.attendees,
@@ -61,12 +61,12 @@ export function GroupPurchaseForm({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message ?? "Group purchase failed.");
+        throw new Error(body.message ?? 'Group purchase failed.');
       }
       setSuccess(true);
       onSuccess?.();
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Something went wrong.");
+      setServerError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setSubmitting(false);
     }
@@ -80,8 +80,12 @@ export function GroupPurchaseForm({
         <div className="text-4xl">🎉</div>
         <h2 className="text-xl font-bold text-white">Purchase Complete!</h2>
         <p className="text-sm text-gray-400">
-          {fields.length} {ticketTypeName} ticket{fields.length > 1 ? "s" : ""} purchased for{" "}
-          <span className="text-white">{fields.length} attendee{fields.length > 1 ? "s" : ""}</span>.
+          {fields.length} {ticketTypeName} ticket{fields.length > 1 ? 's' : ''} purchased
+          for{' '}
+          <span className="text-white">
+            {fields.length} attendee{fields.length > 1 ? 's' : ''}
+          </span>
+          .
         </p>
       </div>
     );
@@ -98,9 +102,14 @@ export function GroupPurchaseForm({
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {fields.map((field, index) => (
-          <div key={field.id} className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
+          <div
+            key={field.id}
+            className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3"
+          >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-400">Attendee {index + 1}</span>
+              <span className="text-xs font-medium text-gray-400">
+                Attendee {index + 1}
+              </span>
               {fields.length > 1 && (
                 <button
                   type="button"
@@ -118,11 +127,13 @@ export function GroupPurchaseForm({
                   {...register(`attendees.${index}.name`)}
                   aria-invalid={!!errors.attendees?.[index]?.name}
                   className={`w-full rounded-lg bg-white/5 border px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#4D21FF] ${
-                    errors.attendees?.[index]?.name ? "border-red-500" : "border-white/10"
+                    errors.attendees?.[index]?.name ? 'border-red-500' : 'border-white/10'
                   }`}
                 />
                 {errors.attendees?.[index]?.name && (
-                  <p className="mt-1 text-xs text-red-400">{errors.attendees[index]!.name!.message}</p>
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.attendees[index]!.name!.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -132,11 +143,15 @@ export function GroupPurchaseForm({
                   {...register(`attendees.${index}.email`)}
                   aria-invalid={!!errors.attendees?.[index]?.email}
                   className={`w-full rounded-lg bg-white/5 border px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-[#4D21FF] ${
-                    errors.attendees?.[index]?.email ? "border-red-500" : "border-white/10"
+                    errors.attendees?.[index]?.email
+                      ? 'border-red-500'
+                      : 'border-white/10'
                   }`}
                 />
                 {errors.attendees?.[index]?.email && (
-                  <p className="mt-1 text-xs text-red-400">{errors.attendees[index]!.email!.message}</p>
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.attendees[index]!.email!.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -146,7 +161,7 @@ export function GroupPurchaseForm({
         {fields.length < maxQuantity && (
           <button
             type="button"
-            onClick={() => append({ name: "", email: "" })}
+            onClick={() => append({ name: '', email: '' })}
             className="w-full py-2.5 rounded-lg border border-dashed border-white/10 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-colors"
           >
             + Add another attendee
@@ -154,7 +169,9 @@ export function GroupPurchaseForm({
         )}
 
         {serverError && (
-          <p role="alert" className="text-xs text-red-400">{serverError}</p>
+          <p role="alert" className="text-xs text-red-400">
+            {serverError}
+          </p>
         )}
 
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
@@ -169,7 +186,9 @@ export function GroupPurchaseForm({
           disabled={submitting || fields.length === 0}
           className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-semibold hover:opacity-95 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {submitting ? "Processing…" : `Purchase ${fields.length} Ticket${fields.length !== 1 ? "s" : ""}`}
+          {submitting
+            ? 'Processing…'
+            : `Purchase ${fields.length} Ticket${fields.length !== 1 ? 's' : ''}`}
         </button>
       </form>
     </div>

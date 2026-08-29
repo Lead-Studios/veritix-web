@@ -1,6 +1,9 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-interface EventWithCover { coverImage?: string | null; name: string; }
+interface EventWithCover {
+  coverImage?: string | null;
+  name: string;
+}
 
 export function useEventImages(events: EventWithCover[] | undefined) {
   const images = useMemo(
@@ -9,7 +12,7 @@ export function useEventImages(events: EventWithCover[] | undefined) {
         src: e.coverImage ?? null,
         alt: e.name,
       })),
-    [events]
+    [events],
   );
   return images;
 }

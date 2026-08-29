@@ -1,4 +1,4 @@
-import { buildUrl, API_ROUTES } from "./api-routes";
+import { buildUrl, API_ROUTES } from './api-routes';
 
 export interface CheckInRecord {
   ticketCode: string;
@@ -13,11 +13,11 @@ export interface CheckInRecord {
  */
 export async function markTicketUsed(ticketCode: string): Promise<void> {
   const res = await fetch(buildUrl(API_ROUTES.tickets.checkIn), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ticketCode }),
   });
-  if (!res.ok) throw new Error("Failed to record check-in. Please try again.");
+  if (!res.ok) throw new Error('Failed to record check-in. Please try again.');
 }
 
 /**

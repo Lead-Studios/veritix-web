@@ -1,10 +1,7 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  fetchEventInventory,
-  type TicketTypeInventory,
-} from "@/lib/inventoryApi";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchEventInventory, type TicketTypeInventory } from '@/lib/inventoryApi';
 
 interface UseEventInventoryOptions {
   /** Polling interval in milliseconds. Set to 0 to disable polling. */
@@ -45,8 +42,8 @@ export function useEventInventory(
       if (controller.signal.aborted) return;
       setData(result);
     } catch (err) {
-      if ((err as { name?: string })?.name === "AbortError") return;
-      setError(err instanceof Error ? err.message : "Failed to load inventory");
+      if ((err as { name?: string })?.name === 'AbortError') return;
+      setError(err instanceof Error ? err.message : 'Failed to load inventory');
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
@@ -62,17 +59,17 @@ export function useEventInventory(
   useEffect(() => {
     if (!eventId || intervalMs <= 0) return;
     const id = setInterval(() => {
-      if (typeof document !== "undefined" && document.hidden) return;
+      if (typeof document !== 'undefined' && document.hidden) return;
       load();
     }, intervalMs);
     const onFocus = () => load();
-    if (typeof window !== "undefined") {
-      window.addEventListener("focus", onFocus);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', onFocus);
     }
     return () => {
       clearInterval(id);
-      if (typeof window !== "undefined") {
-        window.removeEventListener("focus", onFocus);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', onFocus);
       }
     };
   }, [eventId, intervalMs, load]);

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Component, type ErrorInfo, type ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
@@ -32,7 +32,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo) {
     this.props.onError?.(error, info);
     console.error(
-      `[ChartErrorBoundary${this.props.chartName ? ` — ${this.props.chartName}` : ""}]`,
+      `[ChartErrorBoundary${this.props.chartName ? ` — ${this.props.chartName}` : ''}]`,
       error,
       info,
     );
@@ -54,15 +54,11 @@ export class ChartErrorBoundary extends Component<Props, State> {
           aria-live="polite"
           className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/5 p-8 text-center"
         >
-          <AlertTriangle
-            size={24}
-            className="mb-3 text-yellow-400"
-            aria-hidden="true"
-          />
+          <AlertTriangle size={24} className="mb-3 text-yellow-400" aria-hidden="true" />
           <p className="text-sm font-medium text-gray-300">
             {this.props.chartName
               ? `"${this.props.chartName}" unavailable — refresh to retry`
-              : "Chart unavailable — refresh to retry"}
+              : 'Chart unavailable — refresh to retry'}
           </p>
           <button
             onClick={this.reset}

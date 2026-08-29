@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 interface OfflineBannerProps {
   /** Message shown when offline */
@@ -12,7 +12,7 @@ interface OfflineBannerProps {
   className?: string;
 }
 
-type NetworkState = "online" | "offline" | "reconnected";
+type NetworkState = 'online' | 'offline' | 'reconnected';
 
 /**
  * Displays a sticky banner when the user loses internet connectivity.
@@ -21,37 +21,37 @@ type NetworkState = "online" | "offline" | "reconnected";
  * Uses the browser `online` / `offline` events and `navigator.onLine`.
  */
 export const OfflineBanner: React.FC<OfflineBannerProps> = ({
-  offlineMessage = "You appear to be offline. Some features may be unavailable.",
+  offlineMessage = 'You appear to be offline. Some features may be unavailable.',
   reconnectedMessage = "You're back online!",
   reconnectedDuration = 3000,
-  className = "",
+  className = '',
 }) => {
   const [state, setState] = useState<NetworkState>(
-    typeof navigator !== "undefined" && !navigator.onLine ? "offline" : "online"
+    typeof navigator !== 'undefined' && !navigator.onLine ? 'offline' : 'online',
   );
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
 
-    const handleOffline = () => setState("offline");
+    const handleOffline = () => setState('offline');
     const handleOnline = () => {
-      setState("reconnected");
-      timer = setTimeout(() => setState("online"), reconnectedDuration);
+      setState('reconnected');
+      timer = setTimeout(() => setState('online'), reconnectedDuration);
     };
 
-    window.addEventListener("offline", handleOffline);
-    window.addEventListener("online", handleOnline);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
     return () => {
-      window.removeEventListener("offline", handleOffline);
-      window.removeEventListener("online", handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
       clearTimeout(timer);
     };
   }, [reconnectedDuration]);
 
-  if (state === "online") return null;
+  if (state === 'online') return null;
 
-  const isOffline = state === "offline";
+  const isOffline = state === 'offline';
 
   return (
     <div
@@ -59,13 +59,11 @@ export const OfflineBanner: React.FC<OfflineBannerProps> = ({
       aria-live="polite"
       aria-atomic="true"
       className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all ${
-        isOffline
-          ? "bg-gray-900 text-gray-100"
-          : "bg-emerald-600 text-white"
+        isOffline ? 'bg-gray-900 text-gray-100' : 'bg-emerald-600 text-white'
       } ${className}`}
     >
       <span aria-hidden="true" className="text-base">
-        {isOffline ? "⚡" : "✓"}
+        {isOffline ? '⚡' : '✓'}
       </span>
       {isOffline ? offlineMessage : reconnectedMessage}
     </div>

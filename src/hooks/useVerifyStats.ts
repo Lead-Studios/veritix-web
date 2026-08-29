@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface VerifyStats {
   scanned: number;
@@ -17,7 +17,7 @@ export function useVerifyStats(eventId?: string) {
   useEffect(() => {
     if (!eventId) return;
     setLoading(true);
-    const token = localStorage.getItem("auth_token") ?? "";
+    const token = localStorage.getItem('auth_token') ?? '';
     fetch(`/api/verify/stats?eventId=${eventId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })

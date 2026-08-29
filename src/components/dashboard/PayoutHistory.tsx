@@ -84,7 +84,12 @@ export function PayoutHistory({ organizerId }: PayoutHistoryProps) {
             <input
               type="date"
               value={filter.from}
-              onChange={(e) => setCustomRange(e.target.value, filter.to ?? new Date().toISOString().slice(0, 10))}
+              onChange={(e) =>
+                setCustomRange(
+                  e.target.value,
+                  filter.to ?? new Date().toISOString().slice(0, 10),
+                )
+              }
               className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-white focus:border-brand-primary focus:outline-none [color-scheme:dark]"
               aria-label="From date"
             />
@@ -130,16 +135,28 @@ export function PayoutHistory({ organizerId }: PayoutHistoryProps) {
           <table className="min-w-full divide-y divide-gray-200 text-left text-xs dark:divide-gray-800">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th scope="col" className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                <th
+                  scope="col"
+                  className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400"
+                >
                   Date
                 </th>
-                <th scope="col" className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                <th
+                  scope="col"
+                  className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400"
+                >
                   Amount
                 </th>
-                <th scope="col" className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                <th
+                  scope="col"
+                  className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400"
+                >
                   Status
                 </th>
-                <th scope="col" className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                <th
+                  scope="col"
+                  className="px-4 py-3 font-semibold text-gray-600 dark:text-gray-400"
+                >
                   Transaction Ref
                 </th>
               </tr>

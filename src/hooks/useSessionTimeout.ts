@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from 'react';
 
 interface Options {
   onWarn: () => void;
@@ -20,11 +20,11 @@ export function useSessionTimeout({
 
   const schedule = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch('/api/auth/session');
       if (!res.ok) return;
 
       const { exp }: SessionApiResponse = await res.json();
-      if (typeof exp !== "number") return;
+      if (typeof exp !== 'number') return;
 
       const expiry = exp * 1000;
       const now = Date.now();
@@ -34,7 +34,7 @@ export function useSessionTimeout({
       if (warnAt > 0) warnTimer.current = setTimeout(onWarn, warnAt);
       if (logoutAt > 0) logoutTimer.current = setTimeout(onLogout, logoutAt);
     } catch (e: unknown) {
-      console.error("Failed to fetch session", e);
+      console.error('Failed to fetch session', e);
     }
   }, [onWarn, onLogout, warnBeforeMs]);
 

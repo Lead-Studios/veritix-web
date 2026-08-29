@@ -1,20 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const transferSchema = z.object({
   recipientAddress: z
     .string()
-    .min(1, "Recipient address is required")
-    .regex(/^G[A-Z2-7]{55}$/, "Must be a valid Stellar public key (starts with G, 56 chars)"),
+    .min(1, 'Recipient address is required')
+    .regex(
+      /^G[A-Z2-7]{55}$/,
+      'Must be a valid Stellar public key (starts with G, 56 chars)',
+    ),
 });
 
 type TransferFormValues = z.infer<typeof transferSchema>;
 
-type TransferStep = "form" | "confirm" | "pending" | "success" | "error";
+type TransferStep = 'form' | 'confirm' | 'pending' | 'success' | 'error';
 
 interface TicketTransferModalProps {
   ticketId: string;
@@ -36,9 +39,9 @@ export function TicketTransferModal({
   onClose,
   onTransferred,
 }: TicketTransferModalProps) {
-  const [step, setStep] = useState<TransferStep>("form");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [recipientAddress, setRecipientAddress] = useState("");
+  const [step, setStep] = useState<TransferStep>('form');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
 
   const {
     register,
@@ -49,33 +52,35 @@ export function TicketTransferModal({
 
   const handleClose = () => {
     reset();
-    setStep("form");
-    setErrorMsg("");
+    setStep('form');
+    setErrorMsg('');
     onClose();
   };
 
   const onFormSubmit = (data: TransferFormValues) => {
     setRecipientAddress(data.recipientAddress);
-    setStep("confirm");
+    setStep('confirm');
   };
 
   const confirmTransfer = async () => {
-    setStep("pending");
+    setStep('pending');
     try {
       const res = await fetch(`/api/tickets/${encodeURIComponent(ticketId)}/transfer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recipientAddress }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message ?? "Transfer failed.");
+        throw new Error(body.message ?? 'Transfer failed.');
       }
-      setStep("success");
+      setStep('success');
       onTransferred?.();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Transfer failed. Please try again.");
-      setStep("error");
+      setErrorMsg(
+        err instanceof Error ? err.message : 'Transfer failed. Please try again.',
+      );
+      setStep('error');
     }
   };
 
@@ -94,7 +99,7 @@ export function TicketTransferModal({
         </h2>
         <p className="text-xs text-gray-500 font-mono">{ticketCode}</p>
 
-        {step === "form" && (
+        {step === 'form' && (
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4" noValidate>
             <div>
               <label htmlFor="recipient" className="block text-sm text-gray-400 mb-1">
@@ -103,11 +108,11 @@ export function TicketTransferModal({
               <input
                 id="recipient"
                 type="text"
-                {...register("recipientAddress")}
+                {...register('recipientAddress')}
                 aria-invalid={!!errors.recipientAddress}
                 placeholder="GABC…"
                 className={`w-full rounded-lg bg-white/5 border px-3 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-[#4D21FF] font-mono ${
-                  errors.recipientAddress ? "border-red-500" : "border-white/10"
+                  errors.recipientAddress ? 'border-red-500' : 'border-white/10'
                 }`}
               />
               {errors.recipientAddress && (
@@ -117,21 +122,26 @@ export function TicketTransferModal({
               )}
             </div>
             <div className="flex gap-3">
-              <button type="button" onClick={handleClose} className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm hover:text-white">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm hover:text-white"
+              >
                 Cancel
               </button>
-              <button type="submit" className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold hover:bg-[#3d18cc]">
+              <button
+                type="submit"
+                className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold hover:bg-[#3d18cc]"
+              >
                 Continue
               </button>
             </div>
           </form>
         )}
 
-        {step === "confirm" && (
+        {step === 'confirm' && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-300">
-              Transfer this ticket to:
-            </p>
+            <p className="text-sm text-gray-300">Transfer this ticket to:</p>
             <p className="text-xs font-mono text-white break-all bg-white/5 rounded-lg p-3">
               {recipientAddress}
             </p>
@@ -139,40 +149,59 @@ export function TicketTransferModal({
               ⚠ This action is irreversible once confirmed on the Stellar network.
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setStep("form")} className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm hover:text-white">
+              <button
+                onClick={() => setStep('form')}
+                className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm hover:text-white"
+              >
                 Back
               </button>
-              <button onClick={confirmTransfer} className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold hover:bg-[#3d18cc]">
+              <button
+                onClick={confirmTransfer}
+                className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold hover:bg-[#3d18cc]"
+              >
                 Confirm Transfer
               </button>
             </div>
           </div>
         )}
 
-        {step === "pending" && (
+        {step === 'pending' && (
           <div className="flex items-center gap-3 text-gray-300 text-sm py-4">
             <span className="w-5 h-5 border-2 border-[#4D21FF] border-t-transparent rounded-full animate-spin flex-shrink-0" />
             Submitting transfer to Stellar network…
           </div>
         )}
 
-        {step === "success" && (
+        {step === 'success' && (
           <div className="space-y-4">
-            <p className="text-green-400 text-sm font-semibold">✓ Ticket transferred successfully.</p>
-            <button onClick={handleClose} className="w-full py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold">
+            <p className="text-green-400 text-sm font-semibold">
+              ✓ Ticket transferred successfully.
+            </p>
+            <button
+              onClick={handleClose}
+              className="w-full py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold"
+            >
               Close
             </button>
           </div>
         )}
 
-        {step === "error" && (
+        {step === 'error' && (
           <div className="space-y-4">
-            <p role="alert" className="text-red-400 text-sm">{errorMsg}</p>
+            <p role="alert" className="text-red-400 text-sm">
+              {errorMsg}
+            </p>
             <div className="flex gap-3">
-              <button onClick={handleClose} className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm">
+              <button
+                onClick={handleClose}
+                className="flex-1 py-2.5 rounded-lg border border-white/10 text-white/70 text-sm"
+              >
                 Cancel
               </button>
-              <button onClick={() => setStep("confirm")} className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold">
+              <button
+                onClick={() => setStep('confirm')}
+                className="flex-1 py-2.5 rounded-lg bg-[#4D21FF] text-white text-sm font-semibold"
+              >
                 Retry
               </button>
             </div>

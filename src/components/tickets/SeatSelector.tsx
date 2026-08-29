@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export interface Seat {
   id: string;
   row: string;
   number: number;
-  status: "available" | "taken" | "selected";
+  status: 'available' | 'taken' | 'selected';
 }
 
 interface SeatSelectorProps {
@@ -15,10 +15,11 @@ interface SeatSelectorProps {
   onSelectionChange?: (selectedIds: string[]) => void;
 }
 
-const STATUS_STYLES: Record<Seat["status"], string> = {
-  available: "bg-white/10 border-white/20 text-gray-300 hover:bg-[#4D21FF]/40 hover:border-[#4D21FF] cursor-pointer",
-  taken: "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50",
-  selected: "bg-[#4D21FF] border-[#4D21FF] text-white cursor-pointer",
+const STATUS_STYLES: Record<Seat['status'], string> = {
+  available:
+    'bg-white/10 border-white/20 text-gray-300 hover:bg-[#4D21FF]/40 hover:border-[#4D21FF] cursor-pointer',
+  taken: 'bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed opacity-50',
+  selected: 'bg-[#4D21FF] border-[#4D21FF] text-white cursor-pointer',
 };
 
 /**
@@ -31,24 +32,26 @@ export function SeatSelector({
   maxSelectable = 1,
   onSelectionChange,
 }: SeatSelectorProps) {
-  const [seatMap, setSeatMap] = useState<Map<string, Seat>>(() => new Map(seats.map((s) => [s.id, s])));
+  const [seatMap, setSeatMap] = useState<Map<string, Seat>>(
+    () => new Map(seats.map((s) => [s.id, s])),
+  );
 
   const selectedIds = Array.from(seatMap.values())
-    .filter((s) => s.status === "selected")
+    .filter((s) => s.status === 'selected')
     .map((s) => s.id);
 
   const toggleSeat = (id: string) => {
     const seat = seatMap.get(id);
-    if (!seat || seat.status === "taken") return;
+    if (!seat || seat.status === 'taken') return;
 
-    const isSelected = seat.status === "selected";
+    const isSelected = seat.status === 'selected';
     if (!isSelected && selectedIds.length >= maxSelectable) return;
 
     const updated = new Map(seatMap);
-    updated.set(id, { ...seat, status: isSelected ? "available" : "selected" });
+    updated.set(id, { ...seat, status: isSelected ? 'available' : 'selected' });
     setSeatMap(updated);
     const newSelected = Array.from(updated.values())
-      .filter((s) => s.status === "selected")
+      .filter((s) => s.status === 'selected')
       .map((s) => s.id);
     onSelectionChange?.(newSelected);
   };
@@ -59,7 +62,7 @@ export function SeatSelector({
       if (!acc.has(seat.row)) acc.set(seat.row, []);
       acc.get(seat.row)!.push(seat.id);
       return acc;
-    }, new Map<string, string[]>())
+    }, new Map<string, string[]>()),
   );
 
   return (
@@ -89,7 +92,9 @@ export function SeatSelector({
       <div className="space-y-2">
         {rows.map(([row, seatIds]) => (
           <div key={row} className="flex items-center gap-2">
-            <span className="w-6 text-xs text-gray-500 text-center flex-shrink-0">{row}</span>
+            <span className="w-6 text-xs text-gray-500 text-center flex-shrink-0">
+              {row}
+            </span>
             <div className="flex flex-wrap gap-1.5">
               {seatIds.map((id) => {
                 const seat = seatMap.get(id)!;
@@ -97,9 +102,9 @@ export function SeatSelector({
                   <button
                     key={id}
                     onClick={() => toggleSeat(id)}
-                    disabled={seat.status === "taken"}
+                    disabled={seat.status === 'taken'}
                     aria-label={`Row ${seat.row} seat ${seat.number} — ${seat.status}`}
-                    aria-pressed={seat.status === "selected"}
+                    aria-pressed={seat.status === 'selected'}
                     className={`w-8 h-8 rounded border text-xs font-medium transition-colors ${STATUS_STYLES[seat.status]}`}
                   >
                     {seat.number}
@@ -113,13 +118,18 @@ export function SeatSelector({
 
       {/* Selection summary */}
       <p className="text-xs text-gray-400">
-        {selectedIds.length} of {maxSelectable} seat{maxSelectable !== 1 ? "s" : ""} selected
+        {selectedIds.length} of {maxSelectable} seat{maxSelectable !== 1 ? 's' : ''}{' '}
+        selected
         {selectedIds.length > 0 && (
           <span className="ml-2 text-white">
-            ({selectedIds.map((id) => {
-              const s = seatMap.get(id)!;
-              return `${s.row}${s.number}`;
-            }).join(", ")})
+            (
+            {selectedIds
+              .map((id) => {
+                const s = seatMap.get(id)!;
+                return `${s.row}${s.number}`;
+              })
+              .join(', ')}
+            )
           </span>
         )}
       </p>

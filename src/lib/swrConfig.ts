@@ -1,4 +1,4 @@
-import type { SWRConfiguration } from "swr";
+import type { SWRConfiguration } from 'swr';
 
 /**
  * Shared SWR configuration for the authenticated app.

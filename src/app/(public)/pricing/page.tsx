@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import dynamic from "next/dynamic";
+import { useState } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import dynamic from 'next/dynamic';
 
-const LandingFooter = dynamic(
-  () => import("@/components/landing/LandingFooter"),
-  { ssr: false, loading: () => <div className="bg-[#050a1f] py-16 h-48 animate-pulse" /> }
-);
+const LandingFooter = dynamic(() => import('@/components/landing/LandingFooter'), {
+  ssr: false,
+  loading: () => <div className="bg-[#050a1f] py-16 h-48 animate-pulse" />,
+});
 
 const MotionLink = motion(Link);
 
@@ -22,85 +22,88 @@ const fadeUp = {
 
 const pricingTiers = [
   {
-    name: "Free",
-    description: "Perfect for getting started",
-    tickets: "Up to 50 tickets",
-    fee: "5% platform fee",
-    price: "$0",
+    name: 'Free',
+    description: 'Perfect for getting started',
+    tickets: 'Up to 50 tickets',
+    fee: '5% platform fee',
+    price: '$0',
     features: [
-      "Up to 50 tickets per event",
-      "Basic event analytics",
-      "Email support",
-      "Standard ticket types",
-      "Basic QR code tickets",
+      'Up to 50 tickets per event',
+      'Basic event analytics',
+      'Email support',
+      'Standard ticket types',
+      'Basic QR code tickets',
     ],
-    cta: "Get Started",
+    cta: 'Get Started',
     popular: false,
   },
   {
-    name: "Pro",
-    description: "For growing organizers",
-    tickets: "Up to 500 tickets",
-    fee: "3% platform fee",
-    price: "$29",
-    period: "/month",
+    name: 'Pro',
+    description: 'For growing organizers',
+    tickets: 'Up to 500 tickets',
+    fee: '3% platform fee',
+    price: '$29',
+    period: '/month',
     features: [
-      "Up to 500 tickets per event",
-      "Advanced analytics dashboard",
-      "Priority email support",
-      "Custom ticket designs",
-      "NFT ticket minting",
-      "Social media integration",
-      "Promotional tools",
+      'Up to 500 tickets per event',
+      'Advanced analytics dashboard',
+      'Priority email support',
+      'Custom ticket designs',
+      'NFT ticket minting',
+      'Social media integration',
+      'Promotional tools',
     ],
-    cta: "Upgrade to Pro",
+    cta: 'Upgrade to Pro',
     popular: true,
   },
   {
-    name: "Enterprise",
-    description: "For large-scale events",
-    tickets: "Unlimited tickets",
-    fee: "Custom pricing",
-    price: "Custom",
+    name: 'Enterprise',
+    description: 'For large-scale events',
+    tickets: 'Unlimited tickets',
+    fee: 'Custom pricing',
+    price: 'Custom',
     features: [
-      "Unlimited tickets",
-      "Dedicated account manager",
-      "24/7 phone support",
-      "White-label solution",
-      "Custom integrations",
-      "Advanced security features",
-      "Multi-event management",
-      "Revenue sharing options",
+      'Unlimited tickets',
+      'Dedicated account manager',
+      '24/7 phone support',
+      'White-label solution',
+      'Custom integrations',
+      'Advanced security features',
+      'Multi-event management',
+      'Revenue sharing options',
     ],
-    cta: "Contact Sales",
+    cta: 'Contact Sales',
     popular: false,
   },
 ];
 
 const comparisonFeatures = [
-  { name: "Tickets per event", free: "50", pro: "500", enterprise: "Unlimited" },
-  { name: "Platform fee", free: "5%", pro: "3%", enterprise: "Custom" },
-  { name: "NFT ticket minting", free: false, pro: true, enterprise: true },
-  { name: "Custom ticket designs", free: false, pro: true, enterprise: true },
-  { name: "Analytics dashboard", free: "Basic", pro: "Advanced", enterprise: "Advanced" },
-  { name: "Email support", free: "Standard", pro: "Priority", enterprise: "24/7" },
-  { name: "Social media integration", free: false, pro: true, enterprise: true },
-  { name: "White-label solution", free: false, pro: false, enterprise: true },
-  { name: "Custom integrations", free: false, pro: false, enterprise: true },
+  { name: 'Tickets per event', free: '50', pro: '500', enterprise: 'Unlimited' },
+  { name: 'Platform fee', free: '5%', pro: '3%', enterprise: 'Custom' },
+  { name: 'NFT ticket minting', free: false, pro: true, enterprise: true },
+  { name: 'Custom ticket designs', free: false, pro: true, enterprise: true },
+  { name: 'Analytics dashboard', free: 'Basic', pro: 'Advanced', enterprise: 'Advanced' },
+  { name: 'Email support', free: 'Standard', pro: 'Priority', enterprise: '24/7' },
+  { name: 'Social media integration', free: false, pro: true, enterprise: true },
+  { name: 'White-label solution', free: false, pro: false, enterprise: true },
+  { name: 'Custom integrations', free: false, pro: false, enterprise: true },
 ];
 
 const faqs = [
   {
-    question: "When do I get paid?",
-    answer: "Payments are processed within 5-7 business days after your event concludes. You can track your earnings in real-time through your dashboard. For Pro and Enterprise plans, expedited payment options are available.",
+    question: 'When do I get paid?',
+    answer:
+      'Payments are processed within 5-7 business days after your event concludes. You can track your earnings in real-time through your dashboard. For Pro and Enterprise plans, expedited payment options are available.',
   },
   {
-    question: "What is the platform fee?",
-    answer: "The platform fee is a percentage charged on each ticket sale. Free tier has a 5% fee, Pro tier has a 3% fee, and Enterprise tier offers custom pricing based on your event volume and requirements.",
+    question: 'What is the platform fee?',
+    answer:
+      'The platform fee is a percentage charged on each ticket sale. Free tier has a 5% fee, Pro tier has a 3% fee, and Enterprise tier offers custom pricing based on your event volume and requirements.',
   },
   {
-    question: "Is there a setup fee?",
-    answer: "No, there are no setup fees for any tier. You can create events and start selling tickets immediately. Enterprise plans may have custom implementation fees for specialized integrations.",
+    question: 'Is there a setup fee?',
+    answer:
+      'No, there are no setup fees for any tier. You can create events and start selling tickets immediately. Enterprise plans may have custom implementation fees for specialized integrations.',
   },
 ];
 
@@ -123,7 +126,10 @@ export default function PricingPage() {
             VeriTix
           </Link>
 
-          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-8 text-sm text-white/80 lg:flex"
+          >
             <Link href="/" className="transition hover:text-white">
               Home
             </Link>
@@ -158,9 +164,7 @@ export default function PricingPage() {
       <main>
         <section className="bg-gradient-to-b from-[#0b1025] via-[#111a42] to-[#0b1025] py-20">
           <motion.div className="mx-auto w-full max-w-7xl px-6 text-center" {...fadeUp}>
-            <p className="text-xs uppercase tracking-[0.4em] text-white/60">
-              Pricing
-            </p>
+            <p className="text-xs uppercase tracking-[0.4em] text-white/60">Pricing</p>
             <h1 className="font-display mt-4 text-4xl text-white sm:text-5xl lg:text-6xl">
               Simple, Transparent Pricing
             </h1>
@@ -178,8 +182,8 @@ export default function PricingPage() {
                   key={tier.name}
                   className={`relative rounded-3xl border p-8 backdrop-blur ${
                     tier.popular
-                      ? "border-[#4d21ff] bg-gradient-to-b from-[#1a1f3a] to-[#0f1428] shadow-[0_20px_60px_rgba(77,33,255,0.2)]"
-                      : "border-white/10 bg-white/5 shadow-[0_20px_60px_rgba(10,16,40,0.5)]"
+                      ? 'border-[#4d21ff] bg-gradient-to-b from-[#1a1f3a] to-[#0f1428] shadow-[0_20px_60px_rgba(77,33,255,0.2)]'
+                      : 'border-white/10 bg-white/5 shadow-[0_20px_60px_rgba(10,16,40,0.5)]'
                   }`}
                   whileHover={{ y: -8 }}
                   transition={{ duration: 0.3 }}
@@ -191,7 +195,7 @@ export default function PricingPage() {
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="text-center">
                     <h3 className="text-2xl font-bold text-white">{tier.name}</h3>
                     <p className="mt-2 text-sm text-white/70">{tier.description}</p>
@@ -207,7 +211,10 @@ export default function PricingPage() {
 
                   <ul className="mt-8 space-y-4">
                     {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3 text-sm text-white/80">
+                      <li
+                        key={feature}
+                        className="flex items-start gap-3 text-sm text-white/80"
+                      >
                         <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#21d4ff]" />
                         <span>{feature}</span>
                       </li>
@@ -218,8 +225,8 @@ export default function PricingPage() {
                     href={`/sign-up?plan=${tier.name.toLowerCase()}`}
                     className={`mt-8 block w-full rounded-full px-6 py-3 text-center text-sm font-semibold transition ${
                       tier.popular
-                        ? "bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] text-white"
-                        : "border border-[#3a3c77] text-[#7c85ff] hover:text-white"
+                        ? 'bg-gradient-to-r from-[#4d21ff] to-[#21d4ff] text-white'
+                        : 'border border-[#3a3c77] text-[#7c85ff] hover:text-white'
                     }`}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.98 }}
@@ -266,12 +273,12 @@ export default function PricingPage() {
                     <tr
                       key={feature.name}
                       className={`border-b border-white/5 ${
-                        index % 2 === 0 ? "bg-white/[0.02]" : ""
+                        index % 2 === 0 ? 'bg-white/[0.02]' : ''
                       }`}
                     >
                       <td className="px-6 py-4 text-sm text-white/80">{feature.name}</td>
                       <td className="px-6 py-4 text-center text-sm text-white/80">
-                        {typeof feature.free === "boolean" ? (
+                        {typeof feature.free === 'boolean' ? (
                           feature.free ? (
                             <Check className="mx-auto h-5 w-5 text-[#21d4ff]" />
                           ) : (
@@ -282,7 +289,7 @@ export default function PricingPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-[#7c85ff]">
-                        {typeof feature.pro === "boolean" ? (
+                        {typeof feature.pro === 'boolean' ? (
                           feature.pro ? (
                             <Check className="mx-auto h-5 w-5 text-[#21d4ff]" />
                           ) : (
@@ -293,7 +300,7 @@ export default function PricingPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-white/80">
-                        {typeof feature.enterprise === "boolean" ? (
+                        {typeof feature.enterprise === 'boolean' ? (
                           feature.enterprise ? (
                             <Check className="mx-auto h-5 w-5 text-[#21d4ff]" />
                           ) : (
@@ -346,7 +353,7 @@ export default function PricingPage() {
                   {openFaq === index && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
+                      animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
                       className="px-6 pb-5"

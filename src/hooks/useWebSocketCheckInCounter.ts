@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface WebSocketCheckInState {
   checkInCount: number;
@@ -10,25 +10,22 @@ export interface WebSocketCheckInState {
 }
 
 interface CheckinUpdateMessage {
-  type: "checkin_update";
+  type: 'checkin_update';
   checkInCount: number;
   totalCapacity: number;
 }
 
 function isCheckinUpdateMessage(value: unknown): value is CheckinUpdateMessage {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
-    (value as CheckinUpdateMessage).type === "checkin_update" &&
-    typeof (value as CheckinUpdateMessage).checkInCount === "number" &&
-    typeof (value as CheckinUpdateMessage).totalCapacity === "number"
+    (value as CheckinUpdateMessage).type === 'checkin_update' &&
+    typeof (value as CheckinUpdateMessage).checkInCount === 'number' &&
+    typeof (value as CheckinUpdateMessage).totalCapacity === 'number'
   );
 }
 
-export function useWebSocketCheckInCounter(
-  eventId: string | null,
-  wsUrl: string,
-) {
+export function useWebSocketCheckInCounter(eventId: string | null, wsUrl: string) {
   const [state, setState] = useState<WebSocketCheckInState>({
     checkInCount: 0,
     totalCapacity: 0,
@@ -59,7 +56,7 @@ export function useWebSocketCheckInCounter(
             });
           }
         } catch (e: unknown) {
-          console.error("Failed to parse WebSocket message", e);
+          console.error('Failed to parse WebSocket message', e);
         }
       };
 
@@ -74,7 +71,7 @@ export function useWebSocketCheckInCounter(
 
       wsRef.current = ws;
     } catch (e: unknown) {
-      console.error("WebSocket connection failed", e);
+      console.error('WebSocket connection failed', e);
     }
   }, [eventId, wsUrl]);
 

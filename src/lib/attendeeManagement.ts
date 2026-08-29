@@ -1,6 +1,6 @@
 // FE-097: Attendee and order management utilities for manage-event screen
 
-import { buildUrl, API_ROUTES } from "./api-routes";
+import { buildUrl, API_ROUTES } from './api-routes';
 
 export interface Attendee {
   id: string;
@@ -30,11 +30,9 @@ interface FetchAttendeesResponse {
   attendees: ApiAttendee[];
 }
 
-export async function fetchEventAttendees(
-  eventId: string,
-): Promise<Attendee[]> {
+export async function fetchEventAttendees(eventId: string): Promise<Attendee[]> {
   const res = await fetch(buildUrl(API_ROUTES.admin.attendees(eventId)));
-  if (!res.ok) throw new Error("Failed to fetch attendees");
+  if (!res.ok) throw new Error('Failed to fetch attendees');
   const data: FetchAttendeesResponse = await res.json();
   return data.attendees.map((a) => ({
     id: a.id,
@@ -56,12 +54,11 @@ export async function checkInAttendee(
   const res = await fetch(
     buildUrl(API_ROUTES.events.attendeeCheckIn(eventId, attendeeId)),
     {
-      method: "POST",
+      method: 'POST',
     },
   );
-  if (!res.ok)
-    return { success: false, message: "Check-in failed. Please try again." };
-  return { success: true, message: "Attendee checked in." };
+  if (!res.ok) return { success: false, message: 'Check-in failed. Please try again.' };
+  return { success: true, message: 'Attendee checked in.' };
 }
 
 export async function banAttendee(
@@ -70,28 +67,24 @@ export async function banAttendee(
   reason: string,
 ): Promise<{ success: boolean; message: string }> {
   const res = await fetch(buildUrl(API_ROUTES.admin.ban(eventId)), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ attendeeId, reason }),
   });
-  if (!res.ok)
-    return { success: false, message: "Banning failed. Please try again." };
-  return { success: true, message: "Attendee banned." };
+  if (!res.ok) return { success: false, message: 'Banning failed. Please try again.' };
+  return { success: true, message: 'Attendee banned.' };
 }
 
-export function exportAttendeesCSV(
-  attendees: Attendee[],
-  eventId = "event",
-): void {
+export function exportAttendeesCSV(attendees: Attendee[], eventId = 'event'): void {
   const headers = [
-    "Name",
-    "Email",
-    "Ticket Type",
-    "Order ID",
-    "Checked In",
-    "Purchased At",
-    "Banned",
-    "Ban Reason",
+    'Name',
+    'Email',
+    'Ticket Type',
+    'Order ID',
+    'Checked In',
+    'Purchased At',
+    'Banned',
+    'Ban Reason',
   ];
   const rows = attendees.map((a) => [
     a.name,
@@ -101,12 +94,12 @@ export function exportAttendeesCSV(
     String(a.checkedIn),
     a.purchasedAt,
     String(a.banned ?? false),
-    a.banReason ?? "",
+    a.banReason ?? '',
   ]);
-  const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `attendees-${eventId}-${Date.now()}.csv`;
   a.click();

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 interface BanAttendeeDialogProps {
   open: boolean;
@@ -15,7 +15,7 @@ export default function BanAttendeeDialog({
   onConfirm,
   attendeeName,
 }: BanAttendeeDialogProps) {
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState('');
 
   if (!open) return null;
 

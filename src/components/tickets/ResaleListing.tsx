@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ResaleListingForm } from "./ResaleListingForm";
+import { useState } from 'react';
+import { ResaleListingForm } from './ResaleListingForm';
 
 interface ResaleListingProps {
   ticketId: string;
@@ -10,7 +10,12 @@ interface ResaleListingProps {
   eventName: string;
 }
 
-export function ResaleListing({ ticketId, originalPrice, ticketType, eventName }: ResaleListingProps) {
+export function ResaleListing({
+  ticketId,
+  originalPrice,
+  ticketType,
+  eventName,
+}: ResaleListingProps) {
   const [success, setSuccess] = useState(false);
 
   if (success) {
@@ -19,8 +24,9 @@ export function ResaleListing({ ticketId, originalPrice, ticketType, eventName }
         <div className="text-4xl">🎫</div>
         <h2 className="text-xl font-bold text-white">Listed for Resale</h2>
         <p className="text-sm text-gray-400">
-          Your {ticketType} ticket for <span className="text-white">{eventName}</span> is now listed on the resale
-          marketplace. You will be notified when a buyer is found.
+          Your {ticketType} ticket for <span className="text-white">{eventName}</span> is
+          now listed on the resale marketplace. You will be notified when a buyer is
+          found.
         </p>
         <p className="text-xs text-gray-500">
           Manage your listing from your ticket details page.
@@ -34,11 +40,16 @@ export function ResaleListing({ ticketId, originalPrice, ticketType, eventName }
       <div>
         <h2 className="text-lg font-semibold text-white">Resell Your Ticket</h2>
         <p className="text-sm text-gray-400 mt-1">
-          List your {ticketType} ticket for <span className="text-white">{eventName}</span> at or below the maximum
-          allowed price.
+          List your {ticketType} ticket for{' '}
+          <span className="text-white">{eventName}</span> at or below the maximum allowed
+          price.
         </p>
       </div>
-      <ResaleListingForm ticketId={ticketId} originalPrice={originalPrice} onSuccess={() => setSuccess(true)} />
+      <ResaleListingForm
+        ticketId={ticketId}
+        originalPrice={originalPrice}
+        onSuccess={() => setSuccess(true)}
+      />
     </div>
   );
 }

@@ -43,13 +43,15 @@ export default function FilterInput({
   onChange = () => {},
   focusColor = 'cyan-400',
   rounded = 'rounded-xl',
-  inputClassName = ''
+  inputClassName = '',
 }: FilterInputProps) {
   const colorStyles = focusColorMap[focusColor] || focusColorMap['cyan-400'];
 
   return (
     <div className="relative group">
-      <Icon className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors ${colorStyles.text}`} />
+      <Icon
+        className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors ${colorStyles.text}`}
+      />
       <input
         type="text"
         placeholder={placeholder}

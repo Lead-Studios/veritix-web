@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { LiveCheckInCounter } from "@/components/dashboard/LiveCheckInCounter";
-import { useParams } from "next/navigation";
+import { LiveCheckInCounter } from '@/components/dashboard/LiveCheckInCounter';
+import { useParams } from 'next/navigation';
 
 /**
  * Determine if an event is "live" based on its start/end datetimes.
@@ -9,14 +9,12 @@ import { useParams } from "next/navigation";
  */
 function isEventLive(startIso: string, endIso: string): boolean {
   const now = Date.now();
-  return (
-    now >= new Date(startIso).getTime() && now <= new Date(endIso).getTime()
-  );
+  return now >= new Date(startIso).getTime() && now <= new Date(endIso).getTime();
 }
 
 const DEMO_EVENT = {
-  id: "demo-123",
-  name: "Afrobeats Night Lagos",
+  id: 'demo-123',
+  name: 'Afrobeats Night Lagos',
   startIso: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // started 30 min ago
   endIso: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(), // ends in 3 h
 };
@@ -42,11 +40,7 @@ export default function AnalyticsLivePage() {
         <h2 id="checkin-section" className="sr-only">
           Check-in counter
         </h2>
-        <LiveCheckInCounter
-          eventId={eventId}
-          isLive={live}
-          className="max-w-sm"
-        />
+        <LiveCheckInCounter eventId={eventId} isLive={live} className="max-w-sm" />
       </section>
 
       <section className="rounded-2xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-400">

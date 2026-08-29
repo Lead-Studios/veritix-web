@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import * as Sentry from "@sentry/nextjs";
-import React from "react";
-import { RouteErrorState } from "@/components/ui/RouteErrorState";
+import * as Sentry from '@sentry/nextjs';
+import React from 'react';
+import { RouteErrorState } from '@/components/ui/RouteErrorState';
 
 type Props = {
   children: React.ReactNode;
@@ -43,8 +43,11 @@ export class SentryErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return (
         <RouteErrorState
-          title={this.props.title ?? "This section is unavailable right now."}
-          description={this.props.description ?? "We hit an unexpected error. Please try again in a moment."}
+          title={this.props.title ?? 'This section is unavailable right now.'}
+          description={
+            this.props.description ??
+            'We hit an unexpected error. Please try again in a moment.'
+          }
           onRetry={this.reset}
         />
       );

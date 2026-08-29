@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import type { Demographics } from "@/hooks/useOrganizerAnalytics";
-import { THEME_COLORS } from "@/lib/themeColors";
+import dynamic from 'next/dynamic';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import type { Demographics } from '@/hooks/useOrganizerAnalytics';
+import { THEME_COLORS } from '@/lib/themeColors';
 
-const PIE_COLORS = [THEME_COLORS.brandPrimary, THEME_COLORS.brandAccent, "#a78bfa", "#34d399", "#f59e0b", "#f87171"];
+const PIE_COLORS = [
+  THEME_COLORS.brandPrimary,
+  THEME_COLORS.brandAccent,
+  '#a78bfa',
+  '#34d399',
+  '#f59e0b',
+  '#f87171',
+];
 
 // Lazy-load the map so it never SSR-crashes
-const GeoHeatmap = dynamic(() => import("./GeoHeatmap"), {
+const GeoHeatmap = dynamic(() => import('./GeoHeatmap'), {
   ssr: false,
   loading: () => <div className="h-[300px] animate-pulse rounded-xl bg-white/5" />,
 });
@@ -36,7 +36,10 @@ function DemoGroup({
       <p className="mb-3 text-xs font-semibold uppercase text-brand-accent">{title}</p>
       <div className="space-y-2">
         {items.map((item) => (
-          <div key={item.label} className="flex items-center justify-between text-xs text-brand-accent">
+          <div
+            key={item.label}
+            className="flex items-center justify-between text-xs text-brand-accent"
+          >
             <span className="truncate">{item.label}</span>
             <span className="ml-2 shrink-0 font-semibold text-brand-primary">
               {item.count.toLocaleString()} ({item.percentage}%)
@@ -62,7 +65,11 @@ function PieChartSection({
   }));
 
   return (
-    <div className="rounded-lg bg-white/5 p-4" role="img" aria-label={`${title} pie chart`}>
+    <div
+      className="rounded-lg bg-white/5 p-4"
+      role="img"
+      aria-label={`${title} pie chart`}
+    >
       <p className="mb-3 text-xs font-semibold uppercase text-brand-accent">{title}</p>
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
@@ -82,14 +89,18 @@ function PieChartSection({
           <Tooltip
             contentStyle={{
               background: THEME_COLORS.surfaceDark,
-              border: "1px solid rgba(77,33,255,0.4)",
+              border: '1px solid rgba(77,33,255,0.4)',
               borderRadius: 8,
-              color: "#fff",
+              color: '#fff',
               fontSize: 12,
             }}
-            formatter={(value: number, _name: string, props: { payload?: { percentage?: number } }) => [
+            formatter={(
+              value: number,
+              _name: string,
+              props: { payload?: { percentage?: number } },
+            ) => [
               `${value.toLocaleString()} (${props.payload?.percentage ?? 0}%)`,
-              "Attendees",
+              'Attendees',
             ]}
           />
           <Legend
@@ -132,7 +143,9 @@ export function DemographicsSection({ demographics }: Props) {
 
   return (
     <section aria-label="Demographic breakdown">
-      <p className="mb-4 text-sm font-semibold uppercase text-brand-accent">Audience Demographics</p>
+      <p className="mb-4 text-sm font-semibold uppercase text-brand-accent">
+        Audience Demographics
+      </p>
 
       {/* Geographic heatmap — shown when region data exists */}
       {demographics.region.length > 0 ? (
@@ -150,7 +163,10 @@ export function DemographicsSection({ demographics }: Props) {
         )}
         {demographics.referralSource.length > 0 && (
           <div className="sm:col-span-2 lg:col-span-1">
-            <PieChartSection title="Referral Source" items={demographics.referralSource} />
+            <PieChartSection
+              title="Referral Source"
+              items={demographics.referralSource}
+            />
           </div>
         )}
       </div>

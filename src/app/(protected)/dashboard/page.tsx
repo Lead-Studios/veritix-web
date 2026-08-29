@@ -313,8 +313,12 @@ export default function DashboardPage() {
               <ScrollColumn animationClass="animate-scroll-up-once" className="gap-6">
                 <Card className="rounded-lg">
                   <p className="text-xs uppercase text-brand-accent">Performance</p>
-                  <p className="text-sm text-brand-accent">Top-selling tickets this week</p>
-                  <div className="mt-3 text-xs text-brand-primary">Updated 2 mins ago</div>
+                  <p className="text-sm text-brand-accent">
+                    Top-selling tickets this week
+                  </p>
+                  <div className="mt-3 text-xs text-brand-primary">
+                    Updated 2 mins ago
+                  </div>
                 </Card>
 
                 <Card className="rounded-lg">

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from 'react';
 
 interface FocusTrapProps {
   active: boolean;
@@ -9,13 +9,13 @@ interface FocusTrapProps {
 }
 
 const FOCUSABLE_SELECTORS = [
-  "a[href]",
-  "button:not([disabled])",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
   "[tabindex]:not([tabindex='-1'])",
-].join(", ");
+].join(', ');
 
 export function FocusTrap({ active, children, className }: FocusTrapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,9 @@ export function FocusTrap({ active, children, className }: FocusTrapProps) {
 
   const getFocusableElements = useCallback(() => {
     if (!containerRef.current) return [];
-    return Array.from(containerRef.current.querySelectorAll(FOCUSABLE_SELECTORS)) as HTMLElement[];
+    return Array.from(
+      containerRef.current.querySelectorAll(FOCUSABLE_SELECTORS),
+    ) as HTMLElement[];
   }, []);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export function FocusTrap({ active, children, className }: FocusTrapProps) {
     if (!active) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
+      if (e.key !== 'Tab') return;
 
       const focusable = getFocusableElements();
       if (focusable.length === 0) return;
@@ -69,8 +71,8 @@ export function FocusTrap({ active, children, className }: FocusTrapProps) {
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [active, getFocusableElements]);
 
   return (

@@ -8,15 +8,15 @@ API hooks use [SWR](https://swr.vercel.app/) for data fetching and caching. Glob
 defaults live in `src/lib/swrConfig.ts` (`SWR_CONFIG`) and are applied once via the
 `<SWRConfig>` provider in `src/app/(protected)/layout.tsx`:
 
-| Option | Value | Reason |
-|---|---|---|
-| `dedupingInterval` | `60_000` ms | Prevents duplicate requests within 60 s |
-| `revalidateOnFocus` | `false` | Avoids refetch on every tab switch |
+| Option              | Value       | Reason                                  |
+| ------------------- | ----------- | --------------------------------------- |
+| `dedupingInterval`  | `60_000` ms | Prevents duplicate requests within 60 s |
+| `revalidateOnFocus` | `false`     | Avoids refetch on every tab switch      |
 
 ### Hooks
 
-| Hook | Endpoint | Notes |
-|---|---|---|
+| Hook                    | Endpoint                        | Notes                                          |
+| ----------------------- | ------------------------------- | ---------------------------------------------- |
 | `useOrganizerAnalytics` | `/api/organizers/:id/analytics` | Inherits `SWR_CONFIG` from the layout provider |
 
 ### Adding a new hook

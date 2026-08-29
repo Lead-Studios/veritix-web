@@ -1,20 +1,23 @@
-import type { Event } from "@/types/event";
-import type { Organizer } from "@/types/organizer";
-import { mockEvents } from "@/mocks/events";
-import { apiClient, ApiError } from "./apiClient";
-import { authedFetch } from "./authedFetch";
-import { API_ROUTES } from "./api-routes";
+import type { Event } from '@/types/event';
+import type { Organizer } from '@/types/organizer';
+import { mockEvents } from '@/mocks/events';
+import { apiClient, ApiError } from './apiClient';
+import { authedFetch } from './authedFetch';
+import { API_ROUTES } from './api-routes';
 
 const mockOrganizers: Record<string, Organizer> = {
-  "org-1": { id: "org-1", name: "Rhythm Nation Collective" },
-  "org-2": { id: "org-2", name: "Beat Collective" },
+  'org-1': { id: 'org-1', name: 'Rhythm Nation Collective' },
+  'org-2': { id: 'org-2', name: 'Beat Collective' },
 };
 
 function getApiBase() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  return process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 }
 
-export async function fetchEvents(params?: { page?: number; limit?: number }): Promise<Event[]> {
+export async function fetchEvents(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<Event[]> {
   if (!getApiBase()) return mockEvents as unknown as Event[];
 
   const page = params?.page ?? 1;

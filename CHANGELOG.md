@@ -25,8 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI guard script (`npm run check-env`) verifying `.env.example` completeness (#774)
 - Documented all consumed environment variables in `.env.example` with types (#774)
 - `CONTRIBUTING.md` with workflow, hooks, and conventions guide (#773)
+- Prettier config and `format`/`format:check` scripts; CI now fails on unformatted files (#729)
+- Unit test coverage for `useOrganizerAnalytics` covering loading, success, organizerId key-building, and error states (#731)
 
 ### Changed
+- Formatted the existing `src/` tree with Prettier (#729)
+- `no-restricted-imports` ESLint rule now correctly targets only imports crossing two or more directory levels, instead of also matching legitimate single-level `../` imports (#730)
 
 ### Fixed
 

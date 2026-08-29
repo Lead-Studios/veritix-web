@@ -3,15 +3,21 @@
 export interface SessionUser {
   id: string;
   email: string;
-  role: "organizer" | "attendee" | "admin";
+  role: 'organizer' | 'attendee' | 'admin';
 }
 
-export function isEventOwner(event: { ownerId: string }, user: SessionUser | null): boolean {
+export function isEventOwner(
+  event: { ownerId: string },
+  user: SessionUser | null,
+): boolean {
   if (!user) return false;
   return event.ownerId === user.id;
 }
 
-export function canManageEvent(event: { ownerId: string }, user: SessionUser | null): boolean {
+export function canManageEvent(
+  event: { ownerId: string },
+  user: SessionUser | null,
+): boolean {
   if (!user) return false;
-  return isEventOwner(event, user) || user.role === "admin";
+  return isEventOwner(event, user) || user.role === 'admin';
 }

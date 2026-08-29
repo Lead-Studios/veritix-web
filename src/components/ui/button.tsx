@@ -5,4 +5,4 @@
  *
  * Prefer importing from "@/components/button" for new code.
  */
-export { Button } from "../button";
+export { Button } from '../button';

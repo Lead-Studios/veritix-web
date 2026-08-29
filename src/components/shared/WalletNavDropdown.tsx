@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
 interface WalletNavDropdownProps {
   address: string;
@@ -16,7 +16,11 @@ function truncate(addr: string) {
  * FE-125: Connected-wallet nav dropdown that shows the wallet address,
  * network, and XLM balance fetched from Horizon.
  */
-export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavDropdownProps) {
+export function WalletNavDropdown({
+  address,
+  network,
+  onDisconnect,
+}: WalletNavDropdownProps) {
   const [open, setOpen] = useState(false);
   const [balance, setBalance] = useState<string | null>(null);
   const [loadingBalance, setLoadingBalance] = useState(false);
@@ -27,8 +31,8 @@ export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavD
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   // Fetch XLM balance from Horizon when dropdown opens
@@ -39,22 +43,21 @@ export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavD
 
     const loadBalance = async () => {
       setLoadingBalance(true);
-      const horizonBase =
-        network.toLowerCase().includes("test")
-          ? "https://horizon-testnet.stellar.org"
-          : "https://horizon.stellar.org";
+      const horizonBase = network.toLowerCase().includes('test')
+        ? 'https://horizon-testnet.stellar.org'
+        : 'https://horizon.stellar.org';
 
       try {
         const response = await fetch(`${horizonBase}/accounts/${address}`);
         const data = await response.json();
         const xlm = (data.balances as { asset_type: string; balance: string }[])?.find(
-          (b) => b.asset_type === "native"
+          (b) => b.asset_type === 'native',
         );
         if (!active) return;
-        setBalance(xlm ? `${parseFloat(xlm.balance).toFixed(2)} XLM` : "—");
+        setBalance(xlm ? `${parseFloat(xlm.balance).toFixed(2)} XLM` : '—');
       } catch {
         if (!active) return;
-        setBalance("—");
+        setBalance('—');
       } finally {
         if (active) setLoadingBalance(false);
       }
@@ -94,12 +97,15 @@ export function WalletNavDropdown({ address, network, onDisconnect }: WalletNavD
               {loadingBalance ? (
                 <span className="inline-block w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
               ) : (
-                balance ?? "—"
+                (balance ?? '—')
               )}
             </p>
           </div>
           <button
-            onClick={() => { setOpen(false); onDisconnect(); }}
+            onClick={() => {
+              setOpen(false);
+              onDisconnect();
+            }}
             className="w-full py-2 rounded-lg border border-red-700/50 text-red-400 text-sm hover:bg-red-900/20 transition-colors"
           >
             Disconnect

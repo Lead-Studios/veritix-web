@@ -1,60 +1,60 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState("");
-  const [apiError, setApiError] = useState("");
+  const [success, setSuccess] = useState('');
+  const [apiError, setApiError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!formData.name) e.name = "Name is required";
-    if (!formData.email) e.email = "Email is required";
-    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) e.email = "Invalid email address";
-    if (!formData.subject) e.subject = "Subject is required";
-    if (!formData.message) e.message = "Message is required";
+    if (!formData.name) e.name = 'Name is required';
+    if (!formData.email) e.email = 'Email is required';
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) e.email = 'Invalid email address';
+    if (!formData.subject) e.subject = 'Subject is required';
+    if (!formData.message) e.message = 'Message is required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccess("");
-    setApiError("");
+    setSuccess('');
+    setApiError('');
 
     if (!validate()) return;
 
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setApiError(err?.message || "Failed to send your message. Please try again.");
+        setApiError(err?.message || 'Failed to send your message. Please try again.');
         return;
       }
 
-      setSuccess("Your message has been sent successfully.");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setSuccess('Your message has been sent successfully.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
       setErrors({});
     } catch {
-      setApiError("Network error. Please check your connection and try again.");
+      setApiError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -64,13 +64,26 @@ export default function ContactForm() {
     return (
       <div className="rounded-2xl contact-form-graadient backdrop-blur-xl border border-white/10 p-8 flex flex-col items-center justify-center gap-4 text-center min-h-[320px]">
         <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
-          <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          <svg
+            className="w-7 h-7 text-green-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-white">Message Sent!</h2>
         <p className="text-white/60 text-sm">{success}</p>
-        <button onClick={() => setSuccess("")} className="mt-2 text-sm text-[#21D4FF] hover:underline">
+        <button
+          onClick={() => setSuccess('')}
+          className="mt-2 text-sm text-[#21D4FF] hover:underline"
+        >
           Send another message
         </button>
       </div>
@@ -134,7 +147,7 @@ export default function ContactForm() {
           disabled={loading}
           className="w-full py-3 rounded-lg font-medium bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] disabled:opacity-60"
         >
-          {loading ? "Sending..." : "Send Message"}
+          {loading ? 'Sending...' : 'Send Message'}
         </motion.button>
       </form>
     </div>
@@ -155,7 +168,9 @@ function Input({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
-      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">
+        {label}
+      </label>
       <input
         id={id}
         {...props}
@@ -163,7 +178,11 @@ function Input({
         aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none focus:border-blue-500"
       />
-      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && (
+        <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -180,7 +199,9 @@ function Textarea({
 } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <div>
-      <label htmlFor={id} className="text-sm text-white/70">{label}</label>
+      <label htmlFor={id} className="text-sm text-white/70">
+        {label}
+      </label>
       <textarea
         id={id}
         {...props}
@@ -189,7 +210,11 @@ function Textarea({
         aria-invalid={!!error}
         className="mt-1 w-full rounded-md bg-white/5 border border-white/10 px-3 py-2 outline-none resize-none focus:border-blue-500"
       />
-      {error && <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">{error}</p>}
+      {error && (
+        <p id={`${id}-error`} role="alert" className="text-xs text-red-400 mt-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

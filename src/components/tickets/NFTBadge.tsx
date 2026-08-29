@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { HiExternalLink } from "react-icons/hi";
+import { HiExternalLink } from 'react-icons/hi';
 
 interface NFTBadgeProps {
   txHash: string;
-  network?: "testnet" | "mainnet";
+  network?: 'testnet' | 'mainnet';
 }
 
 const NETWORK_EXPLORER: Record<string, string> = {
-  testnet: "https://stellar.expert/explorer/testnet",
-  mainnet: "https://stellar.expert/explorer/public",
+  testnet: 'https://stellar.expert/explorer/testnet',
+  mainnet: 'https://stellar.expert/explorer/public',
 };
 
-export function NFTBadge({ txHash, network = "testnet" }: NFTBadgeProps) {
+export function NFTBadge({ txHash, network = 'testnet' }: NFTBadgeProps) {
   const explorerUrl = `${NETWORK_EXPLORER[network]}/tx/${txHash}`;
 
   return (

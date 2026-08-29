@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 import {
   PieChart,
   Pie,
@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 
 export interface AgeGroup {
   label: string; // e.g. "18–24"
@@ -42,8 +42,8 @@ interface DemographicsSectionProps {
   className?: string;
 }
 
-const GENDER_COLORS = ["#7c3aed", "#a78bfa", "#c4b5fd", "#ede9fe"];
-const AGE_COLOR = "#7c3aed";
+const GENDER_COLORS = ['#7c3aed', '#a78bfa', '#c4b5fd', '#ede9fe'];
+const AGE_COLOR = '#7c3aed';
 
 function LoadingCard({ label }: { label: string }) {
   return (
@@ -62,7 +62,7 @@ function LoadingCard({ label }: { label: string }) {
 export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
   data,
   isLoading = false,
-  className = "",
+  className = '',
 }) => {
   if (isLoading) {
     return (
@@ -77,19 +77,45 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
   const totalGender = data.genderBreakdown.reduce((s, g) => s + g.count, 0);
 
   return (
-    <section aria-label="Attendee demographics" className={`grid gap-4 md:grid-cols-3 ${className}`}>
+    <section
+      aria-label="Attendee demographics"
+      className={`grid gap-4 md:grid-cols-3 ${className}`}
+    >
       {/* Age Distribution */}
       <div className="rounded-xl border border-gray-700 bg-gray-900 p-5">
         <h3 className="mb-3 text-sm font-medium text-gray-400">Age Distribution</h3>
         <ResponsiveContainer width="100%" height={192}>
-          <BarChart data={data.ageGroups} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
+          <BarChart
+            data={data.ageGroups}
+            margin={{ top: 0, right: 8, left: -20, bottom: 0 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-            <Tooltip
-              contentStyle={{ borderRadius: 8, border: "1px solid #374151", background: "#111827", color: "#f9fafb", fontSize: 12 }}
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              axisLine={false}
+              tickLine={false}
             />
-            <Bar dataKey="count" name="Attendees" fill={AGE_COLOR} radius={[3, 3, 0, 0]} />
+            <YAxis
+              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 8,
+                border: '1px solid #374151',
+                background: '#111827',
+                color: '#f9fafb',
+                fontSize: 12,
+              }}
+            />
+            <Bar
+              dataKey="count"
+              name="Attendees"
+              fill={AGE_COLOR}
+              radius={[3, 3, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -118,12 +144,18 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
                 `${value} (${((value / totalGender) * 100).toFixed(1)}%)`,
                 name,
               ]}
-              contentStyle={{ borderRadius: 8, border: "1px solid #374151", background: "#111827", color: "#f9fafb", fontSize: 12 }}
+              contentStyle={{
+                borderRadius: 8,
+                border: '1px solid #374151',
+                background: '#111827',
+                color: '#f9fafb',
+                fontSize: 12,
+              }}
             />
             <Legend
               iconType="circle"
               iconSize={8}
-              wrapperStyle={{ fontSize: 12, color: "#d1d5db" }}
+              wrapperStyle={{ fontSize: 12, color: '#d1d5db' }}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -139,10 +171,28 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
             margin={{ top: 0, right: 8, left: 8, bottom: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />
-            <XAxis type="number" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-            <YAxis dataKey="city" type="category" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={60} />
+            <XAxis
+              type="number"
+              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              dataKey="city"
+              type="category"
+              tick={{ fontSize: 11, fill: '#9ca3af' }}
+              axisLine={false}
+              tickLine={false}
+              width={60}
+            />
             <Tooltip
-              contentStyle={{ borderRadius: 8, border: "1px solid #374151", background: "#111827", color: "#f9fafb", fontSize: 12 }}
+              contentStyle={{
+                borderRadius: 8,
+                border: '1px solid #374151',
+                background: '#111827',
+                color: '#f9fafb',
+                fontSize: 12,
+              }}
             />
             <Bar dataKey="count" name="Attendees" fill="#a78bfa" radius={[0, 3, 3, 0]} />
           </BarChart>

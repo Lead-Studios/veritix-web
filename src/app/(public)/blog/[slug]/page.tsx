@@ -1,9 +1,9 @@
-import Link from "next/link";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import { getPostBySlug, getAllPosts } from "@/lib/blog";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { Calendar, Clock, User, Tag, ArrowLeft, Share2 } from "lucide-react";
+import Link from 'next/link';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { getPostBySlug, getAllPosts } from '@/lib/blog';
+import { MDXRemote } from 'next-mdx-remote/rsc';
+import { Calendar, Clock, User, Tag, ArrowLeft, Share2 } from 'lucide-react';
 
 interface BlogPostPageProps {
   params: {
@@ -20,10 +20,10 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
   const post = getPostBySlug(params.slug);
-  
+
   if (!post) {
     return {
-      title: "Post Not Found",
+      title: 'Post Not Found',
     };
   }
 
@@ -41,13 +41,13 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
           alt: post.title,
         },
       ],
-      type: "article",
+      type: 'article',
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: post.title,
       description: post.content.slice(0, 160),
       images: [post.coverImage],
@@ -74,7 +74,10 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             VeriTix
           </Link>
 
-          <nav aria-label="Main navigation" className="hidden items-center gap-8 text-sm text-white/80 lg:flex">
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center gap-8 text-sm text-white/80 lg:flex"
+          >
             <Link href="/" className="transition hover:text-white">
               Home
             </Link>
@@ -129,9 +132,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               ))}
             </div>
 
-            <h1 className="font-display text-4xl text-white sm:text-5xl">
-              {post.title}
-            </h1>
+            <h1 className="font-display text-4xl text-white sm:text-5xl">{post.title}</h1>
 
             <div className="mt-6 flex flex-wrap items-center gap-6 text-sm text-white/60">
               <div className="flex items-center gap-2">
@@ -140,7 +141,13 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Calendar size={18} />
-                <span>{new Date(post.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
+                <span>
+                  {new Date(post.date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock size={18} />
@@ -158,7 +165,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
           <div className="mb-8 overflow-hidden rounded-3xl">
             <Image
-              src={post.coverImage || "/concert.png"}
+              src={post.coverImage || '/concert.png'}
               alt={post.title}
               width={1200}
               height={630}
@@ -173,11 +180,10 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         </article>
 
         <div className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-8">
-          <h2 className="font-display text-2xl text-white mb-4">
-            Ready to get started?
-          </h2>
+          <h2 className="font-display text-2xl text-white mb-4">Ready to get started?</h2>
           <p className="text-white/70 mb-6">
-            Join thousands of users who are already experiencing the future of event ticketing with VeriTix.
+            Join thousands of users who are already experiencing the future of event
+            ticketing with VeriTix.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Toggle from "@/components/events/ui/Toggle";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import Toggle from '@/components/events/ui/Toggle';
 import {
   getNotificationPreferences,
   patchNotificationPreference,
   type NotificationPreferences,
-} from "@/lib/profile";
-import { Loader2 } from "lucide-react";
+} from '@/lib/profile';
+import { Loader2 } from 'lucide-react';
 
 const LABELS: { key: keyof NotificationPreferences; label: string }[] = [
-  { key: "upcomingEvents", label: "Upcoming Events" },
-  { key: "ticketConfirmations", label: "Ticket Confirmations" },
-  { key: "platformUpdates", label: "Platform Updates" },
+  { key: 'upcomingEvents', label: 'Upcoming Events' },
+  { key: 'ticketConfirmations', label: 'Ticket Confirmations' },
+  { key: 'platformUpdates', label: 'Platform Updates' },
 ];
 
 export default function NotificationPrefsSection() {
@@ -24,7 +24,7 @@ export default function NotificationPrefsSection() {
   useEffect(() => {
     getNotificationPreferences()
       .then(setPrefs)
-      .catch(() => toast.error("Failed to load notification preferences."))
+      .catch(() => toast.error('Failed to load notification preferences.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,7 +36,7 @@ export default function NotificationPrefsSection() {
       await patchNotificationPreference(key, value);
     } catch (err) {
       setPrefs({ ...prefs, [key]: !value }); // revert
-      toast.error(err instanceof Error ? err.message : "Failed to update preference.");
+      toast.error(err instanceof Error ? err.message : 'Failed to update preference.');
     } finally {
       setPending((prev) => {
         const next = new Set(prev);
@@ -47,7 +47,10 @@ export default function NotificationPrefsSection() {
   };
 
   return (
-    <section aria-labelledby="notif-prefs-heading" className="rounded-2xl border border-white/10 bg-[#0b1025] p-6">
+    <section
+      aria-labelledby="notif-prefs-heading"
+      className="rounded-2xl border border-white/10 bg-[#0b1025] p-6"
+    >
       <h2 id="notif-prefs-heading" className="mb-5 text-lg font-semibold text-white">
         Notification Preferences
       </h2>
@@ -65,7 +68,9 @@ export default function NotificationPrefsSection() {
               <li key={key} className="flex items-center justify-between">
                 <span className="text-sm text-white/80">{label}</span>
                 <div className="flex items-center gap-2">
-                  {isPending && <Loader2 size={14} className="animate-spin text-white/40" />}
+                  {isPending && (
+                    <Loader2 size={14} className="animate-spin text-white/40" />
+                  )}
                   <Toggle
                     checked={prefs?.[key] ?? false}
                     onChange={(val) => handleToggle(key, val)}

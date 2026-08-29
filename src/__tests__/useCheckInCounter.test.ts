@@ -1,6 +1,6 @@
-import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useCheckInCounter } from "../hooks/useCheckInCounter";
+import { act, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useCheckInCounter } from '../hooks/useCheckInCounter';
 
 const POLL_MS = 15_000;
 
@@ -18,10 +18,10 @@ const makeErrFetch = () =>
     json: async () => ({}),
   } as Response);
 
-describe("useCheckInCounter", () => {
+describe('useCheckInCounter', () => {
   beforeEach(() => {
     // Only fake setInterval/clearInterval — leave Promise/microtask queue real
-    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
   });
 
   afterEach(() => {
@@ -29,10 +29,10 @@ describe("useCheckInCounter", () => {
     vi.useRealTimers();
   });
 
-  it("fetches immediately on mount when isLive=true", async () => {
-    vi.stubGlobal("fetch", makeOkFetch({ checkInCount: 42, totalCapacity: 500 }));
+  it('fetches immediately on mount when isLive=true', async () => {
+    vi.stubGlobal('fetch', makeOkFetch({ checkInCount: 42, totalCapacity: 500 }));
 
-    const { result } = renderHook(() => useCheckInCounter("evt-1", true));
+    const { result } = renderHook(() => useCheckInCounter('evt-1', true));
 
     // Let the async fetch resolve
     await act(async () => {});
@@ -42,47 +42,52 @@ describe("useCheckInCounter", () => {
     expect(result.current.lastUpdated).toBeInstanceOf(Date);
   });
 
-  it("does NOT fetch on mount when isLive=false", async () => {
+  it('does NOT fetch on mount when isLive=false', async () => {
     const fetchMock = makeOkFetch({ checkInCount: 0, totalCapacity: 0 });
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal('fetch', fetchMock);
 
-    renderHook(() => useCheckInCounter("evt-2", false));
+    renderHook(() => useCheckInCounter('evt-2', false));
 
-    act(() => { vi.advanceTimersByTime(POLL_MS * 3); });
+    act(() => {
+      vi.advanceTimersByTime(POLL_MS * 3);
+    });
     await act(async () => {});
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("polls every 15 s while isLive=true", async () => {
+  it('polls every 15 s while isLive=true', async () => {
     const fetchMock = makeOkFetch({ checkInCount: 10, totalCapacity: 200 });
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal('fetch', fetchMock);
 
-    renderHook(() => useCheckInCounter("evt-3", true));
+    renderHook(() => useCheckInCounter('evt-3', true));
 
     // Initial fetch
     await act(async () => {});
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
     // Tick 1
-    act(() => { vi.advanceTimersByTime(POLL_MS); });
+    act(() => {
+      vi.advanceTimersByTime(POLL_MS);
+    });
     await act(async () => {});
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     // Tick 2
-    act(() => { vi.advanceTimersByTime(POLL_MS); });
+    act(() => {
+      vi.advanceTimersByTime(POLL_MS);
+    });
     await act(async () => {});
     expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
-  it("stops polling when isLive transitions false", async () => {
+  it('stops polling when isLive transitions false', async () => {
     const fetchMock = makeOkFetch({ checkInCount: 5, totalCapacity: 100 });
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal('fetch', fetchMock);
 
-    const { rerender } = renderHook(
-      ({ live }) => useCheckInCounter("evt-4", live),
-      { initialProps: { live: true } }
-    );
+    const { rerender } = renderHook(({ live }) => useCheckInCounter('evt-4', live), {
+      initialProps: { live: true },
+    });
 
     await act(async () => {});
     const callsBefore = fetchMock.mock.calls.length;
@@ -90,17 +95,19 @@ describe("useCheckInCounter", () => {
     // Event ends
     rerender({ live: false });
 
-    act(() => { vi.advanceTimersByTime(POLL_MS * 3); });
+    act(() => {
+      vi.advanceTimersByTime(POLL_MS * 3);
+    });
     await act(async () => {});
 
     expect(fetchMock.mock.calls.length).toBe(callsBefore);
   });
 
-  it("clears interval on unmount", async () => {
-    vi.stubGlobal("fetch", makeOkFetch({ checkInCount: 0, totalCapacity: 300 }));
-    const clearSpy = vi.spyOn(global, "clearInterval");
+  it('clears interval on unmount', async () => {
+    vi.stubGlobal('fetch', makeOkFetch({ checkInCount: 0, totalCapacity: 300 }));
+    const clearSpy = vi.spyOn(global, 'clearInterval');
 
-    const { unmount } = renderHook(() => useCheckInCounter("evt-5", true));
+    const { unmount } = renderHook(() => useCheckInCounter('evt-5', true));
 
     await act(async () => {});
     unmount();
@@ -108,10 +115,10 @@ describe("useCheckInCounter", () => {
     expect(clearSpy).toHaveBeenCalled();
   });
 
-  it("exposes an error when the API call fails", async () => {
-    vi.stubGlobal("fetch", makeErrFetch());
+  it('exposes an error when the API call fails', async () => {
+    vi.stubGlobal('fetch', makeErrFetch());
 
-    const { result } = renderHook(() => useCheckInCounter("evt-6", true));
+    const { result } = renderHook(() => useCheckInCounter('evt-6', true));
 
     await act(async () => {});
 
@@ -119,16 +126,18 @@ describe("useCheckInCounter", () => {
     expect(result.current.checkInCount).toBeNull();
   });
 
-  it("manual refresh re-fetches immediately", async () => {
+  it('manual refresh re-fetches immediately', async () => {
     const fetchMock = makeOkFetch({ checkInCount: 77, totalCapacity: 400 });
-    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal('fetch', fetchMock);
 
-    const { result } = renderHook(() => useCheckInCounter("evt-7", true));
+    const { result } = renderHook(() => useCheckInCounter('evt-7', true));
 
     await act(async () => {});
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    await act(async () => { result.current.refresh(); });
+    await act(async () => {
+      result.current.refresh();
+    });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });

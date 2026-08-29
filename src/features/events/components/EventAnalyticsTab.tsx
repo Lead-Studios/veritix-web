@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import useSWR from "swr";
-import { fetchEventAnalytics } from "@/lib/eventAnalytics";
-import { SalesVelocityChart } from "@/components/dashboard/charts/SalesVelocityChart";
-import { Skeleton } from "@/components/ui/Skeleton";
+import useSWR from 'swr';
+import { fetchEventAnalytics } from '@/lib/eventAnalytics';
+import { SalesVelocityChart } from '@/components/dashboard/charts/SalesVelocityChart';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface EventAnalyticsTabProps {
   eventId: string;
@@ -29,7 +29,7 @@ export default function EventAnalyticsTab({ eventId }: EventAnalyticsTabProps) {
   if (error || !data) {
     return (
       <p className="text-sm text-red-400">
-        {error?.message ?? "Failed to load analytics."}
+        {error?.message ?? 'Failed to load analytics.'}
       </p>
     );
   }
@@ -47,10 +47,10 @@ export default function EventAnalyticsTab({ eventId }: EventAnalyticsTabProps) {
       {/* Quick stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: "Tickets Sold", value: data.totalSold },
-          { label: "Capacity", value: data.totalCapacity },
-          { label: "Revenue", value: `$${data.revenue.toLocaleString()}` },
-          { label: "Scan Rate", value: `${scanRate}%` },
+          { label: 'Tickets Sold', value: data.totalSold },
+          { label: 'Capacity', value: data.totalCapacity },
+          { label: 'Revenue', value: `$${data.revenue.toLocaleString()}` },
+          { label: 'Scan Rate', value: `${scanRate}%` },
         ].map(({ label, value }) => (
           <div
             key={label}
@@ -76,7 +76,9 @@ export default function EventAnalyticsTab({ eventId }: EventAnalyticsTabProps) {
                 <li key={t.type}>
                   <div className="mb-1 flex justify-between text-xs text-[#21D4FF]/80">
                     <span>{t.type}</span>
-                    <span>{t.sold} / {t.total}</span>
+                    <span>
+                      {t.sold} / {t.total}
+                    </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-white/10">
                     <div

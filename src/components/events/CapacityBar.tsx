@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-interface Props { capacity: number; sold: number; }
+interface Props {
+  capacity: number;
+  sold: number;
+}
 
 export default function CapacityBar({ capacity, sold }: Props) {
   const pct = capacity > 0 ? Math.min((sold / capacity) * 100, 100) : 0;
-  const color = pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-yellow-500" : "bg-green-500";
+  const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-green-500';
   const remaining = Math.max(capacity - sold, 0);
   return (
     <div className="w-full">
@@ -13,7 +16,10 @@ export default function CapacityBar({ capacity, sold }: Props) {
         <span>{remaining} remaining</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={`h-2 rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+        <div
+          className={`h-2 rounded-full transition-all ${color}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

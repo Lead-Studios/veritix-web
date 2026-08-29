@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import type { TicketTypeBreakdown } from "@/hooks/useOrganizerAnalytics";
+import dynamic from 'next/dynamic';
+import type { TicketTypeBreakdown } from '@/hooks/useOrganizerAnalytics';
 
 const TicketTypeChartInner = dynamic(
-  () => import("./TicketTypeChartInner").then((m) => ({ default: m.TicketTypeChartInner })),
+  () =>
+    import('./TicketTypeChartInner').then((m) => ({ default: m.TicketTypeChartInner })),
   {
     ssr: false,
     loading: () => (
@@ -12,7 +13,7 @@ const TicketTypeChartInner = dynamic(
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-primary/30 border-t-brand-primary" />
       </div>
     ),
-  }
+  },
 );
 
 interface Props {

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { Modal } from "@/components/ui/Modal";
+import { useEffect, useState, useCallback } from 'react';
+import { Modal } from '@/components/ui/Modal';
 
 interface ShortcutGroup {
   title: string;
@@ -10,55 +10,55 @@ interface ShortcutGroup {
 
 const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
-    title: "Global",
+    title: 'Global',
     shortcuts: [
-      { key: "?", description: "Open keyboard shortcuts help" },
-      { key: "Esc", description: "Close modal or dialog" },
+      { key: '?', description: 'Open keyboard shortcuts help' },
+      { key: 'Esc', description: 'Close modal or dialog' },
     ],
   },
   {
-    title: "Verify Page",
+    title: 'Verify Page',
     shortcuts: [
-      { key: "Esc", description: "Clear result and refocus input" },
-      { key: "Enter", description: "Verify ticket code" },
+      { key: 'Esc', description: 'Clear result and refocus input' },
+      { key: 'Enter', description: 'Verify ticket code' },
     ],
   },
   {
-    title: "Dashboard",
-    shortcuts: [
-      { key: "E", description: "Export analytics CSV" },
-    ],
+    title: 'Dashboard',
+    shortcuts: [{ key: 'E', description: 'Export analytics CSV' }],
   },
 ];
 
 export function KeyboardShortcutHelp() {
   const [open, setOpen] = useState(false);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput =
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable;
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    const isInput =
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable;
 
-      if (isInput) return;
+    if (isInput) return;
 
-      if (e.key === "?" || (e.shiftKey && e.key === "/")) {
-        e.preventDefault();
-        setOpen((prev) => !prev);
-      }
-    },
-    []
-  );
+    if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+      e.preventDefault();
+      setOpen((prev) => !prev);
+    }
+  }, []);
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
   return (
-    <Modal open={open} onClose={() => setOpen(false)} title="Keyboard Shortcuts" size="md">
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      title="Keyboard Shortcuts"
+      size="md"
+    >
       <div className="space-y-6">
         {SHORTCUT_GROUPS.map((group) => (
           <div key={group.title}>
