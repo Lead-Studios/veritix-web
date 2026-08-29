@@ -1,3 +1,4 @@
+// Middleware routing engine controlling authorization limits on routes.
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
