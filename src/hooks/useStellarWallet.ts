@@ -1,3 +1,6 @@
+/**
+ * useStellarWallet hook handles connection status and signing of txs with Freighter/Albedo.
+ */
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
