@@ -78,5 +78,13 @@
       "eslint --fix",
       "tsc --noEmit --pretty"
     ]
-  }
+  },
+  "description": "Veritix decentralized ticketing web application frontend",
+  "keywords": [
+    "stellar",
+    "ticketing",
+    "soroban",
+    "nextjs",
+    "typescript"
+  ]
 }
