@@ -1,3 +1,7 @@
+/**
+ * Route: (protected)/dashboard
+ * Purpose: Renders main layout view content.
+ */
 "use client";
 
 import { useEffect, useMemo, useState } from "react";

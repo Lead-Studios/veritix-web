@@ -1,3 +1,7 @@
+/**
+ * Route: (public)
+ * Purpose: Renders main layout view content.
+ */
 "use client";
 
 import { useState, useMemo } from "react";
