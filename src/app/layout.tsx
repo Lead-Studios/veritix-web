@@ -1,58 +1,58 @@
-import { ToastContainer } from 'react-toastify';
-import { Manrope, Playfair_Display } from 'next/font/google';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
+import { AppProviders } from '@/providers/app-providers';
+import { themeInitScript } from '@/components/theme/theme-provider';
+import { env } from '@/lib/env';
 import './global.css';
-import { AuthProvider } from '@/context/authContext';
-import { validateEnvironment } from '@/lib/validateEnv';
-import { KeyboardShortcutHelp } from '@/components/KeyboardShortcutHelp';
 
-const bodyFont = Manrope({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-body',
   display: 'swap',
-});
-
-const displayFont = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
+  variable: '--font-sans',
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: {
-    default: 'VeriTix',
-    template: '%s | VeriTix',
+    default: 'Veritix — on-chain ticketing',
+    template: '%s · Veritix',
   },
-  description: 'Blockchain-powered ticketing on Stellar',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://veritix.io'),
+  description:
+    'Buy and sell event tickets with payment settled on-chain. Organizers get paid on time; buyers stay protected by escrow.',
+  openGraph: {
+    type: 'website',
+    siteName: 'Veritix',
+    title: 'Veritix — on-chain ticketing',
+    description: 'Event ticketing with escrowed, on-chain settlement.',
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#101428' },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  validateEnvironment();
   return (
-    <html lang="en" dir="ltr">
-      <body
-        className={`${bodyFont.variable} ${displayFont.variable} bg-[#0b1025] text-white antialiased`}
-      >
-        {/* Skip-to-content link for keyboard users */}
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className="font-sans">
+        {/*
+          Applies the stored theme before paint so dark-mode users see no flash.
+          It lives at the top of <body> rather than in a manual <head>, which the
+          App Router owns and which breaks hydration when rendered by hand.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <a
-          href="#main-content"
-          className="absolute left-[-9999px] z-[9999] rounded-b bg-purple-700 px-4 py-2 text-sm font-semibold text-white no-underline focus-visible:left-1/2 focus-visible:-translate-x-1/2 focus-visible:outline-none"
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
         >
-          Skip to main content
+          Skip to content
         </a>
-        <AuthProvider>
-          <KeyboardShortcutHelp />
-          <main id="main-content" tabIndex={-1}>
-            {children}
-          </main>
-        </AuthProvider>
-        <ToastContainer
-          aria-label="Notifications"
-          position="bottom-right"
-          closeOnClick
-          pauseOnFocusLoss
-        />
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

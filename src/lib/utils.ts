@@ -1,16 +1,11 @@
-export function isValidRedirect(url: string | null | undefined): url is string {
-  if (!url) return false;
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-  // Must be a relative path starting with '/'
-  if (!url.startsWith('/')) return false;
-
-  // Must not contain '//' or '..', which could be used for open redirects
-  // or path traversal attacks.
-  if (url.includes('//') || url.includes('..')) return false;
-
-  // Optional: You might want to exclude certain paths if needed,
-  // e.g., internal API routes.
-  // if (url.startsWith('/api/')) return false;
-
-  return true;
+/**
+ * Merge Tailwind class names, resolving conflicts so the last class wins.
+ * This is the `utils` alias declared in components.json — shadcn components
+ * generated into src/components/ui import `cn` from here.
+ */
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }
