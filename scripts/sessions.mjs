@@ -58,3 +58,4 @@ if (missing.length > 0) {
 }
 
 console.log("✅  All consumed env vars are documented in .env.example.");
+    
