@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { CartProvider } from '@/context/cart-context';
 import { fetcher, ApiError } from '@/lib/api-client';
 
 /**
@@ -24,7 +25,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           errorRetryCount: 3,
         }}
       >
-        {children}
+        <CartProvider>{children}</CartProvider>
       </SWRConfig>
     </ThemeProvider>
   );
