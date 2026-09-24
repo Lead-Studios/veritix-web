@@ -100,16 +100,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => setCart(readStoredCart()), []);
 
   /** Update state and the stored copy together, so they cannot drift. */
-  const update = React.useCallback(
-    (getNext: (current: CartState) => CartState) => {
-      setCart((current) => {
-        const next = getNext(current);
-        writeStoredCart(next);
-        return next;
-      });
-    },
-    [],
-  );
+  const update = React.useCallback((getNext: (current: CartState) => CartState) => {
+    setCart((current) => {
+      const next = getNext(current);
+      writeStoredCart(next);
+      return next;
+    });
+  }, []);
 
   const addItem = React.useCallback(
     (event: VeritixEvent, tierId: string, quantity: number) => {

@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
     : DEFAULT_EVENT_SORT;
 
   const statusParam = first('status');
-  const status: EventStatus | undefined = (
-    EVENT_STATUSES as string[]
-  ).includes(statusParam ?? '')
+  const status: EventStatus | undefined = (EVENT_STATUSES as string[]).includes(
+    statusParam ?? '',
+  )
     ? (statusParam as EventStatus)
     : undefined;
 
