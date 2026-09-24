@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { SWRConfig } from 'swr';
+import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { fetcher, ApiError } from '@/lib/api-client';
 
@@ -25,6 +26,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         }}
       >
         {children}
+        {/* Mounted once here so any component can `toast()` without its own container. */}
+        <ToastContainer position="bottom-right" />
       </SWRConfig>
     </ThemeProvider>
   );
