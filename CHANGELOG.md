@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Pricing page at `/pricing` with three plans, a full feature comparison, and an FAQ (#978)
+- Terms of Service and Privacy Policy at `/terms` and `/privacy`, each with a table of contents, a capped measure, and a last-updated date (#981)
+- `LegalDocument` and `LegalList` shared shells for long-form legal pages, plus a `.legal-body` component layer so neither page repeats the typography (#981)
+- Newsletter signup in the site footer: inline validation, a success state that takes focus, and a plain statement of what subscribers get (#983)
+- `POST /api/newsletter`, a validating proxy to the backend so the browser never learns where the list lives (#983)
+- `e2e/smoke.spec.ts` covering the landing page, the route guard, the public routes, and the 404 page (#988)
+- `.github/workflows/e2e.yml` running the Playwright suite, caching the browser build and uploading the report (#988)
 - Accessibility audit across every route: focus management, labels, landmarks, and heading order (#984)
 - `Textarea` primitive (`src/components/ui/textarea.tsx`), mirroring `Input` including `aria-[invalid=true]` (#984)
 - `titleAs` on `ErrorState` and `EmptyState`, so a page whose whole body is a state has a real heading (#984)
@@ -43,6 +50,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit test coverage for `useOrganizerAnalytics` covering loading, success, organizerId key-building, and error states (#731)
 
 ### Changed
+- The site footer's three link groups are `<h2>` sections rather than styled paragraphs, and the newsletter block sits above the legal line instead of inside a grid cell (#983)
+- `playwright.config.ts` targets `127.0.0.1` rather than `localhost`, and adds a global timeout, an action timeout, a browser cache, and the GitHub HTML reporter (#988)
+- The E2E web server is `next dev` by default, with `E2E_WEB_SERVER=build` to test a production build once `next build` succeeds on `main` (#988)
 - CI runs the `package.json` scripts instead of hand-written `npx` commands, so the runner, a laptop, and the Husky hooks execute the same thing (#985)
 - CI reads the Node version from `.nvmrc` rather than hard-coding `20` (#985, #986)
 - `lint` covers `src` only; the previous whole-repo scope is available as `lint:all` (#985)
