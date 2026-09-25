@@ -19,6 +19,7 @@ export const routes = {
   dashboard: '/dashboard',
   myTickets: '/my-tickets',
   checkout: '/checkout',
+  orders: '/orders',
   settings: '/settings',
   verify: '/verify',
 } as const;
@@ -28,6 +29,7 @@ export const PROTECTED_PREFIXES = [
   '/dashboard',
   '/my-tickets',
   '/checkout',
+  '/orders',
   '/settings',
   '/verify',
 ] as const;

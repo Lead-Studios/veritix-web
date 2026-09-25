@@ -12,6 +12,8 @@ import type { VeritixEvent } from '@/types';
  * back) does not lose the selection, and is dropped when the tab closes.
  */
 
+export const MAX_QUANTITY_PER_TIER_PER_ORDER = 4;
+
 export interface CartLine {
   tierId: string;
   quantity: number;
@@ -43,7 +45,7 @@ export const CartContext = React.createContext<CartContextValue | null>(null);
 
 function normalizeQuantity(quantity: number): number {
   if (!Number.isFinite(quantity)) return 1;
-  return Math.max(1, Math.trunc(quantity));
+  return Math.min(MAX_QUANTITY_PER_TIER_PER_ORDER, Math.max(1, Math.trunc(quantity)));
 }
 
 /**
@@ -115,12 +117,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const lines = current.event?.id === event.id ? current.lines : [];
         const existing = lines.find((line) => line.tierId === tierId);
 
+        // The cap applies to the resulting line quantity, not the increment
+        // being added, so bumping an already-full line is a no-op rather
+        // than pushing it over the limit.
         return {
           event,
           lines: existing
             ? lines.map((line) =>
                 line.tierId === tierId
-                  ? { ...line, quantity: line.quantity + normalizeQuantity(quantity) }
+                  ? { ...line, quantity: normalizeQuantity(line.quantity + quantity) }
                   : line,
               )
             : [...lines, { tierId, quantity: normalizeQuantity(quantity) }],

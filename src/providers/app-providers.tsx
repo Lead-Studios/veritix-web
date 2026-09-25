@@ -4,6 +4,7 @@ import * as React from 'react';
 import { SWRConfig } from 'swr';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { CartProvider } from '@/context/cart-context';
+import { ToastProvider } from '@/components/ui/toast';
 import { fetcher, ApiError } from '@/lib/api-client';
 
 /**
@@ -25,7 +26,10 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           errorRetryCount: 3,
         }}
       >
-        <CartProvider>{children}</CartProvider>
+        {/* Inside SWRConfig so a fetch error handler can raise a toast. */}
+        <ToastProvider>
+          <CartProvider>{children}</CartProvider>
+        </ToastProvider>
       </SWRConfig>
     </ThemeProvider>
   );
