@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- PATCH-only user settings API under `/api/user/` for profile, password,
+  notifications, and wallet updates, behind a shared session check (#977)
+- Blog built from MDX files in `src/content/blog`, with a static index, one
+  page per post, reading time, and validated frontmatter (#979)
+- Contact page and form, with a server-side honeypot and minimum-submit-time
+  spam protection and no third-party script (#980)
+- Cookie consent banner that defaults to necessary-only, persists the
+  choice, and never blocks the page behind a modal (#982)
 - Pricing page at `/pricing` with three plans, a full feature comparison, and an FAQ (#978)
 - Terms of Service and Privacy Policy at `/terms` and `/privacy`, each with a table of contents, a capped measure, and a last-updated date (#981)
 - `LegalDocument` and `LegalList` shared shells for long-form legal pages, plus a `.legal-body` component layer so neither page repeats the typography (#981)

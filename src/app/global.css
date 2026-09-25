@@ -195,3 +195,122 @@
     }
   }
 }
+
+@layer components {
+  /*
+   * Blog post bodies, rendered from MDX.
+   *
+   * MDX compiles to plain elements with no class names, so there is nothing to
+   * attach utilities to and the only options are per-element wrapper components
+   * (which every post then has to opt into) or one rule set here. The wrapper
+   * components would be the better answer if the element set were open-ended;
+   * it is not, a post is `h2`, `p`, `ul`, `ol`, `pre`, `code`, `blockquote`,
+   * `table`, `img`, and `a`.
+   *
+   * `@tailwindcss/typography` is not a dependency and is not worth adding for
+   * one surface, so this is a smaller version of what its `prose` class does.
+   * A full typography plugin would also restyle things this deliberately does
+   * not touch, like the site's own heading scale.
+   */
+  .mdx-body {
+    @apply text-muted-foreground;
+  }
+
+  .mdx-body > * + * {
+    @apply mt-5;
+  }
+
+  /* Headings. Sizes come from the site's scale, not from a typography default,
+     so a post and the rest of the product look like the same product. */
+  .mdx-body h2 {
+    @apply mt-12 text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  .mdx-body h3 {
+    @apply mt-8 text-xl font-semibold tracking-tight text-foreground;
+  }
+
+  .mdx-body h4 {
+    @apply mt-6 text-base font-semibold text-foreground;
+  }
+
+  /* A heading directly after a heading gets no top margin, or the gap between
+     two consecutive subheadings is twice the gap between a heading and text. */
+  .mdx-body h2 + *,
+  .mdx-body h3 + *,
+  .mdx-body h4 + * {
+    @apply mt-3;
+  }
+
+  .mdx-body p {
+    @apply leading-relaxed;
+  }
+
+  .mdx-body a {
+    @apply font-medium text-foreground underline underline-offset-4 hover:text-primary;
+  }
+
+  .mdx-body strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .mdx-body ul,
+  .mdx-body ol {
+    @apply list-outside space-y-2 pl-6;
+  }
+
+  .mdx-body ul {
+    @apply list-disc;
+  }
+
+  .mdx-body ol {
+    @apply list-decimal;
+  }
+
+  .mdx-body li > ul,
+  .mdx-body li > ol {
+    @apply mt-2;
+  }
+
+  .mdx-body blockquote {
+    @apply border-l-2 border-border pl-4 italic;
+  }
+
+  /*
+   * Code. `whitespace-pre` on the block so a long line scrolls rather than
+   * wrapping mid-token, which is how a shell command or an address stops being
+   * copyable.
+   */
+  .mdx-body code {
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em] text-foreground;
+  }
+
+  .mdx-body pre {
+    @apply overflow-x-auto rounded-lg border border-border bg-muted/50 p-4;
+  }
+
+  .mdx-body pre code {
+    @apply bg-transparent p-0 text-sm;
+  }
+
+  .mdx-body table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .mdx-body th,
+  .mdx-body td {
+    @apply border border-border px-3 py-2 text-left align-top;
+  }
+
+  .mdx-body th {
+    @apply bg-muted/50 font-medium text-foreground;
+  }
+
+  .mdx-body img {
+    @apply rounded-lg;
+  }
+
+  .mdx-body hr {
+    @apply my-10 border-border;
+  }
+}

@@ -1,0 +1,73 @@
+---
+title: 'What "verifiable ticket" should mean'
+description: 'A verifiable ticket is one that fails verification for a reason you can explain. Here is what that rules out, and what it does not.'
+publishedAt: '2026-07-02'
+author: 'Veritix'
+tags: ['tickets', 'verification', 'fraud']
+---
+
+"Verifiable" is doing a lot of work in ticketing marketing, and most of the
+time it is not being made to mean anything specific. A barcode is verifiable. A
+screenshot of a barcode is verifiable. Both check out and neither means
+anything.
+
+Here is the standard we are trying to hold.
+
+## A verification that cannot be faked is one that checks the ledger
+
+Every ticket Veritix issues corresponds to a record that is publicly checkable
+on the Stellar network. Presenting at the door is not "does this string look
+like a ticket" — it is "does this ticket exist, has it already been used, and is
+the person presenting it the holder recorded against it".
+
+That means a screenshot of a QR code fails. The code in the screenshot encodes a
+claim, not a record. The person at the door is looking at the record on the
+network, and there is no such thing as an image of one.
+
+## The property that actually matters: single use
+
+A forgeable ticket is one of two bad outcomes, and people only discuss the first.
+
+The first is a ticket that does not exist — invented, or copied from a real
+event and reprinted. The second is a real ticket used twice: a screenshot shared
+with a friend, or a resale that never got revoked.
+
+The second is the more common failure in practice, and it is the one a scanner
+solves. A ticket is marked used in the same check that admits it, so the second
+presentation of the same ticket is a failure, and the failure is recorded. Not
+"should fail if nobody noticed first" — there is no window in which two doors
+accept the same ticket.
+
+## What verification does not give you
+
+Being honest about the limits, because a security claim that overstates itself is
+worse than no security claim.
+
+- **It does not stop the original buyer transferring the ticket to someone
+  else.** It stops them from *copying* it. If transfer is enabled for an event,
+  the transfer is recorded and the new holder is who the ledger names. If it is
+  not enabled, the ticket is not transferable and a transfer is a breach of the
+  buyer's agreement with the organizer.
+- **It does not stop resale.** A ticket resold through any channel is still a
+  valid ticket. Resale is a pricing problem, not a forgery problem, and
+  pretending a blockchain solves it would be a category error.
+- **It does not tell the person at the door why a ticket failed to a
+  useful degree.** "Already used at 19:42" is a much more useful message than
+  "invalid", and it is the kind of detail that turns an argument into a
+  conversation. It is worth doing properly and it is its own work.
+- **It does not protect the buyer from an organizer who does not honour a
+  ticket.** That is a contract problem, covered by the refund commitment published
+  with the event and by the Terms — not something a ledger can fix.
+
+## Why the boring version matters
+
+There is a temptation, in a product like this, to describe verification in terms
+that sound like more than they are. "Cryptographically provable ownership" is
+technically true and practically useless to somebody working a door on a
+Saturday night.
+
+The version that holds up is the boring one: a ticket is a record, the record is
+checked against the ledger, the record is marked used, and a second attempt
+fails. If that is not impressive enough, the answer is not a better adjective.
+It is a better door-side experience — clearer failure messages, an offline
+fallback for a venue with no signal — which is where the actual work is.

@@ -8,6 +8,7 @@ export const routes = {
   event: (slug: string) => `/events/${slug}`,
   pricing: '/pricing',
   blog: '/blog',
+  blogPost: (slug: string) => `/blog/${slug}`,
   contact: '/contact',
   terms: '/terms',
   privacy: '/privacy',

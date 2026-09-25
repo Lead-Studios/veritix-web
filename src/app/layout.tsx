@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { AppProviders } from '@/providers/app-providers';
+import { CookieBanner } from '@/components/cookie-banner';
 import { themeInitScript } from '@/components/theme/theme-provider';
 import { env } from '@/lib/env';
 import './global.css';
@@ -58,6 +59,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <AppProviders>{children}</AppProviders>
+        {/*
+          Last in <body> so it renders after the page, and so it is the element a
+          Tab from the end of the document reaches. It is not inside
+          `AppProviders` and not inside any page's layout: consent is a property
+          of the site, not of the `(public)` or `(protected)` group, and a banner
+          that only appears on public pages is a banner that fails exactly where
+          it matters least and succeeds nowhere it matters.
+        */}
+        <CookieBanner />
       </body>
     </html>
   );
