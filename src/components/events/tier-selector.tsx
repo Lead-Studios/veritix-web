@@ -110,11 +110,18 @@ export function TierSelector({
                   >
                     <Minus aria-hidden="true" />
                   </Button>
+                  {/* The live region announced the bare number, so a screen
+                      reader said "3" with no idea of what had changed. The tier
+                      name and unit are visually hidden alongside it. */}
                   <span
                     className="w-8 text-center text-sm tabular-nums"
                     aria-live="polite"
                   >
                     {quantity}
+                    <span className="sr-only">
+                      {' '}
+                      {tier.name} {quantity === 1 ? 'ticket' : 'tickets'} selected
+                    </span>
                   </span>
                   <Button
                     type="button"

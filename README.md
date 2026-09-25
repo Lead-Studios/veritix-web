@@ -17,9 +17,16 @@ VeriTix is a **decentralized ticketing system** that eliminates fraud, prevents 
 
 | Tool | Version |
 |------|---------|
-| Node.js | 20+ |
+| Node.js | 20.19+ (`.nvmrc`) |
 | npm | 10+ |
 | Git | any recent |
+
+`.nvmrc` is the single source of truth for the Node version; `engines.node`,
+both CI workflows, and the Dockerfile all follow it. With [nvm](https://github.com/nvm-sh/nvm):
+
+```bash
+nvm use
+```
 
 You will also need a running instance of the **VeriTix backend API** (NestJS). Set `NEXT_PUBLIC_API_BASE_URL` to point at it.
 

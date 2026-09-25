@@ -22,7 +22,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Same source of truth as ci.yml, so the two workflows cannot drift
+          # onto different Node versions.
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies

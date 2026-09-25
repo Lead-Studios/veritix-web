@@ -12,11 +12,12 @@ const inter = Inter({
   variable: '--font-sans',
 });
 
-
-
-
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+  applicationName: 'Veritix',
+  // public/manifest.json is what makes the app installable; the service worker
+  // behind it is emitted by `npm run build:pwa` (ENABLE_PWA=true).
+  manifest: '/manifest.json',
   title: {
     default: 'Veritix — on-chain ticketing',
     template: '%s · Veritix',

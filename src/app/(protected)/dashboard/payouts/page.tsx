@@ -1,47 +1,81 @@
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { formatCurrency, formatDate } from '@/lib/format';
+
+// Amounts are minor units (cents) so they can go through formatCurrency
+// instead of a hand-rolled `$${amount.toLocaleString()}`.
 const PAYOUTS = [
-  { ref: "ESC-001", amount: 1200, status: "Settled", date: "2026-09-10" },
-  { ref: "ESC-002", amount: 850, status: "Escrowed", date: "-" },
-  { ref: "ESC-003", amount: 3400, status: "Settled", date: "2026-09-18" },
-  { ref: "ESC-004", amount: 960, status: "Escrowed", date: "-" },
-];
+  { ref: 'ESC-001', amount: 120_000, status: 'Settled', date: '2026-09-10' },
+  { ref: 'ESC-002', amount: 85_000, status: 'Escrowed', date: '' },
+  { ref: 'ESC-003', amount: 340_000, status: 'Settled', date: '2026-09-18' },
+  { ref: 'ESC-004', amount: 96_000, status: 'Escrowed', date: '' },
+] as const;
+
+/** Raw `bg-green-100`/`bg-yellow-100` pairs were unreadable in dark mode. */
+const STATUS_VARIANT = {
+  Settled: 'success',
+  Escrowed: 'warning',
+} as const;
 
 export default function PayoutsPage() {
-  const totalEscrowed = PAYOUTS
-    .filter((p) => p.status === "Escrowed")
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalEscrowed = PAYOUTS.filter((p) => p.status === 'Escrowed').reduce(
+    (sum, p) => sum + p.amount,
+    0,
+  );
 
   return (
-    <main className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Payouts</h1>
-      <p className="text-muted-foreground text-sm">
-        Total still held in escrow:{" "}
-        <span className="font-medium text-foreground">${totalEscrowed.toLocaleString()}</span>
-      </p>
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr>
-              {["Escrow Ref", "Amount", "Status", "Settlement Date"].map((h) => (
-                <th key={h} className="px-4 py-3 text-left font-medium text-muted-foreground">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {PAYOUTS.map((p) => (
-              <tr key={p.ref} className="border-t border-border hover:bg-muted/30 transition-colors">
-                <td className="px-4 py-3 font-mono">{p.ref}</td>
-                <td className="px-4 py-3">${p.amount.toLocaleString()}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.status === "Settled" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                    {p.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">{p.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    // A <div>, not a second <main>: the protected layout already renders
+    // <main id="main">, and a nested main is two landmarks where there should
+    // be one. The layout also supplies the page padding.
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Payouts</h1>
+        <p className="text-sm text-muted-foreground">
+          Total still held in escrow:{' '}
+          <span className="font-medium text-foreground">{formatCurrency(totalEscrowed)}</span>
+        </p>
       </div>
-    </main>
+      <div className="rounded-lg border border-border">
+        <Table>
+          {/* Without a caption the table is announced as a bare grid, and the
+              header row repeats "Escrow Ref Amount Status…" on every cell. */}
+          <TableCaption className="sr-only">Escrowed and settled payouts</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Escrow Ref</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Settlement Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {PAYOUTS.map((p) => (
+              <TableRow key={p.ref}>
+                <TableCell data-label="Escrow Ref" className="font-mono">
+                  {p.ref}
+                </TableCell>
+                <TableCell data-label="Amount">{formatCurrency(p.amount)}</TableCell>
+                <TableCell data-label="Status">
+                  <Badge variant={STATUS_VARIANT[p.status]}>{p.status}</Badge>
+                </TableCell>
+                <TableCell data-label="Settlement Date" className="text-muted-foreground">
+                  {/* An empty cell announced as "blank" is indistinguishable
+                      from a rendering bug; say why it is empty. */}
+                  {p.date ? formatDate(p.date) : 'Pending'}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }

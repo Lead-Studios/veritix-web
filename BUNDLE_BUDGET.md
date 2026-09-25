@@ -13,15 +13,29 @@ Measured gzipped.
 ## How to measure
 
 ```bash
-ANALYZE=true npm run build
+npm run analyze
 ```
 
-Opens an interactive treemap in the browser. The `@next/bundle-analyzer`
-wrapper in `next.config.js` handles the instrumentation.
+Builds with `ANALYZE=true` and `@next/bundle-analyzer`, which opens an
+interactive treemap in the browser. The wrapper in `next.config.js` handles the
+instrumentation; it is inert unless `ANALYZE` is set, so normal builds and CI
+are unaffected.
+
+The treemap is a human tool. The automated gate is separate:
+
+```bash
+npm run build && npm run budget
+```
+
+`scripts/check-bundle-budget.mjs` reads `.next/app-build-manifest.json`, gzips
+the exact chunks each route loads, and fails when a route exceeds the table
+above. The limits live in that script so they stay reviewable in one place —
+keep it in sync with the table. A missing build manifest is a failure, not a
+pass.
 
 ## Rules
 
 1. New dependencies >5 kB gzipped require a PR justification.
 2. Tree-shaking: import only what you need (`import { BarChart } from "recharts"`).
 3. Dynamic-import heavy views with `next/dynamic` and `ssr: false`.
-4. CI should fail if the dashboard chunk exceeds 150 kB (see `BUNDLE_CI_CHECK`).
+4. CI fails if a budgeted route exceeds its limit (`npm run budget`).

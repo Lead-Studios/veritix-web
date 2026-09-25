@@ -112,7 +112,7 @@ export default function OrderConfirmationPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Summary</CardTitle>
+          <CardTitle as="h2">Summary</CardTitle>
           <CardDescription>
             {order.tickets.length} {order.tickets.length === 1 ? 'ticket' : 'tickets'}{' '}
             issued
@@ -139,7 +139,7 @@ export default function OrderConfirmationPage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Tickets issued</CardTitle>
+          <CardTitle as="h2">Tickets issued</CardTitle>
           <CardDescription>
             Each ticket is verifiable on Stellar at the door.
           </CardDescription>

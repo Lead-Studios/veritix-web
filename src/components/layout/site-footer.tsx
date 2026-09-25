@@ -46,6 +46,9 @@ export function SiteFooter() {
               {/* A heading, not a styled paragraph: these three groups are
                   sections of the footer, and a screen reader user needs them in
                   the document outline to skip between them. */}
+              {/* A heading, not a styled paragraph: the footer had no headings at
+                  all, so a screen-reader user had no way to tell the three link
+                  groups apart without reading every link in order. */}
               <h2 className="text-sm font-medium text-foreground">{heading}</h2>
               <ul className="space-y-2">
                 {links.map(({ href, label }) => (

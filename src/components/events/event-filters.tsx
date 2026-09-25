@@ -82,12 +82,17 @@ export function EventFilters({ className }: EventFiltersProps) {
 
   const hasFilters = FILTER_KEYS.some((key) => values[key] !== '');
 
-  const fields = (
+  // Namespaced per rendered copy: both layouts stay mounted and are switched by
+  // CSS at the md breakpoint, so identical ids would exist twice in the DOM.
+  // `<label for>` resolves to the first match in document order, which was
+  // always the `hidden md:block` card, so on a phone "City" focused an input
+  // inside a display:none subtree and the soft keyboard never opened.
+  const fields = (idPrefix: string) => (
     <div className="grid gap-4 sm:grid-cols-2">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="filter-city">City</Label>
+        <Label htmlFor={`${idPrefix}-filter-city`}>City</Label>
         <Input
-          id="filter-city"
+          id={`${idPrefix}-filter-city`}
           name="city"
           value={values.city}
           placeholder="Any city"
@@ -96,9 +101,9 @@ export function EventFilters({ className }: EventFiltersProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="filter-date">Date</Label>
+        <Label htmlFor={`${idPrefix}-filter-date`}>Date</Label>
         <Input
-          id="filter-date"
+          id={`${idPrefix}-filter-date`}
           name="date"
           type="date"
           value={values.date}
@@ -107,9 +112,9 @@ export function EventFilters({ className }: EventFiltersProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="filter-min-price">Min price</Label>
+        <Label htmlFor={`${idPrefix}-filter-min-price`}>Min price</Label>
         <Input
-          id="filter-min-price"
+          id={`${idPrefix}-filter-min-price`}
           name="minPrice"
           type="number"
           min={0}
@@ -121,9 +126,9 @@ export function EventFilters({ className }: EventFiltersProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="filter-max-price">Max price</Label>
+        <Label htmlFor={`${idPrefix}-filter-max-price`}>Max price</Label>
         <Input
-          id="filter-max-price"
+          id={`${idPrefix}-filter-max-price`}
           name="maxPrice"
           type="number"
           min={0}
@@ -147,10 +152,10 @@ export function EventFilters({ className }: EventFiltersProps) {
       {/* Inline from the md breakpoint up, where there is room for four fields. */}
       <Card className="hidden md:block">
         <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle>Filters</CardTitle>
+          <CardTitle as="h2">Filters</CardTitle>
           {clearButton}
         </CardHeader>
-        <CardContent className="p-6 pt-0">{fields}</CardContent>
+        <CardContent className="p-6 pt-0">{fields('inline')}</CardContent>
       </Card>
 
       {/* Below md the same fields live behind a Sheet so the listing stays visible. */}
@@ -165,7 +170,7 @@ export function EventFilters({ className }: EventFiltersProps) {
             </>
           }
         >
-          {fields}
+          {fields('sheet')}
           {clearButton && <div className="mt-6">{clearButton}</div>}
         </Sheet>
       </div>

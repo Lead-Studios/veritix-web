@@ -56,7 +56,10 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle className="hidden sm:inline-flex" />
+          <ThemeToggle
+            className="hidden sm:inline-flex"
+            distinguishingLabel="site header"
+          />
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href={routes.login}>Log in</Link>
           </Button>
@@ -99,7 +102,9 @@ export function SiteHeader() {
               </Button>
             </div>
             <div className="px-3 pt-2">
-              <ThemeToggle />
+              {/* Two "Colour theme" radiogroups on one page are ambiguous to a
+                  screen-reader user, so each instance names its location. */}
+              <ThemeToggle distinguishingLabel="mobile menu" />
             </div>
           </Container>
         </div>
