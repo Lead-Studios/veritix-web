@@ -38,6 +38,13 @@ const preview: Preview = {
         },
       },
     },
+    backgrounds: {
+      default: "veritix",
+      values: [
+        { name: "veritix", value: "#ffffff" },
+        { name: "dark", value: "#101428" },
+      ],
+    },
   },
 };
 

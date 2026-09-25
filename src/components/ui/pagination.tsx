@@ -9,22 +9,28 @@ import { cn } from '@/lib/utils';
  *
  * Rendered as real anchors rather than click handlers, so pagination shows up
  * in the browser history and the back button moves between pages.
+ *
+ * The page is a self-contained component rather than a set of
+ * `PaginationContent`/`PaginationItem`/`PaginationLink` primitives: the only
+ * consumer wants a complete, correctly-labelled control, and every page-number
+ * and previous/next pair is announced by an explicit accessible name.
+ * Rendered as real anchors rather than click handlers, so pagination appears in
+ * browser history and the back button moves between pages.
  */
-
 export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   /** 1-based current page. */
   page: number;
   totalPages: number;
-  /** Target href for a page. Must preserve the other query parameters. */
+  /** Target href for a page; callers preserve their other query parameters. */
   hrefForPage: (page: number) => string;
+  /** Distinguishes this control from any other navigation on the page. */
+  label?: string;
 }
 
-/** First, last, and a window around the current page, with gaps collapsed. */
 function pageWindow(page: number, totalPages: number): Array<number | 'gap'> {
   const candidates = [1, page - 1, page, page + 1, totalPages]
     .filter((candidate) => candidate >= 1 && candidate <= totalPages)
     .sort((a, b) => a - b);
-
   const out: Array<number | 'gap'> = [];
   let previous = 0;
 
@@ -34,11 +40,16 @@ function pageWindow(page: number, totalPages: number): Array<number | 'gap'> {
     out.push(candidate);
     previous = candidate;
   }
-
   return out;
 }
 
 const stepClass = 'size-9';
+
+/**
+ * A step that is not available. A `<span>` rather than a disabled `<button>`,
+ * because a disabled control is removed from the tab order and skipped by
+ * screen readers, which leaves no way to discover that the control exists.
+ */
 const disabledClass = cn(
   buttonVariants({ variant: 'outline', size: 'icon' }),
   stepClass,
@@ -49,9 +60,11 @@ export function Pagination({
   page,
   totalPages,
   hrefForPage,
+  label = 'Pagination',
   className,
   ...props
 }: PaginationProps) {
+export function Pagination({ page, totalPages, hrefForPage, className, ...props }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const isFirst = page <= 1;
@@ -59,14 +72,15 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={label}
       className={cn('flex items-center justify-center gap-1', className)}
       {...props}
     >
+    <nav aria-label="Pagination" className={cn('flex items-center justify-center gap-1', className)} {...props}>
       {isFirst ? (
         <span className={disabledClass} aria-disabled="true">
           <ChevronLeft aria-hidden="true" />
-          <span className="sr-only">Previous page</span>
+          <span className="sr-only">Previous page, unavailable</span>
         </span>
       ) : (
         <Link
@@ -80,24 +94,25 @@ export function Pagination({
 
       {pageWindow(page, totalPages).map((entry, index) =>
         entry === 'gap' ? (
-          <span
-            key={`gap-${index}`}
-            className="px-1 text-sm text-muted-foreground"
-            aria-hidden="true"
-          >
+          // Was `aria-hidden`, which made the skipped pages invisible: a screen
+          // reader heard 1, 2, 6 with nothing between them. The visible glyph
+          // is decorative; the explanation is in text.
+          <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground">
+            <span aria-hidden="true">…</span>
+            <span className="sr-only">and other pages</span>
+          <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground" aria-hidden="true">
             …
           </span>
         ) : (
           <Link
             key={entry}
             href={hrefForPage(entry)}
+            // The current page is conveyed by `aria-current`, not only by the
+            // filled-in button style, which a screen reader cannot see.
             aria-current={entry === page ? 'page' : undefined}
-            aria-label={`Page ${entry}`}
+            aria-label={entry === page ? `Page ${entry}, current page` : `Go to page ${entry}`}
             className={cn(
-              buttonVariants({
-                variant: entry === page ? 'default' : 'outline',
-                size: 'icon',
-              }),
+              buttonVariants({ variant: entry === page ? 'default' : 'outline', size: 'icon' }),
               stepClass,
               'text-sm',
             )}
@@ -110,7 +125,7 @@ export function Pagination({
       {isLast ? (
         <span className={disabledClass} aria-disabled="true">
           <ChevronRight aria-hidden="true" />
-          <span className="sr-only">Next page</span>
+          <span className="sr-only">Next page, unavailable</span>
         </span>
       ) : (
         <Link
@@ -124,75 +139,3 @@ export function Pagination({
     </nav>
   );
 }
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { Button, type ButtonProps } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-
-const Pagination = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
-  ({ className, ...props }, ref) => (
-    <nav ref={ref} aria-label="Pagination" className={cn('mx-auto flex w-full justify-center', className)} {...props} />
-  ),
-);
-Pagination.displayName = 'Pagination';
-
-const PaginationContent = React.forwardRef<HTMLUListElement, React.HTMLAttributes<HTMLUListElement>>(
-  ({ className, ...props }, ref) => (
-    <ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props} />
-  ),
-);
-PaginationContent.displayName = 'PaginationContent';
-
-const PaginationItem = React.forwardRef<HTMLLIElement, React.LiHTMLAttributes<HTMLLIElement>>(
-  ({ className, ...props }, ref) => <li ref={ref} className={cn('', className)} {...props} />,
-);
-PaginationItem.displayName = 'PaginationItem';
-
-type PaginationLinkProps = {
-  isActive?: boolean;
-} & Pick<ButtonProps, 'size'> &
-  React.AnchorHTMLAttributes<HTMLAnchorElement>;
-
-const PaginationLink = ({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) => (
-  <a
-    aria-current={isActive ? 'page' : undefined}
-    className={cn(
-      'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-      size === 'default' ? 'h-10 px-4' : size === 'sm' ? 'h-8 px-3 text-xs' : 'h-10 w-10',
-      isActive ? 'border border-input bg-background' : 'hover:bg-secondary hover:text-secondary-foreground',
-      className,
-    )}
-    {...props}
-  />
-);
-PaginationLink.displayName = 'PaginationLink';
-
-const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to previous page" size="default" className={cn('gap-1 pl-2.5', className)} {...props}>
-    <ChevronLeft className="size-4" aria-hidden="true" />
-    <span>Previous</span>
-  </PaginationLink>
-);
-
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="default" className={cn('gap-1 pr-2.5', className)} {...props}>
-    <span>Next</span>
-    <ChevronRight className="size-4" aria-hidden="true" />
-  </PaginationLink>
-);
-
-const PaginationEllipsis = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span aria-hidden="true" className={cn('flex h-10 w-10 items-center justify-center', className)} {...props}>
-    <MoreHorizontal className="size-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-);
-
-export {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-};

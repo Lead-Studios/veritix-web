@@ -1,10 +1,7 @@
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
+import { getSentryOptions } from './sentry.options';
 
-if (process.env.NODE_ENV === "production") {
-  Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    enabled: Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN),
-    tracesSampleRate: 0.1,
-    debug: false,
-  });
+// Server diagnostics are opt-in and never initialize during local development.
+if (process.env.NODE_ENV === 'production') {
+  Sentry.init(getSentryOptions());
 }

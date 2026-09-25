@@ -109,6 +109,50 @@
   }
 }
 
+@layer components {
+  /*
+   * Long-form legal body copy.
+   *
+   * `@tailwindcss/typography` is not a dependency and is not worth adding for
+   * two pages, so the handful of elements the Terms and Privacy documents
+   * actually use are styled here rather than being given utility classes one
+   * paragraph at a time. `> * + *` rather than `space-y-*` on the wrapper, so
+   * the spacing rule survives a section body that is a list inside a list.
+   */
+  .legal-body > * + * {
+    @apply mt-4;
+  }
+
+  .legal-body p {
+    @apply leading-relaxed;
+  }
+
+  .legal-body a {
+    @apply font-medium text-foreground underline underline-offset-4 hover:text-primary;
+  }
+
+  .legal-body ul,
+  .legal-body ol {
+    @apply list-outside space-y-2 pl-5;
+  }
+
+  .legal-body ul {
+    @apply list-disc;
+  }
+
+  .legal-body ol {
+    @apply list-decimal;
+  }
+
+  .legal-body h3 {
+    @apply mt-6 text-base font-semibold text-foreground;
+  }
+
+  .legal-body strong {
+    @apply font-medium text-foreground;
+  }
+}
+
 @media print {
   /*
    * Print a document, not an app. The receipt asks the browser to print the

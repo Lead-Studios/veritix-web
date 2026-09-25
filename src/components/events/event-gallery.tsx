@@ -63,6 +63,12 @@ export function EventGallery({ images, title, className }: EventGalleryProps) {
       className={cn('flex flex-col gap-3', className)}
       onKeyDown={onKeyDown}
     >
+      {/* Advancing the carousel changed the image and said nothing. The main
+          image's alt text is replaced when the node is reused rather than
+          re-created, so the position needs a live region of its own. */}
+      <p aria-live="polite" className="sr-only">
+        {label(safeIndex)}
+      </p>
       <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-border bg-secondary">
         <button
           type="button"

@@ -18,7 +18,11 @@ export const routes = {
   forgotPassword: '/forgot-password',
 
   dashboard: '/dashboard',
+  dashboardEvents: '/dashboard/events',
+  dashboardEventNew: '/dashboard/events/new',
+  dashboardEventEdit: (id: string) => `/dashboard/events/${id}/edit`,
   myTickets: '/my-tickets',
+  myTicket: (id: string) => `/my-tickets/${id}`,
   checkout: '/checkout',
   orders: '/orders',
   settings: '/settings',
