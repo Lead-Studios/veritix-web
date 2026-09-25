@@ -109,6 +109,35 @@
   }
 }
 
+@media print {
+  /*
+   * Print a document, not an app. The receipt asks the browser to print the
+   * page; the app shell (topbar, sidebar, footer) and every interactive
+   * control have no business on paper.
+   */
+  header,
+  aside,
+  footer,
+  nav,
+  button,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+}
+
 @layer utilities {
   /* Respect a user's reduced-motion preference everywhere by default. */
   @media (prefers-reduced-motion: reduce) {
