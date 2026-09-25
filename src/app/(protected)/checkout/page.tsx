@@ -81,7 +81,7 @@ export default function CheckoutPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Order summary</CardTitle>
+          <CardTitle as="h2">Order summary</CardTitle>
           <CardDescription>
             {itemCount} {itemCount === 1 ? 'ticket' : 'tickets'} selected
           </CardDescription>
@@ -153,7 +153,7 @@ export default function CheckoutPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your details</CardTitle>
+          <CardTitle as="h2">Your details</CardTitle>
           <CardDescription>The name and email the tickets are issued to.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -193,7 +193,7 @@ export default function CheckoutPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment</CardTitle>
+          <CardTitle as="h2">Payment</CardTitle>
           <CardDescription>
             Ticket payments are held in escrow on Stellar until the event completes.
           </CardDescription>

@@ -143,7 +143,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Tickets</CardTitle>
+              <CardTitle as="h2">Tickets</CardTitle>
               <CardDescription>
                 Pick the tiers you want. Quantities are capped at what is left.
               </CardDescription>
@@ -155,7 +155,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
           <Card>
             <CardHeader>
-              <CardTitle>Schedule</CardTitle>
+              <CardTitle as="h2">Schedule</CardTitle>
               <CardDescription>
                 All times are shown in your local timezone.
               </CardDescription>
@@ -176,7 +176,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
         <Card className="lg:sticky lg:top-24 lg:self-start">
           <CardHeader>
-            <CardTitle>Organizer</CardTitle>
+            <CardTitle as="h2">Organizer</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-3">
             <Avatar alt={event.organizer.name} />

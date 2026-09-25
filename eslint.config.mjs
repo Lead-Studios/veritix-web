@@ -35,7 +35,15 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": "error",
     },
   },
-  // Override default ignores of eslint-config-next.
+  // This must stay a standalone `globalIgnores` entry. A bare `ignores` key
+  // inside a config object is a per-config exclude list, not a global one, so
+  // converting it would silently start linting .next/** and coverage/** and
+  // produce thousands of errors from generated code. It is also safe to keep
+  // after the Storybook spread below: globalIgnores is position-independent.
+  //
+  // Carries over every entry that used to live in .eslintignore, which ESLint 9
+  // flat config never reads -- it only warns about the file, so edits to it
+  // had no effect. The file is deleted rather than left to disagree.
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
@@ -44,6 +52,14 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "node_modules/**",
     "next-env.d.ts",
+    // Previously only in the (dead) .eslintignore:
+    ".DS_Store",
+    // Build and coverage output that nothing else covers:
+    "storybook-static/**",
+    "out-vercel/**",
+    "playwright-report/**",
+    "test-results/**",
+    "blob-report/**",
   ]),
   ...storybook.configs["flat/recommended"]
 ]);

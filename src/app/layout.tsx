@@ -12,9 +12,6 @@ const inter = Inter({
   variable: '--font-sans',
 });
 
-
-
-
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: {

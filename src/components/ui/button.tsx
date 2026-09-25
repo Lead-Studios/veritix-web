@@ -31,12 +31,28 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   /** Render as the child element instead of a <button>, for links styled as buttons. */
   asChild?: boolean;
+  /**
+   * Defaults to `"button"`. A bare `<button>` inside a form is a submit
+   * control, which silently submits on Enter and on click — pass `"submit"`
+   * deliberately or the form posts at the worst moment. Ignored when
+   * `asChild` is set, since the child owns its own element type.
+   */
+  type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, type = 'button', ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
-    return <Comp ref={ref} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+    return (
+      <Comp
+        ref={ref}
+        // Slot forwards `type` to the child, so an <a> would receive a stray
+        // attribute; only a real button gets the default.
+        {...(asChild ? {} : { type })}
+        className={cn(buttonVariants({ variant, size }), className)}
+        {...props}
+      />
+    );
   },
 );
 Button.displayName = 'Button';
