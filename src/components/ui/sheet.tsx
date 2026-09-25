@@ -96,6 +96,7 @@ export function Sheet({
               title={title}
               description={description}
             >
+            <SheetContent side={side} className={className} title={title} description={description}>
               {children}
             </SheetContent>
           ) : null}
@@ -263,6 +264,38 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
         <SheetOverlay />
         <div
           ref={setPanelRef}
+
+    // Focus moves into the panel only on the closed -> open transition.
+    // Depending on the whole context object would re-focus on every render and
+    // yank focus away from whatever the user is interacting with inside it.
+    const wasOpen = React.useRef(false);
+    React.useEffect(() => {
+      const justOpened = context.open && !wasOpen.current;
+      wasOpen.current = context.open;
+      if (!context.open) return;
+
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          context.setOpen(false);
+        }
+      };
+      document.addEventListener('keydown', onKeyDown);
+      if (justOpened) panelRef.current?.focus();
+      return () => document.removeEventListener('keydown', onKeyDown);
+    }, [context.open, context.setOpen]);
+
+    if (!context.open) return null;
+
+    return (
+      <>
+        <SheetOverlay />
+        <div
+          ref={(node) => {
+            panelRef.current = node;
+            if (typeof ref === 'function') ref(node);
+            else if (ref) ref.current = node;
+          }}
           role="dialog"
           aria-modal="true"
           // A dialog with no accessible name is unusable with a screen reader,
@@ -293,6 +326,8 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
                   {panelDescription}
                 </p>
               )}
+              {panelTitle && <h2 id={titleId} className="text-base font-semibold leading-none">{panelTitle}</h2>}
+              {panelDescription && <p id={descriptionId} className="text-sm text-muted-foreground">{panelDescription}</p>}
             </div>
           )}
           <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
@@ -305,6 +340,7 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
         </div>
       </div>,
       document.body,
+      </>
     );
   },
 );
@@ -329,6 +365,16 @@ export const SheetFooter = Object.assign(
   ),
   { displayName: 'SheetFooter' },
 );
+
+export const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
+);
+SheetHeader.displayName = 'SheetHeader';
+
+export const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />
+);
+SheetFooter.displayName = 'SheetFooter';
 
 export const SheetTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => <h2 ref={ref} className={cn('text-lg font-semibold text-foreground', className)} {...props} />,

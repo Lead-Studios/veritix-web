@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, Type-check, Test, Build
+    name: Lint, Type-check, Test, Build, Budget
     runs-on: ubuntu-latest
     # A hung build should fail, not hold a runner for the default six hours.
     timeout-minutes: 20
@@ -75,3 +75,8 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: npm run build
+
+      # The analyzer treemap is a human tool; this gate reads the build manifest
+      # and fails the pull request when a documented route budget is exceeded.
+      - name: Bundle budget
+        run: npm run budget

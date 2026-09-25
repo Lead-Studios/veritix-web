@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.nvmrc` pinning Node `20.19.0`, the minimum required by `oxc-parser` and compatible with Next.js 16 (#986)
 - `lint:all` script (`eslint .`), preserving the pre-`eslint src` scope under a new name (#985)
 - `globalIgnores` for `storybook-static`, `out-vercel`, `playwright-report`, `test-results`, and `blob-report` (#987)
+- Storybook stories for every primitive in `src/components/ui/`, including variant matrices and disabled/invalid states (#989)
+- Bundle budget gate (`npm run budget`) reading `.next/app-build-manifest.json`; CI now fails when a documented route budget is exceeded (#990)
+- `@next/bundle-analyzer` wired through `next.config.js` and `npm run analyze` (#990)
+- PWA support via `next-pwa`: `npm run build:pwa` emits a service worker with `NetworkFirst` caching for `/verify` and `CacheFirst` for static assets; `public/manifest.json` is now linked from the root layout (#991)
+- Sentry instrumentation: `src/instrumentation.ts`, `src/instrumentation.client.ts`, `withSentryConfig` source-map upload, and a `beforeSend` scrubber that drops request bodies, cookies, query strings, and user PII (#992)
+- `SENTRY_ORG` and `SENTRY_PROJECT` documented in `.env.example`; `ENABLE_PWA` added for opt-in service-worker builds (#991, #992)
 - Storybook with Next.js framework, a11y, and viewport addons (#609)
 - CHANGELOG and commitlint configuration (#610)
 - GitHub Actions CI workflow with lint, type-check, and build (#612)
@@ -69,6 +75,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The disabled states that only existed in `title` attributes are rendered as real text and wired up with `aria-describedby` (#984)
 - `csv.ts` and `breadcrumbs.tsx` used double-quoted strings and a missing final newline, failing `format:check` (#985)
 - `dialog.tsx` overlays and the sheet backdrop respond to `onClick` without a keyboard path; `Escape` and the close button provide one (#984)
+- `src/components/ui/pagination.tsx` and `src/components/ui/sheet.tsx` no longer contain two conflicting implementations of the same component; both now serve the API their call sites use (#989)
+- `src/app/(protected)/my-tickets/page.tsx` no longer has imports inside a function body or two default exports, and it now actually renders the upcoming and past ticket groups (#989)
+- The client error boundary reports through Sentry instead of relying on an automatic capture that never happened (#992)
+- `.storybook/heaer.ts` and the duplicate `.storybook/preview.tsx` removed, so Storybook loads exactly one preview configuration (#989)
 
 ### Removed
 - `.eslintignore`, which ESLint 9 flat config ignores in favour of `globalIgnores` (#987)

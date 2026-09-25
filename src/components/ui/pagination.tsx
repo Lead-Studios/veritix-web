@@ -14,24 +14,23 @@ import { cn } from '@/lib/utils';
  * `PaginationContent`/`PaginationItem`/`PaginationLink` primitives: the only
  * consumer wants a complete, correctly-labelled control, and every page-number
  * and previous/next pair is announced by an explicit accessible name.
+ * Rendered as real anchors rather than click handlers, so pagination appears in
+ * browser history and the back button moves between pages.
  */
-
 export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   /** 1-based current page. */
   page: number;
   totalPages: number;
-  /** Target href for a page. Must preserve the other query parameters. */
+  /** Target href for a page; callers preserve their other query parameters. */
   hrefForPage: (page: number) => string;
   /** Distinguishes this control from any other navigation on the page. */
   label?: string;
 }
 
-/** First, last, and a window around the current page, with gaps collapsed. */
 function pageWindow(page: number, totalPages: number): Array<number | 'gap'> {
   const candidates = [1, page - 1, page, page + 1, totalPages]
     .filter((candidate) => candidate >= 1 && candidate <= totalPages)
     .sort((a, b) => a - b);
-
   const out: Array<number | 'gap'> = [];
   let previous = 0;
 
@@ -41,7 +40,6 @@ function pageWindow(page: number, totalPages: number): Array<number | 'gap'> {
     out.push(candidate);
     previous = candidate;
   }
-
   return out;
 }
 
@@ -66,6 +64,7 @@ export function Pagination({
   className,
   ...props
 }: PaginationProps) {
+export function Pagination({ page, totalPages, hrefForPage, className, ...props }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const isFirst = page <= 1;
@@ -77,6 +76,7 @@ export function Pagination({
       className={cn('flex items-center justify-center gap-1', className)}
       {...props}
     >
+    <nav aria-label="Pagination" className={cn('flex items-center justify-center gap-1', className)} {...props}>
       {isFirst ? (
         <span className={disabledClass} aria-disabled="true">
           <ChevronLeft aria-hidden="true" />
@@ -100,6 +100,8 @@ export function Pagination({
           <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground">
             <span aria-hidden="true">…</span>
             <span className="sr-only">and other pages</span>
+          <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground" aria-hidden="true">
+            …
           </span>
         ) : (
           <Link
@@ -110,10 +112,7 @@ export function Pagination({
             aria-current={entry === page ? 'page' : undefined}
             aria-label={entry === page ? `Page ${entry}, current page` : `Go to page ${entry}`}
             className={cn(
-              buttonVariants({
-                variant: entry === page ? 'default' : 'outline',
-                size: 'icon',
-              }),
+              buttonVariants({ variant: entry === page ? 'default' : 'outline', size: 'icon' }),
               stepClass,
               'text-sm',
             )}
