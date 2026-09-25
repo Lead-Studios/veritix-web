@@ -4,6 +4,7 @@ import { AppProviders } from '@/providers/app-providers';
 import { themeInitScript } from '@/components/theme/theme-provider';
 import { env } from '@/lib/env';
 import './global.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({
   subsets: ['latin'],

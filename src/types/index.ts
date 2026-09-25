@@ -32,7 +32,11 @@ export interface VeritixEvent {
   title: string;
   description: string;
   coverImageUrl?: string;
+  /** Extra gallery images in display order; falls back to the cover image. */
+  images?: string[];
   venue: string;
+  /** Street address for the venue, when the organizer supplied one. */
+  address?: string;
   city: string;
   startsAt: string;
   endsAt: string;
