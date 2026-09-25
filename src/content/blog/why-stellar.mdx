@@ -1,0 +1,82 @@
+---
+title: 'Why we built the escrow on Stellar'
+description: 'A look at the network choice behind Veritix: sub-cent fees, fast finality, and a transaction history that is actually queryable.'
+publishedAt: '2026-06-11'
+author: 'Veritix'
+tags: ['stellar', 'engineering', 'architecture']
+---
+
+The escrow is the product, so the network underneath it is not an
+implementation detail. It constrains what the product can promise, how fast it
+can promise it, and what it costs. A short account of why it is Stellar and what
+we had to work around.
+
+## The requirement, stated as numbers
+
+A ticketing escrow has a shape that rules out most chains:
+
+- **A fee small enough to disappear into the ticket.** Not amortised across a
+  month of volume — charged per transaction, because a buyer buys one or two
+  tickets and that is the whole transaction. Ethereum's L2 fees are not reliably
+  in the range where you can hide them in a price.
+- **Finality in seconds.** An organizer watching a settlement should not be
+  refreshing a page waiting for confirmations, and a buyer should not be told a
+  refund is pending while it is actually done.
+- **A queryable history.** Our own settlement report reads from the chain. If
+  reading a ticket's status costs a block explorer call with a rate limit, then
+  every door-side check is a queue, and doors have queues already.
+- **A real token.** Tickets settle in money a buyer recognises, not in a
+  platform-specific unit that has to be re-argued at every purchase.
+
+## What Stellar gives
+
+Sub-cent fees by default, finality in seconds, and a transaction history you can
+query directly rather than scrape. The XLM token is liquid and boring, which is
+exactly what you want for something a person hands over money for.
+
+The operational properties that mattered more than expected:
+
+- **A transaction envelope is explicit.** A payment is submitted as a signed
+  XDR envelope, and the signable thing is a well-defined object. Wallet
+  integration is a matter of handing that object to a wallet and getting the
+  signature back, with no server in the middle holding a key. Which matters,
+  because a ticketing platform that can move a buyer's funds is a very large
+  thing to be trusted with.
+- **Soroban exists when we need it,** for the paths where escrow logic wants to
+  be code rather than a convention. We are not using it for settlement today.
+
+## What we had to work around
+
+Stellar is not uniformly pleasant, and the sharp edges are worth recording.
+
+**Base fees are quoted in stroops, one ten-millionth of XLM.** Every amount in
+this codebase is a `bigint` in stroops, never a float, because a float loses
+precision exactly where you cannot afford it. The temptation to store a price in
+cents in the database and convert at the boundary is real, and it is where
+rounding bugs live.
+
+**Ledger closes are a batching concept, not a per-transaction one.** A
+transaction is "final" once it is in a closed ledger. That is seconds, not
+milliseconds, and any UI that says "processing" for half a second and then
+"done" is lying by implication. We show the close the transaction landed in.
+
+**Sequence numbers are per-account, not per-transaction.** Two tabs open, both
+submitting, and the second fails with a sequence error that has nothing to do
+with what the user did. Every submission path in the app has to handle it, and
+the error surfaces to a person as "try again", not as a sequence number.
+
+**The testnet is not the mainnet.** Testnet accounts and XLM are free and
+meaningless, which means a testnet pass proves the code path and nothing about
+whether the escrow is funded. Mainnet testing costs real money and cannot be
+automated freely, so it is a deliberate, manual, occasional thing rather than
+something that happens on every merge.
+
+## The honest summary
+
+We picked the network that makes the unit economics work, not the one with the
+best reputation. The trade we accepted is a smaller, less flashy ecosystem and a
+transaction model that asks for more care in a few places. Given that the
+alternative was fees a buyer would notice, that trade was easy.
+
+Where this turns out to be wrong, it will be because of something we did not
+think about. If you find it, we would like to hear about it.

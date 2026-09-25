@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- PATCH-only user settings API under `/api/user/` for profile, password,
+  notifications, and wallet updates, behind a shared session check (#977)
+- Blog built from MDX files in `src/content/blog`, with a static index, one
+  page per post, reading time, and validated frontmatter (#979)
+- Contact page and form, with a server-side honeypot and minimum-submit-time
+  spam protection and no third-party script (#980)
+- Cookie consent banner that defaults to necessary-only, persists the
+  choice, and never blocks the page behind a modal (#982)
 - Storybook with Next.js framework, a11y, and viewport addons (#609)
 - CHANGELOG and commitlint configuration (#610)
 - GitHub Actions CI workflow with lint, type-check, and build (#612)

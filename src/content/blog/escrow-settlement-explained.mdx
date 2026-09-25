@@ -1,0 +1,92 @@
+---
+title: 'Escrow settlement, explained without the hand-waving'
+description: 'What actually happens to a ticket payment between the moment somebody buys a ticket and the moment an organizer gets paid — and why each step is on-chain.'
+publishedAt: '2026-08-14'
+author: 'Veritix'
+tags: ['escrow', 'settlement', 'stellar']
+featured: true
+---
+
+Every ticketing platform eventually has to explain where the money goes. Most of
+them say "payouts processed" or "funds held securely", which is true in the way
+that a locked door is secure: technically accurate, and not much help to the
+person standing outside it.
+
+Here is what actually happens on Veritix, in order, with no steps skipped.
+
+## The money never sits with us
+
+When a buyer pays for a ticket, the funds do not move into a Veritix balance and
+they do not sit in a platform bank account. They move into an **escrow account**
+on the Stellar network — a Stellar account whose transfers are public and
+verifiable by anyone with a browser.
+
+This is the single decision that shapes everything else, so it is worth being
+blunt about what it buys and what it costs.
+
+What it buys: the organizer cannot pay out early, buyers cannot be charged twice
+for the same seat, and neither side has to take the other's word for what
+happened. The ledger is the record. It is not our record.
+
+What it costs: escrow accounts are public. The addresses, the amounts, and the
+transaction identifiers are visible to anyone who looks. That is a real
+constraint, and the reason the Privacy Policy says plainly that we do not put
+personal data on-chain and that the wallet addresses we do are permanently
+public.
+
+## Revenue splits are decided before the first sale
+
+When an organizer publishes an event, they define the split: this percentage to
+me, this percentage to the artist, this percentage to the venue. It is fixed at
+that moment and it cannot be edited afterwards.
+
+That restriction is the whole point. A split you can change after buyers have
+paid is not a promise, it is an intention, and every buyer who agreed to it is
+holding a document that has since been revised. So the split is locked when the
+event is published, and the version the buyers agreed to is the version that
+settles.
+
+## Settlement is one transaction, not a batch job
+
+When the event completes and the settlement window closes, the escrow releases
+the shares in a single transaction. The organizer, the artist, and the venue are
+paid in the same operation, and the fee we deduct is deducted from the escrow
+account before the release rather than invoiced afterwards.
+
+There is no payout to request. There is no invoice to chase. The transfer either
+appears in the ledger or it does not, and the report in the organizer dashboard
+reads from the ledger rather than from an internal table that might disagree with
+it.
+
+## Refunds, before and after settlement
+
+Before settlement, while the escrow is open, a refund is straightforward: the
+funds are still in the escrow account, and a refund is a transfer back to the
+original payment method. If an organizer cancels, every ticket sold is refundable
+that way — whether or not individual buyers ask.
+
+After settlement, a refund is different, and pretending otherwise is the most
+common misleading thing said about on-chain ticketing. Once the release has
+happened, the funds are in the recipients' accounts. A refund is a **new
+transfer out of the organizer's settled share**. It shows up in their report as a
+refund rather than as a reduction in ticket revenue, because that is what it is.
+
+This is a real trade-off, not a bug. It means we cannot hold money back after
+settlement to make a post-settlement refund painless, and we could not if we
+wanted to — the release is unconditional once its conditions are met. What it
+means in practice is that the protection buyers get is strongest before the event
+and weaker after it, and an organizer who plans to cancel has to behave
+accordingly. The Terms say this. It seemed better to say it than to bury it.
+
+## Why this is worth the complexity
+
+We could have done a much simpler thing: hold the money ourselves, mark orders
+paid when a webhook fires, and pay organizers weekly. That is what most
+platforms do and it works fine, right up until the moment somebody disputes it —
+at which point the answer is whatever our database says, and the buyer has no way
+to check.
+
+The on-chain version is slower to build, harder to operate, and more expensive
+per ticket. What it buys is that the most important question a ticketing
+platform gets asked — *did the money actually move, and to whom* — has an answer
+that does not depend on trusting us. That is the bet.
