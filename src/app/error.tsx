@@ -1,12 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import * as Sentry from '@sentry/nextjs';
 import { ErrorState } from '@/components/feedback/error-state';
 import { Container } from '@/components/layout/container';
-
-
-
-
 
 /**
  * Route-segment error boundary. Next.js remounts this on a caught render error
@@ -20,9 +17,10 @@ export default function Error({
   reset: () => void;
 }) {
   React.useEffect(() => {
-    // Sentry's Next.js integration captures this automatically in production;
-    // logging keeps it visible in local development too.
-    console.error(error);
+    // The boundary catches client render errors explicitly; server request errors
+    // are handled by Sentry's instrumentation hook.
+    Sentry.captureException(error, { tags: { boundary: 'app/error' } });
+    if (process.env.NODE_ENV !== 'production') console.error(error);
   }, [error]);
 
   return (
@@ -39,6 +37,3 @@ export default function Error({
     </Container>
   );
 }
-
-
-
