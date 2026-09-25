@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Pricing page at `/pricing` with three plans, a full feature comparison, and an FAQ (#978)
+- Terms of Service and Privacy Policy at `/terms` and `/privacy`, each with a table of contents, a capped measure, and a last-updated date (#981)
+- `LegalDocument` and `LegalList` shared shells for long-form legal pages, plus a `.legal-body` component layer so neither page repeats the typography (#981)
+- Newsletter signup in the site footer: inline validation, a success state that takes focus, and a plain statement of what subscribers get (#983)
+- `POST /api/newsletter`, a validating proxy to the backend so the browser never learns where the list lives (#983)
+- `e2e/smoke.spec.ts` covering the landing page, the route guard, the public routes, and the 404 page (#988)
+- `.github/workflows/e2e.yml` running the Playwright suite, caching the browser build and uploading the report (#988)
 - Storybook with Next.js framework, a11y, and viewport addons (#609)
 - CHANGELOG and commitlint configuration (#610)
 - GitHub Actions CI workflow with lint, type-check, and build (#612)
@@ -29,6 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit test coverage for `useOrganizerAnalytics` covering loading, success, organizerId key-building, and error states (#731)
 
 ### Changed
+- The site footer's three link groups are `<h2>` sections rather than styled paragraphs, and the newsletter block sits above the legal line instead of inside a grid cell (#983)
+- `playwright.config.ts` targets `127.0.0.1` rather than `localhost`, and adds a global timeout, an action timeout, a browser cache, and the GitHub HTML reporter (#988)
+- The E2E web server is `next dev` by default, with `E2E_WEB_SERVER=build` to test a production build once `next build` succeeds on `main` (#988)
 - Formatted the existing `src/` tree with Prettier (#729)
 - `no-restricted-imports` ESLint rule now correctly targets only imports crossing two or more directory levels, instead of also matching legitimate single-level `../` imports (#730)
 
