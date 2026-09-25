@@ -8,7 +8,7 @@ on:
 
 jobs:
   ci:
-    name: Lint, Type-check, Test, Build
+    name: Lint, Type-check, Test, Build, Budget
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Format check
-        run: npx prettier --check src/
+        run: npm run format:check
 
       - name: Lint
         run: npm run lint
@@ -34,9 +34,14 @@ jobs:
         run: npm run type-check
 
       - name: Test
-        run: npm test -- --passWithNoTests
+        run: npm test
 
       - name: Build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: npm run build
+
+      # The analyzer treemap is a human tool; this gate reads the build manifest
+      # and fails the pull request when a documented route budget is exceeded.
+      - name: Bundle budget
+        run: npm run budget
