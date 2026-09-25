@@ -42,7 +42,10 @@ export function SiteFooter() {
 
           {COLUMNS.map(({ heading, links }) => (
             <nav key={heading} aria-label={heading} className="space-y-3">
-              <p className="text-sm font-medium text-foreground">{heading}</p>
+              {/* A heading, not a styled paragraph: the footer had no headings at
+                  all, so a screen-reader user had no way to tell the three link
+                  groups apart without reading every link in order. */}
+              <h2 className="text-sm font-medium text-foreground">{heading}</h2>
               <ul className="space-y-2">
                 {links.map(({ href, label }) => (
                   <li key={href}>

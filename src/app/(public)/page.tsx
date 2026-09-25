@@ -2,7 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Wallet, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/layout/container';
 import { routes } from '@/lib/routes';
@@ -35,10 +41,16 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <>
-      <section className="border-b border-border">
+      {/* Each <section> is named by the heading it contains. Unnamed sections
+          are not exposed as landmark regions, so the page offered screen-reader
+          users a single undifferentiated block. */}
+      <section className="border-b border-border" aria-labelledby="home-hero-heading">
         <Container className="flex flex-col items-start gap-6 py-20 sm:py-28">
           <Badge variant="secondary">Built on Stellar</Badge>
-          <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1
+            id="home-hero-heading"
+            className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl"
+          >
             Ticketing that settles on-chain
           </h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
@@ -59,8 +71,14 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section>
+      <section aria-labelledby="home-features-heading">
         <Container className="py-16 sm:py-20">
+          {/* `CardTitle` renders an <h3>. Without an <h2> above it the outline
+              jumped from h1 straight to h3, and there was no heading at all
+              introducing the three features. */}
+          <h2 id="home-features-heading" className="sr-only">
+            Why Veritix
+          </h2>
           <div className="grid gap-6 md:grid-cols-3">
             {FEATURES.map(({ Icon, title, description }) => (
               <Card key={title}>
@@ -75,11 +93,19 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className="border-t border-border bg-secondary/30">
+      <section
+        className="border-t border-border bg-secondary/30"
+        aria-labelledby="home-organizer-heading"
+      >
         <Container className="py-16 sm:py-20">
           <Card className="border-none bg-transparent shadow-none">
             <CardContent className="flex flex-col items-start gap-4 p-0">
-              <h2 className="text-2xl font-semibold tracking-tight">Running an event?</h2>
+              <h2
+                id="home-organizer-heading"
+                className="text-2xl font-semibold tracking-tight"
+              >
+                Running an event?
+              </h2>
               <p className="max-w-xl text-muted-foreground">
                 Set your ticket tiers, define how revenue splits, and let settlement happen on its own.
               </p>

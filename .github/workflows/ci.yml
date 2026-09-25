@@ -1,3 +1,18 @@
+# Gates every push and pull request: install, format, lint, type-check, test,
+# build. The Node version is read from .nvmrc so the runner, a contributor's
+# laptop, and the Dockerfile cannot drift apart.
+#
+# Each gate runs the package.json script rather than a hand-written `npx`
+# command, so CI, a laptop, and the Husky hooks all execute the same thing:
+#
+#   npm run format:check  ->  npx prettier --check src/
+#   npm run lint          ->  npx eslint src
+#   npm run type-check    ->  npx tsc --noEmit
+#   npm test              ->  npx vitest run --coverage
+#   npm run build         ->  npx next build
+#
+# The job name is unchanged on purpose: branch protection keys required checks
+# off the name, and renaming it blocks merges until an admin updates the rules.
 name: CI
 
 on:
@@ -6,10 +21,21 @@ on:
   push:
     branches: [main]
 
+# Matches the least-privilege default already used by lighthouse.yml.
+permissions:
+  contents: read
+
+# Superseded pushes on a pull request should not keep burning runner minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     name: Lint, Type-check, Test, Build, Budget
     runs-on: ubuntu-latest
+    # A hung build should fail, not hold a runner for the default six hours.
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -18,12 +44,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # .nvmrc is the single source of truth for the Node version (#986).
+          # setup-node resolves node-version-file and node-version exclusively,
+          # so only the file may be given here.
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
+      # Every quality gate goes through the package.json script rather than a
+      # hand-written command, so CI, a laptop, and the Husky hooks all run the
+      # same thing. `npx prettier` and `npm test -- --passWithNoTests` were
+      # drifting from the scripts they were meant to mirror.
       - name: Format check
         run: npm run format:check
 
@@ -33,6 +66,8 @@ jobs:
       - name: Type-check
         run: npm run type-check
 
+      # --passWithNoTests is a Jest flag; Vitest forwards and ignores it, so it
+      # only ever implied a safety net that was not there. There are tests.
       - name: Test
         run: npm test
 

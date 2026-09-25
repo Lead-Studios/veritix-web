@@ -1,10 +1,26 @@
 'use client';
 
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Slot } from '@radix-ui/react-slot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+/** Focusable descendants, mirroring the selector used by `ui/dialog`. */
+const FOCUSABLE =
+  'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, object, embed, [contenteditable], [tabindex]:not([tabindex^="-"])';
+
+/** No-op subscribe: the value never changes after the first client render. */
+const subscribeToNothing = () => () => {};
+
+/**
+ * False while server-rendering, true once on the client. `createPortal` needs a
+ * DOM target, which does not exist during SSR.
+ */
+function useIsClient(): boolean {
+  return React.useSyncExternalStore(subscribeToNothing, () => true, () => false);
+}
 
 type SheetSide = 'top' | 'right' | 'bottom' | 'left';
 
@@ -74,6 +90,12 @@ export function Sheet({
             {triggerLabel}
           </Button>
           {isOpen ? (
+            <SheetContent
+              side={side}
+              className={className}
+              title={title}
+              description={description}
+            >
             <SheetContent side={side} className={className} title={title} description={description}>
               {children}
             </SheetContent>
@@ -161,6 +183,87 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
     const panelDescription = description ?? context.description;
     const titleId = React.useId();
     const descriptionId = React.useId();
+    const isClient = useIsClient();
+
+    const setPanelRef = React.useCallback(
+      (node: HTMLDivElement | null) => {
+        panelRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref],
+    );
+
+    // Focus moves into the panel on open and back to the trigger on close, and
+    // Tab is trapped in between — the same contract `ui/dialog` implements.
+    // A layout effect catches the opener before the portal paints.
+    React.useLayoutEffect(() => {
+      if (!context.open) return;
+
+      const previouslyFocused = document.activeElement as HTMLElement | null;
+      const panel = panelRef.current;
+      if (panel) {
+        const first = panel.querySelector<HTMLElement>(FOCUSABLE);
+        (first ?? panel).focus();
+      }
+
+      return () => previouslyFocused?.focus?.();
+    }, [context.open, isClient]);
+
+    // Background scrolling is locked while the sheet is up, restoring whatever
+    // the document already had rather than assuming it was scrollable.
+    React.useEffect(() => {
+      if (!context.open) return;
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
+    }, [context.open]);
+
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        event.preventDefault();
+        context.setOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (element) => element.offsetParent !== null || element === document.activeElement,
+      );
+
+      // Nothing to cycle between: hold focus on the panel rather than letting
+      // Tab escape to the page behind the overlay.
+      if (focusable.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    if (!context.open || !isClient) return null;
+
+    return createPortal(
+      <div onKeyDown={onKeyDown}>
+        <SheetOverlay />
+        <div
+          ref={setPanelRef}
 
     // Focus moves into the panel only on the closed -> open transition.
     // Depending on the whole context object would re-focus on every render and
@@ -213,6 +316,16 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
         >
           {(panelTitle || panelDescription) && (
             <div className="space-y-1 pr-8">
+              {panelTitle && (
+                <h2 id={titleId} className="text-base font-semibold leading-none">
+                  {panelTitle}
+                </h2>
+              )}
+              {panelDescription && (
+                <p id={descriptionId} className="text-sm text-muted-foreground">
+                  {panelDescription}
+                </p>
+              )}
               {panelTitle && <h2 id={titleId} className="text-base font-semibold leading-none">{panelTitle}</h2>}
               {panelDescription && <p id={descriptionId} className="text-sm text-muted-foreground">{panelDescription}</p>}
             </div>
@@ -225,11 +338,33 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
             <X className="size-4" aria-hidden="true" />
           </SheetClose>
         </div>
+      </div>,
+      document.body,
       </>
     );
   },
 );
 SheetContent.displayName = 'SheetContent';
+
+export const SheetHeader = Object.assign(
+  ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div
+      className={cn('flex flex-col space-y-2 text-center sm:text-left', className)}
+      {...props}
+    />
+  ),
+  { displayName: 'SheetHeader' },
+);
+
+export const SheetFooter = Object.assign(
+  ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    <div
+      className={cn('mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
+      {...props}
+    />
+  ),
+  { displayName: 'SheetFooter' },
+);
 
 export const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />

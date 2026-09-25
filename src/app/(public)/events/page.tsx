@@ -81,6 +81,16 @@ function EventsListing() {
         <EventFilters />
       </div>
 
+      {/* Searching, filtering, and paging all change the grid below without
+          moving focus or changing the URL visibly. Without this the only
+          feedback a screen-reader user gets is silence. */}
+      {!isLoading && data && (
+        <p role="status" className="sr-only">
+          Showing {data.items.length} of {data.total} events
+          {hasActiveFilters ? ' matching your filters' : ''}, page {page} of {totalPages}.
+        </p>
+      )}
+
       {error ? (
         <ErrorState
           title="We could not load the events"
@@ -91,7 +101,15 @@ function EventsListing() {
         <EventCardSkeletonGrid count={6} />
       ) : data && data.items.length > 0 ? (
         <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* `EventCard` titles are <h3>s, so without this the outline jumped
+              straight from the page <h1> to the first result. */}
+          <h2 id="events-results-heading" className="sr-only">
+            Results
+          </h2>
+          <div
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            aria-labelledby="events-results-heading"
+          >
             {data.items.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
