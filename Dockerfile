@@ -1,4 +1,6 @@
-FROM node:20-alpine AS base
+# Keep in step with .nvmrc, which CI and `engines.node` both derive from.
+# oxc-parser (via the ESLint toolchain) requires ^20.19.0 || >=22.12.0.
+FROM node:20.19.0-alpine AS base
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 FROM base AS deps
