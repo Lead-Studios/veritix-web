@@ -193,6 +193,60 @@ export const EVENTS: VeritixEvent[] = [
       },
     ],
   },
+  {
+    // The two completed shows below are what the analytics check-in rate is
+    // measured against: sold against scanned only exists once an event has run.
+    id: 'evt_7',
+    slug: 'lagos-jazz-soul-night',
+    title: 'Lagos Jazz & Soul Night',
+    description: 'A hot August night of horns, grooves, and late sets.',
+    venue: 'Freedom Park',
+    city: 'Lagos',
+    startsAt: '2026-09-11T19:00:00.000Z',
+    endsAt: '2026-09-12T01:00:00.000Z',
+    status: 'completed',
+    organizer: { id: 'org_1', name: 'Rhythm Nation', verified: true },
+    tiers: [
+      {
+        id: 'tier_7a',
+        name: 'Balcony',
+        priceMinor: 4_000,
+        currency: 'USD',
+        quantityTotal: 150,
+        quantitySold: 96,
+      },
+      {
+        id: 'tier_7b',
+        name: 'Floor',
+        priceMinor: 7_500,
+        currency: 'USD',
+        quantityTotal: 350,
+        quantitySold: 218,
+      },
+    ],
+  },
+  {
+    id: 'evt_8',
+    slug: 'accra-chill-fest',
+    title: 'Accra Chill Fest',
+    description: 'An outdoor afternoon of highlife, afrobeat, and sound systems.',
+    venue: 'Labadi Beach',
+    city: 'Accra',
+    startsAt: '2026-08-29T14:00:00.000Z',
+    endsAt: '2026-08-29T22:00:00.000Z',
+    status: 'completed',
+    organizer: { id: 'org_1', name: 'Rhythm Nation', verified: true },
+    tiers: [
+      {
+        id: 'tier_8a',
+        name: 'General admission',
+        priceMinor: 5_500,
+        currency: 'USD',
+        quantityTotal: 500,
+        quantitySold: 431,
+      },
+    ],
+  },
 ];
 
 /** Compare two events for the requested sort. List order is never mutated. */
