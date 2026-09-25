@@ -4,7 +4,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Expand } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 /**
@@ -137,37 +137,38 @@ export function EventGallery({ images, title, className }: EventGalleryProps) {
         </ul>
       )}
 
-      <Dialog
-        open={lightboxOpen}
-        onOpenChange={setLightboxOpen}
-        title={label(safeIndex)}
-        className="max-w-5xl"
-      >
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-secondary">
-          <Image
-            src={current}
-            alt={label(safeIndex)}
-            fill
-            sizes="100vw"
-            className="object-contain"
-          />
-        </div>
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>{label(safeIndex)}</DialogTitle>
+          </DialogHeader>
 
-        {count > 1 && (
-          <div className="flex items-center justify-between">
-            <Button type="button" variant="outline" size="sm" onClick={() => step(-1)}>
-              <ChevronLeft aria-hidden="true" />
-              Previous
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              {safeIndex + 1} / {count}
-            </span>
-            <Button type="button" variant="outline" size="sm" onClick={() => step(1)}>
-              Next
-              <ChevronRight aria-hidden="true" />
-            </Button>
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-secondary">
+            <Image
+              src={current}
+              alt={label(safeIndex)}
+              fill
+              sizes="100vw"
+              className="object-contain"
+            />
           </div>
-        )}
+
+          {count > 1 && (
+            <div className="flex items-center justify-between">
+              <Button type="button" variant="outline" size="sm" onClick={() => step(-1)}>
+                <ChevronLeft aria-hidden="true" />
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {safeIndex + 1} / {count}
+              </span>
+              <Button type="button" variant="outline" size="sm" onClick={() => step(1)}>
+                Next
+                <ChevronRight aria-hidden="true" />
+              </Button>
+            </div>
+          )}
+        </DialogContent>
       </Dialog>
     </div>
   );
