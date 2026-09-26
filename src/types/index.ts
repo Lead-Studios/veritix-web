@@ -26,6 +26,12 @@ export interface TicketTier {
   quantitySold: number;
 }
 
+/** A share of an event's ticket revenue paid to someone other than the organizer. */
+export interface RevenueSplit {
+  recipient: string;
+  percent: number;
+}
+
 export interface VeritixEvent {
   id: string;
   slug: string;
@@ -43,6 +49,8 @@ export interface VeritixEvent {
   status: EventStatus;
   organizer: Organizer;
   tiers: TicketTier[];
+  /** Empty or absent means the organizer keeps all of the revenue. */
+  splits?: RevenueSplit[];
 }
 
 export interface Ticket {

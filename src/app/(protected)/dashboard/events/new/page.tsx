@@ -1,20 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { z } from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
-
-const eventBasicsSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  venue: z.string().min(1, 'Venue is required'),
-  city: z.string().min(1, 'City is required'),
-  startsAt: z.string().min(1),
-  endsAt: z.string().min(1),
-});
+// The same rules the API enforces, including "end date not before start date".
+import { eventBasicsSchema } from '@/lib/event-schema';
 
 const EMPTY = {
   title: '',
@@ -131,14 +123,25 @@ export default function NewEventPage() {
             id="event-starts-at"
             label="Start date"
             value={values.startsAt}
-            onChange={(v) => setValues((current) => ({ ...current, startsAt: v }))}
+            onChange={(v) => {
+              setTouched(true);
+              setValues((current) => ({ ...current, startsAt: v }));
+            }}
           />
           <DatePicker
             id="event-ends-at"
             label="End date"
             value={values.endsAt}
-            onChange={(v) => setValues((current) => ({ ...current, endsAt: v }))}
+            onChange={(v) => {
+              setTouched(true);
+              setValues((current) => ({ ...current, endsAt: v }));
+            }}
           />
+          {touched && errors.endsAt && values.startsAt && values.endsAt && (
+            <p id="event-ends-at-error" className="text-sm text-destructive">
+              {errors.endsAt}
+            </p>
+          )}
         </fieldset>
 
         {/* role="alert" so the summary is announced the moment it appears; a bare
