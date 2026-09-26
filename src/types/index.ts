@@ -54,6 +54,8 @@ export interface Ticket {
   /** On-chain escrow id backing this ticket, when settled through the contract. */
   escrowId?: string;
   issuedAt: string;
+  /** When the ticket was scanned in at the gate; set once `status` is `used`. */
+  usedAt?: string;
 }
 
 export interface Order {
