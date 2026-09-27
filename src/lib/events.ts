@@ -1,4 +1,5 @@
 import type { EventStatus, Paginated, VeritixEvent } from '@/types';
+import type { EventInput } from '@/lib/event-schema';
 
 /**
  * Read model for the events API.
@@ -305,4 +306,107 @@ export function queryEvents(query: EventQuery = {}): Paginated<VeritixEvent> {
 
 export function findEventBySlug(slug: string): VeritixEvent | undefined {
   return EVENTS.find((event) => event.slug === slug);
+}
+
+export function findEventById(id: string): VeritixEvent | undefined {
+  return EVENTS.find((event) => event.id === id);
+}
+
+/**
+ * The event with this id, but only if `userId` organizes it.
+ *
+ * Someone else's event and a missing event both come back as `undefined`, so
+ * a route cannot accidentally answer 403 and confirm that an id exists.
+ */
+export function findOwnedEvent(id: string, userId: string): VeritixEvent | undefined {
+  const event = findEventById(id);
+  return event && event.organizer.id === userId ? event : undefined;
+}
+
+function slugify(title: string): string {
+  const base = title
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+  return base || 'event';
+}
+
+function uniqueSlug(title: string, ignoreId?: string): string {
+  const base = slugify(title);
+  let slug = base;
+  for (let n = 2; EVENTS.some((e) => e.slug === slug && e.id !== ignoreId); n++) {
+    slug = `${base}-${n}`;
+  }
+  return slug;
+}
+
+function newId(prefix: string): string {
+  return `${prefix}_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
+}
+
+function toIso(value: string): string {
+  return new Date(value).toISOString();
+}
+
+/** Create a draft owned by `userId`. New events are never published directly. */
+export function createEvent(input: EventInput, userId: string): VeritixEvent {
+  const event: VeritixEvent = {
+    id: newId('evt'),
+    slug: uniqueSlug(input.title),
+    title: input.title,
+    description: input.description,
+    venue: input.venue,
+    city: input.city,
+    startsAt: toIso(input.startsAt),
+    endsAt: toIso(input.endsAt),
+    status: 'draft',
+    organizer: { id: userId, name: userId, verified: false },
+    tiers: input.tiers.map((tier) => ({ ...tier, id: newId('tier'), quantitySold: 0 })),
+    splits: input.splits,
+  };
+  EVENTS.push(event);
+  return event;
+}
+
+/**
+ * Apply a validated edit. Tier ids and sold counts are carried over by
+ * position so an edit to a tier name does not reset its sales.
+ */
+export function updateEvent(event: VeritixEvent, input: EventInput): VeritixEvent {
+  event.title = input.title;
+  event.slug = event.status === 'draft' ? uniqueSlug(input.title, event.id) : event.slug;
+  event.description = input.description;
+  event.venue = input.venue;
+  event.city = input.city;
+  event.startsAt = toIso(input.startsAt);
+  event.endsAt = toIso(input.endsAt);
+  event.tiers = input.tiers.map((tier, index) => ({
+    ...tier,
+    id: event.tiers[index]?.id ?? newId('tier'),
+    quantitySold: event.tiers[index]?.quantitySold ?? 0,
+  }));
+  event.splits = input.splits;
+  return event;
+}
+
+/** Which statuses each lifecycle action may start from. */
+export const STATUS_TRANSITIONS = {
+  publish: ['draft'],
+  cancel: ['draft', 'published'],
+} as const satisfies Record<string, readonly EventStatus[]>;
+
+export type EventAction = keyof typeof STATUS_TRANSITIONS;
+
+const ACTION_RESULT: Record<EventAction, EventStatus> = {
+  publish: 'published',
+  cancel: 'cancelled',
+};
+
+/** Move an event through its lifecycle, or return `null` if `action` is not allowed from its status. */
+export function transitionEvent(event: VeritixEvent, action: EventAction): VeritixEvent | null {
+  if (!(STATUS_TRANSITIONS[action] as readonly EventStatus[]).includes(event.status)) return null;
+  event.status = ACTION_RESULT[action];
+  return event;
 }

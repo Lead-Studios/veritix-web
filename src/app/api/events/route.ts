@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import {
+  createEvent,
   DEFAULT_EVENT_SORT,
   EVENT_SORTS,
   EVENT_STATUSES,
@@ -7,6 +8,8 @@ import {
   type EventSort,
 } from '@/lib/events';
 import type { EventStatus } from '@/types';
+import { eventInputSchema, toFieldErrors } from '@/lib/event-schema';
+import { readSessionUserId, unauthorized } from '@/lib/api/server';
 
 /**
  * GET /api/events
@@ -62,4 +65,31 @@ export async function GET(request: NextRequest) {
       organizerId: first('organizerId'),
     }),
   );
+}
+
+/**
+ * POST /api/events
+ *
+ * Creates a draft owned by the signed-in user. The organizer is always the
+ * session user; an `organizer` field in the body is ignored rather than
+ * trusted. Publishing is a separate step (`POST /api/events/[id]/publish`).
+ */
+export async function POST(request: NextRequest) {
+  const userId = readSessionUserId(request);
+  if (!userId) return unauthorized();
+
+  const raw: unknown = await request.json().catch(() => null);
+  const parsed = eventInputSchema.safeParse(raw);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { message: 'Check the event details and try again.', fields: toFieldErrors(parsed.error) },
+      { status: 422 },
+    );
+  }
+
+  return NextResponse.json(createEvent(parsed.data, userId), {
+    status: 201,
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }
