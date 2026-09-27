@@ -39,6 +39,12 @@ export interface AnalyticsTotals {
   checkedIn: number;
   /** Integer minor units, summed across currencies as if they were one. */
   grossMinor: number;
+  /** Platform fees on the tickets sold, in minor units. See `platformFeeMinor`. */
+  feesMinor: number;
+  /** Value refunded to buyers in the range, in minor units. */
+  refundedMinor: number;
+  /** `grossMinor - feesMinor - refundedMinor`: what the organizer keeps. */
+  netMinor: number;
   /** 0–1, or `null` when nothing was sold and the ratio is undefined. */
   checkInRate: number | null;
   eventCount: number;
@@ -85,6 +91,18 @@ export interface AnalyticsQuery extends Partial<AnalyticsRange> {
   ownerId: string;
 }
 
+/**
+ * Platform fee on the Starter plan: 2.5% of the ticket price plus a fixed
+ * 99-cent fee per ticket, matching the pricing page.
+ */
+export const PLATFORM_FEE_RATE = 0.025;
+export const PLATFORM_FEE_PER_TICKET_MINOR = 99;
+
+/** Fee owed on `ticketsSold` tickets totalling `grossMinor`, in minor units. */
+export function platformFeeMinor(grossMinor: number, ticketsSold: number): number {
+  return Math.round(grossMinor * PLATFORM_FEE_RATE) + ticketsSold * PLATFORM_FEE_PER_TICKET_MINOR;
+}
+
 /** Days of sales history generated for each event. */
 const SALES_WINDOW_DAYS = 21;
 
@@ -109,6 +127,12 @@ const ATTENDANCE: Record<string, number> = {
   evt_8: 0.88,
 };
 
+/** Share of sold tickets later refunded, per event. Events not listed use the default. */
+const REFUND_RATE: Record<string, number> = {
+  evt_7: 0.06,
+};
+const DEFAULT_REFUND_RATE = 0.02;
+
 interface DailyRow {
   date: string;
   eventId: string;
@@ -116,6 +140,7 @@ interface DailyRow {
   ticketsSold: number;
   checkedIn: number;
   grossMinor: number;
+  refundedMinor: number;
 }
 
 /** Whole days since the epoch for a `YYYY-MM-DD`, or `null` if it is not a real day. */
@@ -242,6 +267,7 @@ function buildEventRows(event: (typeof EVENTS)[number], ownerId: string): DailyR
 
   const hasRun = event.status === 'completed' && startsAtDay <= fixtureToday;
   const attendance = ATTENDANCE[event.id];
+  const refundRate = REFUND_RATE[event.id] ?? DEFAULT_REFUND_RATE;
 
   const rows = allocated.map((ticketsSold, index) => {
     const date = toDayLabel(startDay + index);
@@ -254,6 +280,10 @@ function buildEventRows(event: (typeof EVENTS)[number], ownerId: string): DailyR
       // as their own row below rather than spread across the sales window.
       checkedIn: 0,
       grossMinor: ticketsSold * priceMinor,
+      // Refunds are booked on the day of the sale they reverse. The random draw
+      // comes after the weights so adding it did not shift the sales series.
+      refundedMinor:
+        Math.max(0, Math.round(ticketsSold * refundRate + (random() - 0.5))) * priceMinor,
     } satisfies DailyRow;
   });
 
@@ -267,6 +297,7 @@ function buildEventRows(event: (typeof EVENTS)[number], ownerId: string): DailyR
       ticketsSold: 0,
       checkedIn: Math.round(totalSold * (attendance ?? 0)),
       grossMinor: 0,
+      refundedMinor: 0,
     });
   }
 
@@ -299,12 +330,17 @@ function aggregate(rows: DailyRow[], eventCount: number): Pick<AnalyticsSnapshot
   const ticketsSold = rows.reduce((total, row) => total + row.ticketsSold, 0);
   const checkedIn = rows.reduce((total, row) => total + row.checkedIn, 0);
   const grossMinor = rows.reduce((total, row) => total + row.grossMinor, 0);
+  const refundedMinor = rows.reduce((total, row) => total + row.refundedMinor, 0);
+  const feesMinor = platformFeeMinor(grossMinor, ticketsSold);
 
   return {
     totals: {
       ticketsSold,
       checkedIn,
       grossMinor,
+      feesMinor,
+      refundedMinor,
+      netMinor: grossMinor - feesMinor - refundedMinor,
       // Undefined rather than zero: nothing sold is not "nobody turned up".
       checkInRate: ticketsSold > 0 ? checkedIn / ticketsSold : null,
       eventCount,
