@@ -23,6 +23,9 @@ import { readSessionUserId, unauthorized } from '@/lib/api/server';
  *   date        events starting on this UTC day, as YYYY-MM-DD
  *   status      draft | published | cancelled | completed
  *   organizerId events belonging to one organizer
+ *   mine        `1` for the signed-in user's own events (401 when signed
+ *               out); overrides organizerId. The client cannot read the
+ *               session cookie, so this is how it asks for "my events".
  *
  * Unknown values are ignored rather than rejected, so a stale bookmark still
  * renders a sensible list instead of an error page.
@@ -53,6 +56,13 @@ export async function GET(request: NextRequest) {
 
   const pageSize = positiveInt('pageSize') ?? positiveInt('limit');
 
+  let organizerId = first('organizerId');
+  if (params.get('mine') === '1') {
+    const userId = readSessionUserId(request);
+    if (!userId) return unauthorized();
+    organizerId = userId;
+  }
+
   return NextResponse.json(
     queryEvents({
       q: first('q'),
@@ -62,7 +72,7 @@ export async function GET(request: NextRequest) {
       city: first('city'),
       date: first('date'),
       status,
-      organizerId: first('organizerId'),
+      organizerId,
     }),
   );
 }
