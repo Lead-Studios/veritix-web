@@ -1,5 +1,16 @@
 export { Button } from "./button";
 export { Input } from "./input";
+export { Select } from "./select";
+export type { SelectOption } from "./select";
+export { Textarea } from "./textarea";
+export { Alert, Callout } from "./alert";
+export type { AlertVariant, AlertProps, CalloutProps } from "./alert";
+export { Dialog } from "./dialog";
+export type { DialogProps } from "./dialog";
+export { Tabs } from "./tabs";
+export type { TabItem, TabsProps } from "./tabs";
+export { DropdownMenu } from "./dropdown-menu";
+export type { DropdownMenuItemDef, DropdownMenuProps } from "./dropdown-menu";
 export { Modal } from "./Modal";
 export { Badge } from "./Badge";
 export { Loader } from "./Loader";
