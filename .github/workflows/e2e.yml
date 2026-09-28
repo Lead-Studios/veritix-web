@@ -54,7 +54,7 @@ jobs:
       # download is skipped. Keyed on the lockfile, because that is what decides
       # which Playwright version — and therefore which browser build — is needed.
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
