@@ -1,248 +1,108 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { StatusBadge } from '@/components/dashboard/StatusBadge'
-import { HeroContent } from '@/components/dashboard/HeroContent'
-import { CTAButton } from '@/components/dashboard/CTAButton'
-import { QuickActions } from '@/components/dashboard/QuickActions'
-import { RecentActivity } from '@/components/dashboard/RecentActivity'
-import { ScrollColumn } from '@/components/dashboard/ScrollColumn'
-import { Card, CardHeader, StatDisplay } from '@/components/dashboard/Card'
-import { EventImage } from '@/components/dashboard/EventImage'
-import { RevenueChart } from '@/components/dashboard/charts/RevenueChart'
-import { PerformanceChart } from '@/components/dashboard/charts/PerformanceChart'
-import { EmptyState } from '@/components/EmptyState'
-import { TicketTypeChart } from '@/components/dashboard/charts/TicketTypeChart'
-import { DemographicsSection } from '@/components/dashboard/DemographicsSection'
-import { eventImages } from '@/components/dashboard/constants'
-import {
-  demoRevenueData,
-  demoPerformanceData,
-  demoTotalEarned,
-  demoPayoutsQueued,
-  demoNextSettlementDays,
-} from '@/components/dashboard/demoData'
-import { useOrganizerAnalytics } from '@/hooks/useOrganizerAnalytics'
-import { exportAnalyticsCsv } from '@/lib/exportAnalyticsCsv'
+import * as React from 'react';
+import useSWR from 'swr';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckInRate } from '@/components/analytics/check-in-rate';
+import { SALES_CHART_HEIGHT, SalesChart } from '@/components/analytics/sales-chart';
+import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/dashboard/stat-card';
+import { formatCurrency, formatNumber } from '@/lib/format';
+import type { AnalyticsSnapshot } from '@/lib/analytics';
 
-function formatCurrency(n: number) {
-  return `₦ ${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
-}
+/**
+ * Organizer overview.
+ *
+ * Everything here comes from `/api/analytics`, which scopes the response to the
+ * session user's own events. The chart is the one lazy-loaded widget on the
+ * page, so the dashboard's first paint does not carry `recharts` — see
+ * `components/analytics/sales-chart`.
+ */
+export default function DashboardOverviewPage() {
+  const { data, error, isLoading } = useSWR<AnalyticsSnapshot>('/analytics');
 
-function SkeletonBlock({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded bg-white/10 ${className}`} />
-}
+  // The page had no heading, so a screen reader landing on the dashboard found
+  // four unlabelled values and nothing to orient by.
+  const heading = <h1 className="mb-4 text-2xl font-semibold">Dashboard</h1>;
 
-function DashboardSkeleton() {
-  return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex flex-col gap-4">
-          <SkeletonBlock className="h-24" />
-          <SkeletonBlock className="h-48" />
-          <SkeletonBlock className="h-20" />
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export default function DashboardPage() {
-  const { data, loading } = useOrganizerAnalytics()
-  const router = useRouter()
-
-  const hasEvents = !loading && (data?.totalEvents ?? 0) > 0
-
-  const revenueData = data?.revenue.map((d) => ({ month: d.day, revenue: d.revenue })) ?? []
-  const barData = data?.performance.map((d) => ({ month: d.day, value: d.value })) ?? []
-  const totalEarned = data?.totalEarned ?? 0
-  const payoutsQueued = data?.payoutsQueued ?? 0
-  const nextSettlementDays = data?.nextSettlementDays ?? 0
-
-  // Use real event images from API, fall back to empty array (EventImage handles placeholder)
-  const eventImages = data?.events?.slice(0, 4).map((e) => ({
-    src: e.coverImage ?? null,
-    alt: e.name,
-  })) ?? []
-
-  const hasData = !loading && data !== null
-
-  return (
-    <div className="dark min-h-screen overflow-y-auto flex flex-col bg-[#101428]">
-      <div className="relative px-4 py-8 sm:px-6 lg:px-8 flex-shrink-0">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex justify-center">
-            <StatusBadge text="Tailored to all your event needs" />
-          </div>
-
-          <HeroContent
-            title="Create, Manage and Control your events efficiently"
-            subtitle="Streamline your event's processes with our easy-to-use dashboard"
-          />
-
-          <div className="mb-8 flex flex-col sm:flex-row justify-center gap-4">
-            <CTAButton href="/events/create" text="Get Started" variant="primary" />
-            <CTAButton href="/events" text="Discover events" variant="secondary" />
-            <button
-              onClick={() => data && exportAnalyticsCsv(data)}
-              disabled={!hasData}
-              title={!hasData ? "No analytics data available to export" : undefined}
-              className="rounded-full border border-[#4D21FF] px-6 py-2 text-sm font-semibold text-[#21D4FF] transition hover:bg-[#4D21FF]/20 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Export CSV
-            </button>
-          </div>
-
-          <QuickActions />
-
-          <div className="grid gap-1 lg:grid-cols-3 h-[500px] gap-4 lg:gap-1">
-            {/* Left Column - Revenue */}
-            <ScrollColumn animationClass="animate-scroll-up-once">
-              <Card>
-                <CardHeader
-                  title="Revenue"
-                  subtitle="A quick look at earnings this week"
-                  extraInfo="Weekly Summary"
-                />
-              </Card>
-
-              <Card>
-                <div className="mb-4">
-          {/* Loading skeleton */}
-          {loading && <DashboardSkeleton />}
-
-          {/* Empty state — no events yet */}
-          {!loading && !hasEvents && (
-            <EmptyState
-              title="No events yet"
-              description="Create your first event to start seeing analytics, revenue, and performance data here."
-              action={{
-                label: 'Create your first event',
-                onClick: () => router.push('/events/create'),
-              }}
-            />
-          )}
-
-          {/* Dashboard grid — only shown when events exist */}
-          {!loading && hasEvents && (
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:h-[500px]">
-              {/* Left Column - Revenue */}
-              <ScrollColumn animationClass="animate-scroll-up-once">
-                <Card>
-                  <CardHeader
-                    title="Revenue"
-                    subtitle="A quick look at earnings this week"
-                    extraInfo="Weekly Summary"
-                  />
-                </Card>
-
-                <Card>
-                  <div className="mb-4">
-                    <CardHeader title="Revenue" subtitle="Revenue for the past week" />
-                  </div>
-                  <div className="h-48 w-full min-h-[192px]">
-                    <RevenueChart data={revenueData} />
-                  </div>
-                  <p className="mt-4 text-xs text-[#21D4FF]">Trending by 18.6% in the past week ↗️</p>
-                </Card>
-
-                <Card>
-                  <StatDisplay
-                    label="Payouts queued"
-                    value={formatCurrency(payoutsQueued)}
-                    detail={`Next settlement: ${nextSettlementDays} days`}
-                  />
-                </Card>
-              </ScrollColumn>
-
-              {/* Middle Column - Attendees */}
-              <ScrollColumn animationClass="animate-scroll-down-once" className="gap-0">
-                <Card>
-                  <p className="text-xs uppercase text-[#21D4FF]">Latest check-ins</p>
-                  <p className="text-sm text-[#21D4FF]">
-                    {data?.checkInsLive
-                      ? `Doors open in ${data.doorsOpenInMinutes}m`
-                      : 'No active events'}
-                  </p>
-                  <div className="mt-3 text-xs text-[#4D21FF]">
-                    {data?.checkInsLive ? 'Live updates enabled' : 'Updates paused'}
-                  </div>
-                </Card>
-
-                <Card>
-                  <div className="mb-4">
-                    <p className="text-2xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                    <p className="text-xs text-[#21D4FF]">1.5k from last week</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {eventImages.map((image, index) => (
-                      <EventImage key={index} src={image.src} alt={image.alt} />
-                    ))}
-                  </div>
-                </Card>
-              </ScrollColumn>
-
-              {/* Right Column - Performance */}
-              <ScrollColumn animationClass="animate-scroll-up-once" className="gap-6">
-                <Card className="rounded-lg">
-                  <p className="text-xs uppercase text-[#21D4FF]">Performance</p>
-                  <p className="text-sm text-[#21D4FF]">Top-selling tickets this week</p>
-                  <div className="mt-3 text-xs text-[#4D21FF]">Updated 2 mins ago</div>
-                </Card>
-
-                <Card className="rounded-lg">
-                  <div className="mb-4 flex justify-between items-start">
-                    <div>
-                      <p className="text-xs uppercase text-[#21D4FF]">Trending</p>
-                      <p className="text-sm font-semibold text-[#21D4FF]">Trending by 38.2% ↗️</p>
-                      <p className="text-xs text-[#21D4FF]">Jan 14 - Jan 20 2026</p>
-                    </div>
-                    <span className="text-sm font-semibold text-[#4D21FF]">7d</span>
-                  </div>
-                  <div className="h-48 w-full min-h-[192px]">
-                    <PerformanceChart data={barData} />
-                  </div>
-                  <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                    <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                    <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                    <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
-                  </div>
-                </Card>
-              </ScrollColumn>
-                  )}
-                </div>
-                <div className="mt-4 border-t pt-4 border-[#4D21FF]">
-                  <p className="text-xs font-semibold uppercase text-[#21D4FF]">Total Earned</p>
-                  <p className="text-xl font-bold text-[#4D21FF]">{formatCurrency(totalEarned)}</p>
-                  <p className="text-xs text-[#21D4FF]">Total amount sent to your bank account</p>
-                </div>
-              </Card>
-            </ScrollColumn>
-          </div>
-
-          <div className="mt-8">
-            <RecentActivity />
-          </div>
-          {/* Ticket Type Breakdown — Issue #219 */}
-          {!loading && data?.ticketBreakdown && data.ticketBreakdown.length > 0 && (
-            <div className="mt-10">
-              <Card>
-                <CardHeader title="Ticket Type Breakdown" subtitle="Revenue and volume by ticket category" />
-                <div className="mt-4">
-                  <TicketTypeChart data={data.ticketBreakdown} />
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {/* Demographics — Issue #221 */}
-          {!loading && data?.demographics && (
-            <div className="mt-10">
-              <DemographicsSection demographics={data.demographics} />
-            </div>
-          )}
+  if (isLoading) {
+    return (
+      <div>
+        {heading}
+        {/* role="status" so the loading state is announced rather than being
+            a silent block of grey rectangles. */}
+        <p role="status" className="sr-only">
+          Loading your dashboard
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Dashboard</CardTitle>
+          <CardDescription>
+            We could not load your numbers. Check your connection and try again.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const { totals, salesOverTime, currency } = data ?? {
+    totals: {
+      ticketsSold: 0,
+      checkedIn: 0,
+      grossMinor: 0,
+      feesMinor: 0,
+      refundedMinor: 0,
+      netMinor: 0,
+      checkInRate: null,
+      eventCount: 0,
+    },
+    salesOverTime: [],
+    currency: 'USD',
+  };
+
+  return (
+    <div className="space-y-6">
+      {heading}
+      <div className="grid grid-cols-2 gap-4">
+        <StatCard label="Events" value={totals.eventCount} />
+        <StatCard label="Tickets sold" value={formatNumber(totals.ticketsSold)} />
+        <StatCard label="Gross revenue" value={formatCurrency(totals.grossMinor, currency)} />
+        <StatCard
+          label="Check-in rate"
+          value={totals.checkInRate === null ? '—' : `${(totals.checkInRate * 100).toFixed(1)}%`}
+        />
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales over time</CardTitle>
+          <CardDescription>Tickets sold and gross revenue per day.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SalesChart
+            points={salesOverTime}
+            currency={currency}
+            height={SALES_CHART_HEIGHT}
+          />
+        </CardContent>
+      </Card>
+
+      <CheckInRate
+        range={data?.range}
+        salesOverTime={salesOverTime}
+        currency={currency}
+      />
     </div>
-  )
+  );
 }

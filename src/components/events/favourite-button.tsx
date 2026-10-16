@@ -1,12 +1,13 @@
 'use client';
 
-import { HiHeart } from 'react-icons/hi';
+import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 /**
  * Favourite toggle for a single event.
  *
- * Presentational on purpose: the caller owns one `useFavourite()` per page and
+ * Presentational on purpose: the caller owns one `useFavourites()` per page and
  * passes the state down, so the card and the event detail header can never
  * disagree about whether an event is saved.
  */
@@ -25,27 +26,23 @@ export function FavouriteButton({
   className,
 }: FavouriteButtonProps) {
   return (
-    <button
+    <Button
       type="button"
+      variant={isFavourite ? 'secondary' : 'outline'}
+      size="icon"
       aria-pressed={isFavourite}
       aria-label={isFavourite ? 'Remove from favourites' : 'Save to favourites'}
-      className={cn(
-        'inline-flex items-center justify-center rounded-full p-2 transition-all duration-300',
-        isFavourite
-          ? 'bg-pink-500 text-white hover:bg-pink-600'
-          : 'bg-white/10 text-white hover:bg-white/20',
-        className
-      )}
-      onClick={(e) => {
+      className={className}
+      onClick={(event) => {
         // Stops the card link from navigating when this sits inside one.
-        e.preventDefault();
+        event.preventDefault();
         onToggle(eventId);
       }}
     >
-      <HiHeart
-        className={cn('h-5 w-5', isFavourite && 'fill-current')}
+      <Heart
+        className={cn(isFavourite && 'fill-current text-primary')}
         aria-hidden="true"
       />
-    </button>
+    </Button>
   );
 }

@@ -1,0 +1,50 @@
+# TEMPORARY: dependency updates are slowed and kept small while the lockfile and CI
+# are being repaired. Dependabot PRs currently all fail `npm ci`, so each extra PR
+# is noise. Once CI is green on `main`, restore the weekly schedule, raise the PR
+# limits, and drop the major-version `ignore` rule.
+#
+# Security updates (vulnerability fixes) are controlled by the repository's
+# "Dependabot security updates" setting, not by this file, so slowing version
+# updates here does not turn them off.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    # Major bumps are the large, breaking ones; pause them until the tree is healthy.
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        update-types:
+          - "patch"
+    labels:
+      - "dependencies"
+      - "automated"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 2
+    labels:
+      - "dependencies"
+      - "github-actions"

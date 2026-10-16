@@ -1,6 +1,6 @@
-import { HiExternalLink, HiLocationMarker } from 'react-icons/hi';
+import { ExternalLink, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Event } from '@/types/event';
+import type { VeritixEvent } from '@/types';
 
 /**
  * Where the event is, and a way to go look at it.
@@ -11,44 +11,41 @@ import type { Event } from '@/types/event';
  */
 
 export interface EventVenueProps {
-  event: Event;
+  event: VeritixEvent;
   className?: string;
 }
 
-/** Search URL for the venue, using venue name + location. */
-function mapSearchUrl(event: Event): string {
-  const query = [event.venue, event.location].filter(Boolean).join(', ');
+/** Search URL for the venue, including anything more specific we are given. */
+function mapSearchUrl(event: VeritixEvent): string {
+  const query = [event.venue, event.address, event.city].filter(Boolean).join(', ');
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
 export function EventVenue({ event, className }: EventVenueProps) {
+  const addressLine = [event.address, event.city].filter(Boolean).join(', ');
+
   return (
     <section
       aria-label="Venue and location"
       className={cn('flex flex-col gap-3', className)}
     >
-      <h2 className="text-lg font-semibold leading-tight tracking-tight text-white">Venue</h2>
+      <h2 className="text-lg font-semibold leading-tight tracking-tight">Venue</h2>
 
-      <div className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
-        <HiLocationMarker
-          className="mt-0.5 h-4 w-4 shrink-0 text-[#4D21FF]"
-          aria-hidden="true"
-        />
+      <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
+        <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
 
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-sm font-medium text-white">{event.venue}</p>
-          {event.location && (
-            <p className="text-sm text-gray-400">{event.location}</p>
-          )}
+          <p className="text-sm font-medium">{event.venue}</p>
+          {addressLine && <p className="text-sm text-muted-foreground">{addressLine}</p>}
 
           <a
             href={mapSearchUrl(event)}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D21FF] underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             Open in Maps
-            <HiExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            <ExternalLink className="size-3.5" aria-hidden="true" />
             <span className="sr-only">(opens in a new tab)</span>
           </a>
         </div>

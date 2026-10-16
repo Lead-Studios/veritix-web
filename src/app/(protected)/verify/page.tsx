@@ -1,482 +1,448 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  HiArrowLeft,
-  HiQrcode,
-  HiCheck,
-  HiX,
-  HiTicket,
-  HiRefresh,
-  HiSearch,
-} from 'react-icons/hi';
+import * as React from 'react';
+import { Camera, CameraOff, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { formatDateTime } from '@/lib/format';
+import { cn } from '@/lib/utils';
+import type { Paginated, VeritixEvent } from '@/types';
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
-const VALID_TICKETS: Record<string, {
-  holderName: string;
-  ticketType: string;
-  event: string;
-  date: string;
-  seat?: string;
-}> = {
-  'TKT-2024-ALPHA-001': {
-    holderName: 'Jordan Rivera',
-    ticketType: 'VIP Pass',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
-    seat: 'VIP Zone A',
+/**
+ * Gate check-in.
+ *
+ * The page never decides whether a ticket is genuine: every code, scanned or
+ * typed, goes to `POST /api/verify`, which checks the signature, the event,
+ * and marks the ticket used. The page only reads the code and shows the
+ * answer, big enough to read at arm's length on a phone.
+ */
+
+/** The subset of the Barcode Detection API used here; not in TS's DOM lib yet. */
+interface DetectedBarcode {
+  rawValue: string;
+}
+interface BarcodeDetectorLike {
+  detect(source: CanvasImageSource): Promise<DetectedBarcode[]>;
+}
+type BarcodeDetectorCtor = new (options?: { formats?: string[] }) => BarcodeDetectorLike;
+
+function barcodeDetector(): BarcodeDetectorCtor | null {
+  if (typeof window === 'undefined') return null;
+  return (window as unknown as { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector ?? null;
+}
+
+type ResultKind = 'valid' | 'already_used' | 'invalid' | 'error';
+
+interface ScanResult {
+  kind: ResultKind;
+  message: string;
+  usedAt?: string;
+  ticketId?: string;
+}
+
+/** API outcomes that mean "this ticket must not get in", shown as one red state. */
+const INVALID_OUTCOMES = new Set([
+  'malformed',
+  'invalid_signature',
+  'wrong_event',
+  'not_valid',
+  'not_found',
+]);
+
+const SCAN_INTERVAL_MS = 250;
+/** How long a result stays up before the camera resumes on its own. */
+const RESUME_AFTER_MS = 2500;
+const EVENT_STORAGE_KEY = 'veritix:verify-event';
+
+async function submitCode(payload: string, eventId: string): Promise<ScanResult> {
+  let response: Response;
+  try {
+    response = await fetch('/api/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload, eventId }),
+    });
+  } catch {
+    return { kind: 'error', message: 'Could not reach the server. Check the connection and scan again.' };
+  }
+
+  const body = (await response.json().catch(() => ({}))) as {
+    status?: string;
+    message?: string;
+    usedAt?: string;
+    ticketId?: string;
+  };
+
+  if (body.status === 'valid') {
+    return { kind: 'valid', message: 'Ticket accepted.', usedAt: body.usedAt, ticketId: body.ticketId };
+  }
+  if (body.status === 'already_used') {
+    return {
+      kind: 'already_used',
+      message: 'This ticket has already been scanned.',
+      usedAt: body.usedAt,
+    };
+  }
+  if (body.status && INVALID_OUTCOMES.has(body.status)) {
+    return { kind: 'invalid', message: body.message ?? 'This ticket is not valid.' };
+  }
+  // No outcome means the request itself failed (signed out, wrong event
+  // selected, verification not configured) — not a verdict on the ticket.
+  return {
+    kind: 'error',
+    message: body.message ?? 'Something went wrong. Scan again.',
+  };
+}
+
+const RESULT_STYLE: Record<ResultKind, { title: string; className: string; Icon: typeof CheckCircle2 }> = {
+  valid: {
+    title: 'Valid — let them in',
+    className: 'border-success bg-success text-success-foreground',
+    Icon: CheckCircle2,
   },
-  'TKT-2024-BETA-042': {
-    holderName: 'Morgan Chen',
-    ticketType: 'General Admission',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
+  already_used: {
+    title: 'Already used',
+    className: 'border-warning bg-warning text-warning-foreground',
+    Icon: AlertTriangle,
   },
-  'TKT-2024-GAMMA-199': {
-    holderName: 'Alex Morales',
-    ticketType: 'Early Bird',
-    event: 'Summer Dance Festival',
-    date: 'Aug 15, 2025',
+  invalid: {
+    title: 'Invalid ticket',
+    className: 'border-destructive bg-destructive text-destructive-foreground',
+    Icon: XCircle,
+  },
+  error: {
+    title: 'Could not check ticket',
+    className: 'border-border bg-muted text-foreground',
+    Icon: AlertTriangle,
   },
 };
 
-type VerifyState = 'idle' | 'loading' | 'success' | 'failure' | 'already-used' | 'service-error';
-
-// ─── Scan Frame Animation ─────────────────────────────────────────────────────
-function ScanFrame() {
+function ResultPanel({ result, onDismiss }: { result: ScanResult; onDismiss: () => void }) {
+  const { title, className, Icon } = RESULT_STYLE[result.kind];
   return (
-    <div className="relative w-56 h-56 mx-auto">
-      {/* Corner brackets */}
-      {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => {
-        const isTop = corner.startsWith('top');
-        const isLeft = corner.endsWith('left');
-        return (
-          <div
-            key={corner}
-            className={`absolute w-8 h-8 ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'}`}
-          >
-            <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-full h-0.5`}
-            />
-            <div
-              className={`absolute bg-[#4D21FF] ${isTop ? 'top-0' : 'bottom-0'} ${isLeft ? 'left-0' : 'right-0'} w-0.5 h-full`}
-            />
-          </div>
-        );
-      })}
+    <div className={cn('rounded-lg border-2 p-5', className)} data-result={result.kind}>
+      <div className="flex items-start gap-3">
+        <Icon className="mt-0.5 h-8 w-8 shrink-0" aria-hidden="true" />
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-xl font-semibold">{title}</p>
+          <p>{result.message}</p>
+          {result.kind === 'already_used' && result.usedAt && (
+            <p className="text-sm">First scanned {formatDateTime(result.usedAt)}.</p>
+          )}
+          {result.kind === 'valid' && result.ticketId && (
+            <p className="text-sm opacity-90">Ticket {result.ticketId}</p>
+          )}
+        </div>
+      </div>
+      <Button variant="outline" size="sm" className="mt-4 text-foreground" onClick={onDismiss}>
+        Scan next ticket
+      </Button>
+    </div>
+  );
+}
 
-      {/* Scan line */}
-      <motion.div
-        className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[#21D4FF] to-transparent"
-        animate={{ top: ['10%', '90%', '10%'] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-      />
+type CameraState = 'idle' | 'starting' | 'on' | 'unsupported' | 'denied' | 'failed';
 
-      {/* Inner grid pattern (decorative) */}
-      <div className="absolute inset-4 opacity-10">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 20px), repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 20px)',
-          }}
-        />
+export default function VerifyPage() {
+  const [events, setEvents] = React.useState<VeritixEvent[] | null>(null);
+  const [eventsError, setEventsError] = React.useState(false);
+  const [eventId, setEventId] = React.useState('');
+
+  const [result, setResult] = React.useState<ScanResult | null>(null);
+  const [checking, setChecking] = React.useState(false);
+  const [code, setCode] = React.useState('');
+  const [camera, setCamera] = React.useState<CameraState>('idle');
+
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const streamRef = React.useRef<MediaStream | null>(null);
+  // Read inside the scan loop, which must not restart on every render.
+  const busyRef = React.useRef(false);
+  const eventIdRef = React.useRef('');
+  const resumeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  eventIdRef.current = eventId;
+
+  // The organizer's own events. Other events would only ever answer 404.
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch('/api/events?mine=1&pageSize=50')
+      .then((res) => (res.ok ? (res.json() as Promise<Paginated<VeritixEvent>>) : Promise.reject()))
+      .then((page) => {
+        if (cancelled) return;
+        const scannable = page.items.filter((e) => e.status === 'published');
+        setEvents(scannable);
+        let saved = '';
+        try {
+          saved = localStorage.getItem(EVENT_STORAGE_KEY) ?? '';
+        } catch {
+          // Storage can be blocked; the picker just starts empty.
+        }
+        const initial = scannable.find((e) => e.id === saved) ?? (scannable.length === 1 ? scannable[0] : undefined);
+        if (initial) setEventId(initial.id);
+      })
+      .catch(() => !cancelled && setEventsError(true));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const chooseEvent = (id: string) => {
+    setEventId(id);
+    setResult(null);
+    try {
+      localStorage.setItem(EVENT_STORAGE_KEY, id);
+    } catch {
+      // Not remembering the choice is fine.
+    }
+  };
+
+  const clearResult = React.useCallback(() => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = null;
+    busyRef.current = false;
+    setResult(null);
+  }, []);
+
+  const check = React.useCallback(
+    async (payload: string) => {
+      const trimmed = payload.trim();
+      if (!trimmed || !eventIdRef.current || busyRef.current) return;
+
+      busyRef.current = true;
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+      setChecking(true);
+      const outcome = await submitCode(trimmed, eventIdRef.current);
+      setChecking(false);
+      setResult(outcome);
+
+      // A buzz the gate agent can feel without looking down: one for yes,
+      // three for no.
+      try {
+        navigator.vibrate?.(outcome.kind === 'valid' ? 120 : [80, 60, 80, 60, 80]);
+      } catch {
+        // Unsupported; the panel is the real signal.
+      }
+
+      // Keep the camera paused while the result is up so the same ticket,
+      // still in frame, is not submitted again as "already used".
+      resumeTimer.current = setTimeout(() => {
+        busyRef.current = false;
+      }, RESUME_AFTER_MS);
+    },
+    [],
+  );
+
+  const stopCamera = React.useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setCamera((current) => (current === 'on' || current === 'starting' ? 'idle' : current));
+  }, []);
+
+  const startCamera = React.useCallback(async () => {
+    if (!barcodeDetector() || !navigator.mediaDevices?.getUserMedia) {
+      setCamera('unsupported');
+      return;
+    }
+    setCamera('starting');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play().catch(() => undefined);
+      }
+      setCamera('on');
+    } catch (error) {
+      const name = (error as { name?: string })?.name;
+      setCamera(name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : 'failed');
+    }
+  }, []);
+
+  // Detection loop, running only while the camera is on.
+  React.useEffect(() => {
+    if (camera !== 'on') return;
+    const Detector = barcodeDetector();
+    if (!Detector) return;
+    const detector = new Detector({ formats: ['qr_code'] });
+    let stopped = false;
+
+    const tick = async () => {
+      if (stopped) return;
+      const video = videoRef.current;
+      if (video && video.readyState >= 2 && !busyRef.current) {
+        try {
+          const codes = await detector.detect(video);
+          const value = codes[0]?.rawValue;
+          if (value && !stopped) await check(value);
+        } catch {
+          // A frame that fails to decode is normal; try the next one.
+        }
+      }
+      if (!stopped) setTimeout(tick, SCAN_INTERVAL_MS);
+    };
+    void tick();
+
+    return () => {
+      stopped = true;
+    };
+  }, [camera, check]);
+
+  // Release the camera when leaving the page.
+  React.useEffect(
+    () => () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    },
+    [],
+  );
+
+  const submitManual = async (event: React.FormEvent) => {
+    event.preventDefault();
+    busyRef.current = false;
+    await check(code);
+    setCode('');
+  };
+
+  const cameraMessage: Partial<Record<CameraState, string>> = {
+    unsupported:
+      'This browser cannot scan QR codes with the camera. Enter the code below instead, or use Chrome on Android.',
+    denied: 'Camera access was blocked. Allow it in the browser settings, or enter the code below.',
+    failed: 'The camera could not be started. Enter the code below instead.',
+  };
+
+  const selectedEvent = events?.find((e) => e.id === eventId);
+
+  return (
+    <div className="mx-auto max-w-xl space-y-6">
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold">Verify tickets</h1>
+        <p className="text-sm text-muted-foreground">
+          Scan a ticket&apos;s QR code, or type the code if the camera is not available.
+        </p>
       </div>
 
-      <HiQrcode className="absolute inset-0 m-auto w-20 h-20 text-white/10" />
-    </div>
-  );
-}
+      <div className="space-y-1.5">
+        <Label htmlFor="verify-event">Event</Label>
+        {events === null && !eventsError && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Spinner className="h-4 w-4" /> Loading your events…
+          </p>
+        )}
+        {eventsError && (
+          <p role="alert" className="text-sm text-destructive">
+            Your events could not be loaded. Refresh the page to try again.
+          </p>
+        )}
+        {events && events.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            You have no published events to check tickets for.
+          </p>
+        )}
+        {events && events.length > 0 && (
+          <select
+            id="verify-event"
+            value={eventId}
+            onChange={(e) => chooseEvent(e.target.value)}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="" disabled>
+              Choose the event you are checking in
+            </option>
+            {events.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.title} — {formatDateTime(e.startsAt)}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
-// ─── Result Card ──────────────────────────────────────────────────────────────
-function ResultCard({
-  state,
-  ticketCode,
-  onReset,
-  onRetry,
-}: {
-  state: VerifyState;
-  ticketCode: string;
-  onReset: () => void;
-  onRetry?: () => void;
-}) {
-  const ticket = VALID_TICKETS[ticketCode.toUpperCase()];
-  const isSuccess = state === 'success';
-  const isAlreadyUsed = state === 'already-used';
-  const isServiceError = state === 'service-error';
+      {/* Announced as soon as it changes, so a screen-reader user at the gate
+          hears the verdict without moving focus. */}
+      <div aria-live="assertive" role="status">
+        {checking && (
+          <p className="flex items-center gap-2 text-sm">
+            <Spinner className="h-4 w-4" /> Checking ticket…
+          </p>
+        )}
+        {!checking && result && <ResultPanel result={result} onDismiss={clearResult} />}
+      </div>
 
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={state}
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.92, y: -20 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-        className={`rounded-2xl border overflow-hidden ${
-          isSuccess
-            ? 'border-emerald-500/40 bg-emerald-900/20'
-            : isAlreadyUsed
-            ? 'border-amber-500/40 bg-amber-900/20'
-            : isServiceError
-            ? 'border-orange-500/40 bg-orange-900/20'
-            : 'border-red-500/40 bg-red-900/20'
-        }`}
-      >
-        {/* Status Banner */}
+      <section aria-labelledby="verify-camera-heading" className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 id="verify-camera-heading" className="text-lg font-medium">
+            Camera
+          </h2>
+          {camera === 'on' || camera === 'starting' ? (
+            <Button variant="outline" size="sm" onClick={stopCamera}>
+              <CameraOff className="mr-2 h-4 w-4" aria-hidden="true" /> Stop camera
+            </Button>
+          ) : (
+            <Button size="sm" onClick={startCamera} disabled={!selectedEvent}>
+              <Camera className="mr-2 h-4 w-4" aria-hidden="true" /> Start camera
+            </Button>
+          )}
+        </div>
+
         <div
-          className={`px-6 py-4 flex items-center gap-3 ${
-            isSuccess
-              ? 'bg-emerald-500'
-              : isAlreadyUsed
-              ? 'bg-amber-500'
-              : isServiceError
-              ? 'bg-orange-500'
-              : 'bg-red-500'
-          }`}
+          className={cn(
+            'relative aspect-square w-full overflow-hidden rounded-lg bg-black',
+            camera !== 'on' && camera !== 'starting' && 'hidden',
+          )}
         >
-          <div className="p-1 rounded-full bg-white/20">
-            {isSuccess ? (
-              <HiCheck className="w-5 h-5 text-white" />
-            ) : isAlreadyUsed ? (
-              <HiRefresh className="w-5 h-5 text-white" />
-            ) : isServiceError ? (
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            ) : (
-              <HiX className="w-5 h-5 text-white" />
-            )}
-          </div>
-          <span className="font-bold text-white text-lg">
-            {isSuccess
-              ? 'Valid Ticket — Entry Granted'
-              : isAlreadyUsed
-              ? 'Already Used'
-              : isServiceError
-              ? 'Service Unavailable'
-              : 'Invalid Ticket'}
-          </span>
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            muted
+            playsInline
+            aria-label="Camera preview for scanning ticket QR codes"
+          />
+          <div
+            className="pointer-events-none absolute inset-[15%] rounded-lg border-4 border-white/80"
+            aria-hidden="true"
+          />
         </div>
 
-        {/* Ticket Details */}
-        <div className="p-6 space-y-4">
-          {isSuccess && ticket ? (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <Detail label="Holder" value={ticket.holderName} />
-                <Detail label="Ticket Type" value={ticket.ticketType} />
-                <Detail label="Event" value={ticket.event} />
-                <Detail label="Date" value={ticket.date} />
-                {ticket.seat && <Detail label="Zone / Seat" value={ticket.seat} />}
-                <Detail label="Code" value={ticketCode.toUpperCase()} mono />
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-4 space-y-2">
-              <p className="text-gray-300 text-sm">
-                {isAlreadyUsed
-                  ? 'This ticket has already been scanned. Please check with your supervisor.'
-                  : isServiceError
-                  ? 'Unable to connect to verification service. Please check your connection and try again.'
-                  : 'No ticket found matching this code. Verify the code and try again.'}
-              </p>
-              {!isServiceError && (
-                <p className="text-gray-500 text-xs font-mono">{ticketCode.toUpperCase()}</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="px-6 pb-6 space-y-3">
-          {isServiceError && onRetry ? (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onRetry}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] hover:opacity-90 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <HiRefresh className="w-4 h-4" />
-              Retry Verification
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onReset}
-              className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <HiRefresh className="w-4 h-4" />
-              Verify Another Ticket
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-function Detail({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <p className="text-xs text-gray-500 uppercase tracking-wider mb-0.5">{label}</p>
-      <p className={`text-white font-semibold text-sm ${mono ? 'font-mono' : ''}`}>{value}</p>
-    </div>
-  );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
-export default function VerifyPage() {
-  const router = useRouter();
-  const [code, setCode] = useState('');
-  const [verifyState, setVerifyState] = useState<VerifyState>('idle');
-  const [usedCodes] = useState<Set<string>>(new Set());
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Autofocus input on mount
-  useEffect(() => { inputRef.current?.focus(); }, []);
-
-  const handleVerify = () => {
-    if (!code.trim()) return;
-    setVerifyState('loading');
-
-    // Simulate async check with potential service failure
-    setTimeout(() => {
-      const upper = code.trim().toUpperCase();
-      
-      // Deterministic service error for testing
-      if (upper === 'TKT-SERVICE-ERR') {
-        setVerifyState('service-error');
-        return;
-      }
-
-      // Simulate random service failure (10% chance for other codes)
-      const simulateServiceError = Math.random() < 0.1;
-      
-      if (simulateServiceError) {
-        setVerifyState('service-error');
-        return;
-      }
-
-      if (usedCodes.has(upper)) {
-        setVerifyState('already-used');
-      } else if (VALID_TICKETS[upper]) {
-        usedCodes.add(upper);
-        setVerifyState('success');
-      } else {
-        setVerifyState('failure');
-      }
-    }, 900);
-  };
-
-  const handleReset = () => {
-    setCode('');
-    setVerifyState('idle');
-    inputRef.current?.focus();
-  };
-
-  const handleRetry = () => {
-    setVerifyState('loading');
-    setTimeout(() => {
-      const upper = code.trim().toUpperCase();
-      if (usedCodes.has(upper)) {
-        setVerifyState('already-used');
-      } else if (VALID_TICKETS[upper]) {
-        usedCodes.add(upper);
-        setVerifyState('success');
-      } else {
-        setVerifyState('failure');
-      }
-    }, 900);
-  };
-
-  const isChecking = verifyState === 'loading';
-  const hasResult = ['success', 'failure', 'already-used', 'service-error'].includes(verifyState);
-
-  return (
-    <div className="min-h-screen bg-primary-dark-blue">
-      {/* Hero Header */}
-      <section className="relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-[#4D21FF]/10 blur-3xl" />
-          <div className="absolute -top-10 right-0 w-64 h-64 rounded-full bg-[#21D4FF]/10 blur-3xl" />
-        </div>
-
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors mb-6"
-          >
-            <HiArrowLeft className="w-5 h-5" />
-            <span>Back</span>
-          </motion.button>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-4"
-          >
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-[#4D21FF] to-[#21D4FF]">
-              <HiTicket className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-white">Ticket Verification</h1>
-              <p className="text-gray-400 text-sm mt-0.5">Summer Dance Festival · Staff Portal</p>
-            </div>
-          </motion.div>
-        </div>
+        {!selectedEvent && camera === 'idle' && events && events.length > 0 && (
+          <p className="text-sm text-muted-foreground">Choose an event to start scanning.</p>
+        )}
+        {cameraMessage[camera] && (
+          <p role="alert" className="text-sm text-muted-foreground">
+            {cameraMessage[camera]}
+          </p>
+        )}
       </section>
 
-      {/* Main Content */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="max-w-2xl mx-auto space-y-6">
-
-          {/* Scanner Placeholder Card */}
-          <AnimatePresence>
-            {verifyState === 'idle' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="rounded-2xl bg-[#00062580]/50 border border-[#E0E0E033]/20 overflow-hidden"
-              >
-                <div className="bg-[#4D21FF] px-6 py-4">
-                  <h2 className="text-base font-bold text-white">Scan QR Code</h2>
-                  <p className="text-blue-200 text-xs mt-0.5">Point camera at attendee&apos;s ticket QR</p>
-                </div>
-                <div className="p-8">
-                  <ScanFrame />
-                  <p className="text-center text-gray-500 text-xs mt-6">
-                    Camera scanning not required — enter code manually below
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Manual Entry Card */}
-          {!hasResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="rounded-2xl bg-[#00062580]/50 border border-[#E0E0E033]/20 overflow-hidden"
-            >
-              <div className="bg-[#4D21FF] px-6 py-4">
-                <h2 className="text-base font-bold text-white">Manual Entry</h2>
-                <p className="text-blue-200 text-xs mt-0.5">Type or paste the ticket code</p>
-              </div>
-
-              <div className="p-6 space-y-4">
-                <div className="relative">
-                  <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
-                    placeholder="e.g. TKT-2024-ALPHA-001"
-                    disabled={isChecking}
-                    autoFocus
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 font-mono text-sm focus:outline-none focus:border-[#4D21FF] transition-colors disabled:opacity-50"
-                  />
-                </div>
-
-                <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  onClick={handleVerify}
-                  disabled={!code.trim() || isChecking}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#4D21FF] to-[#21D4FF] text-white font-bold hover:opacity-90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isChecking ? (
-                    <>
-                      <motion.span
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                        className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                      />
-                      Verifying…
-                    </>
-                  ) : (
-                    <>
-                      <HiCheck className="w-4 h-4" />
-                      Verify Ticket
-                    </>
-                  )}
-                </motion.button>
-
-                {/* Test hints */}
-                <div className="pt-2 border-t border-white/5">
-                  <p className="text-gray-600 text-xs mb-2">Try these demo codes:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.keys(VALID_TICKETS).map((k) => (
-                      <button
-                        key={k}
-                        onClick={() => setCode(k)}
-                        className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-[#4D21FF]/20 hover:text-white transition-colors"
-                      >
-                        {k}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => setCode('TKT-INVALID-000')}
-                      className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-300 transition-colors"
-                    >
-                      TKT-INVALID-000
-                    </button>
-                    <button
-                      onClick={() => setCode('TKT-SERVICE-ERR')}
-                      className="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-gray-400 hover:bg-orange-500/20 hover:text-orange-300 transition-colors"
-                    >
-                      SERVICE ERROR TEST
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Result */}
-          {hasResult && (
-            <ResultCard
-              state={verifyState}
-              ticketCode={code}
-              onReset={handleReset}
-              onRetry={handleRetry}
+      <section aria-labelledby="verify-manual-heading" className="space-y-3">
+        <h2 id="verify-manual-heading" className="text-lg font-medium">
+          Enter code manually
+        </h2>
+        <form onSubmit={submitManual} className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex-1 space-y-1.5">
+            <Label htmlFor="verify-code" className="sr-only">
+              Ticket code
+            </Label>
+            <Input
+              id="verify-code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Paste or type the ticket code"
+              autoComplete="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              disabled={!selectedEvent}
             />
-          )}
-
-          {/* Stats bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-3 gap-3"
-          >
-            {[
-              { label: 'Checked In', value: '1,284', color: 'text-emerald-400' },
-              { label: 'Capacity', value: '5,000', color: 'text-[#21D4FF]' },
-              { label: 'Remaining', value: '3,716', color: 'text-gray-400' },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl bg-[#00062580]/50 border border-[#E0E0E033]/20 p-4 text-center"
-              >
-                <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{stat.label}</p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
+          </div>
+          <Button type="submit" disabled={!selectedEvent || !code.trim() || checking}>
+            Check ticket
+          </Button>
+        </form>
       </section>
     </div>
   );

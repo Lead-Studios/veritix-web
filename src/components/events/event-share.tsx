@@ -1,9 +1,10 @@
 'use client';
 
 import { toast } from 'react-toastify';
-import { HiShare, HiLink } from 'react-icons/hi';
+import { Link2, Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useMounted } from '@/hooks/use-mounted';
 import { cn } from '@/lib/utils';
-import { useMounted } from '@/hooks/useMounted';
 
 /**
  * Sharing for an event.
@@ -31,7 +32,9 @@ const SHARE_TARGETS: ShareTarget[] = [
   {
     label: 'X',
     href: (url, text) =>
-      `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+        url,
+      )}&text=${encodeURIComponent(text)}`,
   },
   {
     label: 'Facebook',
@@ -45,13 +48,11 @@ const SHARE_TARGETS: ShareTarget[] = [
   },
   {
     label: 'WhatsApp',
-    href: (url, text) =>
-      `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
+    href: (url, text) => `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
   },
 ];
 
-const COPY_FAILED =
-  'Could not copy the link — copy it from the address bar instead';
+const COPY_FAILED = 'Could not copy the link — copy it from the address bar instead';
 
 async function copyToClipboard(text: string): Promise<boolean> {
   try {
@@ -97,35 +98,33 @@ export function EventShare({ title, url, className }: EventShareProps) {
       className={cn('flex flex-col gap-3', className)}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => void handleShare()}
-          className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-white/20"
         >
-          <HiShare className="h-4 w-4" aria-hidden="true" />
+          <Share2 aria-hidden="true" />
           Share
-        </button>
-        <button
-          type="button"
-          onClick={() => void handleCopy()}
-          className="inline-flex items-center gap-2 rounded-lg bg-transparent px-3 py-1.5 text-sm font-medium text-gray-300 transition hover:bg-white/10 hover:text-white"
-        >
-          <HiLink className="h-4 w-4" aria-hidden="true" />
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={() => void handleCopy()}>
+          <Link2 aria-hidden="true" />
           Copy link
-        </button>
+        </Button>
       </div>
 
       <ul className="flex flex-wrap items-center gap-1">
         {SHARE_TARGETS.map((target) => (
           <li key={target.label}>
-            <a
-              href={target.href(eventUrl, shareText)}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-gray-400 transition hover:bg-white/10 hover:text-white"
-            >
-              {target.label}
-            </a>
+            <Button asChild variant="ghost" size="sm">
+              <a
+                href={target.href(eventUrl, shareText)}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {target.label}
+              </a>
+            </Button>
           </li>
         ))}
       </ul>

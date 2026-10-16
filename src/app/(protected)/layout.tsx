@@ -1,15 +1,21 @@
-"use client";
+import * as React from 'react';
+import { AppTopbar } from '@/components/layout/app-topbar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
 
-import React from "react";
-import { useAuthState } from "@/hooks/useAuthState";
-import AuthLoadingShell from "@/components/auth/AuthLoadingShell";
-
+/**
+ * Authenticated app shell. Access is gated in src/middleware.ts before this
+ * layout renders, so it can assume a session exists.
+ */
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { isLoading } = useAuthState();
-
-  if (isLoading) {
-    return <AuthLoadingShell />;
-  }
-
-  return <>{children}</>;
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <AppTopbar />
+      <div className="flex flex-1">
+        <AppSidebar />
+        <main id="main" className="flex-1 p-4 sm:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
 }

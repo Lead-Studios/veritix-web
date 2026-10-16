@@ -1,0 +1,85 @@
+# End-to-end smoke suite, run by `.github/workflows/e2e.yml` rather than as a
+# step inside `ci.yml`.
+#
+# Separate file on purpose. `ci.yml` is being reworked in #985 to run every
+# quality gate, and putting Playwright in there would mean two branches editing
+# the same workflow to add one job. This workflow is independent, fails
+# separately, and reports separately — a broken route guard should not be
+# hidden inside a red `Lint, Type-check, Test, Build` check that nobody reads.
+#
+# It is not a required check yet. It is wired up and reporting; adding it to
+# branch protection is a decision for whoever owns the repository settings,
+# because a suite that flakes blocks every merge until it is fixed.
+name: E2E
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright smoke
+    runs-on: ubuntu-latest
+    # Dev-server start plus three retries per test fits comfortably. A run that
+    # needs longer is stuck, and a stuck E2E job holding a runner is the exact
+    # failure this timeout exists to prevent.
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Pinned to the floor the toolchain supports, matching `ci.yml` on
+          # `main`. #986 introduces `.nvmrc`; this should switch to
+          # `node-version-file` in the same commit, not later.
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Restored before the browsers are installed so a cache hit means the
+      # download is skipped. Keyed on the lockfile, because that is what decides
+      # which Playwright version — and therefore which browser build — is needed.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Chromium
+        # `--with-deps` also installs the system libraries Chromium needs. It
+        # needs root, which the runner provides, and it is the difference
+        # between "browser downloaded" and "browser launched".
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke suite
+        run: npx playwright test
+
+      # Uploaded on failure as well as success: the trace and the video are the
+      # only record of what actually happened, and they are worthless if they
+      # live on a runner that has already been discarded.
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore

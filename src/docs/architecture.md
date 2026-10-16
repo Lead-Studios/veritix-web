@@ -1,3 +1,0 @@
-- src/app → owns all routes (Next.js App Router)
-- src/features → reusable domain logic (no pages)
-- No duplicate page definitions allowed
