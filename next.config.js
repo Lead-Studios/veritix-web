@@ -21,6 +21,12 @@ const nextConfig = {
   },
 };
 
+/**
+ * `next-pwa@5.6.0` is unmaintained and only generates a service worker under
+ * webpack, so it stays out of the default build: the `require` below is lazy and
+ * the only caller is the opt-in `build:pwa` script, which passes `--webpack`
+ * alongside `ENABLE_PWA=true`. A plain `next build` (Turbopack) never loads it.
+ */
 const pwaEnabled = process.env.NODE_ENV === 'production' && process.env.ENABLE_PWA === 'true';
 const withPwa = pwaEnabled
   ? require('next-pwa')({

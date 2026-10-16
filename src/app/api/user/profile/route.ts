@@ -74,7 +74,10 @@ export async function PATCH(request: NextRequest) {
   // A field the form did not send is not "clear it". `undefined` here means
   // "leave it alone"; only an explicit `null` clears a field. Conflating the
   // two is the classic way a settings form wipes a user's data by reloading.
-  const patch: Record<string, unknown> = { userId, displayName: parsed.data.displayName };
+  const patch: Record<string, unknown> & { userId: string } = {
+    userId,
+    displayName: parsed.data.displayName,
+  };
   if (parsed.data.avatarUrl !== undefined) patch.avatarUrl = parsed.data.avatarUrl;
   if (parsed.data.city !== undefined) patch.city = parsed.data.city;
 

@@ -81,7 +81,10 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const patch: Record<string, unknown> = { userId, address: parsed.data.address };
+  const patch: Record<string, unknown> & { userId: string } = {
+    userId,
+    address: parsed.data.address,
+  };
   if (parsed.data.label !== undefined) patch.label = parsed.data.label;
 
   try {
