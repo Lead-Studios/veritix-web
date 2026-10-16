@@ -211,14 +211,14 @@ const SECTIONS: readonly LegalSection[] = [
     body: (
       <>
         <p>
-          While an event's escrow account is open, the organizer may refund any ticket, and
+          While an event&apos;s escrow account is open, the organizer may refund any ticket, and
           each refund is made from the escrow account to the original payment method. If an
           organizer cancels an event, every ticket sold is refundable from escrow, whether or
           not individual buyers ask.
         </p>
         <p>
           After settlement, a refund is not a reversal of the original ticket sale. It is a
-          new transfer out of the organizer's settled share, recorded in the organizer's
+          new transfer out of the organizer&apos;s settled share, recorded in the organizer&apos;s
           report as a refund rather than as a reduction in ticket revenue. We do not hold
           funds after settlement to make post-settlement refunds possible, and we could not
           do so if we wanted to — the release is unconditional once its conditions are met.
@@ -237,7 +237,7 @@ const SECTIONS: readonly LegalSection[] = [
     body: (
       <>
         <p>
-          When an event's settlement window closes, the escrow account releases the shares
+          When an event&apos;s settlement window closes, the escrow account releases the shares
           defined when the event was published, in a single transaction, to the addresses
           registered against each share. Splits are defined before the first ticket is sold
           and cannot be edited once escrow has funds in it, because changing a split after
@@ -282,7 +282,7 @@ const SECTIONS: readonly LegalSection[] = [
             already been used;
           </li>
           <li>
-            use the service in a way that violates a network operator's terms or a venue's
+            use the service in a way that violates a network operator&apos;s terms or a venue&apos;s
             terms.
           </li>
         </ul>
@@ -357,16 +357,16 @@ const SECTIONS: readonly LegalSection[] = [
           revenue, or goodwill, arising from these terms or the service.
         </p>
         <p>
-          Each party's total liability under these terms is limited to the total fees paid to
+          Each party&apos;s total liability under these terms is limited to the total fees paid to
           Veritix for the event that gave rise to the claim, or USD 1,000 where no fees were
           paid. Nothing limits liability for death or personal injury caused by negligence,
           for fraud or fraudulent misrepresentation, or for anything else that cannot be
           limited by law.
         </p>
         <p>
-          The cap is not a limit on the organizer. A buyer's claim against an organizer for a
+          The cap is not a limit on the organizer. A buyer&apos;s claim against an organizer for a
           cancelled event, a misdescribed event, or a ticket that was not honoured is a claim
-          against that organizer, under that organizer's refund commitment, not against us.
+          against that organizer, under that organizer&apos;s refund commitment, not against us.
         </p>
       </>
     ),
@@ -378,7 +378,7 @@ const SECTIONS: readonly LegalSection[] = [
       <>
         <p>
           Organizers agree to indemnify us against claims arising from an event they
-          published: in particular, claims that publishing it infringed a third party's
+          published: in particular, claims that publishing it infringed a third party&apos;s
           rights, that its description or refund commitment was misleading, or that it
           failed to honour tickets sold.
         </p>
