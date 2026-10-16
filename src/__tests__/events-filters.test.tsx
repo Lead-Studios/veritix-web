@@ -10,8 +10,9 @@ import {
 
 /**
  * `next/navigation` is mocked so the hook can be driven the way the App Router
- * drives it: the URL is owned by the test, and `router.replace` is observed
- * rather than followed.
+ * drives it: the URL is owned by the test, and `router.replace` both records the
+ * call and applies the new query to `paramsRef`, as the real router would. A
+ * component only sees the new params after it re-renders.
  */
 const { replaceMock, paramsRef } = vi.hoisted(() => ({
   replaceMock: vi.fn(),
@@ -31,7 +32,10 @@ function lastReplaceTarget(): string {
 }
 
 beforeEach(() => {
-  replaceMock.mockClear();
+  replaceMock.mockReset();
+  replaceMock.mockImplementation((url: string) => {
+    paramsRef.current = new URLSearchParams(url.split('?')[1] ?? '');
+  });
   paramsRef.current = new URLSearchParams();
 });
 
@@ -84,15 +88,54 @@ describe('useEventFilters', () => {
   });
 
   it('writes the expected query parameters when a filter changes', () => {
-    const { result } = renderHook(() => useEventFilters());
+    const { result, rerender } = renderHook(() => useEventFilters());
 
     act(() => result.current.setFilter('city', 'Lagos'));
 
     expect(lastReplaceTarget()).toBe('/events?city=Lagos');
 
+    // The router has applied the first change and the component re-rendered.
+    // Keys are serialised in a fixed order (q, city, date, sort), not call order.
+    rerender();
     act(() => result.current.setFilter('q', 'jazz'));
 
-    expect(lastReplaceTarget()).toBe('/events?city=Lagos&q=jazz');
+    expect(lastReplaceTarget()).toBe('/events?q=jazz&city=Lagos');
+  });
+
+  it('keeps both changes when two filters are set before the router re-renders', () => {
+    const { result } = renderHook(() => useEventFilters());
+
+    act(() => {
+      result.current.setFilter('city', 'Lagos');
+      result.current.setFilter('q', 'jazz');
+    });
+
+    expect(lastReplaceTarget()).toBe('/events?q=jazz&city=Lagos');
+  });
+
+  it('applies a change on top of existing filters when called twice in one tick', () => {
+    paramsRef.current = new URLSearchParams('date=2026-10-17&city=Abuja');
+    const { result } = renderHook(() => useEventFilters());
+
+    act(() => {
+      result.current.setFilter('date', '');
+      result.current.setFilter('city', 'Lagos');
+    });
+
+    expect(lastReplaceTarget()).toBe('/events?city=Lagos');
+  });
+
+  it('follows the URL again after it changes elsewhere', () => {
+    const { result, rerender } = renderHook(() => useEventFilters());
+
+    act(() => result.current.setFilter('city', 'Lagos'));
+    // Back/forward navigation replaces the whole query.
+    paramsRef.current = new URLSearchParams('q=rock');
+    rerender();
+
+    act(() => result.current.setFilter('sort', 'title'));
+
+    expect(lastReplaceTarget()).toBe('/events?q=rock&sort=title');
   });
 
   it('drops a filter from the URL when it is cleared', () => {

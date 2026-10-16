@@ -67,8 +67,21 @@ export function useEventFilters(): UseEventFiltersResult {
 
   const filters = React.useMemo(() => parseEventFilters(searchParams), [searchParams]);
 
+  // The most recent filter state, including changes that have been written to the
+  // router but not yet reflected in `searchParams`. `router.replace` is not
+  // synchronous, so two calls in the same tick would otherwise both start from the
+  // same render-time snapshot and the second would discard the first change.
+  const latestFilters = React.useRef(filters);
+
+  // Once the URL catches up (or changes for any other reason such as back/forward),
+  // it is the source of truth again.
+  React.useEffect(() => {
+    latestFilters.current = filters;
+  }, [filters]);
+
   const write = React.useCallback(
     (next: EventFilters) => {
+      latestFilters.current = next;
       const query = toSearchParams(next).toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
@@ -76,8 +89,8 @@ export function useEventFilters(): UseEventFiltersResult {
   );
 
   const setFilter = React.useCallback(
-    (key: EventFilterKey, value: string) => write({ ...filters, [key]: value }),
-    [filters, write],
+    (key: EventFilterKey, value: string) => write({ ...latestFilters.current, [key]: value }),
+    [write],
   );
 
   const clearAll = React.useCallback(() => write(EMPTY_EVENT_FILTERS), [write]);
