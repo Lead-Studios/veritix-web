@@ -18,6 +18,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { LoadingState } from '@/components/feedback/loading-state';
+import { PromoCode } from '@/components/checkout/promo-code';
+import { OrderSummary } from '@/components/checkout/order-summary';
 import { useCart } from '@/context/cart-context';
 import { formatCurrency, formatDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -87,67 +89,21 @@ export default function CheckoutPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <ul className="flex flex-col gap-3">
-            {orderedLines.map(({ tier, quantity, subtotalMinor }) => (
-              <li key={tier.id} className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{tier.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatCurrency(tier.priceMinor, tier.currency)} each
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-8"
-                      aria-label={`Remove one ${tier.name} ticket`}
-                      onClick={() => updateQuantity(tier.id, quantity - 1)}
-                    >
-                      −
-                    </Button>
-                    <span className="w-8 text-center text-sm tabular-nums">
-                      {quantity}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-8"
-                      aria-label={`Add one ${tier.name} ticket`}
-                      onClick={() => updateQuantity(tier.id, quantity + 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <span className="w-24 text-right text-sm font-medium tabular-nums">
-                    {formatCurrency(subtotalMinor, tier.currency)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeItem(tier.id)}
-                    aria-label={`Remove ${tier.name} from the order`}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <Separator />
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">Total</span>
-            <span className="text-base font-semibold tabular-nums">
-              {formatCurrency(totalMinor, currency)}
-            </span>
-          </div>
-
+          <OrderSummary
+            lines={orderedLines.map(({ tier, quantity }) => ({
+              id: tier.id,
+              name: tier.name,
+              quantity,
+              unitMinor: tier.priceMinor,
+            }))}
+            currency={currency}
+            feeMinor={0}
+            eventTitle={event?.title}
+          />
           <Button variant="ghost" size="sm" className="self-start" onClick={clear}>
             Clear cart
           </Button>
+          <PromoCode onApply={async (code) => ({ valid: true, discountMinor: 0 })} />
         </CardContent>
       </Card>
 
