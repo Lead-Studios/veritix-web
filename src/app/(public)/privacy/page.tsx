@@ -175,7 +175,7 @@ const SECTIONS: readonly LegalSection[] = [
     body: (
       <>
         <p>
-          We do not sell personal data, and we do not share it for anyone else's advertising.
+          We do not sell personal data, and we do not share it for anyone else&apos;s advertising.
           We share it with the following, only for the purposes set out here:
         </p>
         <ul>
