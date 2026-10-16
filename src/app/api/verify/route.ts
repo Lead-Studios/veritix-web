@@ -48,7 +48,7 @@ function reply(status: number, outcome: Outcome, message: string, extra: object 
  *     `already_used`.
  */
 export async function POST(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const secret = signingSecret();

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import type { OrderStatus } from '@/types';
+import { readSessionUserId } from '@/lib/api/server';
 
 /**
  * Order and escrow endpoints used by the checkout payment step.
@@ -17,7 +18,7 @@ import type { OrderStatus } from '@/types';
  * An order stays `pending` until the backend reports the transaction confirmed;
  * nothing marks it paid early.
  *
- * Every handler requires an authenticated session (`session_user_id` cookie) —
+ * Every handler requires an authenticated signed session cookie —
  * escrow orders are addressed to a Stellar wallet, but they still belong to the
  * signed-in buyer who initiated checkout.
  */
@@ -97,7 +98,7 @@ function upstream(error: unknown) {
 
 /** Create the order and its escrow, and return the envelope the wallet signs. */
 export async function POST(request: NextRequest) {
-  const sessionUserId = request.cookies.get('session_user_id')?.value;
+  const sessionUserId = await readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
   const draft = (await request.json().catch(() => null)) as OrderDraft | null;
@@ -167,7 +168,7 @@ export async function PATCH(request: NextRequest) {
  * until the transaction confirms). Without it, the session user's orders.
  */
 export async function GET(request: NextRequest) {
-  const sessionUserId = request.cookies.get('session_user_id')?.value;
+  const sessionUserId = await readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
   const orderId = request.nextUrl.searchParams.get('id')?.trim();

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { SESSION_COOKIE_NAME, verifySession } from '@/lib/session';
 
 /**
  * Plumbing shared by the API routes this app owns.
@@ -19,37 +20,13 @@ import { NextResponse, type NextRequest } from 'next/server';
  * route to share code with them widens this change for no user-visible gain.
  */
 
-/**
- * Session cookie names, in the order they are tried.
- *
- * These are inconsistent in the codebase today and this module does not hide
- * that: `src/app/api/orders` and `src/app/api/tickets` set
- * `session_user_id`, while `src/proxy.ts` reads `veritix_session`. One of the
- * two is authoritative and the other is a leftover, but which one is not
- * knowable from inside this repository, so both are accepted. A request
- * authorised by either cookie is authorised; a change to one of them that
- * breaks the other will show up as a 401 here, not as a silent bypass.
- *
- * Whatever the backend reports about the session is authoritative. The cookie
- * identifies the user; it does not prove the session is still valid.
- */
-const SESSION_COOKIE_NAMES = ['session_user_id', 'veritix_session'] as const;
-
+/** API routes only accept the signed session cookie, never a client-editable user id. */
 /**
  * The signed-in user id, or `null`.
- *
- * An empty value counts as signed out. A cookie set to `""` is what a handler
- * that deleted it without an expiry leaves behind, and treating that as user
- * `""` would produce a request the backend happily cannot find — a 404 on an
- * authenticated route is a much worse error message than a 401.
  */
-export function readSessionUserId(request: NextRequest): string | null {
-  for (const name of SESSION_COOKIE_NAMES) {
-    const value = request.cookies.get(name)?.value?.trim();
-    if (value) return value;
-  }
-
-  return null;
+export async function readSessionUserId(request: NextRequest): Promise<string | null> {
+  const user = await verifySession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  return user?.id ?? null;
 }
 
 function jsonError(message: string, status: number, headers?: HeadersInit) {
@@ -67,7 +44,10 @@ export function unauthorized(): NextResponse {
 /** Backend API base. Falls back to the app's own public API URL. */
 function backendBase(): string {
   const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
+    process.env.API_BASE_URL ??
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    '';
   return base.replace(/\/$/, '');
 }
 
