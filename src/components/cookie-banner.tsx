@@ -86,14 +86,20 @@ const LABELS: Record<ConsentChoice, string> = {
  * not towards more.
  *
  * `document` does not exist during server rendering, so this is only ever called
- * from an effect or an event handler. A module-scope read would take the page
- * down on the server rather than just skipping the banner.
+ * on the client: as the store snapshot, from an effect, or from an event handler.
+ * A module-scope read would take the page down on the server rather than just
+ * skipping the banner.
  */
 export function readConsent(): ConsentChoice | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${STORAGE_KEY}=([^;]*)`));
-  if (!match) return null;
+  if (!match) return sessionChoice;
 
-  return decodeURIComponent(match[1]) === 'all' ? 'all' : 'necessary';
+  try {
+    return decodeURIComponent(match[1]) === 'all' ? 'all' : 'necessary';
+  } catch {
+    // A malformed escape sequence is a mangled cookie: fail towards less collection.
+    return 'necessary';
+  }
 }
 
 /**
@@ -107,34 +113,56 @@ export function analyticsAllowed(): boolean {
   return readConsent() === 'all';
 }
 
+/**
+ * The choice made in this page session, used when the cookie cannot be stored or
+ * read back (cookies blocked). Without it the banner would never go away for
+ * someone who has just answered it. Only ever set on the client.
+ */
+let sessionChoice: ConsentChoice | null = null;
+
+const listeners = new Set<() => void>();
+
+/** `useSyncExternalStore` subscription: re-read the choice after it is stored. */
+function subscribe(onChange: () => void) {
+  listeners.add(onChange);
+  return () => {
+    listeners.delete(onChange);
+  };
+}
+
+/** The server cannot see the cookie, so on the server nobody has decided yet. */
+function readConsentOnServer(): ConsentChoice | null {
+  return null;
+}
+
 function storeConsent(choice: ConsentChoice) {
   const secure = window.location.protocol === 'https:' ? '; Secure' : '';
   document.cookie =
     `${STORAGE_KEY}=${encodeURIComponent(choice)}; ` +
     `Max-Age=${MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+  // Only fall back to memory when the browser refused the cookie; otherwise the
+  // cookie is the single source of truth and this stays null.
+  sessionChoice = document.cookie.includes(`${STORAGE_KEY}=`) ? null : choice;
+  listeners.forEach((listener) => listener());
 }
 
 export function CookieBanner() {
   const mounted = useMounted();
-  const [choice, setChoice] = React.useState<ConsentChoice | null>(null);
 
-  // Gated on `mounted` rather than read during render. The server does not know
-  // the cookie, so a server render always omits the banner; reading during
-  // render would also produce markup that differs from the hydrated markup,
-  // which React reports as a hydration error rather than quietly reconciling.
-  React.useEffect(() => {
-    setChoice(readConsent());
-  }, []);
+  // The stored choice is read through an external-store subscription rather than
+  // copied into state from an effect, which would force a second render. The server
+  // snapshot is "undecided", and the banner is also gated on `mounted`, so a server
+  // render always omits it and hydration markup matches.
+  const choice = React.useSyncExternalStore(subscribe, readConsent, readConsentOnServer);
 
   // `choice` being non-null means somebody has already decided, so this stays
   // out of the DOM entirely rather than rendering an empty shell.
   if (!mounted || choice !== null) return null;
 
   function decide(next: ConsentChoice) {
+    // Storing notifies the subscription above, so the banner is gone on the same
+    // paint as the click, rather than flashing for a frame.
     storeConsent(next);
-    // Set before the re-render so the banner is gone on the same paint as the
-    // click, rather than flashing for a frame.
-    setChoice(next);
   }
 
   return (

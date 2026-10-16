@@ -62,6 +62,33 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 /** How a person who fills this in reads to a stopwatch. */
 const MIN_FILL_MS = 1200;
 
+/**
+ * When this form was rendered, as milliseconds since the epoch, for the server's
+ * timing check. One value per mount; empty on the server and during hydration,
+ * which keeps the server and client markup identical. It is always set long before
+ * the form can be submitted, because submitting requires the JavaScript that sets it.
+ *
+ * Implemented with `useSyncExternalStore` rather than a setState-in-effect so it
+ * does not trigger a second render, as `useMounted` does.
+ */
+function useRenderedAt(): string {
+  const [stampStore] = React.useState(() => {
+    let stamp: string | null = null;
+    return {
+      subscribe: () => () => {},
+      // Captured on first read and stable afterwards, as the store contract requires.
+      getSnapshot: () => (stamp ??= String(Date.now())),
+      getServerSnapshot: () => '',
+    };
+  });
+
+  return React.useSyncExternalStore(
+    stampStore.subscribe,
+    stampStore.getSnapshot,
+    stampStore.getServerSnapshot,
+  );
+}
+
 const TOPICS = [
   { value: 'support', label: 'Support — something is not working' },
   { value: 'organizer', label: 'Organizing an event' },
@@ -102,13 +129,7 @@ export function ContactForm({ className, action = '/api/contact' }: ContactFormP
   const honeypotId = React.useId();
   const errorId = React.useId();
 
-  // Empty until after hydration, which is what keeps the server and client
-  // markup identical. The value is always set long before the form can be
-  // submitted, because submitting requires the JavaScript that sets it.
-  const [renderedAt, setRenderedAt] = React.useState('');
-  React.useEffect(() => {
-    setRenderedAt(String(Date.now()));
-  }, []);
+  const renderedAt = useRenderedAt();
 
   // The success message replaces the form, which takes the submit button — and
   // the focus — with it. Focus follows, so the answer is where the keyboard is
