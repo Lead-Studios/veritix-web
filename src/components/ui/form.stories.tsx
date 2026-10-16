@@ -5,10 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
+/**
+ * `Form` is `FormProvider`, so its props are the react-hook-form methods that
+ * each story supplies at render time. They are declared as args only so the
+ * story type does not require them; every story renders its own form.
+ */
+const formArgs = {} as React.ComponentProps<typeof Form>;
+
 const meta = {
   title: 'Components/Form',
   component: Form,
   tags: ['autodocs'],
+  args: { ...formArgs, children: null },
 } satisfies Meta<typeof Form>;
 
 export default meta;

@@ -7,6 +7,9 @@ const meta = {
   title: 'Components/Dialog',
   component: Dialog,
   tags: ['autodocs'],
+  // `Dialog` requires `open`, `onOpenChange` and `children`, so the meta has to
+  // declare them or every `{ render }` story fails `StoryAnnotations`.
+  args: { open: true, onOpenChange: () => undefined, children: null },
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

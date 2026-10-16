@@ -21,17 +21,11 @@ import type { AnalyticsSnapshot } from '@/lib/analytics';
 export default function DashboardOverviewPage() {
   const { data, error, isLoading } = useSWR<AnalyticsSnapshot>('/analytics');
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-24" />
-        ))}
   // The page had no heading, so a screen reader landing on the dashboard found
   // four unlabelled values and nothing to orient by.
   const heading = <h1 className="mb-4 text-2xl font-semibold">Dashboard</h1>;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         {heading}
@@ -79,6 +73,7 @@ export default function DashboardOverviewPage() {
 
   return (
     <div className="space-y-6">
+      {heading}
       <div className="grid grid-cols-2 gap-4">
         <StatCard label="Events" value={totals.eventCount} />
         <StatCard label="Tickets sold" value={formatNumber(totals.ticketsSold)} />
@@ -108,16 +103,6 @@ export default function DashboardOverviewPage() {
         salesOverTime={salesOverTime}
         currency={currency}
       />
-    <div>
-      {heading}
-      {/* The grid is labelled so the numbers are not announced as one
-          undifferentiated list. */}
-      <dl className="grid grid-cols-2 gap-4" aria-label="Organizer summary">
-        <StatCard label="Events" value={0} />
-        <StatCard label="Tickets sold" value={0} />
-        <StatCard label="Gross revenue" value="$0" />
-        <StatCard label="Pending payouts" value="$0" />
-      </dl>
     </div>
   );
 }

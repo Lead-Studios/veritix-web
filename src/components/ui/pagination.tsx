@@ -64,7 +64,6 @@ export function Pagination({
   className,
   ...props
 }: PaginationProps) {
-export function Pagination({ page, totalPages, hrefForPage, className, ...props }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const isFirst = page <= 1;
@@ -76,7 +75,6 @@ export function Pagination({ page, totalPages, hrefForPage, className, ...props 
       className={cn('flex items-center justify-center gap-1', className)}
       {...props}
     >
-    <nav aria-label="Pagination" className={cn('flex items-center justify-center gap-1', className)} {...props}>
       {isFirst ? (
         <span className={disabledClass} aria-disabled="true">
           <ChevronLeft aria-hidden="true" />
@@ -100,8 +98,6 @@ export function Pagination({ page, totalPages, hrefForPage, className, ...props 
           <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground">
             <span aria-hidden="true">…</span>
             <span className="sr-only">and other pages</span>
-          <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground" aria-hidden="true">
-            …
           </span>
         ) : (
           <Link
