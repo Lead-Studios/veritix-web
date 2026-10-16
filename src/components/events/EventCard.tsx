@@ -5,6 +5,8 @@ import { Event } from '@/types/event';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { HiCalendar, HiClock, HiLocationMarker } from 'react-icons/hi';
+import { FavouriteButton } from '@/components/events/favourite-button';
+import { useFavorite } from '@/hooks/useFavorite';
 
 interface EventCardProps {
   event: Event;
@@ -12,6 +14,8 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, index = 0 }: EventCardProps) {
+  const { isLiked, isPending, toggle } = useFavorite(event.id);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

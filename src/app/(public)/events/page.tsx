@@ -26,8 +26,6 @@ export default function EventsPage() {
   const [dateFilter, setDateFilter] = useState('');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchEvents()
