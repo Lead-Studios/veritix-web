@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { TierEditor } from '@/components/dashboard/tier-editor';
 import { DatePicker } from '@/components/ui/date-picker';
 // The same rules the API enforces, including "end date not before start date".
 import { eventBasicsSchema } from '@/lib/event-schema';
@@ -23,6 +24,7 @@ export default function NewEventPage() {
   // renders on mount fires as soon as the page loads and tells the user about
   // a field they have not even looked at yet.
   const [touched, setTouched] = React.useState(false);
+  const [tiers, setTiers] = React.useState([{ name: '', priceMinor: 0, quantityTotal: 0 }]);
 
   const result = eventBasicsSchema.safeParse(values);
   // Field-level messages, so each control can point at the one thing wrong with
@@ -140,6 +142,16 @@ export default function NewEventPage() {
           {touched && errors.endsAt && values.startsAt && values.endsAt && (
             <p id="event-ends-at-error" className="text-sm text-destructive">
               {errors.endsAt}
+            </p>
+          )}
+        </fieldset>
+
+        <fieldset className="space-y-4">
+          <legend className="text-sm font-medium text-muted-foreground">Ticket tiers</legend>
+          <TierEditor tiers={tiers} onChange={setTiers} />
+          {touched && tiers.length === 0 && (
+            <p role="alert" className="text-sm text-destructive">
+              At least one tier is required.
             </p>
           )}
         </fieldset>
