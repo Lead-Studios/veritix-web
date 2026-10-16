@@ -57,11 +57,11 @@ function TierTooltip({
  * `./tier-breakdown`, never directly, or the dynamic import stops splitting
  * anything.
  *
- * Each bar gets its own `Cell` fill and the legend is a fixed `payload` of
- * one entry per tier, rather than the single "Tickets sold" series entry
- * recharts would otherwise show — the tier name is always right there as
- * text next to its swatch, so the mapping never depends on distinguishing
- * bar colours alone.
+ * Each bar gets its own `Cell` fill. `Legend` has no `payload` prop in
+ * recharts 3 — it was removed from `Props` — so the legend is built from the
+ * chart itself and names the series; the per-tier mapping is carried by the
+ * table under the chart, where each tier's name sits next to its swatch and
+ * the breakdown never depends on telling the bar colours apart.
  */
 export function TierBreakdownImpl({ rows, height }: TierBreakdownImplProps) {
   return (
@@ -75,13 +75,7 @@ export function TierBreakdownImpl({ rows, height }: TierBreakdownImplProps) {
           stroke="var(--muted-foreground)"
         />
         <Tooltip content={<TierTooltip />} />
-        <Legend
-          payload={rows.map((row) => ({
-            value: row.name,
-            type: 'circle' as const,
-            color: row.color,
-          }))}
-        />
+        <Legend />
         <Bar dataKey="sold" name="Tickets sold" radius={[4, 4, 0, 0]}>
           {rows.map((row) => (
             <Cell key={row.id} fill={row.color} />

@@ -51,10 +51,29 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 );
 FormItem.displayName = 'FormItem';
 
-const FormLabel = React.forwardRef<HTMLLabelElement, React.LabelHTMLAttributes<HTMLLabelElement>>(
-  ({ className, ...props }, ref) => {
+export type FormLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
+  /** Renders the required marker and is announced to assistive tech. */
+  required?: boolean;
+};
+
+const FormLabel = React.forwardRef<HTMLLabelElement, FormLabelProps>(
+  ({ className, required, children, ...props }, ref) => {
     const { error, formItemId } = useFormField();
-    return <label ref={ref} className={cn(error && 'text-destructive', className)} htmlFor={formItemId} {...props} />;
+    return (
+      <label
+        ref={ref}
+        className={cn(error && 'text-destructive', className)}
+        htmlFor={formItemId}
+        {...props}
+      >
+        {children}
+        {required && (
+          <span className="ml-0.5 text-destructive" aria-hidden="true">
+            *
+          </span>
+        )}
+      </label>
+    );
   },
 );
 FormLabel.displayName = 'FormLabel';
