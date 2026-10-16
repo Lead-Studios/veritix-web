@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   app:
     build:
@@ -15,10 +13,16 @@ services:
       - /app/.next
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      # Default matches the one in src/lib/env.ts; keep the two in step.
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
       - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
+    # Optional. To override the defaults above, copy the template first:
+    #   cp .env.example .env.local
+    # `required: false` needs Docker Compose 2.24 or newer; without the file
+    # the container starts with the defaults in `environment`.
     env_file:
-      - .env.local
+      - path: .env.local
+        required: false
     restart: unless-stopped
     networks:
       - veritix-network

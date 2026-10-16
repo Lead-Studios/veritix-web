@@ -7,6 +7,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Emit `.next/standalone/server.js`. The production stage of the Dockerfile copies
+  // that directory and runs `node server.js`, so the build must produce it.
+  output: 'standalone',
   turbopack: {},
 
   images: {

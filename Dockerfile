@@ -35,4 +35,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
+# The standalone server binds to $HOSTNAME, which Docker sets to the container id;
+# bind all interfaces so the published port is reachable.
+ENV HOSTNAME=0.0.0.0
 CMD ["node", "server.js"]

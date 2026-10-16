@@ -8,6 +8,7 @@ import { z } from 'zod';
  */
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  // docker-compose.yml defaults this variable to the same value; change both together.
   NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:3000/api'),
   NEXT_PUBLIC_STELLAR_NETWORK: z.enum(['testnet', 'mainnet']).default('testnet'),
 });
