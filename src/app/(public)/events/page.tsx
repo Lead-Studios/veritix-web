@@ -14,6 +14,7 @@ import { EventCard } from '@/components/events/event-card';
 import { EventCardSkeletonGrid } from '@/components/events/event-card-skeleton';
 import { EventSearch } from '@/components/events/event-search';
 import { EventFilters } from '@/components/events/event-filters';
+import { EventSort } from '@/components/events/event-sort';
 import { routes } from '@/lib/routes';
 import type { Paginated, VeritixEvent } from '@/types';
 
@@ -78,7 +79,10 @@ function EventsListing() {
 
       <div className="flex flex-col gap-4">
         <EventSearch className="w-full max-w-xl" />
-        <EventFilters />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <EventFilters />
+          <EventSort />
+        </div>
       </div>
 
       {/* Searching, filtering, and paging all change the grid below without

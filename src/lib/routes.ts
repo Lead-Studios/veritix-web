@@ -25,6 +25,7 @@ export const routes = {
   myTicket: (id: string) => `/my-tickets/${id}`,
   checkout: '/checkout',
   orders: '/orders',
+  order: (id: string) => `/orders/${id}`,
   settings: '/settings',
   verify: '/verify',
 } as const;

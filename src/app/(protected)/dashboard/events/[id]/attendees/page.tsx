@@ -24,6 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast';
+import Breadcrumbs from '@/components/layout/breadcrumbs';
 import { ApiError, api } from '@/lib/api-client';
 import { formatDateTime } from '@/lib/format';
 
@@ -110,6 +111,7 @@ export default function AttendeesPage() {
 
   return (
     <div className="space-y-4">
+      <Breadcrumbs />
       {/* The page had no heading, so the search box and the table floated with
           nothing to orient by. */}
       <h1 className="text-2xl font-semibold">Attendees</h1>

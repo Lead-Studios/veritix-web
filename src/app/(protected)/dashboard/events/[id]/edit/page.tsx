@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/feedback/loading-state';
+import Breadcrumbs from '@/components/layout/breadcrumbs';
 import type { VeritixEvent } from '@/types';
 
 export default function EditEventPage() {
@@ -18,6 +19,7 @@ export default function EditEventPage() {
 
   return (
     <div className="space-y-4">
+      <Breadcrumbs />
       <h1 className="text-lg font-semibold">Edit {event.title}</h1>
       <ul className="space-y-2">
         {event.tiers.map((tier) => (
