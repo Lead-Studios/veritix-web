@@ -18,11 +18,15 @@ export interface AppTopbarProps {
 export function AppTopbar({ userName }: AppTopbarProps) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
+  const [lastPathname, setLastPathname] = React.useState(pathname);
 
-  // Close drawer on route change
-  React.useEffect(() => {
+  // Close the drawer whenever the route changes. Adjusting state during render is
+  // the supported pattern here (as in `SiteHeader`); an effect would cost an extra
+  // pass and trips `react-hooks/set-state-in-effect`.
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
