@@ -71,27 +71,30 @@ describe('exportRowsToCSV', () => {
     );
 
     expect(fileText).toBe(
-      'Date,Tickets sold\n2026-09-20,12\n2026-09-21,7',
+      'Date,Tickets sold\r\n2026-09-20,12\r\n2026-09-21,7',
     );
     expect(downloadName()).toBe('sales_2026-09-20_to_2026-09-21_analytics.csv');
   });
 
   it('quotes a cell containing a comma so the row does not shift', async () => {
-    exportRowsToCSV(['Event', 'Sold'], [['Jazz, Soul & More', '314']]);
+    exportRowsToCSV(['Event', 'Sold'], [['Jazz, Soul & More', '314']], 'sales.csv');
 
-    expect(fileText).toBe('Event,Sold\n"Jazz, Soul & More",314');
+    expect(fileText).toBe('Event,Sold\r\n"Jazz, Soul & More",314');
+    expect(downloadName()).toBe('sales.csv');
   });
 
   it('doubles embedded quotes and wraps the cell', async () => {
-    exportRowsToCSV(['Title'], [['The "Main" Room']]);
+    exportRowsToCSV(['Title'], [['The "Main" Room']], 'titles.csv');
 
-    expect(fileText).toBe('Title\n"The ""Main"" Room"');
+    expect(fileText).toBe('Title\r\n"The ""Main"" Room"');
+    expect(downloadName()).toBe('titles.csv');
   });
 
   it('keeps a newline inside one quoted cell', async () => {
-    exportRowsToCSV(['Notes'], [['line one\nline two']]);
+    exportRowsToCSV(['Notes'], [['line one\nline two']], 'notes.csv');
 
-    expect(fileText).toBe('Notes\n"line one\nline two"');
+    expect(fileText).toBe('Notes\r\n"line one\nline two"');
+    expect(downloadName()).toBe('notes.csv');
   });
 
   it('writes headers alone when there are no rows', async () => {
@@ -125,7 +128,7 @@ describe('exportAttendeesToCSV', () => {
         'Name,Email,Ticket Type,Checked In',
         'Ada Lovelace,ada@example.com,Floor,Yes',
         'Alan Turing,alan@example.com,Balcony,No',
-      ].join('\n'),
+      ].join('\r\n'),
     );
   });
 
@@ -137,5 +140,30 @@ describe('exportAttendeesToCSV', () => {
     );
 
     expect(fileText).toContain('Grace Hopper,grace@example.com,Floor,Yes');
+  });
+});
+
+describe('formula injection', () => {
+  it.each([['='], ['+'], ['-'], ['@'], ['\t'], ['\r']])(
+    'neutralises a cell that starts with %j',
+    (trigger) => {
+      exportRowsToCSV(['Name'], [[`${trigger}SUM(A1:A2)`]], 'attendees.csv');
+
+      expect(fileText).toContain(`'${trigger}`);
+    },
+  );
+
+  it('prefixes a hyperlink payload so it cannot open as a live formula', () => {
+    const payload = '=HYPERLINK("http://evil.example","click")';
+
+    exportRowsToCSV(['Name'], [[payload]], 'attendees.csv');
+
+    expect(fileText).toBe(`Name\r\n"'${payload.replace(/"/g, '""')}"`);
+  });
+
+  it('leaves a cell that does not start with a trigger alone', () => {
+    exportRowsToCSV(['Name'], [['Ada Lovelace']], 'attendees.csv');
+
+    expect(fileText).toBe('Name\r\nAda Lovelace');
   });
 });

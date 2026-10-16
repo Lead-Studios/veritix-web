@@ -5,9 +5,27 @@ export interface Attendee {
   checkedIn: boolean;
 }
 
-/** RFC 4180: quote a cell, and double any quote inside it, when it contains a delimiter, quote, or newline. */
+/**
+ * Characters that make a spreadsheet treat a cell as a formula instead of text.
+ * A tab or a carriage return is in the list because either can be used to smuggle
+ * a formula past a check that only looks at the first byte.
+ */
+const FORMULA_TRIGGERS = ['=', '+', '-', '@', '\t', '\r'];
+
+/**
+ * RFC 4180: quote a cell, and double any quote inside it, when it contains a
+ * delimiter, quote, or newline.
+ *
+ * A cell that starts with a formula trigger is prefixed with a single quote
+ * before that. Attendee names and ticket types are user-controlled, so a value
+ * like `=HYPERLINK("http://…","click")` opens as a live formula in Excel or
+ * Sheets when an organizer opens the exported attendee list.
+ */
 function escapeCell(value: string): string {
-  const str = String(value);
+  let str = String(value);
+  if (str.length > 0 && FORMULA_TRIGGERS.includes(str[0])) {
+    str = `'${str}`;
+  }
   if (
     str.includes(',') ||
     str.includes('"') ||
