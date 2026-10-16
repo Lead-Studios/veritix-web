@@ -16,7 +16,7 @@ const KIB = 1024;
 const LIMITS = {
   '/dashboard': 150 * KIB,
   '/verify': 120 * KIB,
-  '/events/create': 130 * KIB,
+  '/dashboard/events/new': 130 * KIB,
 };
 const SHARED_LIMIT = 80 * KIB;
 const BUILD_DIR = resolve('.next');
