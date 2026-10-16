@@ -16,9 +16,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function DatePickerExample({ initial = '', ...props }: { initial?: string; min?: string; max?: string; disabled?: boolean }) {
+function DatePickerExample({
+  initial = '',
+  label = 'Event date',
+  ...props
+}: {
+  initial?: string;
+  label?: string;
+  min?: string;
+  max?: string;
+  disabled?: boolean;
+}) {
   const [value, setValue] = React.useState(initial);
-  return <DatePicker {...props} value={value} onChange={setValue} />;
+  return <DatePicker {...props} label={label} value={value} onChange={setValue} />;
 }
 
 export const Empty: Story = { render: () => <DatePickerExample label="Event date" /> };
