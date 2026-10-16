@@ -11,6 +11,9 @@ const meta = {
   title: 'Components/DropdownMenu',
   component: DropdownMenu,
   tags: ['autodocs'],
+  // `DropdownMenu` requires `children`, so the meta has to declare it or every
+  // `{ render }` story fails to satisfy `StoryAnnotations`.
+  args: { children: null },
 } satisfies Meta<typeof DropdownMenu>;
 
 export default meta;

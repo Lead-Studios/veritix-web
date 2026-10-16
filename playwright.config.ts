@@ -49,12 +49,12 @@ const useProductionBuild = process.env.E2E_WEB_SERVER === 'build';
  * request, which is the only version of the failure most reviewers will read.
  * The HTML report is written for anyone who wants to open the trace.
  */
-const reporter: ReporterDescription = process.env.CI
+const reporter: ReporterDescription[] = process.env.CI
   ? [
       ['github'],
       ['html', { open: 'never' }],
     ]
-  : 'list';
+  : [['list']];
 
 export default defineConfig({
   testDir: './e2e',
