@@ -1,238 +1,316 @@
-/* @import "tw-animate-css"; */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 
 
-@custom-variant dark (&:is(.dark *));
+/**
+ * Design tokens.
+ *
+ * Every colour in the app resolves through one of these variables — no raw hex
+ * in components. Each token is declared as an HSL triplet so Tailwind can apply
+ * opacity modifiers (e.g. `bg-primary/10`).
+ *
+ * Dark mode is class-based (`darkMode: "class"` in tailwind.config.js) and
+ * driven by ThemeProvider, which also honours the OS preference.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
 
-:root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+
+    /* Brand violet — #4D21FF */
+    --primary: 252 100% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Brand cyan — #21D4FF */
+    --accent: 192 100% 56%;
+    --accent-foreground: 0 0% 9%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 252 100% 56%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* Surface dark — #101428 */
+    --background: 230 33% 11%;
+    --foreground: 0 0% 98%;
+
+    --card: 230 28% 14%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 230 28% 14%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 252 100% 66%;
+    --primary-foreground: 0 0% 100%;
+
+    --accent: 192 100% 60%;
+    --accent-foreground: 230 33% 11%;
+
+    --secondary: 230 20% 20%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 230 20% 20%;
+    --muted-foreground: 0 0% 64%;
+
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 66% 52%;
+    --success-foreground: 0 0% 9%;
+
+    --warning: 38 92% 58%;
+    --warning-foreground: 0 0% 9%;
+
+    --border: 230 18% 24%;
+    --input: 230 18% 24%;
+    --ring: 252 100% 66%;
+  }
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-}
 @layer base {
   * {
-    border-color: var(--border);
+    @apply border-border;
   }
+
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Visible focus for keyboard users only — never suppressed outright. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
-
-@keyframes scroll-up-once {
-  0% {
-    transform: translateY(0);
+@layer components {
+  /*
+   * Long-form legal body copy.
+   *
+   * `@tailwindcss/typography` is not a dependency and is not worth adding for
+   * two pages, so the handful of elements the Terms and Privacy documents
+   * actually use are styled here rather than being given utility classes one
+   * paragraph at a time. `> * + *` rather than `space-y-*` on the wrapper, so
+   * the spacing rule survives a section body that is a list inside a list.
+   */
+  .legal-body > * + * {
+    @apply mt-4;
   }
-  100% {
-    transform: translateY(-180px);
+
+  .legal-body p {
+    @apply leading-relaxed;
+  }
+
+  .legal-body a {
+    @apply font-medium text-foreground underline underline-offset-4 hover:text-primary;
+  }
+
+  .legal-body ul,
+  .legal-body ol {
+    @apply list-outside space-y-2 pl-5;
+  }
+
+  .legal-body ul {
+    @apply list-disc;
+  }
+
+  .legal-body ol {
+    @apply list-decimal;
+  }
+
+  .legal-body h3 {
+    @apply mt-6 text-base font-semibold text-foreground;
+  }
+
+  .legal-body strong {
+    @apply font-medium text-foreground;
   }
 }
 
-@keyframes scroll-down-once {
-  0% {
-    transform: translateY(-180px);
+@media print {
+  /*
+   * Print a document, not an app. The receipt asks the browser to print the
+   * page; the app shell (topbar, sidebar, footer) and every interactive
+   * control have no business on paper.
+   */
+  header,
+  aside,
+  footer,
+  nav,
+  button,
+  [data-print-hide] {
+    display: none !important;
   }
-  100% {
-    transform: translateY(0);
+
+  main {
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  a[href]::after {
+    content: '';
   }
 }
 
-.animate-scroll-up-once {
-  animation: scroll-up-once 2s ease-out forwards;
-  will-change: transform;
+@layer utilities {
+  /* Respect a user's reduced-motion preference everywhere by default. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-.animate-scroll-down-once {
-  animation: scroll-down-once 2s ease-out forwards;
-  will-change: transform;
-}
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@layer components {
+  /*
+   * Blog post bodies, rendered from MDX.
+   *
+   * MDX compiles to plain elements with no class names, so there is nothing to
+   * attach utilities to and the only options are per-element wrapper components
+   * (which every post then has to opt into) or one rule set here. The wrapper
+   * components would be the better answer if the element set were open-ended;
+   * it is not, a post is `h2`, `p`, `ul`, `ol`, `pre`, `code`, `blockquote`,
+   * `table`, `img`, and `a`.
+   *
+   * `@tailwindcss/typography` is not a dependency and is not worth adding for
+   * one surface, so this is a smaller version of what its `prose` class does.
+   * A full typography plugin would also restyle things this deliberately does
+   * not touch, like the site's own heading scale.
+   */
+  .mdx-body {
+    @apply text-muted-foreground;
+  }
 
-@font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Light/Proxima Nova Light.ttf")
-    format("truetype");
-  font-weight: 300;
-  font-style: normal;
-}
+  .mdx-body > * + * {
+    @apply mt-5;
+  }
 
-@font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Regular/Proxima Nova Regular.ttf")
-    format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
+  /* Headings. Sizes come from the site's scale, not from a typography default,
+     so a post and the rest of the product look like the same product. */
+  .mdx-body h2 {
+    @apply mt-12 text-2xl font-semibold tracking-tight text-foreground;
+  }
 
-@font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Semibold/Proxima Nova Semibold.ttf")
-    format("truetype");
-  font-weight: 600;
-  font-style: normal;
-}
+  .mdx-body h3 {
+    @apply mt-8 text-xl font-semibold tracking-tight text-foreground;
+  }
 
-@font-face {
-  font-family: "Proxima Nova";
-  src: url("/Proxima Nova/Proxima Nova Extrabold/Proxima Nova Extrabold.ttf")
-    format("truetype");
-  font-weight: 800;
-  font-style: normal;
-}
+  .mdx-body h4 {
+    @apply mt-6 text-base font-semibold text-foreground;
+  }
 
-html,
-body {
-  height: 100%;
-  font-family: "Proxima Nova", sans-serif;
-}
+  /* A heading directly after a heading gets no top margin, or the gap between
+     two consecutive subheadings is twice the gap between a heading and text. */
+  .mdx-body h2 + *,
+  .mdx-body h3 + *,
+  .mdx-body h4 + * {
+    @apply mt-3;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  .mdx-body p {
+    @apply leading-relaxed;
+  }
 
-body {
-  font-family: var(--font-body), "Proxima Nova", sans-serif;
-  background-color: #0b1025;
-  color: #f6f7ff;
-}
+  .mdx-body a {
+    @apply font-medium text-foreground underline underline-offset-4 hover:text-primary;
+  }
 
-.font-display {
-  font-family: var(--font-display), "Proxima Nova", serif;
-}
+  .mdx-body strong {
+    @apply font-semibold text-foreground;
+  }
 
-.contact-form-graadient {
-  background: #000625;
-  background: linear-gradient(
-    157deg,
-    rgba(0, 6, 37, 1) 30%,
-    rgba(30, 58, 138, 1) 57%,
-    rgba(0, 6, 37, 1) 90%
-  );
-}
+  .mdx-body ul,
+  .mdx-body ol {
+    @apply list-outside space-y-2 pl-6;
+  }
 
-.contact-form-graadient-btn {
-  background: #4d21ff;
-  background: linear-gradient(
-    90deg,
-    rgba(77, 33, 255, 1) 0%,
-    rgba(33, 212, 255, 1) 100%
-  );
+  .mdx-body ul {
+    @apply list-disc;
+  }
+
+  .mdx-body ol {
+    @apply list-decimal;
+  }
+
+  .mdx-body li > ul,
+  .mdx-body li > ol {
+    @apply mt-2;
+  }
+
+  .mdx-body blockquote {
+    @apply border-l-2 border-border pl-4 italic;
+  }
+
+  /*
+   * Code. `whitespace-pre` on the block so a long line scrolls rather than
+   * wrapping mid-token, which is how a shell command or an address stops being
+   * copyable.
+   */
+  .mdx-body code {
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em] text-foreground;
+  }
+
+  .mdx-body pre {
+    @apply overflow-x-auto rounded-lg border border-border bg-muted/50 p-4;
+  }
+
+  .mdx-body pre code {
+    @apply bg-transparent p-0 text-sm;
+  }
+
+  .mdx-body table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .mdx-body th,
+  .mdx-body td {
+    @apply border border-border px-3 py-2 text-left align-top;
+  }
+
+  .mdx-body th {
+    @apply bg-muted/50 font-medium text-foreground;
+  }
+
+  .mdx-body img {
+    @apply rounded-lg;
+  }
+
+  .mdx-body hr {
+    @apply my-10 border-border;
+  }
 }

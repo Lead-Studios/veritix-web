@@ -1,274 +1,155 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HiSearch, HiLocationMarker, HiCalendar } from 'react-icons/hi';
-import CategoryFilter from '@/components/events/CategoryFilter';
-import FilterInput from '@/components/events/FilterInput';
-import TabSelector from '@/components/TabSelector';
-import { fetchEvents } from '@/lib/eventsApi';
-import EventCard from '@/components/events/EventCard';
-import { EmptyState } from '@/components/EmptyState';
-import type { Event } from '@/types/event';
+import { Suspense } from 'react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import useSWR from 'swr';
+import { SearchX } from 'lucide-react';
+import { Container } from '@/components/layout/container';
+import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
+import { EmptyState } from '@/components/feedback/empty-state';
+import { ErrorState } from '@/components/feedback/error-state';
+import { EventCard } from '@/components/events/event-card';
+import { EventCardSkeletonGrid } from '@/components/events/event-card-skeleton';
+import { EventSearch } from '@/components/events/event-search';
+import { EventFilters } from '@/components/events/event-filters';
+import { routes } from '@/lib/routes';
+import type { Paginated, VeritixEvent } from '@/types';
 
-const PAGE_SIZE = 9;
+/**
+ * Public listing of events.
+ *
+ * The URL drives the whole view: search, filters, and the page number all live
+ * in the query string, so a filtered and paginated listing can be shared, is
+ * restored on reload, and steps backwards through the browser history.
+ */
 
-type ViewMode = 'upcoming' | 'featured';
+const PAGE_SIZE = 12;
 
-export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeFilters, setActiveFilters] = useState<string[]>(['music', 'festival']);
-  const [viewMode, setViewMode] = useState<ViewMode>('upcoming');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+/** Parameters the listing owns. Anything else in the URL is left alone. */
+const QUERY_KEYS = ['q', 'city', 'date', 'minPrice', 'maxPrice', 'sort'] as const;
 
-  useEffect(() => {
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+function buildRequest(searchParams: URLSearchParams): string {
+  const query = new URLSearchParams({ pageSize: String(PAGE_SIZE) });
 
-  const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    fetchEvents()
-      .then((data) => {
-        setEvents(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load events. Please try again.');
-        setEvents([]);
-      })
-      .finally(() => setLoading(false));
-  };
+  for (const key of QUERY_KEYS) {
+    const value = searchParams.get(key)?.trim();
+    if (value) query.set(key, value);
+  }
 
-  const filteredEvents = useMemo(() => {
-    let list = viewMode === 'featured' ? events.filter((e) => e.featured) : events;
-    if (activeFilters.length > 0) list = list.filter((e) => activeFilters.includes(e.category));
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((e) => e.name.toLowerCase().includes(q) || e.location.toLowerCase().includes(q) || e.venue.toLowerCase().includes(q));
-    }
-    if (locationFilter.trim()) {
-      const loc = locationFilter.toLowerCase();
-      list = list.filter((e) => e.location.toLowerCase().includes(loc) || e.venue.toLowerCase().includes(loc));
-    }
-    if (dateFilter.trim()) list = list.filter((e) => e.date.toLowerCase().includes(dateFilter.toLowerCase()));
-    return list;
-  }, [events, activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+  query.set('page', searchParams.get('page')?.trim() || '1');
 
-  // Reset visible count when filters change
-  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [activeFilters, viewMode, searchQuery, locationFilter, dateFilter]);
+  return `/events?${query.toString()}`;
+}
 
-  // Infinite scroll via IntersectionObserver
-  const loadMore = useCallback(() => {
-    setVisibleCount((c) => Math.min(c + PAGE_SIZE, filteredEvents.length));
-  }, [filteredEvents.length]);
+function EventsListing() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver((entries) => { if (entries[0].isIntersecting) loadMore(); }, { threshold: 0.1 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadMore]);
+  const request = buildRequest(new URLSearchParams(searchParams.toString()));
+  const { data, error, isLoading, mutate } = useSWR<Paginated<VeritixEvent>>(request, {
+    // Keep the current page on screen while the next one loads.
+    keepPreviousData: true,
+  });
 
-  const visibleEvents = filteredEvents.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredEvents.length;
+  const page = Number.parseInt(searchParams.get('page') ?? '1', 10) || 1;
+  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
+  const hasActiveFilters = QUERY_KEYS.some((key) => searchParams.get(key));
 
-  const removeFilter = (filter: string) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== filter));
+  const hrefForPage = (target: number): string => {
+    const next = new URLSearchParams(searchParams.toString());
+
+    if (target <= 1) next.delete('page');
+    else next.set('page', String(target));
+
+    const query = next.toString();
+    return query ? `${pathname}?${query}` : pathname;
   };
 
   return (
-    <div className="min-h-screen bg-[#101428]">
-      <section className="relative overflow-hidden">
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="relative h-60 sm:h-70 md:h-100 rounded-2xl overflow-hidden"
-          >
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: 'url(/images/events/event.png)' }} />
-              <div className="absolute inset-0 bg-black/30" />
-            </div>
-            <div className="relative h-full flex items-center justify-center px-8">
-              <motion.h1
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-center"
-              >
-                <span className="text-[#6B8CFF]">FESTIVAL</span>
-              </motion.h1>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+    <Container className="flex flex-col gap-8 py-10 sm:py-14">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Events</h1>
+        <p className="text-muted-foreground">
+          Browse what is on, and narrow it down to what you want to see.
+        </p>
+      </header>
 
-      <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="rounded-2xl border border-[#E0E0E033]/20 bg-primary-dark-blue/50 p-4 sm:p-6 space-y-5">
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 md:col-span-6">
-              <FilterInput
-                icon={HiSearch}
-                placeholder="Search events, artists, or venues"
-                value={searchQuery}
-                onChange={setSearchQuery}
-                focusColor="#6B8CFF"
-                rounded="rounded-lg"
-                inputClassName="py-3"
-              />
-            </div>
-            <div className="col-span-12 md:col-span-3">
-              <FilterInput
-                icon={HiLocationMarker}
-                placeholder="Location"
-                value={locationFilter}
-                onChange={setLocationFilter}
-                focusColor="#6B8CFF"
-                rounded="rounded-lg"
-                inputClassName="py-3"
-              />
-            </div>
-            <div className="col-span-12 md:col-span-3">
-              <FilterInput
-                icon={HiCalendar}
-                placeholder="Date"
-                value={dateFilter}
-                onChange={setDateFilter}
-                focusColor="#6B8CFF"
-                rounded="rounded-lg"
-                inputClassName="py-3"
-              />
-            </div>
+      <div className="flex flex-col gap-4">
+        <EventSearch className="w-full max-w-xl" />
+        <EventFilters />
+      </div>
+
+      {/* Searching, filtering, and paging all change the grid below without
+          moving focus or changing the URL visibly. Without this the only
+          feedback a screen-reader user gets is silence. */}
+      {!isLoading && data && (
+        <p role="status" className="sr-only">
+          Showing {data.items.length} of {data.total} events
+          {hasActiveFilters ? ' matching your filters' : ''}, page {page} of {totalPages}.
+        </p>
+      )}
+
+      {error ? (
+        <ErrorState
+          title="We could not load the events"
+          description="The listing is unavailable right now. Try again in a moment."
+          onRetry={() => mutate()}
+        />
+      ) : isLoading && !data ? (
+        <EventCardSkeletonGrid count={6} />
+      ) : data && data.items.length > 0 ? (
+        <>
+          {/* `EventCard` titles are <h3>s, so without this the outline jumped
+              straight from the page <h1> to the first result. */}
+          <h2 id="events-results-heading" className="sr-only">
+            Results
+          </h2>
+          <div
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            aria-labelledby="events-results-heading"
+          >
+            {data.items.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CategoryFilter activeFilters={activeFilters} onRemoveFilter={removeFilter} onClearAll={() => setActiveFilters([])} />
-            <motion.p
-              key={filteredEvents.length}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-gray-400 font-medium text-sm"
-            >
-              {!error && `${filteredEvents.length} events found`}
-            </motion.p>
-          </div>
-        </div>
-      </section>
 
-      <TabSelector
-        tabs={['Upcoming Events', 'Featured']}
-        activeTab={viewMode === 'upcoming' ? 'Upcoming Events' : 'Featured'}
-        onTabChange={(tab) => setViewMode(tab === 'Upcoming Events' ? 'upcoming' : 'featured')}
-      />
+          <Pagination page={page} totalPages={totalPages} hrefForPage={hrefForPage} />
+        </>
+      ) : (
+        <EmptyState
+          icon={<SearchX className="size-6" aria-hidden="true" />}
+          title="No events match these filters"
+          description={
+            hasActiveFilters
+              ? 'Try widening the date range or clearing a filter.'
+              : 'Nothing is listed yet — check back soon.'
+          }
+          action={
+            hasActiveFilters ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href={routes.events}>Clear filters</Link>
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
+    </Container>
+  );
+}
 
-      <section className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
-        {/* Loading State */}
-        {loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center py-20 space-y-4"
-          >
-            <div className="w-12 h-12 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
-            <p className="text-gray-400 text-sm">Loading events...</p>
-          </motion.div>
-        )}
-
-        {/* Error State */}
-        {!loading && error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center py-20 space-y-4"
-          >
-            <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
-              <svg className="w-12 h-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div className="text-center space-y-2">
-              <h3 className="text-white font-semibold text-lg">Unable to load events</h3>
-              <p className="text-gray-400 text-sm max-w-md">{error}</p>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleRetry}
-              className="px-6 py-3 rounded-xl bg-[#6B8CFF] hover:bg-[#5a7bef] text-white font-semibold transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Try Again
-            </motion.button>
-          </motion.div>
-        )}
-
-        {/* Events List */}
-        {!loading && !error && (
-          <AnimatePresence mode="wait">
-            {filteredEvents.length > 0 ? (
-              <motion.div
-                key={`${viewMode}-${activeFilters.join('-')}-${searchQuery}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-5"
-              >
-                {visibleEvents.map((event, index) => (
-                  <EventCard key={event.id} event={event} index={index} />
-                ))}
-                {hasMore && (
-                  <div ref={sentinelRef} className="flex justify-center py-6">
-                    <div className="w-8 h-8 border-4 border-[#6B8CFF]/30 border-t-[#6B8CFF] rounded-full animate-spin" />
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-              >
-                <EmptyState
-                  variant="search"
-                  title="No events found"
-                  description="Try adjusting your filters or search query to find more events"
-                  action={{
-                    label: "Clear Filters",
-                    onClick: () => {
-                      setActiveFilters([]);
-                      setSearchQuery('');
-                      setLocationFilter('');
-                      setDateFilter('');
-                    },
-                  }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
-      </section>
-    </div>
+export default function EventsPage() {
+  return (
+    // useSearchParams needs a Suspense boundary during static rendering.
+    <Suspense
+      fallback={
+        <Container className="py-10 sm:py-14">
+          <EventCardSkeletonGrid count={6} />
+        </Container>
+      }
+    >
+      <EventsListing />
+    </Suspense>
   );
 }

@@ -1,0 +1,1 @@
+npm install @stellar/freighter-api
