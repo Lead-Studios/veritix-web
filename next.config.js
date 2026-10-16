@@ -52,7 +52,11 @@ const withPwa = pwaEnabled
     })
   : (config) => config;
 
-const withSentryConfig = require('@sentry/nextjs/withSentryConfig');
+// `withSentryConfig` is a named export of the package root. The
+// `@sentry/nextjs/withSentryConfig` subpath is not in the package's `exports`
+// map, so requiring it throws ERR_PACKAGE_PATH_NOT_EXPORTED and the config
+// never loads.
+const { withSentryConfig } = require('@sentry/nextjs');
 
 /** @type {import('next').NextConfig} */
 module.exports = withSentryConfig(withBundleAnalyzer(withPwa(nextConfig)), {
