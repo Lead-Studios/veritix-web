@@ -346,26 +346,6 @@ export const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
 );
 SheetContent.displayName = 'SheetContent';
 
-export const SheetHeader = Object.assign(
-  ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div
-      className={cn('flex flex-col space-y-2 text-center sm:text-left', className)}
-      {...props}
-    />
-  ),
-  { displayName: 'SheetHeader' },
-);
-
-export const SheetFooter = Object.assign(
-  ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div
-      className={cn('mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
-      {...props}
-    />
-  ),
-  { displayName: 'SheetFooter' },
-);
-
 export const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
 );

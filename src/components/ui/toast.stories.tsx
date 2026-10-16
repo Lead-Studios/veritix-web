@@ -7,6 +7,9 @@ const meta = {
   title: 'Components/Toast',
   component: ToastProvider,
   tags: ['autodocs'],
+  // `children` is a required prop of `ToastProvider`, so the story args have to
+  // declare it even though every story renders its own tree through `render`.
+  args: { children: null },
 } satisfies Meta<typeof ToastProvider>;
 
 export default meta;
