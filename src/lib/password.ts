@@ -45,14 +45,26 @@ export function passwordPolicyError(value: string): string | null {
   return failed ? failed.label : null;
 }
 
+/**
+ * Derived from PASSWORD_RULES so there is exactly one place to add or remove
+ * a policy rule. The `.min` / `.max` guards handle length; `superRefine` walks
+ * PASSWORD_RULES for every other constraint so the checklist and the validator
+ * can never drift apart.
+ */
 export const passwordSchema = z
   .string()
   .min(PASSWORD_MIN_LENGTH, `Use at least ${PASSWORD_MIN_LENGTH} characters`)
   .max(PASSWORD_MAX_LENGTH, `Use at most ${PASSWORD_MAX_LENGTH} characters`)
-  .regex(/[a-z]/, 'Include a lowercase letter')
-  .regex(/[A-Z]/, 'Include an uppercase letter')
-  .regex(/[0-9]/, 'Include a number')
-  .regex(/[^A-Za-z0-9]/, 'Include a symbol');
+  .superRefine((value, ctx) => {
+    for (const rule of PASSWORD_RULES) {
+      if (!rule.test(value)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Include ${rule.label.toLowerCase()}`,
+        });
+      }
+    }
+  });
 
 /**
  * A new password plus its confirmation.

@@ -7,7 +7,7 @@ Measured gzipped.
 | --------------- | ---------------- | ------------------------------------------ |
 | `/dashboard`    | 150 kB           | Must feel instant on 3G; core analytics UI |
 | `/verify`       | 120 kB           | Gate staff devices are often low-end       |
-| `/events/create`| 130 kB           | Multi-step form; no heavy chart libs       |
+| `/dashboard/events/new`| 130 kB           | Multi-step form; no heavy chart libs       |
 | Shared chunks   | 80 kB            | Vendor + framework baseline                |
 
 ## How to measure
