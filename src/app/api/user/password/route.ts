@@ -49,7 +49,7 @@ const passwordBody = z.object({
 });
 
 export async function PATCH(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const raw = await request.json().catch(() => null);

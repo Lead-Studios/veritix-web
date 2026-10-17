@@ -5,6 +5,7 @@ import { SWRConfig } from 'swr';
 import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { CartProvider } from '@/context/cart-context';
+import { SessionProvider } from '@/context/session-context';
 import { ToastProvider } from '@/components/ui/toast';
 import { fetcher, ApiError } from '@/lib/api-client';
 
@@ -29,7 +30,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       >
         {/* Inside SWRConfig so a fetch error handler can raise a toast. */}
         <ToastProvider>
-          <CartProvider>{children}</CartProvider>
+          <SessionProvider>
+            <CartProvider>{children}</CartProvider>
+          </SessionProvider>
         </ToastProvider>
         {/* Mounted once here so any component can `toast()` (react-toastify)
             without its own container. Independent of ToastProvider/useToast
