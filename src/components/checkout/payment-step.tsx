@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { apiRequest } from '@/lib/api-client';
 import { env } from '@/lib/env';
 import { formatXLM } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -151,26 +152,6 @@ const FAILURE_COPY: Record<
   },
 };
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    headers: { 'Content-Type': 'application/json' },
-    ...init,
-  });
-
-  const text = await response.text();
-  const payload: unknown = text ? JSON.parse(text) : undefined;
-
-  if (!response.ok) {
-    const message =
-      payload && typeof payload === 'object' && 'message' in payload
-        ? String((payload as { message: unknown }).message)
-        : response.statusText;
-    throw new Error(message);
-  }
-
-  return payload as T;
-}
-
 /** Map a thrown value onto the failure we can actually explain. */
 function classify(error: unknown, phase: 'connect' | 'sign'): PaymentStatus {
   // EIP-1193 style rejection code, which Freighter follows.
@@ -237,8 +218,8 @@ export function PaymentStep({
       attemptsRef.current += 1;
 
       try {
-        const latest = await apiFetch<OrderRecord>(
-          `/api/orders?id=${encodeURIComponent(orderId)}`,
+        const latest = await apiRequest<OrderRecord>(
+          `/orders?id=${encodeURIComponent(orderId)}`,
         );
         if (!mountedRef.current) return;
 
@@ -325,14 +306,14 @@ export function PaymentStep({
     try {
       // 1. Create the order and its escrow; the backend prepares the envelope.
       setStatus('preparing');
-      const created = await apiFetch<OrderRecord>('/api/orders', {
+      const created = await apiRequest<OrderRecord>('/orders', {
         method: 'POST',
-        body: JSON.stringify({
+        body: {
           eventId,
           buyerAddress: address,
           amountStroops: amountStroops.toString(),
           lines,
-        }),
+        },
       });
 
       if (!mountedRef.current) return;
@@ -359,9 +340,9 @@ export function PaymentStep({
 
       // 3. Submit, then wait for the network to confirm.
       setStatus('pending');
-      const submitted = await apiFetch<OrderRecord>('/api/orders', {
+      const submitted = await apiRequest<OrderRecord>('/orders', {
         method: 'PATCH',
-        body: JSON.stringify({ orderId: created.id, signedXdr }),
+        body: { orderId: created.id, signedXdr },
       });
 
       if (!mountedRef.current) return;
