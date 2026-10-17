@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { queryCheckInRates } from '@/lib/analytics';
+import { demoHeaders, demoPayload } from '@/lib/demo-data';
 
 /**
  * GET /api/analytics/check-in-rate
@@ -16,19 +17,21 @@ import { queryCheckInRates } from '@/lib/analytics';
  * that route for why the owner comes from the cookie and never the query.
  */
 export async function GET(request: NextRequest) {
-  const sessionUserId = request.cookies.get('session_user_id')?.value;
-  if (!sessionUserId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const sessionUserId = await readSessionUserId(request);
+  if (!sessionUserId) return unauthorized();
 
   const params = request.nextUrl.searchParams;
 
   return NextResponse.json(
-    queryCheckInRates({
-      from: params.get('from') ?? undefined,
-      to: params.get('to') ?? undefined,
-      eventId: params.get('eventId') ?? undefined,
-      ownerId: sessionUserId,
-    }),
+    {
+      ...queryCheckInRates({
+        from: params.get('from') ?? undefined,
+        to: params.get('to') ?? undefined,
+        eventId: params.get('eventId') ?? undefined,
+        ownerId: sessionUserId,
+      }),
+      ...demoPayload(),
+    },
+    { headers: demoHeaders() },
   );
 }
