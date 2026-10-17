@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { TierEditor } from '@/components/dashboard/tier-editor';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -250,6 +251,16 @@ export default function NewEventPage() {
           {endsAtError && values.startsAt && values.endsAt && (
             <p id="event-ends-at-error" className="text-sm text-destructive">
               {endsAtError}
+            </p>
+          )}
+        </fieldset>
+
+        <fieldset className="space-y-4">
+          <legend className="text-sm font-medium text-muted-foreground">Ticket tiers</legend>
+          <TierEditor tiers={tiers} onChange={setTiers} />
+          {touched && tiers.length === 0 && (
+            <p role="alert" className="text-sm text-destructive">
+              At least one tier is required.
             </p>
           )}
         </fieldset>
