@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,84 +8,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-
-/**
- * Date, city, and price filters for the events listing.
- *
- * Each filter is written straight to the query string, so a filtered view is
- * shareable and survives a reload, and the back button undoes one change at a
- * time. Rendered inline from `md` up and inside a `Sheet` below it.
- */
+import { useEventFilters } from '@/hooks/use-event-filters';
 
 const FILTER_KEYS = ['city', 'date', 'minPrice', 'maxPrice'] as const;
-
 type FilterKey = (typeof FILTER_KEYS)[number];
-type FilterValues = Record<FilterKey, string>;
-
-const EMPTY_FILTERS: FilterValues = { city: '', date: '', minPrice: '', maxPrice: '' };
 
 export interface EventFiltersProps {
   className?: string;
 }
 
-/** Build the filter query while keeping any parameter the filters do not own. */
-function withFilters(
-  searchParams: URLSearchParams,
-  changes: Partial<FilterValues>,
-): URLSearchParams {
-  const next = new URLSearchParams(searchParams.toString());
-
-  for (const [key, value] of Object.entries(changes)) {
-    const trimmed = value?.trim();
-    if (trimmed) next.set(key, trimmed);
-    else next.delete(key);
-  }
-
-  // Any filter change invalidates the current page.
-  next.delete('page');
-
-  return next;
-}
-
 export function EventFilters({ className }: EventFiltersProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { filters, setFilter, clearAll } = useEventFilters(FILTER_KEYS as readonly string[]);
 
-  const values = React.useMemo<FilterValues>(() => {
-    const next = { ...EMPTY_FILTERS };
-    for (const key of FILTER_KEYS) next[key] = searchParams.get(key) ?? '';
+  const values = React.useMemo(() => {
+    const next = { city: '', date: '', minPrice: '', maxPrice: '' };
+    for (const key of FILTER_KEYS) next[key] = (filters as any)[key] ?? '';
     return next;
-  }, [searchParams]);
-
-  const replace = React.useCallback(
-    (next: URLSearchParams) => {
-      const query = next.toString();
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-    },
-    [pathname, router],
-  );
-
-  const setFilter = React.useCallback(
-    (key: FilterKey, value: string) => {
-      replace(
-        withFilters(new URLSearchParams(searchParams.toString()), { [key]: value }),
-      );
-    },
-    [replace, searchParams],
-  );
-
-  const clearAll = React.useCallback(() => {
-    replace(withFilters(new URLSearchParams(searchParams.toString()), EMPTY_FILTERS));
-  }, [replace, searchParams]);
+  }, [filters]);
 
   const hasFilters = FILTER_KEYS.some((key) => values[key] !== '');
 
-  // Namespaced per rendered copy: both layouts stay mounted and are switched by
-  // CSS at the md breakpoint, so identical ids would exist twice in the DOM.
-  // `<label for>` resolves to the first match in document order, which was
-  // always the `hidden md:block` card, so on a phone "City" focused an input
-  // inside a display:none subtree and the soft keyboard never opened.
   const fields = (idPrefix: string) => (
     <div className="grid gap-4 sm:grid-cols-2">
       <div className="flex flex-col gap-2">
@@ -149,7 +90,6 @@ export function EventFilters({ className }: EventFiltersProps) {
 
   return (
     <div className={className}>
-      {/* Inline from the md breakpoint up, where there is room for four fields. */}
       <Card className="hidden md:block">
         <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle as="h2">Filters</CardTitle>
@@ -158,7 +98,6 @@ export function EventFilters({ className }: EventFiltersProps) {
         <CardContent className="p-6 pt-0">{fields('inline')}</CardContent>
       </Card>
 
-      {/* Below md the same fields live behind a Sheet so the listing stays visible. */}
       <div className="md:hidden">
         <Sheet
           title="Filters"

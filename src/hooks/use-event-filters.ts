@@ -17,6 +17,9 @@ export type EventFilterKey = (typeof EVENT_FILTER_KEYS)[number];
 
 export type EventFilters = Record<EventFilterKey, string>;
 
+/** Generic filter shape for components that own a different key set. */
+export type GenericFilters = Record<string, string>;
+
 export const EMPTY_EVENT_FILTERS: EventFilters = {
   q: '',
   city: '',
@@ -24,76 +27,89 @@ export const EMPTY_EVENT_FILTERS: EventFilters = {
   sort: '',
 };
 
+export const EMPTY_GENERIC_FILTERS: GenericFilters = {};
+
 /** Shape shared by URLSearchParams and next/navigation's ReadonlyURLSearchParams. */
 export interface SearchParamsLike {
   get(key: string): string | null;
 }
 
 /** Read the filter state back out of a query string. Missing keys become empty. */
-export function parseEventFilters(searchParams: SearchParamsLike | null): EventFilters {
-  const filters = { ...EMPTY_EVENT_FILTERS };
-
-  for (const key of EVENT_FILTER_KEYS) {
+export function parseEventFilters(
+  searchParams: SearchParamsLike | null,
+  keys: readonly string[] = EVENT_FILTER_KEYS,
+): Record<string, string> {
+  const filters: Record<string, string> = {};
+  for (const key of keys) {
     filters[key] = searchParams?.get(key)?.trim() ?? '';
   }
-
   return filters;
 }
 
 /** Serialize the filter state, dropping blank values so the URL stays tidy. */
-export function toSearchParams(filters: EventFilters): URLSearchParams {
+export function toSearchParams(filters: GenericFilters, keys?: readonly string[]): URLSearchParams {
   const params = new URLSearchParams();
-
-  for (const key of EVENT_FILTER_KEYS) {
-    const value = filters[key].trim();
+  const keysToWrite = keys ?? Object.keys(filters);
+  for (const key of keysToWrite) {
+    const value = filters[key]?.trim() ?? '';
     if (value) params.set(key, value);
   }
-
   return params;
 }
 
 export interface UseEventFiltersResult {
-  filters: EventFilters;
+  filters: GenericFilters;
   /** Set one filter and push the whole set back into the URL. */
-  setFilter: (key: EventFilterKey, value: string) => void;
-  /** Drop every filter parameter, including any that are not recognised. */
+  setFilter: (key: string, value: string) => void;
+  /** Drop every filter parameter owned by this hook, keeping unrelated ones. */
   clearAll: () => void;
 }
 
-export function useEventFilters(): UseEventFiltersResult {
+export function useEventFilters(keys: readonly string[] = EVENT_FILTER_KEYS): UseEventFiltersResult {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const filters = React.useMemo(() => parseEventFilters(searchParams), [searchParams]);
+  const filters = React.useMemo(() => parseEventFilters(searchParams, keys), [searchParams, keys]);
 
-  // The most recent filter state, including changes that have been written to the
-  // router but not yet reflected in `searchParams`. `router.replace` is not
-  // synchronous, so two calls in the same tick would otherwise both start from the
-  // same render-time snapshot and the second would discard the first change.
-  const latestFilters = React.useRef(filters);
+  const latestParams = React.useRef<URLSearchParams>(new URLSearchParams(searchParams?.toString() ?? ''));
+  const latestFilters = React.useRef<Record<string, string>>(filters);
 
-  // Once the URL catches up (or changes for any other reason such as back/forward),
-  // it is the source of truth again.
   React.useEffect(() => {
+    latestParams.current = new URLSearchParams(searchParams?.toString() ?? '');
     latestFilters.current = filters;
-  }, [filters]);
+  }, [searchParams, filters]);
 
   const write = React.useCallback(
-    (next: EventFilters) => {
+    (next: GenericFilters) => {
+      const merged = new URLSearchParams(latestParams.current.toString());
+      for (const key of keys) {
+        const value = next[key]?.trim() ?? '';
+        if (value) merged.set(key, value);
+        else merged.delete(key);
+      }
+      merged.delete('page');
+
       latestFilters.current = next;
-      const query = toSearchParams(next).toString();
+      const query = merged.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+      latestParams.current = merged;
     },
-    [pathname, router],
+    [pathname, router, keys],
   );
 
   const setFilter = React.useCallback(
-    (key: EventFilterKey, value: string) => write({ ...latestFilters.current, [key]: value }),
+    (key: string, value: string) => {
+      write({ ...latestFilters.current, [key]: value });
+    },
     [write],
   );
 
-  const clearAll = React.useCallback(() => write(EMPTY_EVENT_FILTERS), [write]);
+  const clearAll = React.useCallback(() => {
+    const empty: GenericFilters = {};
+    for (const key of keys) empty[key] = '';
+    write(empty);
+  }, [write, keys]);
 
   return { filters, setFilter, clearAll };
 }
