@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { Camera, CameraOff, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { Camera, CameraOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { ScanResultDisplay, type ScanResult } from '@/components/verify/scan-result';
 import { formatDateTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { Paginated, VeritixEvent } from '@/types';
@@ -31,15 +32,6 @@ type BarcodeDetectorCtor = new (options?: { formats?: string[] }) => BarcodeDete
 function barcodeDetector(): BarcodeDetectorCtor | null {
   if (typeof window === 'undefined') return null;
   return (window as unknown as { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector ?? null;
-}
-
-type ResultKind = 'valid' | 'already_used' | 'invalid' | 'error';
-
-interface ScanResult {
-  kind: ResultKind;
-  message: string;
-  usedAt?: string;
-  ticketId?: string;
 }
 
 /** API outcomes that mean "this ticket must not get in", shown as one red state. */
@@ -94,53 +86,6 @@ async function submitCode(payload: string, eventId: string): Promise<ScanResult>
     kind: 'error',
     message: body.message ?? 'Something went wrong. Scan again.',
   };
-}
-
-const RESULT_STYLE: Record<ResultKind, { title: string; className: string; Icon: typeof CheckCircle2 }> = {
-  valid: {
-    title: 'Valid — let them in',
-    className: 'border-success bg-success text-success-foreground',
-    Icon: CheckCircle2,
-  },
-  already_used: {
-    title: 'Already used',
-    className: 'border-warning bg-warning text-warning-foreground',
-    Icon: AlertTriangle,
-  },
-  invalid: {
-    title: 'Invalid ticket',
-    className: 'border-destructive bg-destructive text-destructive-foreground',
-    Icon: XCircle,
-  },
-  error: {
-    title: 'Could not check ticket',
-    className: 'border-border bg-muted text-foreground',
-    Icon: AlertTriangle,
-  },
-};
-
-function ResultPanel({ result, onDismiss }: { result: ScanResult; onDismiss: () => void }) {
-  const { title, className, Icon } = RESULT_STYLE[result.kind];
-  return (
-    <div className={cn('rounded-lg border-2 p-5', className)} data-result={result.kind}>
-      <div className="flex items-start gap-3">
-        <Icon className="mt-0.5 h-8 w-8 shrink-0" aria-hidden="true" />
-        <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-xl font-semibold">{title}</p>
-          <p>{result.message}</p>
-          {result.kind === 'already_used' && result.usedAt && (
-            <p className="text-sm">First scanned {formatDateTime(result.usedAt)}.</p>
-          )}
-          {result.kind === 'valid' && result.ticketId && (
-            <p className="text-sm opacity-90">Ticket {result.ticketId}</p>
-          )}
-        </div>
-      </div>
-      <Button variant="outline" size="sm" className="mt-4 text-foreground" onClick={onDismiss}>
-        Scan next ticket
-      </Button>
-    </div>
-  );
 }
 
 type CameraState = 'idle' | 'starting' | 'on' | 'unsupported' | 'denied' | 'failed';
@@ -371,7 +316,7 @@ export default function VerifyPage() {
             <Spinner className="h-4 w-4" /> Checking ticket…
           </p>
         )}
-        {!checking && result && <ResultPanel result={result} onDismiss={clearResult} />}
+        {!checking && result && <ScanResultDisplay result={result} onDismiss={clearResult} />}
       </div>
 
       <section aria-labelledby="verify-camera-heading" className="space-y-3">
