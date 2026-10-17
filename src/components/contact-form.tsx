@@ -234,10 +234,8 @@ export function ContactForm({ className, action = '/api/contact' }: ContactFormP
             className="mt-6"
             onClick={() => {
               setStatus('idle');
-              // The timestamp is reset so the minimum-fill-time check does not
-              // reject the second message for arriving too soon after a re-render
-              // that the person did not cause.
-              setRenderedAt(String(Date.now()));
+              // The timestamp is managed by useRenderedAt and will capture a
+              // fresh time on the next render — no setter needed.
             }}
           >
             Send another message

@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/tickets/route';
+import { signedSessionCookie } from './session-test-helpers';
 
 const fetchMock = vi.fn();
 
 function requestWithSession(value?: string): NextRequest {
   return new NextRequest('http://localhost/api/tickets', {
-    headers: value === undefined ? {} : { cookie: `session_user_id=${value}` },
+    headers: value === undefined ? {} : { cookie: signedSessionCookie(value) },
   });
 }
 
@@ -18,7 +19,7 @@ function backendUrl(): URL {
 
 beforeEach(() => {
   fetchMock.mockReset();
-  fetchMock.mockResolvedValue({ json: async () => [] });
+  fetchMock.mockResolvedValue({ ok: true, status: 200, text: async () => '[]' });
   vi.stubGlobal('fetch', fetchMock);
   vi.stubEnv('API_BASE_URL', 'http://backend.test');
 });

@@ -3,14 +3,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -147,23 +145,15 @@ export default function CheckoutPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle as="h2">Payment</CardTitle>
-          <CardDescription>
-            Ticket payments are held in escrow on Stellar until the event completes.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Badge variant="secondary">Settlement not wired up yet</Badge>
-        </CardContent>
-        <CardFooter className="justify-end">
-          <Button disabled>
-            <CreditCard aria-hidden="true" />
-            Pay {formatCurrency(totalMinor, currency)}
-          </Button>
-        </CardFooter>
-      </Card>
+      <PaymentStep
+        eventId={event.id}
+        lines={lines}
+        amountStroops={BigInt(totalMinor)}
+        onPaid={({ id }) => {
+          clear();
+          router.replace(routes.order(id));
+        }}
+      />
     </div>
   );
 }
