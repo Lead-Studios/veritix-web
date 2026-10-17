@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { TierSelector } from '@/components/events/tier-selector';
+import { AddToCalendar } from '@/components/tickets/add-to-calendar';
 import { ApiError, api } from '@/lib/api-client';
 import { formatDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -172,6 +173,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               </div>
             </CardContent>
           </Card>
+          <AddToCalendar event={event} />
         </div>
 
         <Card className="lg:sticky lg:top-24 lg:self-start">
