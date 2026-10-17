@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { TierEditor } from '@/components/dashboard/tier-editor';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -23,6 +24,49 @@ const EMPTY = {
   startsAt: '',
   endsAt: '',
 };
+
+/**
+ * The API refuses to persist an event without at least one ticket tier, but
+ * this first step only collects the basics. Rather than dead-end on a field
+ * the user cannot see, creation seeds a single placeholder tier that the
+ * organizer renames, prices, and sizes on the edit page it lands on.
+ */
+const PLACEHOLDER_TIER = {
+  name: 'General admission',
+  priceMinor: 0,
+  currency: 'USD',
+  quantityTotal: 100,
+} as const;
+
+/** Field paths the form can render inline; anything else is listed at the end. */
+const INLINE_FIELDS = ['title', 'description', 'venue', 'city', 'startsAt', 'endsAt'] as const;
+
+interface ApiFieldError {
+  field: string;
+  message: string;
+}
+
+function readFieldErrors(error: unknown): { message: string | null; fields: Record<string, string> } {
+  if (!(error instanceof ApiError)) {
+    return { message: error instanceof Error ? error.message : null, fields: {} };
+  }
+
+  const body = error.body as { message?: unknown; fields?: unknown } | undefined;
+  const fields: Record<string, string> = {};
+
+  if (Array.isArray(body?.fields)) {
+    for (const entry of body.fields as ApiFieldError[]) {
+      if (entry && typeof entry.field === 'string' && !fields[entry.field]) {
+        fields[entry.field] = entry.message;
+      }
+    }
+  }
+
+  return {
+    message: typeof body?.message === 'string' ? body.message : error.message,
+    fields,
+  };
+}
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -44,12 +88,61 @@ export default function NewEventPage() {
     return map;
   }, [result]);
 
+  // A message from the server takes precedence over the local one for the same
+  // field: it is the authority, and it is what the save actually failed on.
+  const errorFor = (key: string): string | undefined =>
+    serverErrors[key] ?? (touched ? errors[key] : undefined);
+
+  const clearServerError = (key: string) => {
+    setServerErrors((current) => {
+      if (!(key in current)) return current;
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  };
+
   const set =
     (key: keyof typeof EMPTY) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setTouched(true);
       setDraft({ ...values, [key]: event.target.value });
     };
+
+  const setDate = (key: 'startsAt' | 'endsAt') => (value: string) => {
+    setTouched(true);
+    clearServerError(key);
+    setValues((current) => ({ ...current, [key]: value }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setTouched(true);
+    setFormError(null);
+    if (!result.success || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const created = await api.post<VeritixEvent>('/events', {
+        title: values.title.trim(),
+        description: values.description.trim(),
+        venue: values.venue.trim(),
+        city: values.city.trim(),
+        startsAt: values.startsAt,
+        endsAt: values.endsAt,
+        tiers: [PLACEHOLDER_TIER],
+        splits: [],
+      });
+
+      router.push(routes.dashboardEventEdit(created.id));
+    } catch (error) {
+      const { message, fields } = readFieldErrors(error);
+      setServerErrors(fields);
+      setFormError(message ?? 'Could not create the event');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const fields = [
     { key: 'title' as const, label: 'Title' },
@@ -88,7 +181,7 @@ export default function NewEventPage() {
           {fields.map((field) => {
             const inputId = `event-${field.key}`;
             const errorId = `${inputId}-error`;
-            const error = touched ? errors[field.key] : undefined;
+            const error = errorFor(field.key);
             return (
               <div key={field.key} className="space-y-1.5">
                 <Label htmlFor={inputId} required>
@@ -123,9 +216,9 @@ export default function NewEventPage() {
               aria-invalid={touched && errors.description ? true : undefined}
               aria-describedby={touched && errors.description ? 'event-description-error' : undefined}
             />
-            {touched && errors.description && (
+            {errorFor('description') && (
               <p id="event-description-error" className="text-sm text-destructive">
-                {errors.description}
+                {errorFor('description')}
               </p>
             )}
           </div>
@@ -142,6 +235,11 @@ export default function NewEventPage() {
               setDraft({ ...values, startsAt: v });
             }}
           />
+          {startsAtError && values.startsAt && (
+            <p id="event-starts-at-error" className="text-sm text-destructive">
+              {startsAtError}
+            </p>
+          )}
           <DatePicker
             id="event-ends-at"
             label="End date"
@@ -151,9 +249,19 @@ export default function NewEventPage() {
               setDraft({ ...values, endsAt: v });
             }}
           />
-          {touched && errors.endsAt && values.startsAt && values.endsAt && (
+          {endsAtError && values.startsAt && values.endsAt && (
             <p id="event-ends-at-error" className="text-sm text-destructive">
-              {errors.endsAt}
+              {endsAtError}
+            </p>
+          )}
+        </fieldset>
+
+        <fieldset className="space-y-4">
+          <legend className="text-sm font-medium text-muted-foreground">Ticket tiers</legend>
+          <TierEditor tiers={tiers} onChange={setTiers} />
+          {touched && tiers.length === 0 && (
+            <p role="alert" className="text-sm text-destructive">
+              At least one tier is required.
             </p>
           )}
         </fieldset>

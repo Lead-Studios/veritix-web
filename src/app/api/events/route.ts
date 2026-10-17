@@ -10,6 +10,7 @@ import {
 import type { EventStatus } from '@/types';
 import { eventInputSchema, toFieldErrors } from '@/lib/event-schema';
 import { readSessionUserId, unauthorized } from '@/lib/api/server';
+import { demoHeaders, demoPayload } from '@/lib/demo-data';
 
 /**
  * GET /api/events
@@ -58,22 +59,26 @@ export async function GET(request: NextRequest) {
 
   let organizerId = first('organizerId');
   if (params.get('mine') === '1') {
-    const userId = readSessionUserId(request);
+    const userId = await readSessionUserId(request);
     if (!userId) return unauthorized();
     organizerId = userId;
   }
 
   return NextResponse.json(
-    queryEvents({
-      q: first('q'),
-      page: positiveInt('page'),
-      pageSize,
-      sort,
-      city: first('city'),
-      date: first('date'),
-      status,
-      organizerId,
-    }),
+    {
+      ...queryEvents({
+        q: first('q'),
+        page: positiveInt('page'),
+        pageSize,
+        sort,
+        city: first('city'),
+        date: first('date'),
+        status,
+        organizerId,
+      }),
+      ...demoPayload(),
+    },
+    { headers: demoHeaders() },
   );
 }
 
@@ -85,7 +90,7 @@ export async function GET(request: NextRequest) {
  * trusted. Publishing is a separate step (`POST /api/events/[id]/publish`).
  */
 export async function POST(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const raw: unknown = await request.json().catch(() => null);
@@ -98,8 +103,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.json(createEvent(parsed.data, userId), {
-    status: 201,
-    headers: { 'Cache-Control': 'no-store' },
-  });
+  return NextResponse.json(
+    { ...(await createEvent(parsed.data, userId)), ...demoPayload() },
+    {
+      status: 201,
+      headers: { 'Cache-Control': 'no-store', ...demoHeaders() },
+    },
+  );
 }

@@ -1,13 +1,16 @@
 import type { EventStatus, Paginated, VeritixEvent } from '@/types';
 import type { EventInput } from '@/lib/event-schema';
+import { demoDataEnabled } from '@/lib/demo-data';
 
 /**
  * Read model for the events API.
  *
  * The catalogue below is a small in-memory fixture: this app has no database or
  * indexer wired up yet, and the API routes still need something to read from.
- * When the real source lands, `queryEvents` and `findEventBySlug` are the only
- * functions that have to change — the routes stay as they are.
+ * It is seeded only when demo data is enabled, so production does not answer
+ * with invented events. When the real source lands, `queryEvents` and
+ * `findEventBySlug` are the only functions that have to change — the routes
+ * stay as they are.
  */
 
 export const EVENT_SORTS = ['startsAt', '-startsAt', 'title', '-title'] as const;
@@ -37,7 +40,7 @@ export interface EventQuery {
   organizerId?: string;
 }
 
-export const EVENTS: VeritixEvent[] = [
+const SEED_EVENTS: VeritixEvent[] = [
   {
     id: 'evt_1',
     slug: 'lagos-sound-festival',
@@ -250,6 +253,13 @@ export const EVENTS: VeritixEvent[] = [
   },
 ];
 
+/**
+ * The events the read model answers from. A copy of the seed when demo data is
+ * on, empty otherwise — `createEvent` and the routes still push into it, so the
+ * array is mutated, never the seed itself.
+ */
+export const EVENTS: VeritixEvent[] = demoDataEnabled() ? [...SEED_EVENTS] : [];
+
 /** Compare two events for the requested sort. List order is never mutated. */
 function compareEvents(a: VeritixEvent, b: VeritixEvent, sort: EventSort): number {
   switch (sort) {
@@ -350,8 +360,43 @@ function toIso(value: string): string {
   return new Date(value).toISOString();
 }
 
-/** Create a draft owned by `userId`. New events are never published directly. */
-export function createEvent(input: EventInput, userId: string): VeritixEvent {
+/**
+ * Backend API base, or an empty string when none is configured.
+ *
+ * Read straight from `process.env` rather than `@/lib/api/server` because this
+ * module is reachable from client components, and that helper imports
+ * `next/server`.
+ */
+function backendBase(): string {
+  const base =
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
+  return base.replace(/\/$/, '');
+}
+
+/**
+ * Create a draft owned by `userId`. New events are never published directly.
+ *
+ * With a backend configured the event is persisted there and the backend's
+ * copy is returned, so it survives a restart and is visible to every server
+ * process. Without one, development and tests fall back to the in-memory list.
+ */
+export async function createEvent(input: EventInput, userId: string): Promise<VeritixEvent> {
+  const base = backendBase();
+  if (base) {
+    const response = await fetch(`${base}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({ ...input, userId }),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create the event: ${response.status} ${response.statusText}`,
+      );
+    }
+    return (await response.json()) as VeritixEvent;
+  }
+
   const event: VeritixEvent = {
     id: newId('evt'),
     slug: uniqueSlug(input.title),

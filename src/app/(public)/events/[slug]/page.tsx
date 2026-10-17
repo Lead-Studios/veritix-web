@@ -14,7 +14,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { EventGallery } from '@/components/events/event-gallery';
 import { TierSelector } from '@/components/events/tier-selector';
+import { AddToCalendar } from '@/components/tickets/add-to-calendar';
 import { ApiError, api } from '@/lib/api-client';
 import { formatDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -139,6 +141,22 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
       <p className="max-w-3xl text-base text-muted-foreground">{event.description}</p>
 
+      {/* Render the image gallery if additional images are present, or fall
+          back to the cover image so the section always shows something visual.
+          EventGallery returns null when the array is empty, so no extra guard
+          is needed here. */}
+      {(event.images?.length ?? 0) > 0 ? (
+        <EventGallery
+          images={event.images!}
+          title={event.title}
+        />
+      ) : event.coverImageUrl ? (
+        <EventGallery
+          images={[event.coverImageUrl]}
+          title={event.title}
+        />
+      ) : null}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
           <Card>
@@ -172,6 +190,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               </div>
             </CardContent>
           </Card>
+          <AddToCalendar event={event} />
         </div>
 
         <Card className="lg:sticky lg:top-24 lg:self-start">

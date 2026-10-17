@@ -41,10 +41,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          # Pinned to the floor the toolchain supports, matching `ci.yml` on
-          # `main`. #986 introduces `.nvmrc`; this should switch to
-          # `node-version-file` in the same commit, not later.
-          node-version: "20"
+          # .nvmrc is the single source of truth for the Node version, matching
+          # ci.yml and lighthouse.yml so the three workflows cannot drift apart.
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies
