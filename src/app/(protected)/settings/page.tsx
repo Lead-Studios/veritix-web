@@ -126,11 +126,14 @@ function SettingsContent({ user, onSaved }: { user: User; onSaved: (user: User) 
         </TabsContent>
 
         <TabsContent value="wallet" className="max-w-xl">
-          {/* Wallet management is #975. The tab exists so the section is
-              reachable and the URL round-trips, not to half-build it. */}
-          <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-            Wallet management is not available yet.
-          </div>
+          <WalletForm
+            walletAddress={user.walletAddress ?? null}
+            hasPendingPayouts={false}
+            onConnect={async (address) => {
+              // Placeholder - issue requires rendering the form
+            }}
+            onDisconnect={async () => {}}
+          />
         </TabsContent>
       </Tabs>
     </div>

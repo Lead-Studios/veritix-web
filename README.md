@@ -88,6 +88,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 > **Next.js convention:** variables prefixed `NEXT_PUBLIC_` are embedded in the browser bundle. Variables without that prefix are server-only and never sent to the client.
 
+The app signs its `veritix_session` HttpOnly cookie with `AUTH_SECRET` for
+seven days. API routes verify the signature before using the session identity;
+unsigned user-id cookies are not accepted.
+
 ---
 
 ## Running Tests

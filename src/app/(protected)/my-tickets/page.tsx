@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/feedback/empty-state';
 import { ErrorState } from '@/components/feedback/error-state';
 import { LoadingState } from '@/components/feedback/loading-state';
 import { Badge } from '@/components/ui/badge';
+import { TicketCard } from '@/components/tickets/ticket-card';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';

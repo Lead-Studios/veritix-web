@@ -3,8 +3,12 @@
 import * as React from 'react';
 import { notFound, useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LoadingState } from '@/components/feedback/loading-state';
 import { TicketQr } from '@/components/tickets/ticket-qr';
+import { RefundDialog } from '@/components/tickets/refund-dialog';
+import { TransferDialog } from '@/components/tickets/transfer-dialog';
 import type { Ticket, TicketStatus } from '@/types';
 
 const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' | 'outline'> = {
@@ -17,6 +21,8 @@ const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' |
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [ticket, setTicket] = React.useState<Ticket | null | undefined>(undefined);
+  const [showTransfer, setShowTransfer] = React.useState(false);
+  const [showRefund, setShowRefund] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -65,6 +71,40 @@ export default function TicketDetailPage() {
           </div>
         )}
       </dl>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          disabled={ticket.status === 'used' || ticket.status === 'refunded' || ticket.status === 'transferred'}
+          onClick={() => setShowTransfer(true)}
+        >
+          Transfer
+        </Button>
+        <Button
+          disabled={ticket.status === 'used' || ticket.status === 'refunded' || ticket.status === 'transferred'}
+          onClick={() => setShowRefund(true)}
+          variant="outline"
+        >
+          Request refund
+        </Button>
+      </div>
+
+      <Dialog open={showTransfer} onOpenChange={setShowTransfer}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Transfer ticket</DialogTitle>
+          </DialogHeader>
+          <TransferDialog onTransfer={async () => setShowTransfer(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRefund} onOpenChange={setShowRefund}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request refund</DialogTitle>
+          </DialogHeader>
+          <RefundDialog ticketStatus={ticket.status} refundPolicy="30-day refund policy applies." onSubmit={() => setShowRefund(false)} />
+        </DialogContent>
+      </Dialog>
 
       <TicketQr
         signedPayload={ticket.id}
