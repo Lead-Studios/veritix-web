@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
   let organizerId = first('organizerId');
   if (params.get('mine') === '1') {
-    const userId = readSessionUserId(request);
+    const userId = await readSessionUserId(request);
     if (!userId) return unauthorized();
     organizerId = userId;
   }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
  * trusted. Publishing is a separate step (`POST /api/events/[id]/publish`).
  */
 export async function POST(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const raw: unknown = await request.json().catch(() => null);

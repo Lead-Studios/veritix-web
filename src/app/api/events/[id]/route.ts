@@ -38,7 +38,7 @@ export async function GET(_request: Request, { params }: Params) {
  * to discover which event ids exist.
  */
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const { id } = await params;

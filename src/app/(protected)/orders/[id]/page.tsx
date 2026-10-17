@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { ArrowRight, LoaderCircle, Ticket as TicketIcon } from 'lucide-react';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Receipt } from '@/components/orders/receipt';
 import {
   Card,
   CardContent,
@@ -69,6 +70,19 @@ export default function OrderConfirmationPage({
 
   const isPending = order.status === 'pending';
   const escrowReference = order.tickets.find((ticket) => ticket.escrowId)?.escrowId;
+  const event: VeritixEvent = {
+    id: order.eventId,
+    slug: '',
+    title: 'Event',
+    description: '',
+    venue: '',
+    city: '',
+    startsAt: order.createdAt,
+    endsAt: order.createdAt,
+    status: 'published',
+    organizer: { id: '1', name: 'Organizer', verified: false },
+    tiers: order.tickets.map(t => ({ id: t.tierId, name: 'Ticket', priceMinor: Math.floor(order.totalMinor / Math.max(1, order.tickets.length)), currency: order.currency, quantityTotal: 10, quantitySold: 1 })),
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -109,6 +123,8 @@ export default function OrderConfirmationPage({
           </p>
         </div>
       )}
+
+      {order.status === 'paid' && <Receipt order={order} event={event} paymentReference={escrowReference} />}
 
       <Card>
         <CardHeader>

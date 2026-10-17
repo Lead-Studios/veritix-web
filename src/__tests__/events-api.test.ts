@@ -4,13 +4,14 @@ import { POST as createRoute } from '@/app/api/events/route';
 import { PATCH as updateRoute } from '@/app/api/events/[id]/route';
 import { POST as publishRoute } from '@/app/api/events/[id]/publish/route';
 import { POST as cancelRoute } from '@/app/api/events/[id]/cancel/route';
+import { signedSessionCookie } from './session-test-helpers';
 
 const OWNER = 'org_owner_test';
 const STRANGER = 'org_stranger_test';
 
 function request(method: string, userId: string | null, body?: unknown): NextRequest {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (userId) headers.cookie = `session_user_id=${userId}`;
+  if (userId) headers.cookie = signedSessionCookie(userId);
   return new NextRequest('http://localhost/api/events', {
     method,
     headers,
