@@ -28,7 +28,7 @@ export function lifecycleRoute(action: EventAction) {
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
   ) {
-    const userId = readSessionUserId(request);
+    const userId = await readSessionUserId(request);
     if (!userId) return unauthorized();
 
     const { id } = await params;

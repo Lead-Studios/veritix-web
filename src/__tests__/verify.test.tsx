@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/verify/route';
 import { signTicketPayload } from '@/lib/ticket-signing';
 import { issueTicket } from '@/lib/ticket-store';
+import { signedSessionCookie } from './session-test-helpers';
 
 const SECRET = 'test-ticket-signing-secret-0123456789';
 /** Organizer of evt_1 in the events fixture. */
@@ -29,7 +30,7 @@ function newTicket(eventId = 'evt_1') {
 
 function scan(body: unknown, userId: string | null = ORGANIZER) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (userId) headers.cookie = `session_user_id=${userId}`;
+  if (userId) headers.cookie = signedSessionCookie(userId);
   return POST(
     new NextRequest('http://localhost/api/verify', {
       method: 'POST',

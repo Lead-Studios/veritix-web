@@ -11,8 +11,6 @@ export async function GET(request: NextRequest) {
   const sessionUserId = readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
-  // Built with URLSearchParams so a cookie value containing `&` or `=` is encoded as
-  // part of the one `ownerId` value and cannot add or override query parameters.
   const query = new URLSearchParams({ ownerId: sessionUserId });
 
   try {

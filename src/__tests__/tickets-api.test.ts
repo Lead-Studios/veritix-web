@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/tickets/route';
+import { signedSessionCookie } from './session-test-helpers';
 
 const fetchMock = vi.fn();
 
 function requestWithSession(value?: string): NextRequest {
   return new NextRequest('http://localhost/api/tickets', {
-    headers: value === undefined ? {} : { cookie: `session_user_id=${value}` },
+    headers: value === undefined ? {} : { cookie: signedSessionCookie(value) },
   });
 }
 

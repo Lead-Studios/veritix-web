@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CancelEventDialog } from '@/components/dashboard/cancel-event-dialog';
+import { PublishToggle } from '@/components/dashboard/publish-toggle';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { routes } from '@/lib/routes';
 import type { VeritixEvent } from '@/types';
@@ -79,6 +81,13 @@ export default function OrganizerEventsPage() {
                   <Button asChild size="sm" variant="ghost">
                     <Link href={routes.event(event.slug)}>View</Link>
                   </Button>
+                  <PublishToggle published={event.status === 'published'} onChange={() => {}} />
+                  <CancelEventDialog
+                    eventTitle={event.title}
+                    buyerCount={event.tiers.reduce((sum, t) => sum + t.quantitySold, 0)}
+                    totalRefundedMinor={0}
+                    onCancel={async () => {}}
+                  />
                 </div>
               </TableCell>
             </TableRow>

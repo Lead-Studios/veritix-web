@@ -3,6 +3,7 @@ import { findEventById, findEventBySlug, findOwnedEvent, updateEvent } from '@/l
 import { eventInputSchema, toFieldErrors } from '@/lib/event-schema';
 import { readSessionUserId, unauthorized } from '@/lib/api/server';
 import { eventNotFound } from '@/lib/api/event-routes';
+import { demoHeaders, demoPayload } from '@/lib/demo-data';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -22,7 +23,7 @@ export async function GET(_request: Request, { params }: Params) {
     return NextResponse.json({ message: `No event found for "${id}"` }, { status: 404 });
   }
 
-  return NextResponse.json(event);
+  return NextResponse.json({ ...event, ...demoPayload() }, { headers: demoHeaders() });
 }
 
 /**
@@ -37,7 +38,7 @@ export async function GET(_request: Request, { params }: Params) {
  * to discover which event ids exist.
  */
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const { id } = await params;
@@ -102,7 +103,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     );
   }
 
-  return NextResponse.json(updateEvent(event, parsed.data), {
-    headers: { 'Cache-Control': 'no-store' },
-  });
+  return NextResponse.json(
+    { ...updateEvent(event, parsed.data), ...demoPayload() },
+    { headers: { 'Cache-Control': 'no-store', ...demoHeaders() } },
+  );
 }

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { EVENTS } from '@/lib/events';
 import { readSessionUserId, unauthorized } from '@/lib/api/server';
 import { signingSecret, verifyTicketPayload } from '@/lib/ticket-signing';
-import { redeemTicket } from '@/lib/ticket-store';
+import { redeemTicketAtomic, type RedeemResult } from '@/lib/ticket-store';
 
 /** `node:crypto` is used for the HMAC check, so this cannot run on the edge. */
 export const runtime = 'nodejs';
@@ -48,7 +48,7 @@ function reply(status: number, outcome: Outcome, message: string, extra: object 
  *     `already_used`.
  */
 export async function POST(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   const secret = signingSecret();
@@ -87,7 +87,19 @@ export async function POST(request: NextRequest) {
     return reply(422, 'wrong_event', 'This ticket is for a different event.');
   }
 
-  const result = redeemTicket(verified.claims.tid, eventId);
+  // The backend decides in a single conditional write; with none configured
+  // this is the in-memory double. A failure to reach the backend must never be
+  // reported as a valid scan, so it fails closed with a 503.
+  let result: RedeemResult;
+  try {
+    result = await redeemTicketAtomic(verified.claims.tid, eventId);
+  } catch {
+    return NextResponse.json(
+      { message: 'Ticket verification is temporarily unavailable.' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   if (result.ok) {
     return reply(200, 'valid', 'Ticket accepted.', {
       ticketId: result.ticket.id,
