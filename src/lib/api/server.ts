@@ -13,10 +13,9 @@ import { NextResponse, type NextRequest } from 'next/server';
  * construction — it reads `process.env` directly and is never imported from a
  * client component.
  *
- * `src/app/api/orders/route.ts` still carries its own local copy of this
- * plumbing. Collapsing it onto this module is a one-file refactor and is not
- * done here, because the routes below are additive and rewriting a working
- * route to share code with them widens this change for no user-visible gain.
+ * `src/app/api/orders/route.ts` and `src/app/api/tickets/route.ts` both use
+ * this module, so a change to the session check or the backend base URL lands
+ * in one place.
  */
 
 /**

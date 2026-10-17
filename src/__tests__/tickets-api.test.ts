@@ -10,6 +10,16 @@ function requestWithSession(value?: string): NextRequest {
   });
 }
 
+/** A Response-like object; `forwardToBackend` reads `.text()`, not `.json()`. */
+function backendResponse(body: unknown, status = 200): Response {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    statusText: status >= 400 ? 'Backend error' : 'OK',
+    text: async () => (typeof body === 'string' ? body : JSON.stringify(body)),
+  } as unknown as Response;
+}
+
 /** The URL the route asked the backend for. */
 function backendUrl(): URL {
   expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -18,9 +28,9 @@ function backendUrl(): URL {
 
 beforeEach(() => {
   fetchMock.mockReset();
-  fetchMock.mockResolvedValue({ json: async () => [] });
+  fetchMock.mockResolvedValue(backendResponse([]));
   vi.stubGlobal('fetch', fetchMock);
-  vi.stubEnv('API_BASE_URL', 'http://backend.test');
+  vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://backend.test');
 });
 
 afterEach(() => {
@@ -59,5 +69,30 @@ describe('GET /api/tickets', () => {
     const url = backendUrl();
     expect(url.searchParams.get('ownerId')).toBe('a b#c?d');
     expect(url.hash).toBe('');
+  });
+
+  it('passes a backend client error through with its status and message', async () => {
+    fetchMock.mockResolvedValue(backendResponse({ message: 'No such owner' }, 404));
+
+    const response = await GET(requestWithSession('user-42'));
+
+    expect(response.status).toBe(404);
+    expect((await response.json()).message).toBe('No such owner');
+  });
+
+  it('maps a backend failure to 502', async () => {
+    fetchMock.mockResolvedValue(backendResponse({ message: 'boom' }, 500));
+
+    const response = await GET(requestWithSession('user-42'));
+
+    expect(response.status).toBe(502);
+  });
+
+  it('maps an unreachable backend to 502', async () => {
+    fetchMock.mockRejectedValue(new Error('connect ECONNREFUSED'));
+
+    const response = await GET(requestWithSession('user-42'));
+
+    expect(response.status).toBe(502);
   });
 });

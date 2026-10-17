@@ -186,9 +186,14 @@ describe('POST /api/verify', () => {
       delete process.env.JWT_SECRET;
       try {
         expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(503);
+
+        // JWT_SECRET is not a ticket-signing key: setting it alone must not help.
+        process.env.JWT_SECRET = SECRET;
+        expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(503);
       } finally {
         process.env.TICKET_SIGNING_SECRET = saved.t;
         if (saved.j !== undefined) process.env.JWT_SECRET = saved.j;
+        else delete process.env.JWT_SECRET;
       }
     });
   });
