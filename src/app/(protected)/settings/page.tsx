@@ -11,6 +11,7 @@ import { NotificationForm } from '@/components/settings/notification-form';
 import { PasswordForm } from '@/components/settings/password-form';
 import { ProfileForm } from '@/components/settings/profile-form';
 import { WalletForm } from '@/components/settings/wallet-form';
+import { DeleteAccount } from '@/components/settings/delete-account';
 import type { User } from '@/types';
 
 /**
@@ -115,6 +116,9 @@ function SettingsContent({ user, onSaved }: { user: User; onSaved: (user: User) 
 
         <TabsContent value="account" className="max-w-xl">
           <PasswordForm />
+          <div className="mt-8">
+            <DeleteAccount onDelete={async () => {}} />
+          </div>
         </TabsContent>
 
         <TabsContent value="notifications" className="max-w-xl">
