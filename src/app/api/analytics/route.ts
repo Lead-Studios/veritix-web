@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { queryAnalytics } from '@/lib/analytics';
+import { demoHeaders, demoPayload } from '@/lib/demo-data';
 
 /**
  * GET /api/analytics
@@ -30,11 +31,15 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   return NextResponse.json(
-    queryAnalytics({
-      from: params.get('from') ?? undefined,
-      to: params.get('to') ?? undefined,
-      eventId: params.get('eventId') ?? undefined,
-      ownerId: sessionUserId,
-    }),
+    {
+      ...queryAnalytics({
+        from: params.get('from') ?? undefined,
+        to: params.get('to') ?? undefined,
+        eventId: params.get('eventId') ?? undefined,
+        ownerId: sessionUserId,
+      }),
+      ...demoPayload(),
+    },
+    { headers: demoHeaders() },
   );
 }

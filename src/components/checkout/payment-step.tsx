@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock,
   LoaderCircle,
+  RefreshCw,
   ShieldCheck,
   Wallet,
 } from 'lucide-react';
@@ -36,7 +37,9 @@ import type { OrderStatus } from '@/types';
  *      string and get one back.
  *   3. `PATCH /api/orders` submits the signed envelope.
  *   4. Checkout polls `GET /api/orders?id=` until the backend reports the
- *      transaction confirmed. The order is not treated as paid before that.
+ *      transaction confirmed, or a bounded number of attempts runs out. The
+ *      order is not treated as paid before confirmation, and a pending timeout
+ *      or a run of network errors offers a retry instead of hanging forever.
  */
 
 /** The parts of the Freighter extension API this step uses. */
@@ -62,6 +65,8 @@ export type PaymentStatus =
   | 'preparing'
   | 'signing'
   | 'pending'
+  | 'pending-timeout'
+  | 'network-error'
   | 'paid'
   | 'no-wallet'
   | 'rejected'
@@ -77,7 +82,12 @@ export interface PaymentStepProps {
   /** Fires once the backend confirms the transaction; the order is paid then. */
   onPaid?: (order: { id: string; escrowId: string }) => void;
   pollIntervalMs?: number;
+  /** Give up waiting for settlement after this many polls; then retry is offered. */
+  maxPollAttempts?: number;
 }
+
+/** Consecutive failed polls that surface a network error instead of retrying forever. */
+const MAX_POLL_ERRORS = 3;
 
 /** Freighter injects itself on the page under one of these names. */
 function freighter(): FreighterProvider | null {
@@ -195,6 +205,7 @@ export function PaymentStep({
   amountStroops,
   onPaid,
   pollIntervalMs = 4_000,
+  maxPollAttempts = 30,
 }: PaymentStepProps) {
   const [address, setAddress] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<PaymentStatus>('idle');
@@ -202,6 +213,8 @@ export function PaymentStep({
 
   const mountedRef = React.useRef(true);
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const attemptsRef = React.useRef(0);
+  const pollErrorsRef = React.useRef(0);
 
   React.useEffect(
     () => () => {
@@ -211,15 +224,25 @@ export function PaymentStep({
     [],
   );
 
-  /** Keep asking until the order settles; the order is not paid until it does. */
+  /**
+   * Keep asking until the order settles, up to a bounded number of attempts.
+   *
+   * A dropped poll is not a failed payment, so a single error is retried; but
+   * repeated failures move to `network-error` rather than looping silently and
+   * forever. Reaching the attempt cap while the order is still pending moves to
+   * `pending-timeout`, which offers a retry instead of pretending it settled.
+   */
   const pollForSettlement = React.useCallback(
     async (orderId: string) => {
+      attemptsRef.current += 1;
+
       try {
         const latest = await apiFetch<OrderRecord>(
           `/api/orders?id=${encodeURIComponent(orderId)}`,
         );
         if (!mountedRef.current) return;
 
+        pollErrorsRef.current = 0;
         setOrder(latest);
 
         if (latest.status === 'paid') {
@@ -232,17 +255,37 @@ export function PaymentStep({
           return;
         }
       } catch {
-        // A dropped poll is not a failed payment — keep waiting.
+        if (!mountedRef.current) return;
+        // A single dropped poll is not a failed payment — keep waiting. Only a
+        // run of failures means the backend is unreachable.
+        pollErrorsRef.current += 1;
+        if (pollErrorsRef.current >= MAX_POLL_ERRORS) {
+          setStatus('network-error');
+          return;
+        }
       }
 
       if (!mountedRef.current) return;
+      if (attemptsRef.current >= maxPollAttempts) {
+        setStatus('pending-timeout');
+        return;
+      }
       timerRef.current = setTimeout(
         () => void pollForSettlement(orderId),
         pollIntervalMs,
       );
     },
-    [onPaid, pollIntervalMs],
+    [onPaid, pollIntervalMs, maxPollAttempts],
   );
+
+  /** Restart settlement polling from the top, clearing both counters. */
+  const retryPolling = React.useCallback(() => {
+    if (!order) return;
+    attemptsRef.current = 0;
+    pollErrorsRef.current = 0;
+    setStatus('pending');
+    void pollForSettlement(order.id);
+  }, [order, pollForSettlement]);
 
   const connect = React.useCallback(async () => {
     const provider = freighter();
@@ -323,6 +366,8 @@ export function PaymentStep({
 
       if (!mountedRef.current) return;
       setOrder(submitted);
+      attemptsRef.current = 0;
+      pollErrorsRef.current = 0;
       void pollForSettlement(submitted.id);
     } catch (error) {
       if (!mountedRef.current) return;
@@ -336,7 +381,16 @@ export function PaymentStep({
     status === 'signing' ||
     status === 'pending';
   const isPaid = status === 'paid';
-  const failure = status === 'idle' || isBusy || isPaid ? null : FAILURE_COPY[status];
+  const isPendingTimeout = status === 'pending-timeout';
+  const isNetworkError = status === 'network-error';
+  const isAwaitingRetry = isPendingTimeout || isNetworkError;
+  const isFailure =
+    status === 'no-wallet' ||
+    status === 'rejected' ||
+    status === 'insufficient' ||
+    status === 'network-mismatch' ||
+    status === 'failed';
+  const failure = isFailure ? FAILURE_COPY[status] : null;
 
   return (
     <Card>
@@ -436,6 +490,55 @@ export function PaymentStep({
           </div>
         )}
 
+        {isPendingTimeout && order && (
+          <div
+            role="status"
+            className="flex gap-3 rounded-md border border-warning/40 bg-warning/10 p-4 text-sm"
+          >
+            <Clock className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+            <div className="space-y-1">
+              <p className="font-medium text-foreground">
+                Still pending — check again later
+              </p>
+              <p className="text-muted-foreground">
+                The network has not confirmed this payment yet. Your funds are still in
+                escrow and nothing has been charged twice; retry to check again.
+              </p>
+              <p className="break-all font-mono text-xs text-muted-foreground">
+                Escrow {order.escrowId}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isNetworkError && (
+          <div
+            role="alert"
+            className="flex gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm"
+          >
+            <AlertTriangle
+              className="mt-0.5 size-4 shrink-0 text-destructive"
+              aria-hidden="true"
+            />
+            <div className="space-y-1">
+              <p className="font-medium text-foreground">Connection problem</p>
+              <p className="text-muted-foreground">
+                We could not reach the server to confirm the payment. It may still be
+                processing — retry to check again.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isAwaitingRetry && order && (
+          <div className="flex justify-end">
+            <Button type="button" variant="outline" onClick={retryPolling}>
+              <RefreshCw aria-hidden="true" />
+              Retry
+            </Button>
+          </div>
+        )}
+
         {!address && status === 'idle' && (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <ShieldCheck className="size-4 shrink-0" aria-hidden="true" />
@@ -454,7 +557,7 @@ export function PaymentStep({
       <CardFooter className="justify-end">
         <Button
           type="button"
-          disabled={!address || isBusy || isPaid}
+          disabled={!address || isBusy || isPaid || isAwaitingRetry}
           onClick={() => void pay()}
         >
           {isBusy && <LoaderCircle className="animate-spin" aria-hidden="true" />}
