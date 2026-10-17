@@ -284,7 +284,7 @@ export default function VerifyPage() {
             <Spinner className="h-4 w-4" /> Checking ticket…
           </p>
         )}
-        {!checking && result && <ResultPanel result={result} onDismiss={clearResult} />}
+        {!checking && result && <ScanResultDisplay result={result} onDismiss={clearResult} />}
       </div>
 
       <QRScanner onScan={check} disabled={!selectedEvent} />
