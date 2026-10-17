@@ -1,12 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { Camera, CameraOff } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { ScanResultDisplay, type ScanResult } from '@/components/verify/scan-result';
+import { QRScanner } from '@/components/verify/qr-scanner';
 import { formatDateTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { Paginated, VeritixEvent } from '@/types';
@@ -20,18 +20,13 @@ import type { Paginated, VeritixEvent } from '@/types';
  * answer, big enough to read at arm's length on a phone.
  */
 
-/** The subset of the Barcode Detection API used here; not in TS's DOM lib yet. */
-interface DetectedBarcode {
-  rawValue: string;
-}
-interface BarcodeDetectorLike {
-  detect(source: CanvasImageSource): Promise<DetectedBarcode[]>;
-}
-type BarcodeDetectorCtor = new (options?: { formats?: string[] }) => BarcodeDetectorLike;
+type ResultKind = 'valid' | 'already_used' | 'invalid' | 'error';
 
-function barcodeDetector(): BarcodeDetectorCtor | null {
-  if (typeof window === 'undefined') return null;
-  return (window as unknown as { BarcodeDetector?: BarcodeDetectorCtor }).BarcodeDetector ?? null;
+interface ScanResult {
+  kind: ResultKind;
+  message: string;
+  usedAt?: string;
+  ticketId?: string;
 }
 
 /** API outcomes that mean "this ticket must not get in", shown as one red state. */
@@ -43,7 +38,6 @@ const INVALID_OUTCOMES = new Set([
   'not_found',
 ]);
 
-const SCAN_INTERVAL_MS = 250;
 /** How long a result stays up before the camera resumes on its own. */
 const RESUME_AFTER_MS = 2500;
 const EVENT_STORAGE_KEY = 'veritix:verify-event';
@@ -88,7 +82,52 @@ async function submitCode(payload: string, eventId: string): Promise<ScanResult>
   };
 }
 
-type CameraState = 'idle' | 'starting' | 'on' | 'unsupported' | 'denied' | 'failed';
+const RESULT_STYLE: Record<ResultKind, { title: string; className: string; Icon: typeof CheckCircle2 }> = {
+  valid: {
+    title: 'Valid — let them in',
+    className: 'border-success bg-success text-success-foreground',
+    Icon: CheckCircle2,
+  },
+  already_used: {
+    title: 'Already used',
+    className: 'border-warning bg-warning text-warning-foreground',
+    Icon: AlertTriangle,
+  },
+  invalid: {
+    title: 'Invalid ticket',
+    className: 'border-destructive bg-destructive text-destructive-foreground',
+    Icon: XCircle,
+  },
+  error: {
+    title: 'Could not check ticket',
+    className: 'border-border bg-muted text-foreground',
+    Icon: AlertTriangle,
+  },
+};
+
+function ResultPanel({ result, onDismiss }: { result: ScanResult; onDismiss: () => void }) {
+  const { title, className, Icon } = RESULT_STYLE[result.kind];
+  return (
+    <div className={cn('rounded-lg border-2 p-5', className)} data-result={result.kind}>
+      <div className="flex items-start gap-3">
+        <Icon className="mt-0.5 h-8 w-8 shrink-0" aria-hidden="true" />
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="text-xl font-semibold">{title}</p>
+          <p>{result.message}</p>
+          {result.kind === 'already_used' && result.usedAt && (
+            <p className="text-sm">First scanned {formatDateTime(result.usedAt)}.</p>
+          )}
+          {result.kind === 'valid' && result.ticketId && (
+            <p className="text-sm opacity-90">Ticket {result.ticketId}</p>
+          )}
+        </div>
+      </div>
+      <Button variant="outline" size="sm" className="mt-4 text-foreground" onClick={onDismiss}>
+        Scan next ticket
+      </Button>
+    </div>
+  );
+}
 
 export default function VerifyPage() {
   const [events, setEvents] = React.useState<VeritixEvent[] | null>(null);
@@ -98,10 +137,7 @@ export default function VerifyPage() {
   const [result, setResult] = React.useState<ScanResult | null>(null);
   const [checking, setChecking] = React.useState(false);
   const [code, setCode] = React.useState('');
-  const [camera, setCamera] = React.useState<CameraState>('idle');
 
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
   // Read inside the scan loop, which must not restart on every render.
   const busyRef = React.useRef(false);
   const eventIdRef = React.useRef('');
@@ -179,69 +215,8 @@ export default function VerifyPage() {
     [],
   );
 
-  const stopCamera = React.useCallback(() => {
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
-    setCamera((current) => (current === 'on' || current === 'starting' ? 'idle' : current));
-  }, []);
-
-  const startCamera = React.useCallback(async () => {
-    if (!barcodeDetector() || !navigator.mediaDevices?.getUserMedia) {
-      setCamera('unsupported');
-      return;
-    }
-    setCamera('starting');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => undefined);
-      }
-      setCamera('on');
-    } catch (error) {
-      const name = (error as { name?: string })?.name;
-      setCamera(name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : 'failed');
-    }
-  }, []);
-
-  // Detection loop, running only while the camera is on.
-  React.useEffect(() => {
-    if (camera !== 'on') return;
-    const Detector = barcodeDetector();
-    if (!Detector) return;
-    const detector = new Detector({ formats: ['qr_code'] });
-    let stopped = false;
-
-    const tick = async () => {
-      if (stopped) return;
-      const video = videoRef.current;
-      if (video && video.readyState >= 2 && !busyRef.current) {
-        try {
-          const codes = await detector.detect(video);
-          const value = codes[0]?.rawValue;
-          if (value && !stopped) await check(value);
-        } catch {
-          // A frame that fails to decode is normal; try the next one.
-        }
-      }
-      if (!stopped) setTimeout(tick, SCAN_INTERVAL_MS);
-    };
-    void tick();
-
-    return () => {
-      stopped = true;
-    };
-  }, [camera, check]);
-
-  // Release the camera when leaving the page.
   React.useEffect(
     () => () => {
-      streamRef.current?.getTracks().forEach((track) => track.stop());
       if (resumeTimer.current) clearTimeout(resumeTimer.current);
     },
     [],
@@ -252,13 +227,6 @@ export default function VerifyPage() {
     busyRef.current = false;
     await check(code);
     setCode('');
-  };
-
-  const cameraMessage: Partial<Record<CameraState, string>> = {
-    unsupported:
-      'This browser cannot scan QR codes with the camera. Enter the code below instead, or use Chrome on Android.',
-    denied: 'Camera access was blocked. Allow it in the browser settings, or enter the code below.',
-    failed: 'The camera could not be started. Enter the code below instead.',
   };
 
   const selectedEvent = events?.find((e) => e.id === eventId);
@@ -319,50 +287,7 @@ export default function VerifyPage() {
         {!checking && result && <ScanResultDisplay result={result} onDismiss={clearResult} />}
       </div>
 
-      <section aria-labelledby="verify-camera-heading" className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <h2 id="verify-camera-heading" className="text-lg font-medium">
-            Camera
-          </h2>
-          {camera === 'on' || camera === 'starting' ? (
-            <Button variant="outline" size="sm" onClick={stopCamera}>
-              <CameraOff className="mr-2 h-4 w-4" aria-hidden="true" /> Stop camera
-            </Button>
-          ) : (
-            <Button size="sm" onClick={startCamera} disabled={!selectedEvent}>
-              <Camera className="mr-2 h-4 w-4" aria-hidden="true" /> Start camera
-            </Button>
-          )}
-        </div>
-
-        <div
-          className={cn(
-            'relative aspect-square w-full overflow-hidden rounded-lg bg-black',
-            camera !== 'on' && camera !== 'starting' && 'hidden',
-          )}
-        >
-          <video
-            ref={videoRef}
-            className="h-full w-full object-cover"
-            muted
-            playsInline
-            aria-label="Camera preview for scanning ticket QR codes"
-          />
-          <div
-            className="pointer-events-none absolute inset-[15%] rounded-lg border-4 border-white/80"
-            aria-hidden="true"
-          />
-        </div>
-
-        {!selectedEvent && camera === 'idle' && events && events.length > 0 && (
-          <p className="text-sm text-muted-foreground">Choose an event to start scanning.</p>
-        )}
-        {cameraMessage[camera] && (
-          <p role="alert" className="text-sm text-muted-foreground">
-            {cameraMessage[camera]}
-          </p>
-        )}
-      </section>
+      <QRScanner onScan={check} disabled={!selectedEvent} />
 
       <section aria-labelledby="verify-manual-heading" className="space-y-3">
         <h2 id="verify-manual-heading" className="text-lg font-medium">

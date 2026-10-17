@@ -16,6 +16,7 @@ export const routes = {
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
 
   dashboard: '/dashboard',
   dashboardEvents: '/dashboard/events',
@@ -41,7 +42,7 @@ export const PROTECTED_PREFIXES = [
 ] as const;
 
 /** Routes that an already-authenticated user should be redirected away from. */
-export const AUTH_ROUTES = ['/login', '/register', '/forgot-password'] as const;
+export const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'] as const;
 
 export function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
