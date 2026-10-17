@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import type { OrderStatus } from '@/types';
+import { forwardToBackend, toResponse, unauthorized } from '@/lib/api/server';
 
 /**
  * Order and escrow endpoints used by the checkout payment step.
@@ -17,7 +18,7 @@ import type { OrderStatus } from '@/types';
  * An order stays `pending` until the backend reports the transaction confirmed;
  * nothing marks it paid early.
  *
- * Every handler requires an authenticated session (`session_user_id` cookie) —
+ * Every handler requires an authenticated signed session cookie —
  * escrow orders are addressed to a Stellar wallet, but they still belong to the
  * signed-in buyer who initiated checkout.
  */
@@ -40,64 +41,13 @@ interface OrderRecord {
   createdAt: string;
 }
 
-/** Backend API base. Falls back to the app's own public API URL. */
-function backendBase(): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
-  return base.replace(/\/$/, '');
-}
-
-async function callBackend<T>(path: string, init: RequestInit): Promise<T> {
-  const base = backendBase();
-
-  if (!base) {
-    throw new Error('No backend API base URL configured');
-  }
-
-  const response = await fetch(`${base}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init.headers },
-    cache: 'no-store',
-  });
-
-  const text = await response.text();
-  const payload: unknown = text ? safeJson(text) : undefined;
-
-  if (!response.ok) {
-    const message =
-      payload && typeof payload === 'object' && 'message' in payload
-        ? String((payload as { message: unknown }).message)
-        : response.statusText;
-    throw new Error(message);
-  }
-
-  return payload as T;
-}
-
-function safeJson(text: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-}
-
 function badRequest(message: string) {
   return NextResponse.json({ message }, { status: 400 });
 }
 
-function unauthorized() {
-  return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-}
-
-function upstream(error: unknown) {
-  const message = error instanceof Error ? error.message : 'Escrow service unavailable';
-  return NextResponse.json({ message }, { status: 502 });
-}
-
 /** Create the order and its escrow, and return the envelope the wallet signs. */
 export async function POST(request: NextRequest) {
-  const sessionUserId = request.cookies.get('session_user_id')?.value;
+  const sessionUserId = await readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
   const draft = (await request.json().catch(() => null)) as OrderDraft | null;
@@ -120,7 +70,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // The backend opens the escrow account and prepares the payment envelope.
-    const order = await callBackend<OrderRecord>('/orders', {
+    const order = await forwardToBackend<OrderRecord>('/orders', {
       method: 'POST',
       body: JSON.stringify({
         eventId: draft.eventId,
@@ -135,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    return upstream(error);
+    return toResponse(error);
   }
 }
 
@@ -151,14 +101,14 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const order = await callBackend<OrderRecord>(`/orders/${body.orderId}/submit`, {
+    const order = await forwardToBackend<OrderRecord>(`/orders/${body.orderId}/submit`, {
       method: 'POST',
       body: JSON.stringify({ signedXdr: body.signedXdr }),
     });
 
     return NextResponse.json(order);
   } catch (error) {
-    return upstream(error);
+    return toResponse(error);
   }
 }
 
@@ -167,26 +117,26 @@ export async function PATCH(request: NextRequest) {
  * until the transaction confirms). Without it, the session user's orders.
  */
 export async function GET(request: NextRequest) {
-  const sessionUserId = request.cookies.get('session_user_id')?.value;
+  const sessionUserId = await readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
   const orderId = request.nextUrl.searchParams.get('id')?.trim();
 
   try {
     if (orderId) {
-      const order = await callBackend<OrderRecord>(
+      const order = await forwardToBackend<OrderRecord>(
         `/orders/${encodeURIComponent(orderId)}`,
         { method: 'GET' },
       );
       return NextResponse.json(order);
     }
 
-    const orders = await callBackend<OrderRecord[]>(
+    const orders = await forwardToBackend<OrderRecord[]>(
       `/orders?buyerId=${encodeURIComponent(sessionUserId)}`,
       { method: 'GET' },
     );
     return NextResponse.json(orders);
   } catch (error) {
-    return upstream(error);
+    return toResponse(error);
   }
 }

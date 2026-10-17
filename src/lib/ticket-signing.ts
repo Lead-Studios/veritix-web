@@ -4,10 +4,10 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
  * Signed ticket payloads — the string encoded in a ticket's QR code.
  *
  * Server-only. The format is `<base64url(json)>.<base64url(hmac-sha256)>`,
- * signed with `TICKET_SIGNING_SECRET` (falling back to `JWT_SECRET`). Anyone
- * can read the claims; nobody without the secret can mint or alter them, which
- * is the whole point: a QR code checked only in the browser can be forged by
- * anyone who can type JSON.
+ * signed with `TICKET_SIGNING_SECRET`, which is required and has no fallback.
+ * Anyone can read the claims; nobody without the secret can mint or alter
+ * them, which is the whole point: a QR code checked only in the browser can be
+ * forged by anyone who can type JSON.
  */
 
 export interface TicketClaims {
@@ -37,7 +37,7 @@ const BASE64URL = /^[A-Za-z0-9_-]+$/;
  * that forgot to set one.
  */
 export function signingSecret(): string | null {
-  const secret = process.env.TICKET_SIGNING_SECRET || process.env.JWT_SECRET || '';
+  const secret = process.env.TICKET_SIGNING_SECRET || '';
   return secret.length >= 16 ? secret : null;
 }
 
