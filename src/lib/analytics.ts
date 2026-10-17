@@ -1,4 +1,5 @@
 import { EVENTS } from '@/lib/events';
+import { demoDataEnabled } from '@/lib/demo-data';
 
 /**
  * Read model for the organizer analytics API.
@@ -304,10 +305,14 @@ function buildEventRows(event: (typeof EVENTS)[number], ownerId: string): DailyR
   return rows;
 }
 
-const DAILY_ROWS: DailyRow[] = EVENTS.flatMap((event) => {
-  const ownerId = OWNER_BY_EVENT[event.id];
-  return ownerId ? buildEventRows(event, ownerId) : [];
-});
+// The fixture is generated only when demo data is served; production reads
+// these numbers from the backend once it is wired up.
+const DAILY_ROWS: DailyRow[] = demoDataEnabled()
+  ? EVENTS.flatMap((event) => {
+      const ownerId = OWNER_BY_EVENT[event.id];
+      return ownerId ? buildEventRows(event, ownerId) : [];
+    })
+  : [];
 
 /** Events the account may see, in event-date order. */
 function ownedEvents(ownerId: string, eventId?: string) {

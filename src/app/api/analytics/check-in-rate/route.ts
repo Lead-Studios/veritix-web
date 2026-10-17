@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { queryCheckInRates } from '@/lib/analytics';
-import { readSessionUserId, unauthorized } from '@/lib/api/server';
+import { demoHeaders, demoPayload } from '@/lib/demo-data';
 
 /**
  * GET /api/analytics/check-in-rate
@@ -23,11 +23,15 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   return NextResponse.json(
-    queryCheckInRates({
-      from: params.get('from') ?? undefined,
-      to: params.get('to') ?? undefined,
-      eventId: params.get('eventId') ?? undefined,
-      ownerId: sessionUserId,
-    }),
+    {
+      ...queryCheckInRates({
+        from: params.get('from') ?? undefined,
+        to: params.get('to') ?? undefined,
+        eventId: params.get('eventId') ?? undefined,
+        ownerId: sessionUserId,
+      }),
+      ...demoPayload(),
+    },
+    { headers: demoHeaders() },
   );
 }
