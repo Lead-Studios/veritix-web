@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as createRoute } from '@/app/api/events/route';
-import { PATCH as updateRoute } from '@/app/api/events/[id]/route';
+import {
+  GET as getEventRoute,
+  PATCH as updateRoute,
+} from '@/app/api/events/[id]/route';
 import { POST as publishRoute } from '@/app/api/events/[id]/publish/route';
 import { POST as cancelRoute } from '@/app/api/events/[id]/cancel/route';
 import { signedSessionCookie } from './session-test-helpers';
@@ -20,6 +23,27 @@ function request(method: string, userId: string | null, body?: unknown): NextReq
 }
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
+
+describe('GET /api/events/[id]', () => {
+  it('returns an event by its public slug', async () => {
+    const response = await getEventRoute(
+      new Request('http://localhost/api/events/lagos-sound-festival'),
+      ctx('lagos-sound-festival'),
+    );
+
+    expect(response.status).toBe(200);
+    expect((await response.json()).slug).toBe('lagos-sound-festival');
+  });
+
+  it('returns 404 when the event slug does not exist', async () => {
+    const response = await getEventRoute(
+      new Request('http://localhost/api/events/missing-event'),
+      ctx('missing-event'),
+    );
+
+    expect(response.status).toBe(404);
+  });
+});
 
 const body = {
   title: 'Ownership Test Night',
