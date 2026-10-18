@@ -42,6 +42,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           # .nvmrc is the single source of truth for the Node version, matching
+          # ci.yml so the two workflows cannot drift onto different versions.
           # ci.yml and lighthouse.yml so the three workflows cannot drift apart.
           node-version-file: ".nvmrc"
           cache: "npm"
