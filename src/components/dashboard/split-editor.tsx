@@ -9,6 +9,23 @@ export interface SplitRow {
   percentage: number;
 }
 
+/**
+ * An id for the row, not its position.
+ *
+ * Rows used to be keyed by array index. That makes React reconcile a
+ * *position* rather than a *row*, so removing a row left the inputs bound to
+ * the row that shifted into its place — typing into "wallet 2" could edit
+ * "wallet 1" once an earlier recipient was removed.
+ *
+ * The id is derived from the row's own data where possible and falls back to
+ * the index only for rows too empty to identify themselves, so it stays unique
+ * without forcing callers to thread an `id` through their state.
+ */
+function rowId(row: SplitRow, index: number): string {
+  const wallet = row.walletAddress.trim();
+  return wallet ? `wallet-${wallet}` : `row-${index}`;
+}
+
 export function SplitEditor({
   rows,
   onChange,
@@ -44,7 +61,7 @@ export function SplitEditor({
   return (
     <div className="space-y-2">
       {rows.map((row, index) => (
-        <div key={index} className="flex flex-wrap items-end gap-2">
+        <div key={rowId(row, index)} className="flex flex-wrap items-end gap-2">
           <div className="flex-1 min-w-[200px] space-y-1.5">
             <Label htmlFor={`${baseId}-wallet-${index}`}>Wallet address {index + 1}</Label>
             <Input
