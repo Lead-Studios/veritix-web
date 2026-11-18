@@ -146,15 +146,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
           EventGallery returns null when the array is empty, so no extra guard
           is needed here. */}
       {(event.images?.length ?? 0) > 0 ? (
-        <EventGallery
-          images={event.images!}
-          title={event.title}
-        />
+        <EventGallery images={event.images!} title={event.title} />
       ) : event.coverImageUrl ? (
-        <EventGallery
-          images={[event.coverImageUrl]}
-          title={event.title}
-        />
+        <EventGallery images={[event.coverImageUrl]} title={event.title} />
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-3">

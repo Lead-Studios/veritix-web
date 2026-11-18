@@ -30,9 +30,9 @@ export default function ContactPage() {
               Contact us
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              A person reads every message that comes through this form, and it reaches the team
-              rather than a queue. Tell us what happened and we will tell you what we think is
-              going on.
+              A person reads every message that comes through this form, and it reaches
+              the team rather than a queue. Tell us what happened and we will tell you
+              what we think is going on.
             </p>
           </div>
         </Container>
@@ -62,9 +62,9 @@ export default function ContactPage() {
                   How long it takes
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Usually two working days. If it is about money — a payment that did not settle, a
-                  payout that did not arrive — a ticket in your dashboard reaches the people with
-                  access to the ledger, which email does not.
+                  Usually two working days. If it is about money — a payment that did not
+                  settle, a payout that did not arrive — a ticket in your dashboard
+                  reaches the people with access to the ledger, which email does not.
                 </p>
               </div>
 
@@ -77,12 +77,12 @@ export default function ContactPage() {
                   What we need from you
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  The event or order reference, what you expected to happen, and what happened
-                  instead. A screenshot helps more than a description of one.
+                  The event or order reference, what you expected to happen, and what
+                  happened instead. A screenshot helps more than a description of one.
                 </p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Please do not send a password, a wallet secret key, or a full card number. We
-                  will never ask for them, and we cannot use them if you do.
+                  Please do not send a password, a wallet secret key, or a full card
+                  number. We will never ask for them, and we cannot use them if you do.
                 </p>
               </div>
 
@@ -91,7 +91,8 @@ export default function ContactPage() {
                   Before you write
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  The <Link href={routes.terms} className="underline underline-offset-4">
+                  The{' '}
+                  <Link href={routes.terms} className="underline underline-offset-4">
                     terms
                   </Link>{' '}
                   and the{' '}

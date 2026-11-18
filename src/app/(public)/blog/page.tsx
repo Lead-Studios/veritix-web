@@ -43,8 +43,8 @@ export default function BlogIndexPage() {
         <Container className="flex flex-col items-start gap-4 py-16 sm:py-20">
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Blog</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
-            How the money moves, what the ledger does and does not prove, and the reasoning
-            behind the parts of this product that are unusual.
+            How the money moves, what the ledger does and does not prove, and the
+            reasoning behind the parts of this product that are unusual.
           </p>
         </Container>
       </section>
