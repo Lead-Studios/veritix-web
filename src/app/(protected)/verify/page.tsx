@@ -1,14 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { ScanResultDisplay } from '@/components/verify/scan-result';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { QRScanner } from '@/components/verify/qr-scanner';
 import { formatDateTime } from '@/lib/format';
-import { cn } from '@/lib/utils';
 import type { Paginated, VeritixEvent } from '@/types';
 
 /**
@@ -80,53 +79,6 @@ async function submitCode(payload: string, eventId: string): Promise<ScanResult>
     kind: 'error',
     message: body.message ?? 'Something went wrong. Scan again.',
   };
-}
-
-const RESULT_STYLE: Record<ResultKind, { title: string; className: string; Icon: typeof CheckCircle2 }> = {
-  valid: {
-    title: 'Valid — let them in',
-    className: 'border-success bg-success text-success-foreground',
-    Icon: CheckCircle2,
-  },
-  already_used: {
-    title: 'Already used',
-    className: 'border-warning bg-warning text-warning-foreground',
-    Icon: AlertTriangle,
-  },
-  invalid: {
-    title: 'Invalid ticket',
-    className: 'border-destructive bg-destructive text-destructive-foreground',
-    Icon: XCircle,
-  },
-  error: {
-    title: 'Could not check ticket',
-    className: 'border-border bg-muted text-foreground',
-    Icon: AlertTriangle,
-  },
-};
-
-function ResultPanel({ result, onDismiss }: { result: ScanResult; onDismiss: () => void }) {
-  const { title, className, Icon } = RESULT_STYLE[result.kind];
-  return (
-    <div className={cn('rounded-lg border-2 p-5', className)} data-result={result.kind}>
-      <div className="flex items-start gap-3">
-        <Icon className="mt-0.5 h-8 w-8 shrink-0" aria-hidden="true" />
-        <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-xl font-semibold">{title}</p>
-          <p>{result.message}</p>
-          {result.kind === 'already_used' && result.usedAt && (
-            <p className="text-sm">First scanned {formatDateTime(result.usedAt)}.</p>
-          )}
-          {result.kind === 'valid' && result.ticketId && (
-            <p className="text-sm opacity-90">Ticket {result.ticketId}</p>
-          )}
-        </div>
-      </div>
-      <Button variant="outline" size="sm" className="mt-4 text-foreground" onClick={onDismiss}>
-        Scan next ticket
-      </Button>
-    </div>
-  );
 }
 
 export default function VerifyPage() {
