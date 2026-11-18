@@ -20,9 +20,9 @@ describe('resolveAnalyticsRange', () => {
       to: '2026-09-25',
     });
     const { from, to } = resolveAnalyticsRange(undefined, undefined, NOW);
-    expect((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000).toBe(
-      DEFAULT_RANGE_DAYS - 1,
-    );
+    expect(
+      (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000,
+    ).toBe(DEFAULT_RANGE_DAYS - 1);
   });
 
   it('keeps an explicit range', () => {
@@ -64,7 +64,8 @@ describe('resolveAnalyticsRange', () => {
   it('clamps a range wider than MAX_RANGE_DAYS, keeping the end date', () => {
     const range = resolveAnalyticsRange('2000-01-01', '2026-09-25', NOW);
     const days =
-      (Date.parse(`${range.to}T00:00:00Z`) - Date.parse(`${range.from}T00:00:00Z`)) / 86_400_000;
+      (Date.parse(`${range.to}T00:00:00Z`) - Date.parse(`${range.from}T00:00:00Z`)) /
+      86_400_000;
     expect(days).toBe(MAX_RANGE_DAYS - 1);
     expect(range.to).toBe('2026-09-25');
   });
@@ -109,7 +110,11 @@ describe('queryAnalytics', () => {
   });
 
   it('leaves the check-in rate undefined when nothing was sold', () => {
-    const empty = queryAnalytics({ ownerId: OWNER, from: '2026-01-01', to: '2026-01-02' });
+    const empty = queryAnalytics({
+      ownerId: OWNER,
+      from: '2026-01-01',
+      to: '2026-01-02',
+    });
     expect(empty.totals.ticketsSold).toBe(0);
     expect(empty.totals.checkInRate).toBeNull();
   });
@@ -140,7 +145,11 @@ describe('queryCheckInRates', () => {
   it('keeps a lifetime rate when the range covers sales but not the event day', () => {
     // evt_7 ran on 2026-09-11 and sold from 2026-08-21. A window that catches
     // the sales but not the doors must not report a confident 0%.
-    const report = queryCheckInRates({ ownerId: OWNER, from: '2026-08-22', to: '2026-08-31' });
+    const report = queryCheckInRates({
+      ownerId: OWNER,
+      from: '2026-08-22',
+      to: '2026-08-31',
+    });
     const event = report.events.find((candidate) => candidate.eventId === 'evt_7');
 
     expect(event).toBeDefined();
@@ -157,7 +166,11 @@ describe('queryCheckInRates', () => {
   });
 
   it('excludes an event with no activity in the range rather than reporting 0%', () => {
-    const report = queryCheckInRates({ ownerId: OWNER, from: '2026-01-01', to: '2026-01-02' });
+    const report = queryCheckInRates({
+      ownerId: OWNER,
+      from: '2026-01-01',
+      to: '2026-01-02',
+    });
     expect(report.events).toEqual([]);
     expect(report.trend).toEqual([]);
   });
