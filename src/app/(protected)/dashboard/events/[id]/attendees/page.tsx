@@ -204,13 +204,18 @@ export default function AttendeesPage() {
           <DialogHeader>
             <DialogTitle>Check in {pending?.name}?</DialogTitle>
             <DialogDescription>
-              Use this when the attendee cannot show their ticket. Confirm their identity first:
-              the check-in is recorded under your account with the current time, and their ticket
-              ({pending?.tier}, {pending?.email}) can no longer be scanned.
+              Use this when the attendee cannot show their ticket. Confirm their identity
+              first: the check-in is recorded under your account with the current time,
+              and their ticket ({pending?.tier}, {pending?.email}) can no longer be
+              scanned.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPending(null)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setPending(null)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
             <Button onClick={confirmCheckIn} disabled={submitting}>

@@ -19,7 +19,11 @@ const PRESETS = [
 
 function presetRange(days: number): AnalyticsRange {
   const today = new Date();
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (days - 1));
+  const start = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - (days - 1),
+  );
   return { from: toIsoDate(start), to: toIsoDate(today) };
 }
 
@@ -84,8 +88,18 @@ export default function AnalyticsPage() {
         })}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <DatePicker label="From" value={from} max={to || undefined} onChange={updateBound('from')} />
-        <DatePicker label="To" value={to} min={from || undefined} onChange={updateBound('to')} />
+        <DatePicker
+          label="From"
+          value={from}
+          max={to || undefined}
+          onChange={updateBound('from')}
+        />
+        <DatePicker
+          label="To"
+          value={to}
+          min={from || undefined}
+          onChange={updateBound('to')}
+        />
       </div>
     </fieldset>
   );
@@ -137,7 +151,8 @@ export default function AnalyticsPage() {
       <p role="status" className="text-sm text-muted-foreground">
         {isValidating
           ? 'Updating figures…'
-          : data && `Showing ${formatDate(`${data.range.from}T00:00:00`)} to ${formatDate(`${data.range.to}T00:00:00`)}.`}
+          : data &&
+            `Showing ${formatDate(`${data.range.from}T00:00:00`)} to ${formatDate(`${data.range.to}T00:00:00`)}.`}
       </p>
 
       <dl
@@ -145,15 +160,27 @@ export default function AnalyticsPage() {
         aria-label="Revenue summary"
         aria-busy={isValidating}
       >
-        <StatCard label="Gross revenue" value={formatCurrency(totals?.grossMinor ?? 0, currency)} />
-        <StatCard label="Platform fees" value={formatCurrency(totals?.feesMinor ?? 0, currency)} />
-        <StatCard label="Refunds" value={formatCurrency(totals?.refundedMinor ?? 0, currency)} />
-        <StatCard label="Net after fees" value={formatCurrency(totals?.netMinor ?? 0, currency)} />
+        <StatCard
+          label="Gross revenue"
+          value={formatCurrency(totals?.grossMinor ?? 0, currency)}
+        />
+        <StatCard
+          label="Platform fees"
+          value={formatCurrency(totals?.feesMinor ?? 0, currency)}
+        />
+        <StatCard
+          label="Refunds"
+          value={formatCurrency(totals?.refundedMinor ?? 0, currency)}
+        />
+        <StatCard
+          label="Net after fees"
+          value={formatCurrency(totals?.netMinor ?? 0, currency)}
+        />
       </dl>
 
       <p className="text-xs text-muted-foreground">
-        Net after fees is gross revenue minus platform fees (2.5% + {formatCurrency(99, currency)}{' '}
-        per ticket) and refunds issued in the range.
+        Net after fees is gross revenue minus platform fees (2.5% +{' '}
+        {formatCurrency(99, currency)} per ticket) and refunds issued in the range.
       </p>
     </div>
   );
