@@ -70,7 +70,9 @@ describe('POST /api/verify', () => {
       const ticket = newTicket();
 
       const results = await Promise.all(
-        Array.from({ length: 5 }, () => scan({ payload: ticket.payload, eventId: 'evt_1' })),
+        Array.from({ length: 5 }, () =>
+          scan({ payload: ticket.payload, eventId: 'evt_1' }),
+        ),
       );
       const statuses = results.map((res) => res.status).sort();
 
@@ -169,7 +171,9 @@ describe('POST /api/verify', () => {
   describe('access', () => {
     it('requires a session', async () => {
       const ticket = newTicket();
-      expect((await scan({ payload: ticket.payload, eventId: 'evt_1' }, null)).status).toBe(401);
+      expect(
+        (await scan({ payload: ticket.payload, eventId: 'evt_1' }, null)).status,
+      ).toBe(401);
     });
 
     it("returns 404 when scanning for someone else's event, and leaves the ticket unused", async () => {
@@ -177,7 +181,9 @@ describe('POST /api/verify', () => {
       const res = await scan({ payload: ticket.payload, eventId: 'evt_1' }, 'org_2');
       expect(res.status).toBe(404);
 
-      expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(200);
+      expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(
+        200,
+      );
     });
 
     it('fails closed when no signing secret is configured', async () => {
@@ -186,11 +192,15 @@ describe('POST /api/verify', () => {
       delete process.env.TICKET_SIGNING_SECRET;
       delete process.env.JWT_SECRET;
       try {
-        expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(503);
+        expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(
+          503,
+        );
 
         // JWT_SECRET is not a ticket-signing key: setting it alone must not help.
         process.env.JWT_SECRET = SECRET;
-        expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(503);
+        expect((await scan({ payload: ticket.payload, eventId: 'evt_1' })).status).toBe(
+          503,
+        );
       } finally {
         process.env.TICKET_SIGNING_SECRET = saved.t;
         if (saved.j !== undefined) process.env.JWT_SECRET = saved.j;
