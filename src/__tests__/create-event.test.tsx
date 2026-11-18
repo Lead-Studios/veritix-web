@@ -64,7 +64,9 @@ describe('event creation schema', () => {
         startsAt: '2026-10-17T16:00:00.000Z',
         endsAt: '2026-10-16T16:00:00.000Z',
       };
-      expect(errorsFor(input, 'endsAt')).toContain('End date cannot be before the start date');
+      expect(errorsFor(input, 'endsAt')).toContain(
+        'End date cannot be before the start date',
+      );
     });
 
     it('allows a single-day event where the dates are equal', () => {
@@ -73,9 +75,9 @@ describe('event creation schema', () => {
     });
 
     it('rejects an unparseable date', () => {
-      expect(errorsFor({ ...validInput(), startsAt: 'next friday' }, 'startsAt')).toContain(
-        'Start date is not a valid date',
-      );
+      expect(
+        errorsFor({ ...validInput(), startsAt: 'next friday' }, 'startsAt'),
+      ).toContain('Start date is not a valid date');
     });
   });
 
@@ -89,15 +91,21 @@ describe('event creation schema', () => {
     it('rejects a tier with no tickets', () => {
       const input = {
         ...validInput(),
-        tiers: [{ name: 'General', priceMinor: 5_000, currency: 'USD', quantityTotal: 0 }],
+        tiers: [
+          { name: 'General', priceMinor: 5_000, currency: 'USD', quantityTotal: 0 },
+        ],
       };
-      expect(errorsFor(input, 'tiers.0.quantityTotal')).toContain('Quantity must be at least 1');
+      expect(errorsFor(input, 'tiers.0.quantityTotal')).toContain(
+        'Quantity must be at least 1',
+      );
     });
   });
 
   describe('revenue splits', () => {
     it('accepts no splits (the organizer keeps everything)', () => {
-      expect(eventInputSchema.safeParse({ ...validInput(), splits: [] }).success).toBe(true);
+      expect(eventInputSchema.safeParse({ ...validInput(), splits: [] }).success).toBe(
+        true,
+      );
     });
 
     it('accepts splits that total exactly 100%', () => {
@@ -158,7 +166,9 @@ describe('NewEventPage', () => {
     await user.type(screen.getByLabelText('Start date'), '2026-10-17{Enter}');
     await user.type(screen.getByLabelText('End date'), '2026-10-16{Enter}');
 
-    expect(screen.getByText('End date cannot be before the start date')).toBeInTheDocument();
+    expect(
+      screen.getByText('End date cannot be before the start date'),
+    ).toBeInTheDocument();
   });
 
   it('does not flag an end date on or after the start date', async () => {

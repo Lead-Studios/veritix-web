@@ -23,7 +23,9 @@ describe('CookieBanner', () => {
 
     render(<CookieBanner />);
 
-    expect(screen.queryByRole('region', { name: 'Cookie consent' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Cookie consent' }),
+    ).not.toBeInTheDocument();
   });
 
   it('stores the choice and disappears when "Necessary only" is picked', async () => {
@@ -32,7 +34,9 @@ describe('CookieBanner', () => {
 
     await user.click(screen.getByRole('button', { name: 'Necessary only' }));
 
-    expect(screen.queryByRole('region', { name: 'Cookie consent' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Cookie consent' }),
+    ).not.toBeInTheDocument();
     expect(readConsent()).toBe('necessary');
     expect(analyticsAllowed()).toBe(false);
   });
@@ -45,7 +49,9 @@ describe('CookieBanner', () => {
     await user.click(screen.getByRole('button', { name: 'Allow analytics' }));
 
     expect(analyticsAllowed()).toBe(true);
-    expect(screen.queryByRole('region', { name: 'Cookie consent' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Cookie consent' }),
+    ).not.toBeInTheDocument();
   });
 
   it('treats a mangled cookie as the privacy-preserving choice without throwing', () => {
@@ -53,6 +59,8 @@ describe('CookieBanner', () => {
 
     expect(readConsent()).toBe('necessary');
     expect(() => render(<CookieBanner />)).not.toThrow();
-    expect(screen.queryByRole('region', { name: 'Cookie consent' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Cookie consent' }),
+    ).not.toBeInTheDocument();
   });
 });

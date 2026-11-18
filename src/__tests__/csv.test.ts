@@ -70,9 +70,7 @@ describe('exportRowsToCSV', () => {
       'sales_2026-09-20_to_2026-09-21_analytics.csv',
     );
 
-    expect(fileText).toBe(
-      'Date,Tickets sold\r\n2026-09-20,12\r\n2026-09-21,7',
-    );
+    expect(fileText).toBe('Date,Tickets sold\r\n2026-09-20,12\r\n2026-09-21,7');
     expect(downloadName()).toBe('sales_2026-09-20_to_2026-09-21_analytics.csv');
   });
 
@@ -115,8 +113,18 @@ describe('exportAttendeesToCSV', () => {
   it('keeps its original filename shape after the refactor', async () => {
     exportAttendeesToCSV(
       [
-        { name: 'Ada Lovelace', email: 'ada@example.com', ticketType: 'Floor', checkedIn: true },
-        { name: 'Alan Turing', email: 'alan@example.com', ticketType: 'Balcony', checkedIn: false },
+        {
+          name: 'Ada Lovelace',
+          email: 'ada@example.com',
+          ticketType: 'Floor',
+          checkedIn: true,
+        },
+        {
+          name: 'Alan Turing',
+          email: 'alan@example.com',
+          ticketType: 'Balcony',
+          checkedIn: false,
+        },
       ],
       'Lagos Sound Festival',
       '2026-10-17',
@@ -134,7 +142,14 @@ describe('exportAttendeesToCSV', () => {
 
   it('rounds a checked-in flag to a Yes or No a bookkeeper can read', async () => {
     exportAttendeesToCSV(
-      [{ name: 'Grace Hopper', email: 'grace@example.com', ticketType: 'Floor', checkedIn: true }],
+      [
+        {
+          name: 'Grace Hopper',
+          email: 'grace@example.com',
+          ticketType: 'Floor',
+          checkedIn: true,
+        },
+      ],
       'Accra Chill Fest',
       '2026-08-29',
     );
