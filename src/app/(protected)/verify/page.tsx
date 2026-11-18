@@ -143,7 +143,10 @@ export default function VerifyPage() {
   const eventIdRef = React.useRef('');
   const resumeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  eventIdRef.current = eventId;
+  // Written in an effect: refs must not be assigned during render.
+  React.useEffect(() => {
+    eventIdRef.current = eventId;
+  }, [eventId]);
 
   // The organizer's own events. Other events would only ever answer 404.
   React.useEffect(() => {

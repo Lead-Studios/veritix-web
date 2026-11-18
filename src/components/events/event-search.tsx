@@ -19,7 +19,7 @@ export function EventSearch({
   className,
 }: EventSearchProps) {
   const { filters, setFilter } = useEventFilters(['q']);
-  const queryInUrl = (filters as any).q ?? '';
+  const queryInUrl = (filters as Record<string, string | undefined>).q ?? '';
 
   const [value, setValue] = React.useState(queryInUrl);
   const [lastQueryInUrl, setLastQueryInUrl] = React.useState(queryInUrl);
