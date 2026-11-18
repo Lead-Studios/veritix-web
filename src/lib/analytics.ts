@@ -366,7 +366,8 @@ function currencyFor(events: (typeof EVENTS)[number][]): string {
  * than a 404, so the filter cannot be used to probe for events that exist.
  */
 export function queryAnalytics(query: AnalyticsQuery): AnalyticsSnapshot {
-  const range = resolveAnalyticsRange(query.from, query.to);
+  // Anchored to the fixture clock so the default window always overlaps the fixture data.
+  const range = resolveAnalyticsRange(query.from, query.to, new Date(`${FIXTURE_TODAY}T00:00:00Z`));
   const eventId = query.eventId?.trim() || undefined;
 
   const events = ownedEvents(query.ownerId, eventId);

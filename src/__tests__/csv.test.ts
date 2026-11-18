@@ -123,12 +123,14 @@ describe('exportAttendeesToCSV', () => {
     );
 
     expect(downloadName()).toBe('lagos_sound_festival_2026-10-17_attendees.csv');
+    // The export starts with a UTF-8 BOM so Excel reads non-ASCII names correctly.
     expect(fileText).toBe(
-      [
-        'Name,Email,Ticket Type,Checked In',
-        'Ada Lovelace,ada@example.com,Floor,Yes',
-        'Alan Turing,alan@example.com,Balcony,No',
-      ].join('\r\n'),
+      '\ufeff' +
+        [
+          'Name,Email,Ticket Type,Checked In',
+          'Ada Lovelace,ada@example.com,Floor,Yes',
+          'Alan Turing,alan@example.com,Balcony,No',
+        ].join('\r\n'),
     );
   });
 
