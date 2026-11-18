@@ -72,7 +72,13 @@ function SettingsFallback() {
   );
 }
 
-function SettingsContent({ user, onSaved }: { user: User; onSaved: (user: User) => void }) {
+function SettingsContent({
+  user,
+  onSaved,
+}: {
+  user: User;
+  onSaved: (user: User) => void;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -163,7 +169,12 @@ function SettingsShell() {
 
   if (!data) return <SettingsFallback />;
 
-  return <SettingsContent user={data} onSaved={(user) => void mutate(user, { revalidate: false })} />;
+  return (
+    <SettingsContent
+      user={data}
+      onSaved={(user) => void mutate(user, { revalidate: false })}
+    />
+  );
 }
 
 export default function SettingsPage() {

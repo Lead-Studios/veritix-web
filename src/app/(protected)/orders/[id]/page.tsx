@@ -81,7 +81,14 @@ export default function OrderConfirmationPage({
     endsAt: order.createdAt,
     status: 'published',
     organizer: { id: '1', name: 'Organizer', verified: false },
-    tiers: order.tickets.map(t => ({ id: t.tierId, name: 'Ticket', priceMinor: Math.floor(order.totalMinor / Math.max(1, order.tickets.length)), currency: order.currency, quantityTotal: 10, quantitySold: 1 })),
+    tiers: order.tickets.map((t) => ({
+      id: t.tierId,
+      name: 'Ticket',
+      priceMinor: Math.floor(order.totalMinor / Math.max(1, order.tickets.length)),
+      currency: order.currency,
+      quantityTotal: 10,
+      quantitySold: 1,
+    })),
   };
 
   return (
@@ -124,7 +131,9 @@ export default function OrderConfirmationPage({
         </div>
       )}
 
-      {order.status === 'paid' && <Receipt order={order} event={event} paymentReference={escrowReference} />}
+      {order.status === 'paid' && (
+        <Receipt order={order} event={event} paymentReference={escrowReference} />
+      )}
 
       <Card>
         <CardHeader>

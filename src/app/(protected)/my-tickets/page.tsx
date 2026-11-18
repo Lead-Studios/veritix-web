@@ -11,7 +11,10 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import type { Ticket, TicketStatus } from '@/types';
 
-const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' | 'outline'> = {
+const STATUS_VARIANT: Record<
+  TicketStatus,
+  'success' | 'secondary' | 'warning' | 'outline'
+> = {
   valid: 'success',
   used: 'secondary',
   refunded: 'warning',
@@ -27,7 +30,9 @@ export default function MyTicketsPage() {
   React.useEffect(() => {
     let cancelled = false;
     fetch('/api/tickets')
-      .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(response.status),
+      )
       .then((data: Ticket[]) => {
         if (!cancelled) setTickets(Array.isArray(data) ? data : []);
       })
