@@ -72,7 +72,7 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
-      acceptTerms: false as any,
+      acceptTerms: false as unknown as RegisterValues['acceptTerms'],
     },
     mode: 'onBlur',
   });
