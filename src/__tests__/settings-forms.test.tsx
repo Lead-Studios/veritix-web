@@ -34,16 +34,16 @@ vi.mock('@/lib/api-client', () => ({
 }));
 
 // Imported after the mocks so the components pick them up.
-const { ProfileForm, AVATAR_MAX_BYTES, validateAvatar } = await import(
-  '@/components/settings/profile-form'
-);
+const { ProfileForm, AVATAR_MAX_BYTES, validateAvatar } =
+  await import('@/components/settings/profile-form');
 const { PasswordForm } = await import('@/components/settings/password-form');
-const { DEFAULT_PREFERENCES, NotificationForm } = await import(
-  '@/components/settings/notification-form'
-);
-const { parseSettingsTab, SETTINGS_TABS, default: SettingsPage } = await import(
-  '@/app/(protected)/settings/page'
-);
+const { DEFAULT_PREFERENCES, NotificationForm } =
+  await import('@/components/settings/notification-form');
+const {
+  parseSettingsTab,
+  SETTINGS_TABS,
+  default: SettingsPage,
+} = await import('@/app/(protected)/settings/page');
 const { useSearchParams } = await import('next/navigation');
 
 const USER: User = { id: 'user_1', email: 'umi@example.com', name: 'Umi' };
@@ -81,11 +81,15 @@ describe('validateAvatar', () => {
   });
 
   it('rejects a format outside the promise, naming the accepted ones', () => {
-    expect(validateAvatar(makeFile('a.tiff', 'image/tiff', 1024))).toMatch(/PNG, JPEG, or WebP/);
+    expect(validateAvatar(makeFile('a.tiff', 'image/tiff', 1024))).toMatch(
+      /PNG, JPEG, or WebP/,
+    );
   });
 
   it('rejects a file over the size cap and says how far over it is', () => {
-    const problem = validateAvatar(makeFile('big.png', 'image/png', AVATAR_MAX_BYTES + 1));
+    const problem = validateAvatar(
+      makeFile('big.png', 'image/png', AVATAR_MAX_BYTES + 1),
+    );
     expect(problem).toMatch(/under 2.0 MB/);
     expect(problem).toMatch(/2.0 MB/);
   });
@@ -122,7 +126,10 @@ describe('ProfileForm', () => {
     expect(URL.createObjectURL).not.toHaveBeenCalled();
 
     // Accepted, then saved, which clears the selection and frees the blob.
-    await userEvent.upload(screen.getByLabelText(/avatar/i), makeFile('ok.png', 'image/png', 1024));
+    await userEvent.upload(
+      screen.getByLabelText(/avatar/i),
+      makeFile('ok.png', 'image/png', 1024),
+    );
     await userEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
     await waitFor(() => expect(patchMock).toHaveBeenCalledOnce());
@@ -134,7 +141,10 @@ describe('ProfileForm', () => {
     const { revoked } = stubObjectUrl();
     const { unmount } = render(<ProfileForm user={USER} />);
 
-    await userEvent.upload(screen.getByLabelText(/avatar/i), makeFile('ok.png', 'image/png', 1024));
+    await userEvent.upload(
+      screen.getByLabelText(/avatar/i),
+      makeFile('ok.png', 'image/png', 1024),
+    );
     expect(revoked).toEqual([]);
 
     unmount();
@@ -160,7 +170,11 @@ describe('ProfileForm', () => {
 
   it('sends FormData once an avatar is chosen, and previews it', async () => {
     stubObjectUrl();
-    patchMock.mockResolvedValue({ ...USER, name: 'Umi', avatarUrl: 'https://cdn/avatar.png' });
+    patchMock.mockResolvedValue({
+      ...USER,
+      name: 'Umi',
+      avatarUrl: 'https://cdn/avatar.png',
+    });
     render(<ProfileForm user={USER} />);
 
     const file = makeFile('me.png', 'image/png', 2048);
@@ -265,7 +279,9 @@ describe('PasswordForm', () => {
     await fill('old-password', 'Abcdefghij1!', 'Abcdefghij1?');
     await userEvent.click(screen.getByRole('button', { name: /change password/i }));
 
-    await waitFor(() => expect(screen.getByText('The passwords do not match')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The passwords do not match')).toBeInTheDocument(),
+    );
     expect(postMock).not.toHaveBeenCalled();
   });
 
@@ -281,7 +297,10 @@ describe('PasswordForm', () => {
     const [path, body] = postMock.mock.calls[0];
     expect(path).toBe('/settings/password');
     // The confirmation is never sent; the server never needs to trust it.
-    expect(body).toEqual({ currentPassword: 'old-password', newPassword: 'Abcdefghij1!' });
+    expect(body).toEqual({
+      currentPassword: 'old-password',
+      newPassword: 'Abcdefghij1!',
+    });
     expect(toastMock.success).toHaveBeenCalledWith(
       'Password changed — 3 other sessions signed out',
     );
@@ -382,7 +401,11 @@ describe('NotificationForm', () => {
     stubObjectUrl();
     // The platform also turns marketing off, so the server's answer is not just
     // the toggle that was flipped.
-    patchMock.mockResolvedValue({ ...DEFAULT_PREFERENCES, eventReminders: true, marketing: true });
+    patchMock.mockResolvedValue({
+      ...DEFAULT_PREFERENCES,
+      eventReminders: true,
+      marketing: true,
+    });
     renderForm(DEFAULT_PREFERENCES);
 
     await userEvent.click(screen.getByRole('switch', { name: /product news/i }));
@@ -438,7 +461,9 @@ describe('SettingsPage', () => {
 
     resolveAccount(USER);
 
-    await waitFor(() => expect(screen.getByLabelText(/display name/i)).toHaveValue('Umi'));
+    await waitFor(() =>
+      expect(screen.getByLabelText(/display name/i)).toHaveValue('Umi'),
+    );
     expect(screen.getByRole('tab', { name: 'Profile' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Notifications' })).toBeInTheDocument();
@@ -449,7 +474,9 @@ describe('SettingsPage', () => {
     getMock.mockRejectedValue(new Error('offline'));
     renderPage();
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/could not load your account/i);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      /could not load your account/i,
+    );
   });
 
   it('only reads the tab parameter, leaving the rest of the query alone', async () => {
