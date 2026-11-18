@@ -28,7 +28,7 @@ describe('Pagination', () => {
             <PaginationNext href="#" />
           </PaginationItem>
         </PaginationContent>
-      </Pagination>
+      </Pagination>,
     );
 
     const current = screen.getByRole('link', { name: '1' });
@@ -49,7 +49,7 @@ describe('Pagination', () => {
             <PaginationNext href="#" isDisabled />
           </PaginationItem>
         </PaginationContent>
-      </Pagination>
+      </Pagination>,
     );
   });
 });
