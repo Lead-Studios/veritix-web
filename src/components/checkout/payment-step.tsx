@@ -213,6 +213,10 @@ export function PaymentStep({
    * forever. Reaching the attempt cap while the order is still pending moves to
    * `pending-timeout`, which offers a retry instead of pretending it settled.
    */
+  // The poll reschedules itself; going through a ref avoids referencing the callback inside its
+  // own declaration.
+  const pollRef = React.useRef<(orderId: string) => Promise<void>>(async () => {});
+
   const pollForSettlement = React.useCallback(
     async (orderId: string) => {
       attemptsRef.current += 1;
@@ -252,12 +256,16 @@ export function PaymentStep({
         return;
       }
       timerRef.current = setTimeout(
-        () => void pollForSettlement(orderId),
+        () => void pollRef.current(orderId),
         pollIntervalMs,
       );
     },
     [onPaid, pollIntervalMs, maxPollAttempts],
   );
+
+  React.useEffect(() => {
+    pollRef.current = pollForSettlement;
+  }, [pollForSettlement]);
 
   /** Restart settlement polling from the top, clearing both counters. */
   const retryPolling = React.useCallback(() => {

@@ -105,10 +105,16 @@ export function QRScanner({ onScan, disabled = false }: QRScannerProps) {
 
   React.useEffect(() => {
     if (camera !== 'on') return;
+    // Deferred so no state is set synchronously inside the effect body.
+    const markUnsupported = () =>
+      queueMicrotask(() => {
+        releaseStream();
+        setCamera('unsupported');
+      });
+
     const Detector = barcodeDetector();
     if (!Detector) {
-      releaseStream();
-      setCamera('unsupported');
+      markUnsupported();
       return;
     }
 
@@ -118,8 +124,7 @@ export function QRScanner({ onScan, disabled = false }: QRScannerProps) {
     try {
       detector = new Detector({ formats: ['qr_code'] });
     } catch {
-      releaseStream();
-      setCamera('unsupported');
+      markUnsupported();
       return;
     }
 
