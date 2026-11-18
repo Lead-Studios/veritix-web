@@ -55,16 +55,23 @@ describe('VerifyPage', () => {
   it('shows a valid result and sends the code with the selected event', async () => {
     verifyReply = {
       status: 200,
-      body: { status: 'valid', message: 'Ticket accepted.', ticketId: 'tkt_1', usedAt: '2026-10-17T18:00:00.000Z' },
+      body: {
+        status: 'valid',
+        message: 'Ticket accepted.',
+        ticketId: 'tkt_1',
+        usedAt: '2026-10-17T18:00:00.000Z',
+      },
     };
     await enterCode('abc.def');
 
     expect(await screen.findByText('Valid — let them in')).toBeInTheDocument();
-    const [, init] = fetchMock.mock.calls.find(([url]) => url === '/api/verify') as unknown as [
-      string,
-      RequestInit,
-    ];
-    expect(JSON.parse(String(init.body))).toEqual({ payload: 'abc.def', eventId: 'evt_1' });
+    const [, init] = fetchMock.mock.calls.find(
+      ([url]) => url === '/api/verify',
+    ) as unknown as [string, RequestInit];
+    expect(JSON.parse(String(init.body))).toEqual({
+      payload: 'abc.def',
+      eventId: 'evt_1',
+    });
   });
 
   it('shows an already-used result with when it was first scanned', async () => {
@@ -81,7 +88,10 @@ describe('VerifyPage', () => {
   it.each(['malformed', 'invalid_signature', 'wrong_event', 'not_found'])(
     'shows an invalid result for %s',
     async (status) => {
-      verifyReply = { status: 400, body: { status, message: 'This ticket code is not genuine.' } };
+      verifyReply = {
+        status: 400,
+        body: { status, message: 'This ticket code is not genuine.' },
+      };
       await enterCode('abc.def');
 
       expect(await screen.findByText('Invalid ticket')).toBeInTheDocument();
@@ -89,7 +99,10 @@ describe('VerifyPage', () => {
   );
 
   it('does not call a failed request a verdict on the ticket', async () => {
-    verifyReply = { status: 503, body: { message: 'Ticket verification is not configured.' } };
+    verifyReply = {
+      status: 503,
+      body: { message: 'Ticket verification is not configured.' },
+    };
     await enterCode('abc.def');
 
     expect(await screen.findByText('Could not check ticket')).toBeInTheDocument();
@@ -99,7 +112,9 @@ describe('VerifyPage', () => {
   it('clears the result for the next ticket', async () => {
     verifyReply = { status: 200, body: { status: 'valid', message: 'ok' } };
     await enterCode('abc.def');
-    await userEvent.click(await screen.findByRole('button', { name: 'Scan next ticket' }));
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Scan next ticket' }),
+    );
 
     expect(screen.queryByText('Valid — let them in')).not.toBeInTheDocument();
   });

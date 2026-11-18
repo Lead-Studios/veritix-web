@@ -63,8 +63,9 @@ export default function ForgotPasswordPage() {
         <header className="space-y-2">
           <h1 className="text-2xl font-semibold">Check your email</h1>
           <p className="text-sm text-muted-foreground">
-            If an account exists for <span className="font-medium">{emailForConfirmation}</span>,
-            we have sent a password reset link.
+            If an account exists for{' '}
+            <span className="font-medium">{emailForConfirmation}</span>, we have sent a
+            password reset link.
           </p>
           <p className="text-xs text-muted-foreground">
             Please check your inbox and spam folder.
@@ -118,7 +119,10 @@ export default function ForgotPasswordPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Remember your password?{' '}
-        <Link href={routes.login} className="text-primary underline-offset-4 hover:underline">
+        <Link
+          href={routes.login}
+          className="text-primary underline-offset-4 hover:underline"
+        >
           Sign in
         </Link>
       </p>

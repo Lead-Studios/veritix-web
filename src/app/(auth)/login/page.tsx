@@ -88,7 +88,9 @@ export default function LoginPage() {
       router.replace(target);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Could not sign in. Check your details and try again.',
+        error instanceof Error
+          ? error.message
+          : 'Could not sign in. Check your details and try again.',
       );
     }
   });
@@ -97,7 +99,9 @@ export default function LoginPage() {
     <div className="mx-auto w-full max-w-sm space-y-6">
       <header className="space-y-1 text-center">
         <h1 className="text-2xl font-semibold">Sign in</h1>
-        <p className="text-sm text-muted-foreground">Use your email and password to continue.</p>
+        <p className="text-sm text-muted-foreground">
+          Use your email and password to continue.
+        </p>
       </header>
 
       <Form {...form}>
@@ -150,12 +154,18 @@ export default function LoginPage() {
       </Form>
 
       <div className="flex flex-col items-center gap-1 text-sm">
-        <Link href={routes.forgotPassword} className="text-primary underline-offset-4 hover:underline">
+        <Link
+          href={routes.forgotPassword}
+          className="text-primary underline-offset-4 hover:underline"
+        >
           Forgot password?
         </Link>
         <span className="text-muted-foreground">
           No account?{' '}
-          <Link href={routes.register} className="text-primary underline-offset-4 hover:underline">
+          <Link
+            href={routes.register}
+            className="text-primary underline-offset-4 hover:underline"
+          >
             Create one
           </Link>
         </span>
