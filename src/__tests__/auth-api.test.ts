@@ -80,7 +80,8 @@ describe('authentication routes', () => {
     const cookie = response.cookies.get(SESSION_COOKIE_NAME);
     expect(cookie?.value).toBeTruthy();
     expect(response.headers.get('set-cookie')).toContain('HttpOnly');
-    expect(response.headers.get('set-cookie')).toContain('SameSite=Lax');
+    // Next serialises the attribute as `SameSite=lax`.
+    expect(response.headers.get('set-cookie')).toMatch(/SameSite=lax/i);
     expect(response.headers.get('set-cookie')).toContain('Secure');
     expect(response.headers.get('set-cookie')).toContain('Path=/');
 
