@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 import useSWR from 'swr';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { CheckInRate } from '@/components/analytics/check-in-rate';
 import { SALES_CHART_HEIGHT, SalesChart } from '@/components/analytics/sales-chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -77,10 +83,17 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-2 gap-4">
         <StatCard label="Events" value={totals.eventCount} />
         <StatCard label="Tickets sold" value={formatNumber(totals.ticketsSold)} />
-        <StatCard label="Gross revenue" value={formatCurrency(totals.grossMinor, currency)} />
+        <StatCard
+          label="Gross revenue"
+          value={formatCurrency(totals.grossMinor, currency)}
+        />
         <StatCard
           label="Check-in rate"
-          value={totals.checkInRate === null ? '—' : `${(totals.checkInRate * 100).toFixed(1)}%`}
+          value={
+            totals.checkInRate === null
+              ? '—'
+              : `${(totals.checkInRate * 100).toFixed(1)}%`
+          }
         />
       </div>
 
