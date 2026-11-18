@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { PublishToggle } from '@/components/dashboard/publish-toggle';
+import { CancelEventDialog } from '@/components/dashboard/cancel-event-dialog';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { toast } from 'react-toastify';

@@ -12,7 +12,7 @@ import { readSessionUserId, unauthorized } from '@/lib/api/server';
  * read another's settlement records. Anonymous callers get a 401.
  */
 export async function GET(request: NextRequest) {
-  const userId = readSessionUserId(request);
+  const userId = await readSessionUserId(request);
   if (!userId) return unauthorized();
 
   return NextResponse.json(queryPayouts(userId), {

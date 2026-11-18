@@ -19,7 +19,12 @@ const event: VeritixEvent = {
   tiers: [],
 };
 
+const originalCreateObjectURL = URL.createObjectURL;
+const originalRevokeObjectURL = URL.revokeObjectURL;
+
 afterEach(() => {
+  URL.createObjectURL = originalCreateObjectURL;
+  URL.revokeObjectURL = originalRevokeObjectURL;
   vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -31,7 +36,10 @@ describe('AddToCalendar', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const createObjectURL = vi.fn(() => 'blob:calendar-file');
     const revokeObjectURL = vi.fn();
-    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL });
+    // Patch the two methods only: replacing the whole URL global breaks `new URL()` used by the
+    // renderer and user-event, which hangs the test under fake timers.
+    URL.createObjectURL = createObjectURL;
+    URL.revokeObjectURL = revokeObjectURL;
     const anchorClick = vi
       .spyOn(HTMLAnchorElement.prototype, 'click')
       .mockImplementation(() => {});

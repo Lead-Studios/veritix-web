@@ -57,7 +57,9 @@ afterEach(() => {
 
 describe('authentication routes', () => {
   it('creates a signed HttpOnly, SameSite=Lax, Secure cookie on login', async () => {
-    fetchMock.mockResolvedValue(backendResponse({ user: USER, accessToken: 'not-for-client' }));
+    fetchMock.mockResolvedValue(
+      backendResponse({ user: USER, accessToken: 'not-for-client' }),
+    );
 
     const response = await login(
       request('http://localhost/api/auth/login', undefined, {
@@ -78,12 +80,16 @@ describe('authentication routes', () => {
     const cookie = response.cookies.get(SESSION_COOKIE_NAME);
     expect(cookie?.value).toBeTruthy();
     expect(response.headers.get('set-cookie')).toContain('HttpOnly');
-    expect(response.headers.get('set-cookie')).toContain('SameSite=Lax');
+    // Next serialises the attribute as `SameSite=lax`.
+    expect(response.headers.get('set-cookie')).toMatch(/SameSite=lax/i);
     expect(response.headers.get('set-cookie')).toContain('Secure');
     expect(response.headers.get('set-cookie')).toContain('Path=/');
 
     const sessionResponse = await session(
-      request('http://localhost/api/auth/session', `${SESSION_COOKIE_NAME}=${cookie?.value}`),
+      request(
+        'http://localhost/api/auth/session',
+        `${SESSION_COOKIE_NAME}=${cookie?.value}`,
+      ),
     );
     expect(sessionResponse.status).toBe(200);
     expect(await sessionResponse.json()).toEqual(USER);
@@ -91,7 +97,10 @@ describe('authentication routes', () => {
 
   it('does not call the backend for invalid credentials', async () => {
     const response = await login(
-      request('http://localhost/api/auth/login', undefined, { email: 'bad', password: '' }),
+      request('http://localhost/api/auth/login', undefined, {
+        email: 'bad',
+        password: '',
+      }),
     );
 
     expect(response.status).toBe(400);
@@ -99,8 +108,14 @@ describe('authentication routes', () => {
   });
 
   it('returns a bodyless 401 for a missing, invalid, or unsigned session cookie', async () => {
-    for (const cookie of [undefined, `${SESSION_COOKIE_NAME}=tampered`, 'session_user_id=user-1']) {
-      const response = await session(request('http://localhost/api/auth/session', cookie));
+    for (const cookie of [
+      undefined,
+      `${SESSION_COOKIE_NAME}=tampered`,
+      'session_user_id=user-1',
+    ]) {
+      const response = await session(
+        request('http://localhost/api/auth/session', cookie),
+      );
       expect(response.status).toBe(401);
       expect(await response.text()).toBe('');
     }
@@ -122,10 +137,7 @@ describe('GET /api/tickets/[id]', () => {
     fetchMock.mockResolvedValue(backendResponse(TICKET));
 
     const response = await getTicket(
-      request(
-        'http://localhost/api/tickets/ticket-1',
-        signedSessionCookie(USER.id),
-      ),
+      request('http://localhost/api/tickets/ticket-1', signedSessionCookie(USER.id)),
       { params: Promise.resolve({ id: 'ticket-1' }) },
     );
 

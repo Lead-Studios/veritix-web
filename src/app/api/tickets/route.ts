@@ -8,7 +8,7 @@ import {
 
 /** Lists tickets belonging to the session user only. */
 export async function GET(request: NextRequest) {
-  const sessionUserId = readSessionUserId(request);
+  const sessionUserId = await readSessionUserId(request);
   if (!sessionUserId) return unauthorized();
 
   const query = new URLSearchParams({ ownerId: sessionUserId });

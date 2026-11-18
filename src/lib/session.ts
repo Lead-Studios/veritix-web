@@ -18,7 +18,12 @@ const userSchema = z.object({
 
 function secretKey(): Uint8Array | null {
   const secret = process.env.AUTH_SECRET;
-  return secret && secret.length >= 32 ? new TextEncoder().encode(secret) : null;
+  if (!secret || secret.length < 32) return null;
+  // Build the key from a Node Buffer where available: under jsdom a TextEncoder result is a
+  // cross-realm Uint8Array that jose rejects. Edge runtimes have no Buffer and use TextEncoder.
+  return typeof Buffer !== 'undefined'
+    ? new Uint8Array(Buffer.from(secret))
+    : new TextEncoder().encode(secret);
 }
 
 export function sessionSigningConfigured(): boolean {

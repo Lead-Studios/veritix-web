@@ -7,11 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
 import { useEventFilters } from '@/hooks/use-event-filters';
 
 const FILTER_KEYS = ['city', 'date', 'minPrice', 'maxPrice'] as const;
-type FilterKey = (typeof FILTER_KEYS)[number];
 
 export interface EventFiltersProps {
   className?: string;
@@ -22,7 +20,7 @@ export function EventFilters({ className }: EventFiltersProps) {
 
   const values = React.useMemo(() => {
     const next = { city: '', date: '', minPrice: '', maxPrice: '' };
-    for (const key of FILTER_KEYS) next[key] = (filters as any)[key] ?? '';
+    for (const key of FILTER_KEYS) next[key] = (filters as Record<string, string | undefined>)[key] ?? '';
     return next;
   }, [filters]);
 

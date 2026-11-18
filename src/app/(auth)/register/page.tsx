@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Check, X } from 'lucide-react';
@@ -72,12 +72,12 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
-      acceptTerms: false as any,
+      acceptTerms: false as unknown as RegisterValues['acceptTerms'],
     },
     mode: 'onBlur',
   });
 
-  const password = form.watch('password');
+  const password = useWatch({ control: form.control, name: 'password' });
   const passwordError = passwordPolicyError(password);
 
   const onSubmit = form.handleSubmit(async (values) => {

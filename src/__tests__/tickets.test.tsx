@@ -8,10 +8,6 @@ const STATUS_BADGE: Record<TicketStatus, string> = {
   transferred: 'outline',
 };
 
-function badgeVariantFor(status: TicketStatus): string {
-  return STATUS_BADGE[status];
-}
-
 describe('ticket ownership and status', () => {
   it('maps every status to a distinct badge variant', () => {
     const variants = Object.values(STATUS_BADGE);

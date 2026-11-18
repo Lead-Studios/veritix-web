@@ -61,9 +61,6 @@ const MIN_MESSAGE = 20;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/** How a person who fills this in reads to a stopwatch. */
-const MIN_FILL_MS = 1200;
-
 /**
  * When this form was rendered, as milliseconds since the epoch, for the server's
  * timing check. One value per mount; empty on the server and during hydration,

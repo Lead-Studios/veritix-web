@@ -16,7 +16,12 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('swr', () => ({
   default: () => ({
-    data: { id: 'user-1', email: 'user@example.com', name: 'Sam Ali', avatarUrl: undefined },
+    data: {
+      id: 'user-1',
+      email: 'user@example.com',
+      name: 'Sam Ali',
+      avatarUrl: undefined,
+    },
   }),
 }));
 

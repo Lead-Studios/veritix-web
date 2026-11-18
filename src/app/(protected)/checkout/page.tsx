@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { PaymentStep } from '@/components/checkout/payment-step';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,12 +15,11 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { LoadingState } from '@/components/feedback/loading-state';
 import { PromoCode } from '@/components/checkout/promo-code';
 import { OrderSummary } from '@/components/checkout/order-summary';
 import { useCart } from '@/context/cart-context';
-import { formatCurrency, formatDateTime } from '@/lib/format';
+import { formatDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 /**
@@ -37,8 +37,6 @@ export default function CheckoutPage() {
     totalMinor,
     itemCount,
     currency,
-    updateQuantity,
-    removeItem,
     clear,
   } = useCart();
 
@@ -101,7 +99,7 @@ export default function CheckoutPage() {
           <Button variant="ghost" size="sm" className="self-start" onClick={clear}>
             Clear cart
           </Button>
-          <PromoCode onApply={async (code) => ({ valid: true, discountMinor: 0 })} />
+          <PromoCode onApply={async () => ({ valid: true, discountMinor: 0 })} />
         </CardContent>
       </Card>
 

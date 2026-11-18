@@ -9,7 +9,7 @@ describe('Sheet', () => {
       <Sheet>
         <SheetTrigger>Open</SheetTrigger>
         <SheetContent>Sheet content</SheetContent>
-      </Sheet>
+      </Sheet>,
     );
 
     const trigger = screen.getByRole('button', { name: /open/i });
@@ -27,7 +27,7 @@ describe('Sheet', () => {
       <Sheet>
         <SheetTrigger>Open</SheetTrigger>
         <SheetContent>Content</SheetContent>
-      </Sheet>
+      </Sheet>,
     );
 
     await user.click(screen.getByRole('button', { name: /open/i }));

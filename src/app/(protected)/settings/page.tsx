@@ -129,7 +129,7 @@ function SettingsContent({ user, onSaved }: { user: User; onSaved: (user: User) 
           <WalletForm
             walletAddress={user.walletAddress ?? null}
             hasPendingPayouts={false}
-            onConnect={async (address) => {
+            onConnect={async () => {
               // Placeholder - issue requires rendering the form
             }}
             onDisconnect={async () => {}}
