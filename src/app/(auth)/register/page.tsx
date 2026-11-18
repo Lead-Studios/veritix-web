@@ -94,7 +94,9 @@ export default function RegisterPage() {
       router.replace(routes.login);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Could not create your account. Try again.',
+        error instanceof Error
+          ? error.message
+          : 'Could not create your account. Try again.',
       );
     }
   });
@@ -103,7 +105,9 @@ export default function RegisterPage() {
     <div className="mx-auto w-full max-w-sm space-y-6">
       <header className="space-y-1 text-center">
         <h1 className="text-2xl font-semibold">Create an account</h1>
-        <p className="text-sm text-muted-foreground">Enter your details to get started.</p>
+        <p className="text-sm text-muted-foreground">
+          Enter your details to get started.
+        </p>
       </header>
 
       <Form {...form}>
@@ -189,7 +193,11 @@ export default function RegisterPage() {
             )}
           />
 
-          <ul id="password-rules" aria-label="Password requirements" className="space-y-1">
+          <ul
+            id="password-rules"
+            aria-label="Password requirements"
+            className="space-y-1"
+          >
             {PASSWORD_RULES.map((rule) => {
               const met = rule.test(password);
               return (
@@ -200,7 +208,11 @@ export default function RegisterPage() {
                     met ? 'text-success' : 'text-muted-foreground',
                   )}
                 >
-                  {met ? <Check className="size-4 shrink-0" aria-hidden="true" /> : <X className="size-4 shrink-0" aria-hidden="true" />}
+                  {met ? (
+                    <Check className="size-4 shrink-0" aria-hidden="true" />
+                  ) : (
+                    <X className="size-4 shrink-0" aria-hidden="true" />
+                  )}
                   <span>{rule.label}</span>
                   <span className="sr-only">{met ? ' — met' : ' — not met yet'}</span>
                 </li>
@@ -251,7 +263,10 @@ export default function RegisterPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <Link href={routes.login} className="text-primary underline-offset-4 hover:underline">
+        <Link
+          href={routes.login}
+          className="text-primary underline-offset-4 hover:underline"
+        >
           Sign in
         </Link>
       </p>

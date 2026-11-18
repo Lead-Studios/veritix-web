@@ -46,7 +46,9 @@ function ResetPasswordForm() {
       setComplete(true);
     } catch (requestError) {
       const message =
-        requestError instanceof Error ? requestError.message : 'Could not reset your password.';
+        requestError instanceof Error
+          ? requestError.message
+          : 'Could not reset your password.';
       if (
         requestError instanceof ApiError &&
         (requestError.status === 410 ||
@@ -75,7 +77,8 @@ function ResetPasswordForm() {
       {expired ? (
         <div className="space-y-4">
           <p role="alert" className="text-sm text-destructive">
-            This password reset link is missing or has expired. Request a new one to continue.
+            This password reset link is missing or has expired. Request a new one to
+            continue.
           </p>
           <Button asChild>
             <Link href={routes.forgotPassword}>Request a new reset link</Link>
@@ -134,7 +137,10 @@ function ResetPasswordForm() {
 
       <p className="text-sm text-muted-foreground">
         Remember your password?{' '}
-        <Link href={routes.login} className="text-primary underline-offset-4 hover:underline">
+        <Link
+          href={routes.login}
+          className="text-primary underline-offset-4 hover:underline"
+        >
           Sign in
         </Link>
       </p>
@@ -144,7 +150,9 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading reset link…</p>}>
+    <Suspense
+      fallback={<p className="text-sm text-muted-foreground">Loading reset link…</p>}
+    >
       <ResetPasswordForm />
     </Suspense>
   );
