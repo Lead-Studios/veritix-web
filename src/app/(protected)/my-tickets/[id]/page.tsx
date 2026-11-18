@@ -11,7 +11,10 @@ import { RefundDialog } from '@/components/tickets/refund-dialog';
 import { TransferDialog } from '@/components/tickets/transfer-dialog';
 import type { Ticket, TicketStatus } from '@/types';
 
-const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' | 'outline'> = {
+const STATUS_VARIANT: Record<
+  TicketStatus,
+  'success' | 'secondary' | 'warning' | 'outline'
+> = {
   valid: 'success',
   used: 'secondary',
   refunded: 'warning',
@@ -74,13 +77,21 @@ export default function TicketDetailPage() {
 
       <div className="flex flex-wrap gap-2">
         <Button
-          disabled={ticket.status === 'used' || ticket.status === 'refunded' || ticket.status === 'transferred'}
+          disabled={
+            ticket.status === 'used' ||
+            ticket.status === 'refunded' ||
+            ticket.status === 'transferred'
+          }
           onClick={() => setShowTransfer(true)}
         >
           Transfer
         </Button>
         <Button
-          disabled={ticket.status === 'used' || ticket.status === 'refunded' || ticket.status === 'transferred'}
+          disabled={
+            ticket.status === 'used' ||
+            ticket.status === 'refunded' ||
+            ticket.status === 'transferred'
+          }
           onClick={() => setShowRefund(true)}
           variant="outline"
         >
@@ -102,7 +113,11 @@ export default function TicketDetailPage() {
           <DialogHeader>
             <DialogTitle>Request refund</DialogTitle>
           </DialogHeader>
-          <RefundDialog ticketStatus={ticket.status} refundPolicy="30-day refund policy applies." onSubmit={() => setShowRefund(false)} />
+          <RefundDialog
+            ticketStatus={ticket.status}
+            refundPolicy="30-day refund policy applies."
+            onSubmit={() => setShowRefund(false)}
+          />
         </DialogContent>
       </Dialog>
 
