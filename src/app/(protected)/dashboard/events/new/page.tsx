@@ -70,7 +70,7 @@ function readFieldErrors(error: unknown): { message: string | null; fields: Reco
 
 export default function NewEventPage() {
   const router = useRouter();
-  const { draft, setDraft, clearDraft } = useEventDraft<Record<string, any>>(EMPTY);
+  const { draft, setDraft, clearDraft } = useEventDraft<typeof EMPTY>(EMPTY);
   const [splits, setSplits] = React.useState<SplitRow[]>([{ walletAddress: '', percentage: 0 }]);
   const [touched, setTouched] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
