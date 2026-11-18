@@ -11,6 +11,8 @@ describe('POST /api/auth/logout', () => {
       'session_user_id',
       'veritix_session',
     ]);
-    expect(response.cookies.getAll().every(({ expires }) => expires?.getTime() === 0)).toBe(true);
+    expect(
+      response.cookies.getAll().every(({ expires }) => expires?.getTime() === 0),
+    ).toBe(true);
   });
 });
