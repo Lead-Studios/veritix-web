@@ -22,6 +22,8 @@ const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' |
 export default function MyTicketsPage() {
   const [tickets, setTickets] = React.useState<Ticket[] | null>(null);
   const [error, setError] = React.useState(false);
+  // Captured once on mount: Date.now() must not be called during render.
+  const [now] = React.useState(() => Date.now());
 
   React.useEffect(() => {
     let cancelled = false;
@@ -77,7 +79,6 @@ export default function MyTicketsPage() {
     );
   }
 
-  const now = Date.now();
   const upcoming = tickets.filter((ticket) => new Date(ticket.issuedAt).getTime() >= now);
   const past = tickets.filter((ticket) => new Date(ticket.issuedAt).getTime() < now);
 

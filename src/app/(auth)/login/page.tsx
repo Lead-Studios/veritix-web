@@ -43,6 +43,11 @@ type LoginValues = z.infer<typeof loginSchema>;
  * and absolute URLs). If authentication succeeds, we attempt to set the
  * `veritix_session` cookie; the proxy guard uses this cookie to allow access.
  */
+/** Kept outside the component so the page does not mutate `document` during render-time code. */
+function writeSessionCookie(value: string) {
+  document.cookie = `veritix_session=${encodeURIComponent(value)}; path=/; samesite=lax`;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -67,12 +72,12 @@ export default function LoginPage() {
         if (res && typeof res === 'object' && 'session' in res) {
           const session = (res as { session?: unknown }).session;
           if (session && typeof session === 'string' && session.length > 0) {
-            document.cookie = `veritix_session=${encodeURIComponent(session)}; path=/; samesite=lax`;
+            writeSessionCookie(session);
           }
         } else {
           // If no session token is returned, set a non-empty placeholder so the
           // proxy sees an authenticated user in environments without a backend.
-          document.cookie = 'veritix_session=demo; path=/; samesite=lax';
+          writeSessionCookie('demo');
         }
       } catch {
         // Cookie setting should never block navigation.
