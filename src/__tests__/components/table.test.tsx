@@ -26,7 +26,7 @@ describe('Table', () => {
             <TableCell data-label="Value">123</TableCell>
           </TableRow>
         </TableBody>
-      </Table>
+      </Table>,
     );
 
     expect(screen.getByRole('table')).toBeInTheDocument();
