@@ -99,7 +99,11 @@ describe('useEventFilters', () => {
     rerender();
     act(() => result.current.setFilter('q', 'jazz'));
 
-    expect(lastReplaceTarget()).toBe('/events?q=jazz&city=Lagos');
+    // Parameter order carries no meaning, so compare the parsed parameters.
+    expect(Object.fromEntries(new URL(lastReplaceTarget(), 'http://localhost').searchParams)).toEqual({
+      q: 'jazz',
+      city: 'Lagos',
+    });
   });
 
   it('keeps both changes when two filters are set before the router re-renders', () => {
@@ -110,7 +114,11 @@ describe('useEventFilters', () => {
       result.current.setFilter('q', 'jazz');
     });
 
-    expect(lastReplaceTarget()).toBe('/events?q=jazz&city=Lagos');
+    // Parameter order carries no meaning, so compare the parsed parameters.
+    expect(Object.fromEntries(new URL(lastReplaceTarget(), 'http://localhost').searchParams)).toEqual({
+      q: 'jazz',
+      city: 'Lagos',
+    });
   });
 
   it('applies a change on top of existing filters when called twice in one tick', () => {
