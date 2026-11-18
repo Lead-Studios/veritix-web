@@ -38,9 +38,6 @@ const PLACEHOLDER_TIER = {
   quantityTotal: 100,
 } as const;
 
-/** Field paths the form can render inline; anything else is listed at the end. */
-const INLINE_FIELDS = ['title', 'description', 'venue', 'city', 'startsAt', 'endsAt'] as const;
-
 interface ApiFieldError {
   field: string;
   message: string;
@@ -109,11 +106,6 @@ export default function NewEventPage() {
       setDraft({ ...values, [key]: event.target.value });
     };
 
-  const setDate = (key: 'startsAt' | 'endsAt') => (value: string) => {
-    setTouched(true);
-    clearServerError(key);
-    setValues((current) => ({ ...current, [key]: value }));
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
