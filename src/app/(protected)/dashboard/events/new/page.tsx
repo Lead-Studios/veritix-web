@@ -43,7 +43,10 @@ interface ApiFieldError {
   message: string;
 }
 
-function readFieldErrors(error: unknown): { message: string | null; fields: Record<string, string> } {
+function readFieldErrors(error: unknown): {
+  message: string | null;
+  fields: Record<string, string>;
+} {
   if (!(error instanceof ApiError)) {
     return { message: error instanceof Error ? error.message : null, fields: {} };
   }
@@ -68,7 +71,9 @@ function readFieldErrors(error: unknown): { message: string | null; fields: Reco
 export default function NewEventPage() {
   const router = useRouter();
   const { draft, setDraft, clearDraft } = useEventDraft<typeof EMPTY>(EMPTY);
-  const [splits, setSplits] = React.useState<SplitRow[]>([{ walletAddress: '', percentage: 0 }]);
+  const [splits, setSplits] = React.useState<SplitRow[]>([
+    { walletAddress: '', percentage: 0 },
+  ]);
   const [touched, setTouched] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -105,7 +110,6 @@ export default function NewEventPage() {
       setTouched(true);
       setDraft({ ...values, [key]: event.target.value });
     };
-
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -169,7 +173,9 @@ export default function NewEventPage() {
       <h1 className="text-2xl font-semibold">New event</h1>
       <form className="space-y-6" noValidate onSubmit={handleSubmit}>
         <fieldset className="space-y-4">
-          <legend className="text-sm font-medium text-muted-foreground">Event basics</legend>
+          <legend className="text-sm font-medium text-muted-foreground">
+            Event basics
+          </legend>
           {fields.map((field) => {
             const inputId = `event-${field.key}`;
             const errorId = `${inputId}-error`;
@@ -206,7 +212,9 @@ export default function NewEventPage() {
               onChange={set('description')}
               required
               aria-invalid={touched && errors.description ? true : undefined}
-              aria-describedby={touched && errors.description ? 'event-description-error' : undefined}
+              aria-describedby={
+                touched && errors.description ? 'event-description-error' : undefined
+              }
             />
             {errorFor('description') && (
               <p id="event-description-error" className="text-sm text-destructive">
@@ -249,7 +257,9 @@ export default function NewEventPage() {
         </fieldset>
 
         <fieldset className="space-y-4">
-          <legend className="text-sm font-medium text-muted-foreground">Ticket tiers</legend>
+          <legend className="text-sm font-medium text-muted-foreground">
+            Ticket tiers
+          </legend>
           <TierEditor tiers={tiers} onChange={setTiers} />
           {touched && tiers.length === 0 && (
             <p role="alert" className="text-sm text-destructive">
@@ -259,7 +269,9 @@ export default function NewEventPage() {
         </fieldset>
 
         <fieldset className="space-y-4">
-          <legend className="text-sm font-medium text-muted-foreground">Revenue splits</legend>
+          <legend className="text-sm font-medium text-muted-foreground">
+            Revenue splits
+          </legend>
           <SplitEditor rows={splits} onChange={setSplits} />
         </fieldset>
 

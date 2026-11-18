@@ -111,14 +111,18 @@ export default function PayoutsPage() {
                 <TableCell data-label="Escrow Ref" className="font-mono">
                   {payout.ref}
                 </TableCell>
-                <TableCell data-label="Amount">{formatCurrency(payout.amountMinor, currency)}</TableCell>
+                <TableCell data-label="Amount">
+                  {formatCurrency(payout.amountMinor, currency)}
+                </TableCell>
                 <TableCell data-label="Status">
                   <Badge variant={STATUS_VARIANT[payout.status]}>{payout.status}</Badge>
                 </TableCell>
                 <TableCell data-label="Settlement Date" className="text-muted-foreground">
                   {/* An empty cell announced as "blank" is indistinguishable
                       from a rendering bug; say why it is empty. */}
-                  {payout.settledAt ? formatDate(`${payout.settledAt}T00:00:00`) : 'Pending'}
+                  {payout.settledAt
+                    ? formatDate(`${payout.settledAt}T00:00:00`)
+                    : 'Pending'}
                 </TableCell>
               </TableRow>
             ))}

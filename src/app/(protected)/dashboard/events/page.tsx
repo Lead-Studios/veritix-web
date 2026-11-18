@@ -179,7 +179,10 @@ export default function OrganizerEventsPage() {
                   <Button asChild size="sm" variant="ghost">
                     <Link href={routes.event(event.slug)}>View</Link>
                   </Button>
-                  <PublishToggle published={event.status === 'published'} onChange={() => {}} />
+                  <PublishToggle
+                    published={event.status === 'published'}
+                    onChange={() => {}}
+                  />
                   <CancelEventDialog
                     eventTitle={event.title}
                     buyerCount={event.tiers.reduce((sum, t) => sum + t.quantitySold, 0)}
