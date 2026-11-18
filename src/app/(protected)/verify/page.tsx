@@ -50,7 +50,10 @@ async function submitCode(payload: string, eventId: string): Promise<ScanResult>
       body: JSON.stringify({ payload, eventId }),
     });
   } catch {
-    return { kind: 'error', message: 'Could not reach the server. Check the connection and scan again.' };
+    return {
+      kind: 'error',
+      message: 'Could not reach the server. Check the connection and scan again.',
+    };
   }
 
   const body = (await response.json().catch(() => ({}))) as {
@@ -61,7 +64,12 @@ async function submitCode(payload: string, eventId: string): Promise<ScanResult>
   };
 
   if (body.status === 'valid') {
-    return { kind: 'valid', message: 'Ticket accepted.', usedAt: body.usedAt, ticketId: body.ticketId };
+    return {
+      kind: 'valid',
+      message: 'Ticket accepted.',
+      usedAt: body.usedAt,
+      ticketId: body.ticketId,
+    };
   }
   if (body.status === 'already_used') {
     return {
@@ -104,7 +112,9 @@ export default function VerifyPage() {
   React.useEffect(() => {
     let cancelled = false;
     fetch('/api/events?mine=1&pageSize=50')
-      .then((res) => (res.ok ? (res.json() as Promise<Paginated<VeritixEvent>>) : Promise.reject()))
+      .then((res) =>
+        res.ok ? (res.json() as Promise<Paginated<VeritixEvent>>) : Promise.reject(),
+      )
       .then((page) => {
         if (cancelled) return;
         const scannable = page.items.filter((e) => e.status === 'published');
@@ -115,7 +125,9 @@ export default function VerifyPage() {
         } catch {
           // Storage can be blocked; the picker just starts empty.
         }
-        const initial = scannable.find((e) => e.id === saved) ?? (scannable.length === 1 ? scannable[0] : undefined);
+        const initial =
+          scannable.find((e) => e.id === saved) ??
+          (scannable.length === 1 ? scannable[0] : undefined);
         if (initial) setEventId(initial.id);
       })
       .catch(() => !cancelled && setEventsError(true));
@@ -141,34 +153,31 @@ export default function VerifyPage() {
     setResult(null);
   }, []);
 
-  const check = React.useCallback(
-    async (payload: string) => {
-      const trimmed = payload.trim();
-      if (!trimmed || !eventIdRef.current || busyRef.current) return;
+  const check = React.useCallback(async (payload: string) => {
+    const trimmed = payload.trim();
+    if (!trimmed || !eventIdRef.current || busyRef.current) return;
 
-      busyRef.current = true;
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-      setChecking(true);
-      const outcome = await submitCode(trimmed, eventIdRef.current);
-      setChecking(false);
-      setResult(outcome);
+    busyRef.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    setChecking(true);
+    const outcome = await submitCode(trimmed, eventIdRef.current);
+    setChecking(false);
+    setResult(outcome);
 
-      // A buzz the gate agent can feel without looking down: one for yes,
-      // three for no.
-      try {
-        navigator.vibrate?.(outcome.kind === 'valid' ? 120 : [80, 60, 80, 60, 80]);
-      } catch {
-        // Unsupported; the panel is the real signal.
-      }
+    // A buzz the gate agent can feel without looking down: one for yes,
+    // three for no.
+    try {
+      navigator.vibrate?.(outcome.kind === 'valid' ? 120 : [80, 60, 80, 60, 80]);
+    } catch {
+      // Unsupported; the panel is the real signal.
+    }
 
-      // Keep the camera paused while the result is up so the same ticket,
-      // still in frame, is not submitted again as "already used".
-      resumeTimer.current = setTimeout(() => {
-        busyRef.current = false;
-      }, RESUME_AFTER_MS);
-    },
-    [],
-  );
+    // Keep the camera paused while the result is up so the same ticket,
+    // still in frame, is not submitted again as "already used".
+    resumeTimer.current = setTimeout(() => {
+      busyRef.current = false;
+    }, RESUME_AFTER_MS);
+  }, []);
 
   React.useEffect(
     () => () => {
@@ -239,7 +248,9 @@ export default function VerifyPage() {
             <Spinner className="h-4 w-4" /> Checking ticket…
           </p>
         )}
-        {!checking && result && <ScanResultDisplay result={result} onDismiss={clearResult} />}
+        {!checking && result && (
+          <ScanResultDisplay result={result} onDismiss={clearResult} />
+        )}
       </div>
 
       <QRScanner onScan={check} disabled={!selectedEvent} />
