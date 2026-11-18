@@ -11,7 +11,8 @@ export function signedSessionCookie(userId: string): string {
     email: `${encodeURIComponent(userId)}@example.test`,
     name: userId,
   };
-  const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const encode = (value: unknown) =>
+    Buffer.from(JSON.stringify(value)).toString('base64url');
   const header = encode({ alg: 'HS256' });
   const payload = encode({
     user,

@@ -11,10 +11,15 @@ import {
 const VALID = 'Correct-horse-9!';
 
 /** First message for a field, or undefined when the value is accepted. */
-function messagesFor(values: unknown, field: 'currentPassword' | 'newPassword' | 'confirmPassword') {
+function messagesFor(
+  values: unknown,
+  field: 'currentPassword' | 'newPassword' | 'confirmPassword',
+) {
   const result = passwordChangeSchema.safeParse(values);
   if (result.success) return [];
-  return result.error.issues.filter((issue) => issue.path[0] === field).map((i) => i.message);
+  return result.error.issues
+    .filter((issue) => issue.path[0] === field)
+    .map((i) => i.message);
 }
 
 describe('passwordPolicyError', () => {
@@ -23,7 +28,9 @@ describe('passwordPolicyError', () => {
   });
 
   it('names the first rule still unmet, in rule order', () => {
-    expect(passwordPolicyError('short')).toBe(`At least ${PASSWORD_MIN_LENGTH} characters`);
+    expect(passwordPolicyError('short')).toBe(
+      `At least ${PASSWORD_MIN_LENGTH} characters`,
+    );
     expect(passwordPolicyError('alllowercase9!')).toBe('An uppercase letter');
     expect(passwordPolicyError('ALLUPPERCASE9!')).toBe('A lowercase letter');
     expect(passwordPolicyError('NoDigitsHere!!')).toBe('A number');
@@ -51,19 +58,26 @@ describe('passwordPolicyError', () => {
 
 describe('passwordSchema', () => {
   it('rejects anything under the minimum length', () => {
-    expect(passwordSchema.safeParse(VALID.slice(0, PASSWORD_MIN_LENGTH - 1)).success).toBe(false);
+    expect(
+      passwordSchema.safeParse(VALID.slice(0, PASSWORD_MIN_LENGTH - 1)).success,
+    ).toBe(false);
     expect(passwordSchema.safeParse(VALID).success).toBe(true);
   });
 
   it('caps the length, so a paste cannot be used to overflow a column', () => {
-    expect(passwordSchema.safeParse('aB1!'.repeat(PASSWORD_MAX_LENGTH)).success).toBe(false);
+    expect(passwordSchema.safeParse('aB1!'.repeat(PASSWORD_MAX_LENGTH)).success).toBe(
+      false,
+    );
   });
 });
 
 describe('passwordChangeSchema', () => {
   it('requires the current password', () => {
     expect(
-      messagesFor({ currentPassword: '', newPassword: VALID, confirmPassword: VALID }, 'currentPassword'),
+      messagesFor(
+        { currentPassword: '', newPassword: VALID, confirmPassword: VALID },
+        'currentPassword',
+      ),
     ).toEqual(['Enter your current password']);
   });
 
@@ -80,9 +94,15 @@ describe('passwordChangeSchema', () => {
   });
 
   it('attaches a mismatch to the confirmation, not the new password', () => {
-    const values = { currentPassword: 'old', newPassword: VALID, confirmPassword: `${VALID}x` };
+    const values = {
+      currentPassword: 'old',
+      newPassword: VALID,
+      confirmPassword: `${VALID}x`,
+    };
 
-    expect(messagesFor(values, 'confirmPassword')).toEqual(['The passwords do not match']);
+    expect(messagesFor(values, 'confirmPassword')).toEqual([
+      'The passwords do not match',
+    ]);
     // The new password itself is fine — it is the repeat that is wrong.
     expect(messagesFor(values, 'newPassword')).toEqual([]);
   });
@@ -98,7 +118,10 @@ describe('passwordChangeSchema', () => {
 
   it('does not complain about a mismatch while the confirmation is still empty', () => {
     expect(
-      messagesFor({ currentPassword: 'old', newPassword: VALID, confirmPassword: '' }, 'confirmPassword'),
+      messagesFor(
+        { currentPassword: 'old', newPassword: VALID, confirmPassword: '' },
+        'confirmPassword',
+      ),
     ).toEqual(['Confirm your new password']);
   });
 });

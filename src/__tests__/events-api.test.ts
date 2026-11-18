@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST as createRoute } from '@/app/api/events/route';
-import {
-  GET as getEventRoute,
-  PATCH as updateRoute,
-} from '@/app/api/events/[id]/route';
+import { GET as getEventRoute, PATCH as updateRoute } from '@/app/api/events/[id]/route';
 import { POST as publishRoute } from '@/app/api/events/[id]/publish/route';
 import { POST as cancelRoute } from '@/app/api/events/[id]/cancel/route';
 import { signedSessionCookie } from './session-test-helpers';
@@ -84,7 +81,10 @@ describe('events API', () => {
   it('lets the owner update, publish, and cancel', async () => {
     const id = await createDraft();
 
-    const updated = await updateRoute(request('PATCH', OWNER, { title: 'Renamed' }), ctx(id));
+    const updated = await updateRoute(
+      request('PATCH', OWNER, { title: 'Renamed' }),
+      ctx(id),
+    );
     expect(updated.status).toBe(200);
     expect((await updated.json()).title).toBe('Renamed');
 
@@ -116,7 +116,9 @@ describe('events API', () => {
     const id = await createDraft();
     await cancelRoute(request('POST', OWNER), ctx(id));
     expect((await publishRoute(request('POST', OWNER), ctx(id))).status).toBe(409);
-    expect((await updateRoute(request('PATCH', OWNER, { title: 'x' }), ctx(id))).status).toBe(409);
+    expect(
+      (await updateRoute(request('PATCH', OWNER, { title: 'x' }), ctx(id))).status,
+    ).toBe(409);
   });
 
   it('validates the merged event on update', async () => {
