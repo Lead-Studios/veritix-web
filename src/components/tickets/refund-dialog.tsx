@@ -34,7 +34,9 @@ export function RefundDialog({
   return (
     <div className="space-y-3 rounded-lg border border-border p-4">
       <p className="text-sm text-muted-foreground">{refundPolicy}</p>
-      <p className="text-sm text-muted-foreground">Approved refunds release the escrow back to you.</p>
+      <p className="text-sm text-muted-foreground">
+        Approved refunds release the escrow back to you.
+      </p>
 
       {/* A disabled control with no explanation reads as a broken page, so the
           reason is stated next to the badge. */}
