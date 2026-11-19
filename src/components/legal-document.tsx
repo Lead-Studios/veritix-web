@@ -61,7 +61,9 @@ export function LegalDocument({
           </p>
         </div>
 
-        <div className="mt-12 gap-12 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
+        <div
+          className="mt-12 gap-12 lg:grid lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]"
+        >
           {/*
             Sticky on a wide screen, where it sits beside the text as a running
             index. On a narrow one it stacks above the content and scrolls away,
