@@ -9,7 +9,10 @@ export interface LoadingStateProps extends React.HTMLAttributes<HTMLDivElement> 
 export function LoadingState({ label = 'Loading', className, ...props }: LoadingStateProps) {
   return (
     <div
-      className={cn('flex flex-col items-center justify-center gap-3 px-6 py-12 text-center', className)}
+      className={cn(
+        'flex flex-col items-center justify-center gap-3 px-6 py-12 text-center',
+        className,
+      )}
       {...props}
     >
       <Spinner className="size-6 text-muted-foreground" label={null} />
