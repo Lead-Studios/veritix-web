@@ -27,7 +27,8 @@ export const SALES_CHART_HEIGHT = CHART_HEIGHT;
  * the page does not shift when the bundle lands.
  */
 const LazySalesChart = dynamic(
-  () => import('@/components/analytics/sales-chart-impl').then((mod) => mod.SalesChartImpl),
+  () =>
+    import('@/components/analytics/sales-chart-impl').then((mod) => mod.SalesChartImpl),
   {
     ssr: false,
     loading: () => <ChartSkeleton height={SALES_CHART_HEIGHT} />,
