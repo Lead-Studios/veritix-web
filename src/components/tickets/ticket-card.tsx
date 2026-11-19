@@ -2,7 +2,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import type { Ticket, TicketStatus } from '@/types';
 
-const STATUS_VARIANT: Record<TicketStatus, 'success' | 'secondary' | 'warning' | 'outline'> = {
+const STATUS_VARIANT: Record<
+  TicketStatus,
+  'success' | 'secondary' | 'warning' | 'outline'
+> = {
   valid: 'success',
   used: 'secondary',
   refunded: 'warning',
