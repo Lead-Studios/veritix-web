@@ -30,7 +30,10 @@ function secureCookie(): boolean {
 export async function POST(request: NextRequest) {
   const parsed = credentialsSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ message: 'Enter a valid email and password.' }, { status: 400 });
+    return NextResponse.json(
+      { message: 'Enter a valid email and password.' },
+      { status: 400 },
+    );
   }
 
   if (!sessionSigningConfigured()) {
