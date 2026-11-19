@@ -98,7 +98,10 @@ export async function POST(request: NextRequest) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { message: 'Check the event details and try again.', fields: toFieldErrors(parsed.error) },
+      {
+        message: 'Check the event details and try again.',
+        fields: toFieldErrors(parsed.error),
+      },
       { status: 422 },
     );
   }
