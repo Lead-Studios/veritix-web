@@ -44,7 +44,9 @@ export const WithAction: Story = {
   render: () => (
     <Card className="w-full max-w-sm p-6">
       <CardTitle>Organizer profile</CardTitle>
-      <p className="mt-2 text-sm text-muted-foreground">Keep your public details current.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Keep your public details current.
+      </p>
       <Button className="mt-4" size="sm">Update profile</Button>
     </Card>
   ),
