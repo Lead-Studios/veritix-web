@@ -12,7 +12,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function RadioGroup({ disabled = false, invalid = false }: { disabled?: boolean; invalid?: boolean }) {
+function RadioGroup({
+  disabled = false,
+  invalid = false,
+}: {
+  disabled?: boolean;
+  invalid?: boolean;
+}) {
   const [value, setValue] = React.useState('standard');
   return (
     <fieldset className="grid w-64 gap-3">
