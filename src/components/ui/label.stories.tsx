@@ -24,7 +24,9 @@ export const Default: Story = {
 export const Required: Story = {
   render: () => (
     <div className="grid w-64 gap-2">
-      <Label htmlFor="label-required" required>Email address</Label>
+      <Label htmlFor="label-required" required>
+        Email address
+      </Label>
       <Input id="label-required" type="email" required />
     </div>
   ),
@@ -33,7 +35,9 @@ export const Required: Story = {
 export const Disabled: Story = {
   render: () => (
     <div className="grid w-64 gap-2">
-      <Label htmlFor="label-disabled" className="opacity-50">Email address</Label>
+      <Label htmlFor="label-disabled" className="opacity-50">
+        Email address
+      </Label>
       <Input id="label-disabled" type="email" disabled />
     </div>
   ),

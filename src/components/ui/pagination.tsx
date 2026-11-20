@@ -106,9 +106,14 @@ export function Pagination({
             // The current page is conveyed by `aria-current`, not only by the
             // filled-in button style, which a screen reader cannot see.
             aria-current={entry === page ? 'page' : undefined}
-            aria-label={entry === page ? `Page ${entry}, current page` : `Go to page ${entry}`}
+            aria-label={
+              entry === page ? `Page ${entry}, current page` : `Go to page ${entry}`
+            }
             className={cn(
-              buttonVariants({ variant: entry === page ? 'default' : 'outline', size: 'icon' }),
+              buttonVariants({
+                variant: entry === page ? 'default' : 'outline',
+                size: 'icon',
+              }),
               stepClass,
               'text-sm',
             )}
