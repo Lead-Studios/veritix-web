@@ -1,5 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { SESSION_COOKIE_NAME, verifySession } from '@/lib/session';
+import {
+  backendBase as publicBackendBase,
+  trimTrailingSlash,
+} from '@/lib/api/backend-base';
 
 /**
  * Plumbing shared by the API routes this app owns.
@@ -40,14 +44,13 @@ export function unauthorized(): NextResponse {
   });
 }
 
-/** Backend API base. Falls back to the app's own public API URL. */
+/**
+ * Backend API base for server-side requests. `API_BASE_URL` wins when it is set
+ * (even to an empty string); otherwise this is the shared public-URL fallback.
+ */
 function backendBase(): string {
-  const base =
-    process.env.API_BASE_URL ??
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    '';
-  return base.replace(/\/$/, '');
+  const override = process.env.API_BASE_URL;
+  return override === undefined ? publicBackendBase() : trimTrailingSlash(override);
 }
 
 /**
