@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 import { Check, X } from 'lucide-react';
@@ -27,16 +27,16 @@ import {
 } from '@/lib/password';
 
 /**
- * Rotating a password the user thinks is compromised.
+- Rotating a password the user thinks is compromised.
  *
- * The current password is required even though the user is signed in: an
- * unlocked browser should not be enough to take over the account. The new
- * password is checked against the shared policy in `@/lib/password` — the same
- * one registration will use — and the confirmation must match.
+- The current password is required even though the user is signed in: an
+- unlocked browser should not be enough to take over the account. The new
+- password is checked against the shared policy in `@/lib/password` — the same
+- one registration will use — and the confirmation must match.
  *
- * On success the server revokes every *other* session and reports how many. The
- * session that made the change survives, so the user is not signed out of the
- * tab they are looking at; the point is that a stolen cookie stops working.
+- On success the server revokes every *other* session and reports how many. The
+- session that made the change survives, so the user is not signed out of the
+- tab they are looking at; the point is that a stolen cookie stops working.
  */
 
 /** What the settings API returns after a successful change. */
@@ -61,7 +61,11 @@ export function PasswordForm({ className, onChanged }: PasswordFormProps) {
     mode: 'onBlur',
   });
 
-  const newPassword = form.watch('newPassword');
+  const newPassword = useWatch({
+    control: form.control,
+    name: 'newPassword',
+    defaultValue: '',
+  });
   const newPasswordError = passwordPolicyError(newPassword);
 
   const onSubmit = form.handleSubmit(async (values) => {
