@@ -1,6 +1,7 @@
 import type { EventStatus, Paginated, VeritixEvent } from '@/types';
 import type { EventInput } from '@/lib/event-schema';
 import { demoDataEnabled } from '@/lib/demo-data';
+import { backendBase } from '@/lib/api/backend-base';
 
 /**
  * Read model for the events API.
@@ -358,19 +359,6 @@ function newId(prefix: string): string {
 
 function toIso(value: string): string {
   return new Date(value).toISOString();
-}
-
-/**
- * Backend API base, or an empty string when none is configured.
- *
- * Read straight from `process.env` rather than `@/lib/api/server` because this
- * module is reachable from client components, and that helper imports
- * `next/server`.
- */
-function backendBase(): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
-  return base.replace(/\/$/, '');
 }
 
 /**

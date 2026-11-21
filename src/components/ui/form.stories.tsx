@@ -2,7 +2,15 @@ import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
 /**
@@ -24,8 +32,16 @@ type Story = StoryObj<typeof meta>;
 
 type DemoValues = { email: string };
 
-function FormExample({ invalid = false, disabled = false }: { invalid?: boolean; disabled?: boolean }) {
-  const form = useForm<DemoValues>({ defaultValues: { email: invalid ? '' : 'person@example.com' } });
+function FormExample({
+  invalid = false,
+  disabled = false,
+}: {
+  invalid?: boolean;
+  disabled?: boolean;
+}) {
+  const form = useForm<DemoValues>({
+    defaultValues: { email: invalid ? '' : 'person@example.com' },
+  });
   const [showError] = React.useState(invalid);
 
   return (
@@ -40,12 +56,16 @@ function FormExample({ invalid = false, disabled = false }: { invalid?: boolean;
               <FormControl>
                 <Input type="email" autoComplete="email" disabled={disabled} {...field} />
               </FormControl>
-              <FormDescription>We will only use this to send important updates.</FormDescription>
+              <FormDescription>
+                We will only use this to send important updates.
+              </FormDescription>
               {showError ? <FormMessage>Enter a valid email address.</FormMessage> : null}
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={disabled}>Save preferences</Button>
+        <Button type="submit" disabled={disabled}>
+          Save preferences
+        </Button>
       </form>
     </Form>
   );

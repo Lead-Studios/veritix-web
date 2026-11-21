@@ -1,5 +1,6 @@
 import type { Ticket } from '@/types';
 import { demoDataEnabled } from '@/lib/demo-data';
+import { backendBase } from '@/lib/api/backend-base';
 
 /**
  * Ticket records the gate scanner checks against.
@@ -84,19 +85,6 @@ export function redeemTicket(ticketId: string, eventId: string, now = new Date()
   ticket.status = 'used';
   ticket.usedAt = now.toISOString();
   return { ok: true, ticket: { ...ticket } };
-}
-
-/**
- * Backend API base, or an empty string when none is configured.
- *
- * Read straight from `process.env` rather than `@/lib/api/server` because this
- * module is reachable from client components, and that helper imports
- * `next/server`.
- */
-function backendBase(): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
-  return base.replace(/\/$/, '');
 }
 
 /**

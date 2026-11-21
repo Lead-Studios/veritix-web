@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { backendBase } from '@/lib/api/backend-base';
 
 /**
  * Newsletter signup, used by the form in `SiteFooter`.
@@ -16,13 +17,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_EMAIL_LENGTH = 254;
-
-/** Backend API base. Falls back to the app's own public API URL. */
-function backendBase(): string {
-  const base =
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '';
-  return base.replace(/\/$/, '');
-}
 
 function badRequest(message: string) {
   return NextResponse.json({ message }, { status: 400 });
